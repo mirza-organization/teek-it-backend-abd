@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
+
+use App\Mail\StoreRegisterMail;
 use App\Models\Role;
 use App\User;
 use App\Http\Controllers\Controller;
@@ -12,6 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Laracasts\Flash\Flash;
+
 class RegisterController extends Controller
 {
     /*
@@ -47,7 +50,7 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -74,19 +77,19 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \App\User
      */
     protected function register(Request $request)
     {
-       $is_valid =  $this->validator($request->all());
-       if ($is_valid->fails()){
-\flash('Email Already Exists')->error();
-           return Redirect::back()->withInput($request->input())
-               ->withErrors(['name.required', 'Name is required']);
-       }
-$data = $request->toArray();
-//$data['role'] = "seller";
+        $is_valid = $this->validator($request->all());
+        if ($is_valid->fails()) {
+            \flash('Email Already Exists')->error();
+            return Redirect::back()->withInput($request->input())
+                ->withErrors(['name.required', 'Name is required']);
+        }
+        $data = $request->toArray();
+
         $role = Role::where('name', 'seller')->first();
 
         $User = User::create([
@@ -96,7 +99,7 @@ $data = $request->toArray();
             'phone' => $data['phone'],
             'business_name' => $data['company_name'],
             'business_phone' => $data['company_phone'],
-            'is_active' => 1,
+            'is_active' => 0,
 
 
         ]);
@@ -115,17 +118,35 @@ $data = $request->toArray();
 
 <br>
             Here is your account verification link. Click on below link to verify you account. <br><br>
-            <a href="'.$account_verification_link.'">Verify</a> OR Copy This in your Browser
-            '.$account_verification_link.'
+            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+            ' . $account_verification_link . '
 <br><br><br>
         </html>';
 
-//        Mail::send('emails.general', ["html" => $html], function ($message) use ($User) {
-//            $message->to($User->email, $User->name)
-//                ->subject(env('APP_NAME') . ': Account Verification');
-//        });
+        Mail::send('emails.general', ["html" => $html], function ($message) use ($User) {
+            $message->to($User->email, $User->name)
+                ->subject(env('APP_NAME') . ': Account Verification');
+        });
         Flash::message('We have Sent you an Email to Verify your Account');
 //
+
+        $admin_users = Role::with('users')->where('name', 'superadmin')->first();
+        $store_link = $FRONTEND_URL . '/customer/' . $User->id . '/details';
+        foreach ($admin_users->users as $user) {
+            $adminHtml = '<html>
+            Hi, ' . $user->name . '<br><br>
+
+            A new store has been register to your site  ' . env('APP_NAME') . '.
+
+<br>
+            Please click on below link to activate store. <br><br>
+            <a href="' . $store_link . '">Verify</a> OR Copy This in your Browser
+            ' . $store_link . '
+<br><br><br>
+        </html>';
+            if (!empty($adminHtml)) Mail::to($user->email)
+                ->send(new StoreRegisterMail($adminHtml));
+        }
         return Redirect::route('login');
 //return $User;
     }
