@@ -102,6 +102,11 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
         Route::get('', 'PagesController@get_page');
 
     });
+
+
+    Route::group(['prefix'=>'driver'],function (){
+        Route::get('/info/{id}', 'Api\v1\DriverController@info');
+    });
 });
 
 // Superadmin Routes

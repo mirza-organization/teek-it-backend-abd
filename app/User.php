@@ -39,7 +39,8 @@ class User extends Authenticatable implements JWTSubject
         'business_hours',
         'bank_details',
         'user_img',
-        'postal_code'
+        'postal_code',
+        'vehicle_type'
     ];
 
     /**
@@ -119,5 +120,10 @@ class User extends Authenticatable implements JWTSubject
     public function roles()
     {
         return $this->belongsToMany('App\Models\Role', 'role_user');
+    }
+
+    public function seller()
+    {
+        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name','seller');
     }
 }

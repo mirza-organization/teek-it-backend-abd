@@ -11,15 +11,19 @@ class StoreRegisterMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    protected $html;
+    public $html;
+    public $subject;
+
     /**
      * Create a new message instance.
      *
      * @param $html
+     * @param $subject
      */
-    public function __construct($html)
+    public function __construct($html,$subject)
     {
         $this->html = $html;
+        $this->subject = $subject;
     }
 
     /**
@@ -30,6 +34,7 @@ class StoreRegisterMail extends Mailable implements ShouldQueue
     public function build()
     {
         $html = $this->html;
-        return $this->view('emails.general',compact('html'));
+        return $this->view('emails.general',compact('html'))
+            ->subject($this->subject);
     }
 }

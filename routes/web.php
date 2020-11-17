@@ -40,7 +40,7 @@ Route::post('/inventory/update/{product_id}', 'HomeController@inventory_update')
 
 Route::get('/exportProducts', 'ProductsController@exportProducts')->name('exportProducts');
 
-Route::post('/importProducts', 'HomeController@importProducts')->name('importProducts');
+Route::post('/importProducts', 'HomeController@importPordersroducts')->name('importProducts');
 
 Route::get('/orders', 'HomeController@orders')->name('orders');
 Route::get('/orders/ready_state/{order_id}', 'HomeController@change_order_status')->name('accept_order');

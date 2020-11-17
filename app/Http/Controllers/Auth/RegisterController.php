@@ -78,7 +78,7 @@ class RegisterController extends Controller
      * Create a new user instance after a valid registration.
      *
      * @param array $data
-     * @return \App\User
+     * @return User|\Illuminate\Http\RedirectResponse
      */
     protected function register(Request $request)
     {
@@ -123,15 +123,15 @@ class RegisterController extends Controller
 <br><br><br>
         </html>';
 
-        Mail::send('emails.general', ["html" => $html], function ($message) use ($User) {
-            $message->to($User->email, $User->name)
-                ->subject(env('APP_NAME') . ': Account Verification');
-        });
+        $subject = env('APP_NAME') . ': Account Verification';
+        Mail::to($User->email)
+            ->send(new StoreRegisterMail($html, $subject));
+
         Flash::message('We have Sent you an Email to Verify your Account');
-//
 
         $admin_users = Role::with('users')->where('name', 'superadmin')->first();
         $store_link = $FRONTEND_URL . '/customer/' . $User->id . '/details';
+        $admin_subject = env('APP_NAME') . ': New Store Register';
         foreach ($admin_users->users as $user) {
             $adminHtml = '<html>
             Hi, ' . $user->name . '<br><br>
@@ -145,10 +145,9 @@ class RegisterController extends Controller
 <br><br><br>
         </html>';
             if (!empty($adminHtml)) Mail::to($user->email)
-                ->send(new StoreRegisterMail($adminHtml));
+                ->send(new StoreRegisterMail($adminHtml, $admin_subject));
         }
         return Redirect::route('login');
-//return $User;
     }
 //    protected function registered(Request $request, $user)
 //    {
