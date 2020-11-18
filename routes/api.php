@@ -92,6 +92,7 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
         Route::get('update_assign', 'OrdersController@update_assign');
         Route::post('new', 'OrdersController@new');
         Route::post('update', 'OrdersController@updateOrder');
+        Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
     });
     Route::group(['prefix' => 'notifications'], function ($router) {
         Route::get('', 'NotificationsController@get_notifications');
@@ -101,6 +102,11 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
     Route::group(['prefix' => 'page'], function ($router) {
         Route::get('', 'PagesController@get_page');
 
+    });
+
+
+    Route::group(['prefix'=>'driver'],function (){
+        Route::get('/info/{id}', 'Api\v1\DriverController@info');
     });
 });
 
