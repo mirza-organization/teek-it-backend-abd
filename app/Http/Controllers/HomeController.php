@@ -45,9 +45,9 @@ class HomeController extends Controller
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', Auth::id())->sum('order_total');
             $all_orders = Orders::where('seller_id', \auth()->id())
                 ->whereNotNull('order_status')
-                ->orderby(\DB::raw('case when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
+                ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
                  when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
-                ->paginate(5);
+                ->simplePaginate(5);
 //                ->get();
 //            dd($all_orders);
             return view('shopkeeper.dashboard', compact('pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
@@ -392,6 +392,9 @@ class HomeController extends Controller
         $return_arr = [];
         $orders = Orders::query()->where('seller_id', '=', Auth::id())->where('payment_status', '!=', 'hidden')->orderByDesc('id');
         if ($request->search) {
+            $order = Orders::find($request->search);
+            $order->is_viewed = 1;
+            $order->save();
             $orders = $orders->where('id', '=', $request->search);
         }
         $orders = $orders->paginate(10);
@@ -519,7 +522,7 @@ class HomeController extends Controller
 
     public function change_order_status($order_id)
     {
-        Orders::query()->where('id', '=', $order_id)->update(['order_status' => 'ready']);
+        Orders::where('id', '=', $order_id)->update(['order_status' => 'ready', 'is_viewed' => 1]);
         return Redirect::back();
     }
 

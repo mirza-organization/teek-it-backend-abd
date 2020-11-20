@@ -49,7 +49,12 @@ class OrdersController extends Controller
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
         }
-        $orders= $orders->paginate();
+        if (\auth()->user()->vehicle_type == 'bike') {
+            $orders = $orders->whereHas('order_items.products', function ($q) {
+                return $q->where('bike', 1);
+            });
+        }
+        $orders = $orders->paginate();
         $pagination = $orders->toArray();
         if (!empty($orders)) {
             $order_data = [];
@@ -72,7 +77,6 @@ class OrdersController extends Controller
 
             ];
         }
-
         return response()->json($products_data);
     }
 
