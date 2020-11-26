@@ -107,6 +107,7 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
 
     Route::group(['prefix'=>'driver'],function (){
         Route::get('/info/{id}', 'Api\v1\DriverController@info');
+        Route::post('/add-lat-lng', 'Api\v1\DriverController@addLatLng');
     });
 });
 
