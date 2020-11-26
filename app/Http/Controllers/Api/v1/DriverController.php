@@ -28,4 +28,14 @@ class DriverController extends Controller
                 ];
             });
     }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     */
+    public function addLatLng(Request $request)
+    {
+        return User::where('id', auth()->id())
+            ->update(['business_location' => $request->latlng]);
+    }
 }
