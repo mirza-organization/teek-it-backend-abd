@@ -56,6 +56,8 @@ class AuthController extends Controller
             'password' => Hash::make($request->get('password')),
             'business_name' => $request->business_name,
             'business_location' => $request->business_location,
+            'lat' => json_decode($request->business_location)->lat,
+            'lon' => json_decode($request->business_location)->long,
             'seller_id' => $request->seller_id,
             'postal_code' => $request->postal_code,
             'is_active' => $is_active,

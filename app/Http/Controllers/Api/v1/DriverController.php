@@ -35,7 +35,12 @@ class DriverController extends Controller
      */
     public function addLatLng(Request $request)
     {
+        $data = [
+            'business_location' => $request->latlng,
+            'lat' => json_decode($request->latlng)->lat,
+            'lon' => json_decode($request->latlng)->long
+        ];
         return User::where('id', auth()->id())
-            ->update(['business_location' => $request->latlng]);
+            ->update($data);
     }
 }

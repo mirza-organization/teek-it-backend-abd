@@ -354,11 +354,11 @@ class HomeController extends Controller
     {
         $data = $request->Address;
         $location = $request->location_text;
-//        business_hours
-//        print_r($data);die;
         $user = User::find(Auth::id());
         $user->business_location = json_encode($data);
         $user->address_1 = $location;
+        $user->lat = $data['lat'];
+        $user->lon = $data['long'];
         $user->save();
         flash('Location Updated');
         return redirect()->back();

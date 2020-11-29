@@ -40,7 +40,9 @@ class User extends Authenticatable implements JWTSubject
         'bank_details',
         'user_img',
         'postal_code',
-        'vehicle_type'
+        'vehicle_type',
+        'lat',
+        'lon'
     ];
 
     /**

@@ -52,4 +52,9 @@ class Products extends Model
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

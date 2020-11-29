@@ -7,6 +7,7 @@ use App\Orders;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrdersController extends Controller
 {
@@ -45,15 +46,41 @@ class OrdersController extends Controller
 
     public function seller_orders(Request $request)
     {
-        $orders = Orders::query()->select('id');
+        $lat = \auth()->user()->lat;
+        $lng = \auth()->user()->lon;
+        $users = DB::table("users")
+            ->select("users.id", "users.name"
+                , DB::raw("3959 * acos(cos(radians(" . $lat . "))
+        * cos(radians(users.lat))
+        * cos(radians(users.lon) - radians(" . $lng . "))
+        + sin(radians(" . $lat . "))
+        * sin(radians(users.lat))) AS distance"))
+            ->join('role_user', 'users.id', '=', 'role_user.user_id')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('roles.id', 2)
+            ->whereNotNull('lat')
+            ->having('distance','<',6)
+            ->having('distance','>',0.0)
+            ->orderBy('distance')
+            ->get()
+            ->pluck('id')
+            ->toArray();
+        $orders = Orders::query();
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
         }
+        $orders = $orders
+            ->whereHas('order_items.products', function ($q) use ($users) {
+                $q->whereHas('user',function ($w)use ($users){
+                   $w->whereIn('id',$users);
+                });
+            });
         if (\auth()->user()->vehicle_type == 'bike') {
             $orders = $orders->whereHas('order_items.products', function ($q) {
                 return $q->where('bike', 1);
             });
         }
+
         $orders = $orders->paginate();
         $pagination = $orders->toArray();
         if (!empty($orders)) {
