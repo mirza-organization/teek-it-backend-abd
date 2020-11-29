@@ -21,4 +21,9 @@ class Orders extends Model
     {
         return $this->hasManyThrough(OrderItems::class,Products::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 }
