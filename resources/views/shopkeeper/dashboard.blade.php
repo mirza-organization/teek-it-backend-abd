@@ -85,7 +85,7 @@
                     <!-- ./col -->
                 </div>
                 <div class="row">
-                    <div class="col-lg-3 col-md-6">
+                    <div class="col-lg-6 col-md-6">
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">All Orders</h3>

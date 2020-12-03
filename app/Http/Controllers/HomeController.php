@@ -120,9 +120,19 @@ class HomeController extends Controller
     public function inventory_disable($product_id)
     {
         $product = Products::find($product_id);
+        $product->status = 0;
         $product->qty = 0;
         $product->save();
-        flash('SuccessFully Updated')->success();
+        flash('Product Disabled Successfully')->success();
+        return Redirect::back();
+    }
+
+    public function inventory_enable($product_id)
+    {
+        $product = Products::find($product_id);
+        $product->status = 1;
+        $product->save();
+        flash('Product Enabled Successfully')->success();
         return Redirect::back();
     }
 
