@@ -141,13 +141,12 @@ class HomeController extends Controller
         if (Auth::user()->hasRole('seller')) {
             $data = $request->all();
             unset($data['_token']);
-            if (isset($data['color'])) {
-                $keys = $data['color'];
+            if ($request->has('colors')){
+                $keys = $data['colors'];
                 unset($data['color']);
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
-            } else {
-
+            }else{
                 $data['colors'] = null;
             }
 
@@ -254,14 +253,11 @@ class HomeController extends Controller
 
             $data = $request->all();
             unset($data['_token']);
-            if (isset($data['color'])) {
-                $keys = $data['color'];
+            if ($request->has('colors')){
+                $keys = $data['colors'];
                 unset($data['color']);
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
-            } else {
-
-                $data['colors'] = null;
             }
 
             if (!isset($data['van'])) {
@@ -270,7 +266,6 @@ class HomeController extends Controller
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
-//        print_r($data);die;
 
             unset($data['gallery']);
 

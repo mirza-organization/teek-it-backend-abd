@@ -15,8 +15,10 @@
     <link href="{{ asset('res/plugins/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
     <!-- Theme style -->
     <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('res/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    @yield('styles')
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -434,5 +436,7 @@
     }
 
 </script>
+<script src="{{ asset('res/plugins/select2/js/select2.min.js') }}"></script>
+@yield('scripts')
 </body>
 </html>

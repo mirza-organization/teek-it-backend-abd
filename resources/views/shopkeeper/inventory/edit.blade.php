@@ -1,4 +1,11 @@
 @extends('layouts.shopkeeper.app')
+@section('styles')
+    <style>
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #3a4b83;
+        }
+    </style>
+@endsection
 @section('content')
     <div class="content">
 
@@ -137,27 +144,27 @@
                                                 </div>
                                                 <div class="col-md-6 text-left">
 
-                                                    <p for="">Colors: &emsp;
                                                         <?php
-//                                                        echo $inventory->colors;die;
+                                                    $all_colors = [
+                                                        'red' => 'Red',
+                                                        'green' => 'Green',
+                                                        'yellow' => 'Yellow',
+                                                        'blue' => 'Blue'
+                                                    ];
                                                         if ($inventory->colors){
-                                                            $colors1=[
-                                                                'blue'=>false,'green'=>false,'red'=>false,'yellow'=>false
-                                                            ];
-
-                                                            $colors=json_decode($inventory->colors,true);
-                                                            $colors=array_merge($colors1,$colors);
-                                                        }else{
-                                                            $colors=[
-                                                                'blue'=>false,'green'=>false,'red'=>false,'yellow'=>false
-                                                            ];
+                                                            $colors = json_decode($inventory->colors,true);
+                                                            $colors = array_keys($colors);
                                                         }
                                                         ?>
-                                                        <input <?php if ($colors['blue']){ echo "checked";} ?> type="checkbox" name="color[]" value="blue" > Blue
-                                                         <input <?php if ($colors['green']){ echo "checked";} ?> type="checkbox" name="color[]" value="green" > Green
-                                                         <input <?php if ($colors['red']){ echo "checked";} ?> type="checkbox" name="color[]" value="Red" > Red
-                                                         <input <?php if ($colors['yellow']){ echo "checked";} ?> type="checkbox" name="color[]" value="yellow" > Yellow
-                                                    </p>
+                                                            <select class="colors form-control" name="colors[]" multiple="multiple">
+                                                                @foreach($all_colors as $key=>$color)
+                                                                    <option value="{{$key}}"
+                                                                            @isset($colors)
+                                                                            @if(in_array($key,$colors))selected @endif
+                                                                        @endif
+                                                                    >{{$color}}</option>
+                                                                @endforeach
+                                                            </select>
                                                     <div class="row">
 
                                                         <div class="col-md-12 text-left">
@@ -225,4 +232,14 @@
             padding: 30px 50px!important;
         }
     </style>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $('.colors').select2({
+                placeholder: "Select Colors",
+                allowClear: true
+            });
+        });
+    </script>
 @endsection

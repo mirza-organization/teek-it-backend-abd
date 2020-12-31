@@ -29,4 +29,9 @@ class Categories extends Model
 //            'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     }
+
+    public function products()
+    {
+        return $this->hasMany(Products::class,'category_id','id');
+    }
 }
