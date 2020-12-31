@@ -180,11 +180,14 @@ class CategoriesController extends Controller
     public function all()
     {
         $storeId = \request()->store_id;
-        $categories = Categories::whereHas('products', function ($q) use ($storeId) {
+        $categories = Categories::query();
+        if (\request()->has('store_id')) {
+            $categories = $categories->whereHas('products', function ($q) use ($storeId) {
                 $q->where('status', '=', 1)
                     ->where('user_id', '=', $storeId);
-        })
-            ->get();
+            });
+        }
+        $categories = $categories->get();
         if (!empty($categories)) {
             $categories_data = [];
             foreach ($categories as $category) {
