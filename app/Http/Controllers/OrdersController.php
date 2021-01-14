@@ -17,7 +17,7 @@ class OrdersController extends Controller
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
         }
-        $orders = $orders->paginate();
+        $orders = $orders->paginate(100);
         $pagination = $orders->toArray();
         if (!empty($orders)) {
             $order_data = [];
@@ -308,8 +308,10 @@ class OrdersController extends Controller
     public function get_single_order($order_id)
     {
         $temp = [];
-        $temp['order'] = Orders::find($order_id);
+        $order = Orders::find($order_id);
+        $temp['order'] = $order;
         $temp['order_items'] = OrderItems::query()->where('order_id', '=', $order_id)->get();
+        $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
 
