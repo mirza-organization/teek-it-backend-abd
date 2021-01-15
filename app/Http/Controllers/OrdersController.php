@@ -68,19 +68,18 @@ class OrdersController extends Controller
         $orders = Orders::query();
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
-        }
-        $orders = $orders
-            ->whereHas('order_items.products', function ($q) use ($users) {
-                $q->whereHas('user',function ($w)use ($users){
-                   $w->whereIn('id',$users);
+            $orders = $orders
+                ->whereHas('order_items.products', function ($q) use ($users) {
+                    $q->whereHas('user', function ($w) use ($users) {
+                        $w->whereIn('id', $users);
+                    });
                 });
-            });
-        if (\auth()->user()->vehicle_type == 'bike') {
-            $orders = $orders->whereHas('order_items.products', function ($q) {
-                return $q->where('bike', 1);
-            });
+            if (\auth()->user()->vehicle_type == 'bike') {
+                $orders = $orders->whereHas('order_items.products', function ($q) {
+                    return $q->where('bike', 1);
+                });
+            }
         }
-
         $orders = $orders->paginate();
         $pagination = $orders->toArray();
         if (!empty($orders)) {
