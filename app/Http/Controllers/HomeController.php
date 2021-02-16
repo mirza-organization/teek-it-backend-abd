@@ -821,10 +821,6 @@ class HomeController extends Controller
 
     public function withdrawals()
     {
-        if (Auth::user()->hasRole('patient')) {
-//            $transactions = (new TransactionHistoryController())->get_user_transactions(\auth()->id());
-//            return view('layouts.transactions', compact('transactions'));
-        }
         if (Auth::user()->hasRole('seller')) {
             $user_id = Auth::id();
             $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
@@ -833,19 +829,30 @@ class HomeController extends Controller
         }
         if (Auth::user()->hasRole('superadmin')) {
             $user_id = Auth::id();
-            $return_data = WithdrawalRequests::query()->get();
+            $return_data = WithdrawalRequests::has('user.seller')->get();
             $transactions = $return_data;
             return view('admin.withdrawal', compact('transactions'));
         }
     }
 
+    public function withdrawalDrivers()
+    {
+        if (Auth::user()->hasRole('seller')) {
+            $user_id = Auth::id();
+            $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
+            $transactions = $return_data;
+            return view('shopkeeper.withdrawal', compact('transactions'));
+        }
+        if (Auth::user()->hasRole('superadmin')) {
+            $user_id = Auth::id();
+            $return_data = WithdrawalRequests::has('user.driver')->get();
+            $transactions = $return_data;
+            return view('admin.withdrawal-drivers', compact('transactions'));
+        }
+    }
 
     public function withdrawals_request(Request $request)
     {
-        if (Auth::user()->hasRole('patient')) {
-//            $transactions = (new TransactionHistoryController())->get_user_transactions(\auth()->id());
-//            return view('layouts.transactions', compact('transactions'));
-        }
         if (Auth::user()->hasRole('seller')) {
             if (auth()->user()->pending_withdraw < $request->amount) {
                 flash('Please Choose Correct Value')->error();

@@ -48,40 +48,75 @@ class OrdersController extends Controller
     {
         $lat = \auth()->user()->lat;
         $lng = \auth()->user()->lon;
-        $users = DB::table("users")
-            ->select("users.id", "users.name"
-                , DB::raw("3959 * acos(cos(radians(" . $lat . "))
+        $assignedOrders = Orders::where('delivery_boy_id',\auth()->id())->where('delivery_status','assigned')->get();
+        if (count($assignedOrders)==0){
+            $users = DB::table("users")
+                ->select("users.id", "users.name"
+                    , DB::raw("3959 * acos(cos(radians(" . $lat . "))
         * cos(radians(users.lat))
         * cos(radians(users.lon) - radians(" . $lng . "))
         + sin(radians(" . $lat . "))
         * sin(radians(users.lat))) AS distance"))
-            ->join('role_user', 'users.id', '=', 'role_user.user_id')
-            ->join('roles', 'roles.id', '=', 'role_user.role_id')
-            ->where('roles.id', 2)
-            ->whereNotNull('lat')
-            ->having('distance','<',6)
-            ->having('distance','>',0.0)
-            ->orderBy('distance')
-            ->get()
-            ->pluck('id')
-            ->toArray();
-        $orders = Orders::query();
-        if (!empty($request->order_status)) {
-            $orders = $orders->where('order_status', '=', $request->order_status);
-            $orders = $orders
-                ->whereHas('order_items.products', function ($q) use ($users) {
-                    $q->whereHas('user', function ($w) use ($users) {
+                ->join('role_user', 'users.id', '=', 'role_user.user_id')
+                ->join('roles', 'roles.id', '=', 'role_user.role_id')
+                ->where('roles.id', 2)
+                ->whereNotNull('lat')
+                ->having('distance','<',6)
+                ->having('distance','>',0.0)
+                ->orderBy('distance')
+                ->get()
+                ->pluck('id')
+                ->toArray();
+            $orders = Orders::query();
+            if (!empty($request->order_status)) {
+                $orders = $orders->where('order_status', '=', $request->order_status);
+                $orders = $orders
+                    ->whereHas('order_items.products', function ($q) use ($users) {
+                        $q->whereHas('user', function ($w) use ($users) {
                         $w->whereIn('id', $users);
+                        });
                     });
-                });
+                if (\auth()->user()->vehicle_type == 'bike') {
+                    $orders = $orders->whereHas('order_items.products', function ($q) {
+                        return $q->where('bike', 1);
+                    });
+                }
+            }
+            $orders = $orders->paginate();
+            $pagination = $orders->toArray();
+        }else if (count($assignedOrders) == 1){
+            $assignedOrders = $assignedOrders[0];
+            $nearbyOrders = DB::table("orders")
+                ->select("orders.id"
+                    , DB::raw("3959 * acos(cos(radians(" .$assignedOrders->lat . "))
+        * cos(radians(orders.lat))
+        * cos(radians(orders.lng) - radians(" . $assignedOrders->lng . "))
+        + sin(radians(" . $assignedOrders->lat . "))
+        * sin(radians(orders.lat))) AS distance"))
+                ->where(function ($q) {
+                    $q->where('order_status', 'pending')
+                        ->orWhere('order_status', 'ready');
+                })
+                ->whereNotNull('lat')
+                ->having('distance', '<', 2)
+                ->having('distance', '>', 0.0)
+                ->orderBy('distance')
+                ->get()
+                ->pluck('id')
+                ->toArray();
+            $orders = Orders::query();
+            $orders = $orders->where('order_status', '=', $request->order_status);
+            $orders = $orders->whereIn('id',$nearbyOrders);
             if (\auth()->user()->vehicle_type == 'bike') {
                 $orders = $orders->whereHas('order_items.products', function ($q) {
                     return $q->where('bike', 1);
                 });
             }
+            $orders = $orders->paginate();
+            $pagination = $orders->toArray();
+        }else{
+            $orders = array();
         }
-        $orders = $orders->paginate();
-        $pagination = $orders->toArray();
         if (!empty($orders)) {
             $order_data = [];
             foreach ($orders as $order) {
@@ -177,6 +212,7 @@ class OrdersController extends Controller
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
+                $this->calculateDriverFair($order,$user);
             }
 
             $order->driver_charges = $request->driver_charges;
@@ -271,6 +307,7 @@ class OrdersController extends Controller
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
+//                $this->calculateDriverFair($order, $user);
             }
             $order->lat = $request->lat;
             $order->lng = $request->lng;
@@ -314,5 +351,47 @@ class OrdersController extends Controller
         return $temp;
     }
 
+    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2, $unit = 'miles') {
+        $theta = $longitude1 - $longitude2;
+        $distance = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta)));
+        $distance = acos($distance);
+        $distance = rad2deg($distance);
+        $distance = $distance * 60 * 1.1515;
+        switch($unit) {
+            case 'miles':
+                break;
+            case 'kilometers' :
+                $distance = $distance * 1.609344;
+        }
+        return (round($distance,2));
+    }
+
+    private function calculateDriverFair($order, $user)
+    {
+        $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)->where('order_status', 'onTheWay')->get();
+        if (count($childOrders) > 0) {
+            foreach ($childOrders as $childOrder) {
+                $childOrder->update(['parent_id' => $order->id]);
+            }
+        }
+        $driver = User::find($order->delivery_boy_id);
+        $driver_money = $driver->pending_withdraw;
+        if (is_null($order->parent_id)) {
+            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $user->lat, $user->lon);
+            $totalFair = ($distance * 1.50) + 1.10 + 1.50;
+            $driver->pending_withdraw = ($totalFair - 3.50) + $driver_money;
+            $driver->save();
+            $order->driver_charges = $totalFair - 3.50;
+            $order->driver_traveled_km = (round(($distance * 1.609344), 2));
+            $order->save();
+        } else {
+            $oldOrder = Orders::find($order->parent_id);
+            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
+            $pickup = $oldOrder->seller_id == $order->seller_id ? 0.0 : 1.50;
+            $totalFair = ($distance * 1.50) + 1.10 + $pickup;
+            $driver->pending_withdraw = ($totalFair - 3.50) + $driver_money;
+            $driver->save();
+        }
+    }
 
 }

@@ -270,7 +270,6 @@ $images=$request->file('images');
         if (!empty($products)){
             $products_data=[];
             foreach ($products as $product) {
-//print_r($product);
                 $products_data[]=$this->get_product_info($product->id);
             }
             unset($pagination['data']);

@@ -128,4 +128,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany('App\Models\Role', 'role_user')->where('name','seller');
     }
+
+    public function driver()
+    {
+        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name','delivery_boy');
+    }
 }
