@@ -108,9 +108,10 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
     Route::group(['prefix'=>'driver'],function (){
         Route::get('/info/{id}', 'Api\v1\DriverController@info');
         Route::post('/add-lat-lng', 'Api\v1\DriverController@addLatLng');
-        Route::get('/withdrawal-balance', 'Api\v1\DriverController@getWithdrawalBalance');
-        Route::get('/withdrawal-balance/{amount}', 'Api\v1\DriverController@submitWithdrawal');
+        Route::get('/withdrawable-balance', 'Api\v1\DriverController@getWithdrawalBalance');
+        Route::get('/request-withdrawal-balance', 'Api\v1\DriverController@submitWithdrawal');
         Route::post('/bank-details', 'Api\v1\DriverController@submitBankAccountDetails');
+        Route::get('/all-withdrawals', 'Api\v1\DriverController@driverAllWithdrawalRequests');
     });
 });
 

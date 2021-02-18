@@ -40,6 +40,7 @@
                                     @foreach($transactions as $transaction)
                                         <?php
                                         $total = 1;
+
                                         ?>
                                         <tr>
                                             <td>{{$loop->iteration}}</td>
