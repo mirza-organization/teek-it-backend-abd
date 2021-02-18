@@ -844,9 +844,7 @@ class HomeController extends Controller
             return view('shopkeeper.withdrawal', compact('transactions'));
         }
         if (Auth::user()->hasRole('superadmin')) {
-            $user_id = Auth::id();
-            $return_data = WithdrawalRequests::has('user.driver')->get();
-            $transactions = $return_data;
+            $transactions = WithdrawalRequests::has('user.driver')->get();
             return view('admin.withdrawal-drivers', compact('transactions'));
         }
     }

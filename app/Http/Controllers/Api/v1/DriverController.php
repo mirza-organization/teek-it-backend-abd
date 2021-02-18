@@ -47,23 +47,26 @@ class DriverController extends Controller
             ->update($data);
     }
 
-    public function submitWithdrawal($amount)
+    public function submitWithdrawal(Request $request)
     {
         if (!auth()->user()->has('driver')){
             abort(404);
-        }
-        if (auth()->user()->pending_withdraw < $amount) {
-            return response()->json(['message'=>'Your request to withdrawal amount is not correct.'],403);
         }
         $user = User::find(\auth()->id());
         if (empty($user->bank_details)) {
             return response()->json(['message'=>'Please update your bank account info.'],403);
         }
-        $user->pending_withdraw = $user->pending_withdraw - $amount;
-        $user->total_withdraw = $user->total_withdraw + $amount;
+        if ($request->has('amount')) {
+            if ($user->pending_withdraw < $request->amount) {
+                return response()->json(['message' => 'Requested value exceeds your current balance.'], 403);
+            }
+        }
+        $withdrawal = $request->has('amount') ? $request->amount : $user->pending_withdraw;
+        $user->pending_withdraw = $user->pending_withdraw - $withdrawal;
+        $user->total_withdraw = $user->total_withdraw + $withdrawal;
         $with = new WithdrawalRequests();
         $with->user_id = \auth()->id();
-        $with->amount = $amount;
+        $with->amount = $withdrawal;
         $with->status = 'Pending';
         $with->bank_detail = $user->bank_details;
         $with->save();
@@ -76,13 +79,23 @@ class DriverController extends Controller
         if (!auth()->user()->has('driver')){
             abort(404);
         }
-        return response()->json(['amount'=>auth()->user()->pending_withdraw*0.9],200);
+        return response()->json(['balance'=>auth()->user()->pending_withdraw*0.9],200);
     }
 
     public function submitBankAccountDetails(Request $request)
     {
+        $validator = \Validator::make($request->all(), [
+            'branch_code' => 'required',
+            'bank_name' => 'required',
+            'account_number' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $responseArr['message'] = $validator->errors();;
+            return response()->json($responseArr, 422);
+        }
         $data = ['branch' => $request->branch_code, 'bank_name' => $request->bank_name, 'account_number' => $request->account_number];
-        auth()->user()->update(['bank_detailes' => json_encode($data)]);
+        $bankDetails = [1 => $data];
+        auth()->user()->update(['bank_details' => json_encode($bankDetails)]);
         return response()->json(['message' => 'Bank Account details are successfully updated.'], 200);
     }
 
@@ -93,12 +106,6 @@ class DriverController extends Controller
         }
         $user_id = Auth::id();
         $withdrawals = WithdrawalRequests::where('user_id', '=', $user_id)->get();
-        $data = [
-            'amount'=>$withdrawals->amount,
-            'status'=>$withdrawals->status,
-            'transaction_id'=>$withdrawals->transaction_id,
-            'date_time' => $withdrawals->created_at
-        ];
-        return response()->json(['data' => json_encode($data)], 200);
+        return response()->json(['data' => $withdrawals->toArray()], 200);
     }
 }
