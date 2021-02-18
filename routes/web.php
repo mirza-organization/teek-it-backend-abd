@@ -50,12 +50,14 @@ Route::get('/orders/ready_state/{order_id}', 'HomeController@change_order_status
 
 
 Route::get('/inventory/disable/{product_id}', 'HomeController@inventory_disable')->name('inventory_disable');
+Route::get('/inventory/enable/{product_id}', 'HomeController@inventory_enable')->name('inventory_enable');
 
 
 
 
 
 Route::get('/withdrawals', 'HomeController@withdrawals')->name('withdrawals');
+Route::get('/withdrawals-drivers', 'HomeController@withdrawalDrivers')->name('withdrawals.drivers');
 Route::post('/withdrawals', 'HomeController@withdrawals_request')->name('withdraw_request');
 Route::get('/my_order_count', 'HomeController@my_order_count')->name('my_order_count');
 

@@ -7,7 +7,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-12">
-                        <h1 class="m-0 text-dark text-center">Sellers Withdrawal Requests</h1>
+                        <h1 class="m-0 text-dark text-center">Drivers Withdrawal Requests</h1>
                     </div><!-- /.col -->
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -26,7 +26,7 @@
                                     <thead>
                                     <tr class="bg-primary text-white">
                                         <th scope="col">#</th>
-                                        <th scope="col">Seller</th>
+                                        <th scope="col">User</th>
                                         <th scope="col">Amount</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Transaction ID</th>

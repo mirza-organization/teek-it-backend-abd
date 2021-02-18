@@ -120,9 +120,19 @@ class HomeController extends Controller
     public function inventory_disable($product_id)
     {
         $product = Products::find($product_id);
+        $product->status = 0;
         $product->qty = 0;
         $product->save();
-        flash('SuccessFully Updated')->success();
+        flash('Product Disabled Successfully')->success();
+        return Redirect::back();
+    }
+
+    public function inventory_enable($product_id)
+    {
+        $product = Products::find($product_id);
+        $product->status = 1;
+        $product->save();
+        flash('Product Enabled Successfully')->success();
         return Redirect::back();
     }
 
@@ -131,13 +141,12 @@ class HomeController extends Controller
         if (Auth::user()->hasRole('seller')) {
             $data = $request->all();
             unset($data['_token']);
-            if (isset($data['color'])) {
-                $keys = $data['color'];
+            if ($request->has('colors')){
+                $keys = $data['colors'];
                 unset($data['color']);
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
-            } else {
-
+            }else{
                 $data['colors'] = null;
             }
 
@@ -244,14 +253,11 @@ class HomeController extends Controller
 
             $data = $request->all();
             unset($data['_token']);
-            if (isset($data['color'])) {
-                $keys = $data['color'];
+            if ($request->has('colors')){
+                $keys = $data['colors'];
                 unset($data['color']);
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
-            } else {
-
-                $data['colors'] = null;
             }
 
             if (!isset($data['van'])) {
@@ -260,7 +266,6 @@ class HomeController extends Controller
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
-//        print_r($data);die;
 
             unset($data['gallery']);
 
@@ -816,10 +821,6 @@ class HomeController extends Controller
 
     public function withdrawals()
     {
-        if (Auth::user()->hasRole('patient')) {
-//            $transactions = (new TransactionHistoryController())->get_user_transactions(\auth()->id());
-//            return view('layouts.transactions', compact('transactions'));
-        }
         if (Auth::user()->hasRole('seller')) {
             $user_id = Auth::id();
             $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
@@ -828,19 +829,30 @@ class HomeController extends Controller
         }
         if (Auth::user()->hasRole('superadmin')) {
             $user_id = Auth::id();
-            $return_data = WithdrawalRequests::query()->get();
+            $return_data = WithdrawalRequests::has('user.seller')->get();
             $transactions = $return_data;
             return view('admin.withdrawal', compact('transactions'));
         }
     }
 
+    public function withdrawalDrivers()
+    {
+        if (Auth::user()->hasRole('seller')) {
+            $user_id = Auth::id();
+            $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
+            $transactions = $return_data;
+            return view('shopkeeper.withdrawal', compact('transactions'));
+        }
+        if (Auth::user()->hasRole('superadmin')) {
+            $user_id = Auth::id();
+            $return_data = WithdrawalRequests::has('user.driver')->get();
+            $transactions = $return_data;
+            return view('admin.withdrawal-drivers', compact('transactions'));
+        }
+    }
 
     public function withdrawals_request(Request $request)
     {
-        if (Auth::user()->hasRole('patient')) {
-//            $transactions = (new TransactionHistoryController())->get_user_transactions(\auth()->id());
-//            return view('layouts.transactions', compact('transactions'));
-        }
         if (Auth::user()->hasRole('seller')) {
             if (auth()->user()->pending_withdraw < $request->amount) {
                 flash('Please Choose Correct Value')->error();
