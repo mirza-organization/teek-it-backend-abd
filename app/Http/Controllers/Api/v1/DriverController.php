@@ -106,6 +106,18 @@ class DriverController extends Controller
         }
         $user_id = Auth::id();
         $withdrawals = WithdrawalRequests::where('user_id', '=', $user_id)->get();
-        return response()->json(['data' => $withdrawals->toArray()], 200);
+        $data = array();
+        foreach ($withdrawals as $key => $withdrawal) {
+            $data[$key]['id']=$withdrawal->id;
+            $data[$key]['user_id']=$withdrawal->user_id;
+            $data[$key]['amount']=$withdrawal->amount;
+            $data[$key]['status']=$withdrawal->status;
+            $data[$key]['bank_detail']=json_decode($withdrawal->bank_detail);
+            $data[$key]['created_at']=$withdrawal->created_at;
+            $data[$key]['updated_at']=$withdrawal->updated_at;
+            $data[$key]['transaction_id']=$withdrawal->transaction_id;
+
+        }
+        return response()->json(['data' => $data], 200);
     }
 }
