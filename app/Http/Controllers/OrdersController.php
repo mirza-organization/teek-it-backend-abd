@@ -82,7 +82,7 @@ class OrdersController extends Controller
                     });
                 }
             }
-            $orders = $orders->paginate();
+            $orders = $orders->orderByDesc('created_at')->paginate();
             $pagination = $orders->toArray();
         }else if (count($assignedOrders) == 1){
             $assignedOrders = $assignedOrders[0];
@@ -112,7 +112,7 @@ class OrdersController extends Controller
                     return $q->where('bike', 1);
                 });
             }
-            $orders = $orders->paginate();
+            $orders = $orders->orderByDesc('created_at')->paginate();
             $pagination = $orders->toArray();
         }else{
             $orders = array();
