@@ -229,7 +229,7 @@ class OrdersController extends Controller
             Log::info('request data and then if condition');
             Log::info($request->all());
             Log::info(($request->order_status == 'complete' && $request->delivery_status == 'delivered'));
-            if ($request->order_status == 'complete' && $request->delivery_status == 'delivered') {
+            if ($request->order_status == 'delivered' && $request->delivery_status == 'complete') {
                 Log::info('Pass the if condition of complete and delivered');
                 $user = User::find($order->seller_id);
                 $user_money = $user->pending_withdraw;
