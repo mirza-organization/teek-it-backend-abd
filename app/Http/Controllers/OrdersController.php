@@ -73,7 +73,7 @@ class OrdersController extends Controller
                     ->orderBy('distance')
                     ->get()
                     ->pluck('id')
-                    ->toArray();dd($users);
+                    ->toArray();
                 $orders = Orders::query();
                 if (!empty($request->order_status)) {
                     $orders = $orders->where('order_status', '=', $request->order_status);
@@ -110,7 +110,7 @@ class OrdersController extends Controller
                     ->orderBy('distance')
                     ->get()
                     ->pluck('id')
-                    ->toArray();dd($nearbyOrders);
+                    ->toArray();
                 $orders = Orders::query();
                 $orders = $orders->where('order_status', '=', $request->order_status)
                     ->where('delivery_boy_id', \auth()->id());
