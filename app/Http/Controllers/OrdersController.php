@@ -105,13 +105,16 @@ class OrdersController extends Controller
                 ->pluck('id')
                 ->toArray();
             $orders = Orders::query();
-            $orders = $orders->where('order_status', '=', $request->order_status);
-            $orders = $orders->whereIn('id',$nearbyOrders);
-            if (\auth()->user()->vehicle_type == 'bike') {
-                $orders = $orders->whereHas('order_items.products', function ($q) {
-                    return $q->where('bike', 1);
-                });
-            }
+            $orders = $orders->where('order_status', '=', $request->order_status)
+                ->where('delivery_boy_id',\auth()->id());
+            $orders = $orders->orWhere(function ($q) use ($nearbyOrders) {
+                $q->whereIn('id', $nearbyOrders);
+                if (\auth()->user()->vehicle_type == 'bike') {
+                    $q->whereHas('order_items.products', function ($query) {
+                        return $query->where('bike', 1);
+                    });
+                }
+            });
             $orders = $orders->orderByDesc('created_at')->paginate();
             $pagination = $orders->toArray();
         }else{

@@ -113,7 +113,7 @@
                                                       <div class="row">
 
                                                           @foreach(json_decode($user) as $key=>$u)
-                                                              @if(!empty($u) && !in_array($key,$fields))
+                                                              @if(!is_null($u) && !in_array($key,$fields))
 <?php
 
                                                                   if ($key=='f_name'){
@@ -127,7 +127,7 @@
                                                                   <div class="col-md-6">
                                                                       <div class="form-group">
                                                                           <label for="" class="text-capitalize">{{str_replace('_',' ',$key)}}</label>
-                                                                          <input type="text" disabled class="form-control" value="{{$u}}">
+                                                                          <input type="text" disabled class="form-control @if($key=='application_fee') application-fee-input-field @endif" value="{{$u}}">
                                                                       </div>
                                                                   </div>
                                                               @endif
@@ -202,7 +202,7 @@
                                               ?>
 
                                                   @foreach(json_decode($user) as $key=>$u)
-                                                      @if(!empty($u) && !in_array($key,$fields))
+                                                      @if(!is_null($u) && !in_array($key,$fields))
 <?php
                                                           if ($key=='f_name'){
                                                               $key = "First_name";
@@ -211,7 +211,21 @@
                                                               $key = "Last_name";
                                                           }
                                                           ?>
-                                                          <h5 class="text-primary font-weight-bold text-capitalize">{{str_replace('_',' ',$key)}}: <span class="font-weight-normal ">{{$u}}</span></h5>
+                                                          <h5 class="text-primary font-weight-bold text-capitalize">{{str_replace('_',' ',$key)}}:
+                                                              <span class="font-weight-normal ">
+                                                                  @if($key!='application_fee')
+                                                                      {{$u}}
+                                                                  @elseif($user->roles[0]->name=='seller')
+                                                                      <input data-id="{{json_decode($user)->id}}"
+                                                                             id="application_fee" type="number" name="application_fee" value="{{$u}}" step="0.01">
+                                                                  @else
+                                                                      {{$u}}
+                                                                  @endif
+                                                              </span>
+                                                              @if($key=='application_fee' && $user->roles[0]->name=='seller')
+                                                                <button class="btn btn-primary" id="application_fee_update">Update</button>
+                                                              @endif
+                                                          </h5>
                                                       @endif
                                                   @endforeach
                                           </div>
@@ -299,4 +313,23 @@
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->
+@endsection
+
+@section('scripts')
+    <script>
+        $('#application_fee_update').click(function (){
+            event.preventDefault();
+            var id = $('#application_fee').attr('data-id');
+            var val = $('#application_fee').val();
+            var url = "/store/application-fee/"+id+"/"+val;
+            $.ajax({
+                url: url,
+                type: "GET",
+                'success': function (response) {
+                    $('.application-fee-input-field').val(val);
+                    swal({title: "Application fee is successfully updated.", icon: "success"})
+                }
+            });
+        })
+    </script>
 @endsection

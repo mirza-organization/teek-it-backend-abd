@@ -13,7 +13,7 @@ use DataTables;
 use Carbon\Carbon;
 
 class UserAndRoleController extends Controller
-{    
+{
 
     // Users
     public function getUsers()
@@ -21,18 +21,18 @@ class UserAndRoleController extends Controller
         $users = User::whereDoesntHave('roles')->orwhereHas('roles', function ($query) {
             $query->whereNotIn('name', ['user']);
         })->get();
-       
+
        $response = array('status' => true,'message'=>"users retrieved.",'data'=>$users);
             return response()->json($response, 200);
     }
-    
+
     // Users
     public function getDTUsers()
     {
        $users = User::whereDoesntHave('roles')->orwhereHas('roles', function ($query) {
             $query->whereNotIn('name', ['user']);
         })->get();
-       
+
        return DataTables::of($users)->setRowId('id')->make(true);
     }
 
@@ -59,8 +59,8 @@ class UserAndRoleController extends Controller
         return response()->json($response, 200);
     }
 
-    public function updateUser(Request $request){        
-        
+    public function updateUser(Request $request){
+
         $exist=User::whereNotIn('id',[$request->id])->where('email',[$request->email])->first();
 
         if($exist){
@@ -83,16 +83,16 @@ class UserAndRoleController extends Controller
             $User->gender=$request->gender;
             $User->dob=$request->dob;
             $User->save();
-            $response = array('status' => true,'message'=>'User updated successfully.','data'=>$User);             
+            $response = array('status' => true,'message'=>'User updated successfully.','data'=>$User);
             return response()->json($response, 200);
         }else{
             $response = array('status' => false,'message'=>'User not found.');
             return response()->json($response, 404);
-            }            
+            }
     }
 
     public function getUser($id){
-        $User= User::find($id);  
+        $User= User::find($id);
         if($User){
             $response = array('status' => true,'message'=>"user retrieved.",'data'=>$User);
             return response()->json($response, 200);
@@ -104,12 +104,12 @@ class UserAndRoleController extends Controller
     }
 
     public function deleteUser($id){
-        $User= User::find($id);         
-        
+        $User= User::find($id);
+
          if($User){
             $User->roles()->detach();
-            $User->delete(); 
-            $response = array('status' => true,'message'=>'User successfully deleted.');             
+            $User->delete();
+            $response = array('status' => true,'message'=>'User successfully deleted.');
             return response()->json($response, 200);
         }else{
             $response = array('status' => false,'message'=>'User not found','data' => array());
@@ -117,10 +117,10 @@ class UserAndRoleController extends Controller
         }
     }
 
-    public function resetPassword(Request $request){   
+    public function resetPassword(Request $request){
         $default_password=123456;
         $default_password_ob=Setting::where('key','default_password')->first();
-        
+
         if($default_password_ob){
             $default_password=$default_password_ob->value;
         }
@@ -129,13 +129,13 @@ class UserAndRoleController extends Controller
         if($User){
             $User->password=Hash::make($default_password);
             $User->save();
-            $response = array('status' => true,'message'=>'User password reseted successfully.');             
+            $response = array('status' => true,'message'=>'User password reseted successfully.');
             return response()->json($response, 200);
         }
         else{
-            $response = array('status' => false,'message'=>'User not found.','data' => array());             
+            $response = array('status' => false,'message'=>'User not found.','data' => array());
             return response()->json($response, 404);
-        }            
+        }
     }
 
     // User Role Assign
@@ -144,21 +144,21 @@ class UserAndRoleController extends Controller
         if($user){
             $user->roles()->sync($request->role_id);
             $response = array('status' => true,'message'=>'Role assigned successfully.');
-            return response()->json($response, 200);    
+            return response()->json($response, 200);
         }else{
-            $response = array('status' => false,'message'=>'User not found.','data' => array());             
+            $response = array('status' => false,'message'=>'User not found.','data' => array());
             return response()->json($response, 404);
         }
-        
+
     }
 
     public function getUserRole($id){
-        $User= User::find($id);  
+        $User= User::find($id);
          if($User){
-            $response = array('status' => true,'message'=>'Role retrieved.','data'=>$User->roles[0]);             
+            $response = array('status' => true,'message'=>'Role retrieved.','data'=>$User->roles[0]);
             return response()->json($response, 200);
         }else{
-            $response = array('status' => false,'message'=>'User not found.','data' => array());             
+            $response = array('status' => false,'message'=>'User not found.','data' => array());
             return response()->json($response, 404);
         }
     }
@@ -173,14 +173,14 @@ class UserAndRoleController extends Controller
     public function getRoles()
     {
         $Roles = Role::all();
-       
+
         $response = array('status' => true,'message'=>"roles retrieved.",'data'=>$Roles);
             return response()->json($response, 200);
     }
 
     public function createRole(Request $request){
         $validate=Role::validator($request);
-        if($validate->fails()){            
+        if($validate->fails()){
              $response = array('status' => false,'message'=>"Validation error.",'data'=>$validate->messages());
             return response()->json($messages, 400);
         }
@@ -194,8 +194,8 @@ class UserAndRoleController extends Controller
         $response = array('status' => true,'message'=>'Role created successfully.','data'=>$Role);return response()->json($response, 200);
     }
 
-    public function updateRole(Request $request){        
-        
+    public function updateRole(Request $request){
+
         $exist=Role::whereNotIn('id',[$request->id])->where('name',[$request->name])->first();
 
         if($exist){
@@ -216,18 +216,18 @@ class UserAndRoleController extends Controller
             $Role->display_name=$request->display_name;
             $Role->description=$request->description;
             $Role->save();
-            $response = array('status' => true,'message'=>'Role updated successfully.','data'=>$Role);             
+            $response = array('status' => true,'message'=>'Role updated successfully.','data'=>$Role);
             return response()->json($response, 200);
         }else{
-            $response = array('status' => false,'message'=>'role not found.');             
+            $response = array('status' => false,'message'=>'role not found.');
             return response()->json($response, 404);
-        }            
+        }
     }
 
     public function getRole($id){
-        $Role= Role::find($id);  
+        $Role= Role::find($id);
          if($Role){
-            $response = array('status' => 'success','data'=>$Role);             
+            $response = array('status' => 'success','data'=>$Role);
             return response()->json($response, 200);
         }else{
             $meta = array('status' => 'error','message'=>'role not found.');
@@ -236,10 +236,10 @@ class UserAndRoleController extends Controller
         }
     }
 
-    public function deleteRole($id){        
-        $Role= Role::whereId($id)->delete(); 
+    public function deleteRole($id){
+        $Role= Role::whereId($id)->delete();
          if($Role){
-            $response = array('status' => 'success','message'=>'Role successfully deleted.');             
+            $response = array('status' => 'success','message'=>'Role successfully deleted.');
             return response()->json($response, 200);
         }else{
             $meta = array('status' => 'error','message'=>'role not found');
@@ -248,4 +248,11 @@ class UserAndRoleController extends Controller
         }
     }
 
+    public function updateApplicationFee($user_id,$application_fee_amount)
+    {
+        $user = User::find($user_id);
+        $user->application_fee = (int)$application_fee_amount;
+        $user->save();
+        return response()->json(true, 200);
+    }
 }
