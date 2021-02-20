@@ -383,7 +383,9 @@ class OrdersController extends Controller
 
     private function calculateDriverFair($order, $user)
     {
-        $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)->where('order_status', 'onTheWay')->get();
+        $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
+            ->where('id','!=',$order->id)
+            ->where('order_status', 'onTheWay')->get();
         if (count($childOrders) > 0) {
             foreach ($childOrders as $childOrder) {
                 $childOrder->update(['parent_id' => $order->id]);
