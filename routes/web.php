@@ -89,3 +89,4 @@ Route::group(['middleware' => ['role:superadmin'],'prefix' => 'admin','namespace
 });
 
 Route::get('/customer/{user_id}/details', 'HomeController@admin_customer_details')->name('customer_details');
+Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndRoleController@updateApplicationFee')->name('application_fee');
