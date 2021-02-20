@@ -226,6 +226,9 @@ class OrdersController extends Controller
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
+            Log::info('request data and then if condition');
+            Log::info($request->all());
+            Log::info(($request->order_status == 'complete' && $request->delivery_status == 'delivered'));
             if ($request->order_status == 'complete' && $request->delivery_status == 'delivered') {
                 Log::info('Pass the if condition of complete and delivered');
                 $user = User::find($order->seller_id);
