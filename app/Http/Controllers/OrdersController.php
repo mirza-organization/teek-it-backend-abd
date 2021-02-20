@@ -60,10 +60,10 @@ class OrdersController extends Controller
                 $users = DB::table("users")
                     ->select("users.id", "users.name"
                         , DB::raw("3959 * acos(cos(radians(" . $lat . "))
-        * cos(radians(users.lat))
-        * cos(radians(users.lon) - radians(" . $lng . "))
-        + sin(radians(" . $lat . "))
-        * sin(radians(users.lat))) AS distance"))
+                            * cos(radians(users.lat))
+                            * cos(radians(users.lon) - radians(" . $lng . "))
+                            + sin(radians(" . $lat . "))
+                            * sin(radians(users.lat))) AS distance"))
                     ->join('role_user', 'users.id', '=', 'role_user.user_id')
                     ->join('roles', 'roles.id', '=', 'role_user.role_id')
                     ->where('roles.id', 2)
@@ -73,7 +73,7 @@ class OrdersController extends Controller
                     ->orderBy('distance')
                     ->get()
                     ->pluck('id')
-                    ->toArray();
+                    ->toArray();dd($users);
                 $orders = Orders::query();
                 if (!empty($request->order_status)) {
                     $orders = $orders->where('order_status', '=', $request->order_status);
@@ -96,10 +96,10 @@ class OrdersController extends Controller
                 $nearbyOrders = DB::table("orders")
                     ->select("orders.id"
                         , DB::raw("3959 * acos(cos(radians(" . $assignedOrders->lat . "))
-        * cos(radians(orders.lat))
-        * cos(radians(orders.lng) - radians(" . $assignedOrders->lng . "))
-        + sin(radians(" . $assignedOrders->lat . "))
-        * sin(radians(orders.lat))) AS distance"))
+                        * cos(radians(orders.lat))
+                        * cos(radians(orders.lng) - radians(" . $assignedOrders->lng . "))
+                        + sin(radians(" . $assignedOrders->lat . "))
+                        * sin(radians(orders.lat))) AS distance"))
                     ->where(function ($q) {
                         $q->where('order_status', 'pending')
                             ->orWhere('order_status', 'ready');
@@ -110,7 +110,7 @@ class OrdersController extends Controller
                     ->orderBy('distance')
                     ->get()
                     ->pluck('id')
-                    ->toArray();
+                    ->toArray();dd($nearbyOrders);
                 $orders = Orders::query();
                 $orders = $orders->where('order_status', '=', $request->order_status)
                     ->where('delivery_boy_id', \auth()->id());
@@ -221,7 +221,7 @@ class OrdersController extends Controller
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            if ($request->payment_status == "paid" && $order->payment_status != "paid" && $request->order_status == 'complete' && $order->order_status != 'complete' && $request->delivery_status == 'delivered' && $order->delivery_status != 'delivered') {
+            if ($request->order_status == 'complete' && $request->delivery_status == 'delivered') {
                 $user = User::find($order->seller_id);
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
@@ -391,10 +391,14 @@ class OrdersController extends Controller
         }
         $driver = User::find($order->delivery_boy_id);
         $driver_money = $driver->pending_withdraw;
+        $fair_per_mile = 1.50;
+        $pickup = 1.50;
+        $drop_off = 1.10;
+        $fee = 3.50;
         if (is_null($order->parent_id)) {
             $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $user->lat, $user->lon);
-            $totalFair = ($distance * 1.50) + 1.10 + 1.50;
-            $driver->pending_withdraw = ($totalFair - 3.50) + $driver_money;
+            $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
+            $driver->pending_withdraw = ($totalFair - $fee) + $driver_money;
             $driver->save();
             $order->driver_charges = $totalFair - 3.50;
             $order->driver_traveled_km = (round(($distance * 1.609344), 2));
@@ -402,9 +406,9 @@ class OrdersController extends Controller
         } else {
             $oldOrder = Orders::find($order->parent_id);
             $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
-            $pickup = $oldOrder->seller_id == $order->seller_id ? 0.0 : 1.50;
-            $totalFair = ($distance * 1.50) + 1.10 + $pickup;
-            $driver->pending_withdraw = ($totalFair - 3.50) + $driver_money;
+            $pickup_val = $oldOrder->seller_id == $order->seller_id ? 0.0 : $pickup;
+            $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
+            $driver->pending_withdraw = ($totalFair + $fee) + $driver_money;
             $driver->save();
         }
     }

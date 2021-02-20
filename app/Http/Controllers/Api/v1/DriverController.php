@@ -105,7 +105,8 @@ class DriverController extends Controller
             abort(404);
         }
         $user_id = Auth::id();
-        $withdrawals = WithdrawalRequests::where('user_id', '=', $user_id)->get();
+        $withdrawals = WithdrawalRequests::where('user_id', '=', $user_id)
+            ->orderByDesc('created_at')->get();
         $data = array();
         foreach ($withdrawals as $key => $withdrawal) {
             $data[$key]['id']=$withdrawal->id;
