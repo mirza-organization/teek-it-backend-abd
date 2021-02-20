@@ -51,10 +51,14 @@ class OrdersController extends Controller
         $lng = \auth()->user()->lon;
         $orders = array();
         $assignedOrders = Orders::where('delivery_boy_id', \auth()->id())->where('delivery_status', 'assigned')->get();
+        Log::info('for delivered order');
+        Log::info($request->order_status);
         if ($request->has('order_status') && $request->order_status == 'delivered') {
+            Log::info('in delivered order status');
             $orders = Orders::query();
             $orders = $orders->where('order_status', '=', $request->order_status);
             $orders = $orders->orderByDesc('created_at')->paginate();
+            Log::info($orders);
             $pagination = $orders->toArray();
         } elseif ($request->has('order_status') && $request->order_status == 'ready') {
             if (count($assignedOrders) == 0) {
