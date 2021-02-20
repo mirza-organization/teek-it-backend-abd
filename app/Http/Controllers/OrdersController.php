@@ -119,37 +119,65 @@ class OrdersController extends Controller
 
         return response()->json($products_data);
     }
-    public function seller_orders(Request $request){
-        $orders = Orders::query()->select('id');
-        if (!empty($request->order_status)){
-            $orders =  $orders->where('order_status','=',$request->order_status);
+    public function seller_orders(Request $request)
+    {
+        $lat = \auth()->user()->lat;
+        $lng = \auth()->user()->lon;
+        $users = DB::table("users")
+            ->select("users.id", "users.name"
+                , DB::raw("3959 * acos(cos(radians(" . $lat . "))
+        * cos(radians(users.lat))
+        * cos(radians(users.lon) - radians(" . $lng . "))
+        + sin(radians(" . $lat . "))
+        * sin(radians(users.lat))) AS distance"))
+            ->join('role_user', 'users.id', '=', 'role_user.user_id')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('roles.id', 2)
+            ->whereNotNull('lat')
+            ->having('distance','<',6)
+            ->having('distance','>',0.0)
+            ->orderBy('distance')
+            ->get()
+            ->pluck('id')
+            ->toArray();
+        $orders = Orders::query();
+        if (!empty($request->order_status)) {
+            $orders = $orders->where('order_status', '=', $request->order_status);
+            $orders = $orders
+                ->whereHas('order_items.products', function ($q) use ($users) {
+                    $q->whereHas('user', function ($w) use ($users) {
+                        $w->whereIn('id', $users);
+                    });
+                });
+            if (\auth()->user()->vehicle_type == 'bike') {
+                $orders = $orders->whereHas('order_items.products', function ($q) {
+                    return $q->where('bike', 1);
+                });
+            }
         }
-        $orders= $orders->paginate();
+        $orders = $orders->paginate();
         $pagination = $orders->toArray();
-//        print_r($pagination);die;
-        if (!empty($orders)){
-            $order_data=[];
+        if (!empty($orders)) {
+            $order_data = [];
             foreach ($orders as $order) {
-//print_r($product);
-                $order_data[]=$this->get_single_order($order->id);
+                $order_data[] = $this->get_single_order($order->id);
             }
             unset($pagination['data']);
-            $products_data= [
-                'data'=>$order_data,
-                'status'=>true,
-                'message'=>'',
-                'pagination'=>$pagination,
+            $products_data = [
+                'data' => $order_data,
+                'status' => true,
+                'message' => '',
+                'pagination' => $pagination,
 
             ];
-        }else{
-            $products_data= [
-                'data'=>NULL,
-                'status'=>false,
-                'message'=>'No Record Found'
+        } else {
+            $products_data = [
+                'data' => NULL,
+                'status' => false,
+                'message' => 'No Record Found'
 
             ];
         }
-
         return response()->json($products_data);
     }
     public function delivery_boy_orders(Request $request,$delivery_boy_id){
