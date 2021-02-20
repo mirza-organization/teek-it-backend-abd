@@ -56,7 +56,7 @@
                                     <div class="row">
 
 @foreach(json_decode($user) as $key=>$u)
-    @if(!empty($u) && !in_array($key,$fields))
+    @if(!is_null($u) && !in_array($key,$fields))
 
 
                                         <div class="col-md-6">

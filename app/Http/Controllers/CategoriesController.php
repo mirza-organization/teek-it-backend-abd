@@ -121,7 +121,7 @@ class CategoriesController extends Controller
             $image=$request->file('category_image');
 
                 $file =$image;
-                
+
             $cat_name = str_replace(' ','_',$category->category_name);
             $filename=uniqid("Category_".$cat_name.'_'    ).".".$file->getClientOriginalExtension(); //create unique file name...
                 Storage::disk('user_public')->put($filename,File::get($file));
@@ -176,13 +176,21 @@ class CategoriesController extends Controller
         $response = array('status' => true, 'message' => 'Category', 'data' => $category);
         return response()->json($response, 200);
     }
-    public function all(){
 
-
-        $categories = Categories::all();
-        if (!empty($categories)){
-            $categories_data=[];
-foreach ($categories as $category){
+    public function all()
+    {
+        $storeId = \request()->store_id;
+        $categories = Categories::query();
+        if (\request()->has('store_id')) {
+            $categories = $categories->whereHas('products', function ($q) use ($storeId) {
+                $q->where('status', '=', 1)
+                    ->where('user_id', '=', $storeId);
+            });
+        }
+        $categories = $categories->get();
+        if (!empty($categories)) {
+            $categories_data = [];
+            foreach ($categories as $category) {
 //    $products = Products::query()->where('category_id', '=', $category->id)->get();
 //    if (!empty($products)) {
 //        $products_data = [];
@@ -194,8 +202,8 @@ foreach ($categories as $category){
 //
 //    }
 
-    $categories_data[]=$category;
-}
+                $categories_data[] = $category;
+            }
             $products_data = [
                 'data' => $categories_data,
                 'status' => true,
@@ -203,11 +211,11 @@ foreach ($categories as $category){
 
             ];
 
-        }else{
-            $products_data= [
-                'data'=>NULL,
-                'status'=>false,
-                'message'=>'No Record Found'
+        } else {
+            $products_data = [
+                'data' => NULL,
+                'status' => false,
+                'message' => 'No Record Found'
 
             ];
         }
@@ -221,9 +229,12 @@ foreach ($categories as $category){
 
 
     public function Products($category_id){
-
-
-        $products = Products::query()->where('category_id','=',$category_id)->paginate();
+        $storeId = \request()->store_id;
+        $products = Products::query();
+        $products = $products->where('category_id', '=', $category_id)
+            ->where('status',1);
+        if (\request()->has('store_id')) $products->where('user_id', $storeId);
+        $products = $products->paginate();
         $pagination = $products->toArray();
         if (!empty($products)){
             $products_data=[];

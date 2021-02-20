@@ -265,12 +265,11 @@ $images=$request->file('images');
     public function all(){
 
 
-        $products = Products::paginate();
+        $products = Products::where('status',1)->paginate();
         $pagination = $products->toArray();
         if (!empty($products)){
             $products_data=[];
             foreach ($products as $product) {
-//print_r($product);
                 $products_data[]=$this->get_product_info($product->id);
             }
             unset($pagination['data']);
@@ -551,7 +550,7 @@ $product = $this->get_product_info($product_id);
         fclose($f);
 
         // Take the file and put it to a string/file for output (if no save path was included in function arguments)
-     
+
 
         // Delete the temp file
         // unlink($strTempFile);

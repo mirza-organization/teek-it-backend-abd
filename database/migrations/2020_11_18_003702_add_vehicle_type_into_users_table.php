@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddTIdToWithdrawalRequestsTable extends Migration
+class AddVehicleTypeIntoUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddTIdToWithdrawalRequestsTable extends Migration
      */
     public function up()
     {
-        Schema::table('withdrawal_requests', function (Blueprint $table) {
-            $table->string('transaction_id')->default(0)->nullable();
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('vehicle_type', array('bike', 'van'))->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ class AddTIdToWithdrawalRequestsTable extends Migration
      */
     public function down()
     {
-        Schema::table('withdrawal_requests', function (Blueprint $table) {
-            //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('vehicle_type');
         });
     }
 }

@@ -44,25 +44,27 @@ class AuthController extends Controller
         }
 
         $role = Role::where('name', $request->get('role'))->first();
-if ($request->get('role')=='buyer'){
-    $is_active=1;
-}else{
-    $is_active=0;
-}
+        if ($request->get('role') == 'buyer') {
+            $is_active = 1;
+        } else {
+            $is_active = 0;
+        }
         $User = User::create([
             'name' => $request->get('name'),
-            'l_name'=>$request->l_name,
+            'l_name' => $request->l_name,
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
             'business_name' => $request->business_name,
             'business_location' => $request->business_location,
-            'seller_id'=>$request->seller_id,
-            'postal_code'=>$request->postal_code,
-            'is_active'=>$is_active
-
+            'lat' => json_decode($request->business_location)->lat,
+            'lon' => json_decode($request->business_location)->long,
+            'seller_id' => $request->seller_id,
+            'postal_code' => $request->postal_code,
+            'is_active' => $is_active,
+            'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
         ]);
 
-        if($User) {
+        if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {
                 $file = $request->file('user_img');
@@ -79,8 +81,8 @@ if ($request->get('role')=='buyer'){
 
             }
         }
-            $User->user_img = $filename;
-            $User->save();
+        $User->user_img = $filename;
+        $User->save();
 
         $User->roles()->sync($role->id);
 
@@ -97,8 +99,8 @@ if ($request->get('role')=='buyer'){
 
 <br>
             Here is your account verification link. Click on below link to verify you account. <br><br>
-            <a href="'.$account_verification_link.'">Verify</a> OR Copy This in your Browser
-            '.$account_verification_link.'
+            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+            ' . $account_verification_link . '
 <br><br><br>
         </html>';
 
@@ -108,7 +110,7 @@ if ($request->get('role')=='buyer'){
         });
 
 
-        $response = array('status' => true,'role'=>$request->role, 'message' => 'You are registered successfully, check email and click on verification link to activate your account.');
+        $response = array('status' => true, 'role' => $request->role, 'message' => 'You are registered successfully, check email and click on verification link to activate your account.');
         return response()->json($response, 200);
     }
 
@@ -148,7 +150,8 @@ if ($request->get('role')=='buyer'){
 
         if ($validate->fails()) {
             $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            echo "Validation error";return;
+            echo "Validation error";
+            return;
             return response()->json($response, 400);
         }
 
@@ -160,10 +163,11 @@ if ($request->get('role')=='buyer'){
         $email_verified_at = Carbon::now();
 
         if ($user) {
-            if ($user->email_verified_at!=null){
+            if ($user->email_verified_at != null) {
 
                 $response = array('status' => false, 'message' => 'Account Already verified');
-                echo "Account Already verified";return;
+                echo "Account Already verified";
+                return;
                 return response()->json($response, 200);
             }
             $user->email_verified_at = $email_verified_at;
@@ -171,13 +175,15 @@ if ($request->get('role')=='buyer'){
 
             $response = array('status' => true, 'message' => 'Account successfully verified');
 
-            echo "Account successfully verified";return;
+            echo "Account successfully verified";
+            return;
             return response()->json($response, 200);
 
         } else {
             $response = array('status' => false, 'message' => 'Invalid verification token');
 
-            echo "Invalid verification token";return;
+            echo "Invalid verification token";
+            return;
             return response()->json($response, 401);
         }
     }
@@ -219,18 +225,18 @@ if ($request->get('role')=='buyer'){
         $seller_info = [];
         $seller_info = User::find($user->seller_id);
         $url = URL::to('/');
-        $imagePath =$user['user_img'];
+        $imagePath = $user['user_img'];
         $data_info = array(
             'id' => $user->id,
             'name' => $user->name,
-            'l_name'=>$user->l_name,
+            'l_name' => $user->l_name,
             'email' => $user->email,
-            'phone'=>$user->phone,
-            'address_1'=>$user->address_1,
-            'address_2'=>$user->address_2,
-            'postal_code'=>$user->postal_code,
-            'business_name'=>$user->business_name,
-            'business_phone'=>$user->business_phone,
+            'phone' => $user->phone,
+            'address_1' => $user->address_1,
+            'address_2' => $user->address_2,
+            'postal_code' => $user->postal_code,
+            'business_name' => $user->business_name,
+            'business_phone' => $user->business_phone,
             'business_location' => $user->business_location,
             'business_hours' => $user->business_hours,
             'bank_details' => $user->bank_details,
@@ -238,14 +244,14 @@ if ($request->get('role')=='buyer'){
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'is_online' => $user->is_online,
-            'last_login'=>$user->last_login,
-            'seller_info'=>$this->get_seller_info($seller_info),
+            'last_login' => $user->last_login,
+            'seller_info' => $this->get_seller_info($seller_info),
             'roles' => $user->roles->pluck('name'),
             'expires_in' => JWTAuth::factory()->getTTL() * 60,);
-        $user_arr= [
-            'data'=>$data_info,
-            'status'=>true,
-            'message'=>AppConst::updateMsg
+        $user_arr = [
+            'data' => $data_info,
+            'status' => true,
+            'message' => AppConst::updateMsg
 
         ];
 
@@ -293,40 +299,41 @@ if ($request->get('role')=='buyer'){
 
             'id' => $user->id,
             'name' => $user->name,
-            'l_name'=>$user->l_name,
+            'l_name' => $user->l_name,
             'email' => $user->email,
-            'phone'=>$user->phone,
-            'postal_code'=>$user->postal_code,
-            'address_1'=>$user->address_1,
-            'address_2'=>$user->address_2,
+            'phone' => $user->phone,
+            'postal_code' => $user->postal_code,
+            'address_1' => $user->address_1,
+            'address_2' => $user->address_2,
             'is_online' => $user->is_online,
             'business_name' => $user->business_name,
-            'business_phone'=>$user->business_phone,
+            'business_phone' => $user->business_phone,
             'business_location' => $user->business_location,
-            'business_hours'=>$user->business_hours,
-            'bank_details'=>$user->bank_details,
-            'last_login'=>$user->last_login,
+            'business_hours' => $user->business_hours,
+            'bank_details' => $user->bank_details,
+            'last_login' => $user->last_login,
             'roles' => $user->roles->pluck('name'),
 
             'user_img' => $imagePath,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
-            'seller_info'=>$this->get_seller_info($seller_info),
+            'seller_info' => $this->get_seller_info($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,);
-        $user_arr= [
-            'data'=>$data_info,
-            'status'=>true,
-            'message'=>AppConst::loginSuccessMsg
+        $user_arr = [
+            'data' => $data_info,
+            'status' => true,
+            'message' => AppConst::loginSuccessMsg
 
         ];
         return response()->json($user_arr);
     }
 
-    private function get_seller_info($seller_info){
-        $user=$seller_info;
-        if(!$user)
+    private function get_seller_info($seller_info)
+    {
+        $user = $seller_info;
+        if (!$user)
             return null;
         $data_info = array(
             'id' => $user->id,
@@ -336,7 +343,7 @@ if ($request->get('role')=='buyer'){
             'business_location' => $user->business_location,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
-            'address_1'=>$user->address_1,
+            'address_1' => $user->address_1,
             'is_online' => $user->is_online,
             'roles' => $user->roles->pluck('name'),
             'user_img' => $user->user_img
@@ -346,8 +353,9 @@ if ($request->get('role')=='buyer'){
     }
 
 
-    public function get_user($user_id){
-       $data_info = $this->get_seller_info(User::find($user_id));
+    public function get_user($user_id)
+    {
+        $data_info = $this->get_seller_info(User::find($user_id));
 
 
         return $data_info;
@@ -387,67 +395,59 @@ if ($request->get('role')=='buyer'){
     }
 
 
+    public function updateUser(Request $request)
+    {
 
+        $validate = User::updateValidator($request);
 
-
-
-
-
-
-
-    public function updateUser(Request $request){
-
-        $validate=User::updateValidator($request);
-
-        if($validate->fails()){
-            $response = array('status' => false,'message'=>'Validation error','data'=>$validate->messages());
+        if ($validate->fails()) {
+            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
             return response()->json($response, 400);
         }
         $user = JWTAuth::user();
 
 
+        $User = User::find($user->id);
 
-        $User= User::find($user->id);
 
-
-        if($User){
+        if ($User) {
             $filename = $User->user_img;
-            if($request->hasFile('user_img')){
+            if ($request->hasFile('user_img')) {
                 $file = $request->file('user_img');
                 $filename = $file->getClientOriginalName();
-                $filename=uniqid($User->id . '_'    ).".".$file->getClientOriginalExtension(); //create unique file name...
-                Storage::disk('user_public')->put($filename,File::get($file));
-                if(Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
-                    info("file is store successfully : ".$filename);
-                    $filename ="/user_imgs/".$filename;
-                }else {
-                    info("file is not found :- ".$filename);
+                $filename = uniqid($User->id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                Storage::disk('user_public')->put($filename, File::get($file));
+                if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                    info("file is store successfully : " . $filename);
+                    $filename = "/user_imgs/" . $filename;
+                } else {
+                    info("file is not found :- " . $filename);
                 }
 
 
             }
 
 
-
             $User->name = $request->name;
             $User->l_name = $request->l_name;
             $User->postal_code = $request->postal_code;
 
-            $User->address_1=$request->address_1;
-            $User->address_2=$request->address_2;
+            $User->address_1 = $request->address_1;
+            $User->address_2 = $request->address_2;
             $User->user_img = $filename;
             $User->save();
 
             $response = $this->me();
             return $response;
 //            return response()->json($response, 200);
-        }else{
-            $response = array('status' => false,'message'=>'User not found.');
+        } else {
+            $response = array('status' => false, 'message' => 'User not found.');
             return response()->json($response, 404);
         }
     }
 
-    public function updateStatus(Request $request){
+    public function updateStatus(Request $request)
+    {
         $user = User::find(Auth::id());
         $user->is_online = $request->is_online;
         $user->save();
@@ -455,19 +455,21 @@ if ($request->get('role')=='buyer'){
         return $response;
     }
 
-    public function sellers(){
-        $users = User::all();
-        $data=[];
-        foreach ($users as $user){
-            if ($user->hasRole('seller')){
-
-                $data[]= $this->get_seller_info($user);
+    public function sellers()
+    {
+        $users = User::with('seller')
+            ->where('is_active', '=', 1)->get();
+        $data = [];
+        foreach ($users as $user) {
+            if ($user->hasRole('seller')) {
+                $user->where('is_active', 1);
+                $data[] = $this->get_seller_info($user);
             }
         }
-        $user_arr= [
-            'data'=>$data,
-            'status'=>true,
-            'message'=>''
+        $user_arr = [
+            'data' => $data,
+            'status' => true,
+            'message' => ''
 
         ];
 
@@ -492,15 +494,15 @@ if ($request->get('role')=='buyer'){
 
                 $info['products'] = $products_data;
                 unset($pagination['data']);
-                $products_data= [
-                    'data'=>$products_data,
-                    'status'=>true,
-                    'message'=>'',
-                    'pagination'=>$pagination,
+                $products_data = [
+                    'data' => $products_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination,
 
                 ];
                 $user_arr = $products_data;
-            }else{
+            } else {
                 $user_arr = [
                     'data' => null,
                     'status' => false,
@@ -515,21 +517,20 @@ if ($request->get('role')=='buyer'){
     }
 
 
+    public function delivery_boys()
+    {
+        $users = User::query()->where('seller_id', '=', Auth::id())->get();
+        $data = [];
+        foreach ($users as $user) {
+            if ($user->hasRole('delivery_boy')) {
 
-
-    public function delivery_boys(){
-        $users = User::query()->where('seller_id','=',Auth::id())->get();
-        $data=[];
-        foreach ($users as $user){
-            if ($user->hasRole('delivery_boy')){
-
-                $data[]= $this->get_seller_info($user);
+                $data[] = $this->get_seller_info($user);
             }
         }
-        $user_arr= [
-            'data'=>$data,
-            'status'=>true,
-            'message'=>''
+        $user_arr = [
+            'data' => $data,
+            'status' => true,
+            'message' => ''
 
         ];
 
@@ -537,9 +538,10 @@ if ($request->get('role')=='buyer'){
     }
 
 
-    public function get_delivery_boy_info($delivery_boy_info){
-        $user=User::find($delivery_boy_info);
-        if(!$user)
+    public function get_delivery_boy_info($delivery_boy_info)
+    {
+        $user = User::find($delivery_boy_info);
+        if (!$user)
             return null;
         $data_info = array(
             'id' => $user->id,
@@ -547,17 +549,17 @@ if ($request->get('role')=='buyer'){
             'email' => $user->email,
             'business_name' => $user->business_name,
             'business_location' => $user->business_location,
-            'address_1'=>$user->address_1,
+            'address_1' => $user->address_1,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'is_online' => $user->is_online,
             'roles' => $user->roles->pluck('name'),
             'user_img' => $user->user_img
         );
-        $user_arr= [
-            'data'=>$data_info,
-            'status'=>true,
-            'message'=>''
+        $user_arr = [
+            'data' => $data_info,
+            'status' => true,
+            'message' => ''
 
         ];
 
@@ -565,7 +567,6 @@ if ($request->get('role')=='buyer'){
 
 //        return $data_info;
     }
-
 
 
 }

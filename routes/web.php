@@ -40,7 +40,7 @@ Route::post('/inventory/update/{product_id}', 'HomeController@inventory_update')
 
 Route::get('/exportProducts', 'ProductsController@exportProducts')->name('exportProducts');
 
-Route::post('/importProducts', 'HomeController@importProducts')->name('importProducts');
+Route::post('/importProducts', 'HomeController@importPordersroducts')->name('importProducts');
 
 Route::get('/orders', 'HomeController@orders')->name('orders');
 Route::get('/orders/ready_state/{order_id}', 'HomeController@change_order_status')->name('accept_order');
@@ -50,12 +50,14 @@ Route::get('/orders/ready_state/{order_id}', 'HomeController@change_order_status
 
 
 Route::get('/inventory/disable/{product_id}', 'HomeController@inventory_disable')->name('inventory_disable');
+Route::get('/inventory/enable/{product_id}', 'HomeController@inventory_enable')->name('inventory_enable');
 
 
 
 
 
 Route::get('/withdrawals', 'HomeController@withdrawals')->name('withdrawals');
+Route::get('/withdrawals-drivers', 'HomeController@withdrawalDrivers')->name('withdrawals.drivers');
 Route::post('/withdrawals', 'HomeController@withdrawals_request')->name('withdraw_request');
 Route::get('/my_order_count', 'HomeController@my_order_count')->name('my_order_count');
 
@@ -87,3 +89,4 @@ Route::group(['middleware' => ['role:superadmin'],'prefix' => 'admin','namespace
 });
 
 Route::get('/customer/{user_id}/details', 'HomeController@admin_customer_details')->name('customer_details');
+Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndRoleController@updateApplicationFee')->name('application_fee');

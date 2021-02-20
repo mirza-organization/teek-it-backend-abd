@@ -7,118 +7,43 @@ use App\Orders;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 class OrdersController extends Controller
 {
-//    /**
-//     * Display a listing of the resource.
-//     *
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function index()
-//    {
-//        //
-//    }
-//
-//    /**
-//     * Show the form for creating a new resource.
-//     *
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function create()
-//    {
-//        //
-//    }
-//
-//    /**
-//     * Store a newly created resource in storage.
-//     *
-//     * @param  \Illuminate\Http\Request  $request
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function store(Request $request)
-//    {
-//        //
-//    }
-//
-//    /**
-//     * Display the specified resource.
-//     *
-//     * @param  \App\Orders  $orders
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function show(Orders $orders)
-//    {
-//        //
-//    }
-//
-//    /**
-//     * Show the form for editing the specified resource.
-//     *
-//     * @param  \App\Orders  $orders
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function edit(Orders $orders)
-//    {
-//        //
-//    }
-//
-//    /**
-//     * Update the specified resource in storage.
-//     *
-//     * @param  \Illuminate\Http\Request  $request
-//     * @param  \App\Orders  $orders
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function update(Request $request, Orders $orders)
-//    {
-//        //
-//    }
-//
-//    /**
-//     * Remove the specified resource from storage.
-//     *
-//     * @param  \App\Orders  $orders
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function destroy(Orders $orders)
-//    {
-//        //
-//    }
-
-
-    public function index(Request $request){
-        $orders = Orders::query()->select('id')->where('user_id','=',Auth::id());
-        if (!empty($request->order_status)){
-            $orders =  $orders->where('order_status','=',$request->order_status);
+    public function index(Request $request)
+    {
+        $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id());
+        if (!empty($request->order_status)) {
+            $orders = $orders->where('order_status', '=', $request->order_status);
         }
-        $orders= $orders->paginate();
+        $orders = $orders->paginate(100);
         $pagination = $orders->toArray();
-//        print_r($pagination);die;
-        if (!empty($orders)){
-            $order_data=[];
+        if (!empty($orders)) {
+            $order_data = [];
             foreach ($orders as $order) {
-//print_r($product);
-                $order_data[]=$this->get_single_order($order->id);
+                $order_data[] = $this->get_single_order($order->id);
             }
             unset($pagination['data']);
-            $products_data= [
-                'data'=>$order_data,
-                'status'=>true,
-                'message'=>'',
-                'pagination'=>$pagination,
+            $products_data = [
+                'data' => $order_data,
+                'status' => true,
+                'message' => '',
+                'pagination' => $pagination,
 
             ];
-        }else{
-            $products_data= [
-                'data'=>NULL,
-                'status'=>false,
-                'message'=>'No Record Found'
+        } else {
+            $products_data = [
+                'data' => NULL,
+                'status' => false,
+                'message' => 'No Record Found'
 
             ];
         }
 
         return response()->json($products_data);
     }
+
     public function seller_orders(Request $request)
     {
         $lat = \auth()->user()->lat;
@@ -180,106 +105,100 @@ class OrdersController extends Controller
         }
         return response()->json($products_data);
     }
-    public function delivery_boy_orders(Request $request,$delivery_boy_id){
-        $orders = Orders::query()->select('id')->where('delivery_boy_id','=',$delivery_boy_id)->where('delivery_status','=',$request->delivery_status)->paginate();
+
+    public function delivery_boy_orders(Request $request, $delivery_boy_id)
+    {
+        $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)->where('delivery_status', '=', $request->delivery_status)->paginate();
         $pagination = $orders->toArray();
-//        print_r($pagination);die;
-        if (!empty($orders)){
-            $order_data=[];
+        if (!empty($orders)) {
+            $order_data = [];
             foreach ($orders as $order) {
-//print_r($product);
-                $order_data[]=$this->get_single_order($order->id);
+                $order_data[] = $this->get_single_order($order->id);
             }
             unset($pagination['data']);
-            $products_data= [
-                'data'=>$order_data,
-                'status'=>true,
-                'message'=>'',
-                'pagination'=>$pagination,
+            $products_data = [
+                'data' => $order_data,
+                'status' => true,
+                'message' => '',
+                'pagination' => $pagination,
 
             ];
-        }else{
-            $products_data= [
-                'data'=>NULL,
-                'status'=>false,
-                'message'=>'No Record Found'
+        } else {
+            $products_data = [
+                'data' => NULL,
+                'status' => false,
+                'message' => 'No Record Found'
 
             ];
         }
-
         return response()->json($products_data);
     }
-    public function assign_order(Request $request){
-        $products_data= [
-            'data'=>NULL,
-            'status'=>false,
-            'message'=>'No Record Found'
+
+    public function assign_order(Request $request)
+    {
+        $products_data = [
+            'data' => NULL,
+            'status' => false,
+            'message' => 'No Record Found'
 
         ];
         $order = Orders::find($request->order_id);
-        if(!empty($order)){
+        if (!empty($order)) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
             $order->save();
-            $products_data= [
-                'data'=>NULL,
-                'status'=>true,
-                'message'=>'Assigned'
+            $products_data = [
+                'data' => NULL,
+                'status' => true,
+                'message' => 'Assigned'
 
             ];
         }
-
-
-
         return response()->json($products_data);
     }
 
 
-    public function update_assign(Request $request){
-        $products_data= [
-            'data'=>NULL,
-            'status'=>false,
-            'message'=>'No Record Found'
+    public function update_assign(Request $request)
+    {
+        $products_data = [
+            'data' => NULL,
+            'status' => false,
+            'message' => 'No Record Found'
 
         ];
         $order = Orders::find($request->order_id);
-        if(!empty($order)){
+        if (!empty($order)) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            if ($request->payment_status=="paid" && $order->payment_status!="paid" && $request->order_status=='complete' && $order->order_status!='complete' && $request->delivery_status=='delivered' && $order->delivery_status!='delivered'){
+            if ($request->payment_status == "paid" && $order->payment_status != "paid" && $request->order_status == 'complete' && $order->order_status != 'complete' && $request->delivery_status == 'delivered' && $order->delivery_status != 'delivered') {
                 $user = User::find($order->seller_id);
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
+                $this->calculateDriverFair($order,$user);
             }
 
-            $order->driver_charges=$request->driver_charges;
-            $order->driver_traveled_km=$request->driver_traveled_km;
+            $order->driver_charges = $request->driver_charges;
+            $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
-            $products_data= [
-                'data'=>NULL,
-                'status'=>true,
-                'message'=>'Updated'
+            $products_data = [
+                'data' => NULL,
+                'status' => true,
+                'message' => 'Updated'
 
             ];
         }
 
-
-
         return response()->json($products_data);
     }
 
-
-
-
-    public function new(Request $request){
-        // return response()->json($request->all());
-        // print_r();die;
+    public function new(Request $request)
+    {
         $grouped_seller = [];
-        foreach ($request->items as $item){
-            $product_id=$item['product_id'];
+        foreach ($request->items as $item) {
+            $product_id = $item['product_id'];
             $qty = $item['qty'];
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
@@ -292,25 +211,23 @@ class OrdersController extends Controller
         }
 
 
-//    print_r($grouped_seller);
         $order_arr = [];
-        foreach ($grouped_seller as $seller_id=>$order){
-            $total=0;
+        foreach ($grouped_seller as $seller_id => $order) {
+            $total = 0;
             $user_id = Auth()->id();
             $order_total = 0;
             $total_items = 0;
-            foreach ($order as $order_item){
+            foreach ($order as $order_item) {
                 $total_items = $total_items + $order_item['qty'];
-                $order_total = $order_total + ($order_item['price']*$order_item['qty']);
+                $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
 
+            $user = User::find($seller_id);
+            $user_money = $user->pending_withdraw;
+            $user->pending_withdraw = $order_total + $user_money;
+            $user->save();
 
-    $user = User::find($seller_id);
-    $user_money = $user->pending_withdraw;
-    $user->pending_withdraw = $order_total + $user_money;
-    $user->save();
-
-            $new_order= new Orders();
+            $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
             $new_order->total_items = $total_items;
@@ -318,12 +235,12 @@ class OrdersController extends Controller
             $new_order->lng = "NULL";
             $new_order->phone_number = "NULL";
             $new_order->address = "NULL";
-            $new_order->payment_status = "hidden";
+            $new_order->payment_status = $request->payment_status ?? "hidden";
             $new_order->seller_id = $seller_id;
             $new_order->save();
             $order_id = $new_order->id;
             $order_arr[] = $order_id;
-            foreach ($order as $order_item){
+            foreach ($order as $order_item) {
                 $new_order_item = new OrderItems();
                 $new_order_item->order_id = $order_id;
                 $new_order_item->product_id = $order_item['product_id'];
@@ -333,30 +250,30 @@ class OrdersController extends Controller
             }
         }
         $return_data = $this->get_orders_from_ids($order_arr);
-        $user_arr= [
-            'data'=>$return_data,
-            'status'=>true,
-            'message'=>'Order Added Successfully'
+        $user_arr = [
+            'data' => $return_data,
+            'status' => true,
+            'message' => 'Order Added Successfully'
 
         ];
-        return response()->json($user_arr,200);
-//    print_r($_POST);
+        return response()->json($user_arr, 200);
     }
 
 
-
-    public function updateOrder(Request $request){
-        $order_ids =  $request->ids;
-        $order_arr = explode(',',$order_ids);
-        foreach ($order_arr as $order_id){
+    public function updateOrder(Request $request)
+    {
+        $order_ids = $request->ids;
+        $order_arr = explode(',', $order_ids);
+        foreach ($order_arr as $order_id) {
 
             $order = Orders::find($order_id);
-             if ($request->payment_status=="paid" && $order->payment_status!="paid" && $request->order_status=='complete' && $order->order_status!='complete' && $request->delivery_status=='delivered' && $order->delivery_status!='delivered'){
-                 $user = User::find($order->seller_id);
-                 $user_money = $user->pending_withdraw;
-                 $user->pending_withdraw = $order->order_total + $user_money;
-                 $user->save();
-             }
+            if ($request->payment_status == "paid" && $order->payment_status != "paid" && $request->order_status == 'complete' && $order->order_status != 'complete' && $request->delivery_status == 'delivered' && $order->delivery_status != 'delivered') {
+                $user = User::find($order->seller_id);
+                $user_money = $user->pending_withdraw;
+                $user->pending_withdraw = $order->order_total + $user_money;
+                $user->save();
+//                $this->calculateDriverFair($order, $user);
+            }
             $order->lat = $request->lat;
             $order->lng = $request->lng;
             $order->phone_number = $request->phone_number;
@@ -365,43 +282,81 @@ class OrdersController extends Controller
             $order->order_status = $request->order_status;
             $order->transaction_id = $request->transaction_id;
 
-//            $order->driver_charges_cleared=$request->driver_charges_cleared;
-            $order->driver_charges=$request->driver_charges;
-            $order->driver_traveled_km=$request->driver_traveled_km;
+            $order->driver_charges = $request->driver_charges;
+            $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
 
         }
         $return_data = $this->get_orders_from_ids($order_arr);
-        $user_arr= [
-            'data'=>$return_data,
-            'status'=>true,
-            'message'=>'Order Added Successfully'
-
+        $user_arr = [
+            'data' => $return_data,
+            'status' => true,
+            'message' => 'Order Added Successfully'
         ];
-        return response()->json($user_arr,200);
+        return response()->json($user_arr, 200);
     }
 
 
-
-
-
-
-
-    public function get_orders_from_ids($ids){
+    public function get_orders_from_ids($ids)
+    {
         $raw_data = [];
-        foreach ($ids as $order_id){
+        foreach ($ids as $order_id) {
             $raw_data[] = $this->get_single_order($order_id);
         }
         return $raw_data;
     }
 
-    public function get_single_order($order_id){
+    public function get_single_order($order_id)
+    {
         $temp = [];
-        $temp['order'] =Orders::find($order_id);
-        $temp['order_items'] = OrderItems::query()->where('order_id','=',$order_id)->get();
+        $order = Orders::find($order_id);
+        $temp['order'] = $order;
+        $temp['order_items'] = OrderItems::query()->where('order_id', '=', $order_id)->get();
+        $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
 
+    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2, $unit = 'miles') {
+        $theta = $longitude1 - $longitude2;
+        $distance = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta)));
+        $distance = acos($distance);
+        $distance = rad2deg($distance);
+        $distance = $distance * 60 * 1.1515;
+        switch($unit) {
+            case 'miles':
+                break;
+            case 'kilometers' :
+                $distance = $distance * 1.609344;
+        }
+        return (round($distance,2));
+    }
 
+    private function calculateDriverFair($order, $user)
+    {
+        $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)->where('order_status', 'onTheWay')->get();
+        if (count($childOrders) > 0) {
+            foreach ($childOrders as $childOrder) {
+                $childOrder->update(['parent_id' => $order->id]);
+            }
+        }
+        $driver = User::find($order->delivery_boy_id);
+        $driver_money = $driver->pending_withdraw;
+        if (is_null($order->parent_id)) {
+            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $user->lat, $user->lon);
+            $totalFair = ($distance * 1.50) + 1.10 + 1.50;
+            $driver->pending_withdraw = ($totalFair - 3.50) + $driver_money;
+            $driver->save();
+            $order->driver_charges = $totalFair - 3.50;
+            $order->driver_traveled_km = (round(($distance * 1.609344), 2));
+            $order->save();
+        } else {
+            $oldOrder = Orders::find($order->parent_id);
+            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
+            $pickup = $oldOrder->seller_id == $order->seller_id ? 0.0 : 1.50;
+            $totalFair = ($distance * 1.50) + 1.10 + $pickup;
+            $driver->pending_withdraw = ($totalFair - 3.50) + $driver_money;
+            $driver->save();
+        }
+    }
 
 }

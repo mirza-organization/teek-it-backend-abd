@@ -29,7 +29,8 @@
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
                             </div>
-                            <a href="{{route('orders')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{route('orders')}}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -44,7 +45,8 @@
                             <div class="icon">
                                 <i class="ion ion-stats-bars fas fa-status-bar"></i>
                             </div>
-                            <a href="{{route('orders')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{route('orders')}}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -59,7 +61,8 @@
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
                             </div>
-                            <a href="{{route('inventory')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{route('inventory')}}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -71,7 +74,8 @@
 
                                 <p>Total Sales</p>
                             </div>
-                            <a href="{{route('orders')}}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{route('orders')}}" class="small-box-footer">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
                             </div>
@@ -79,6 +83,54 @@
                         </div>
                     </div>
                     <!-- ./col -->
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">All Orders</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body p-0">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Order No</th>
+                                        <th>Status</th>
+                                        <th>View</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @forelse($all_orders as $key => $order)
+                                        <tr>
+                                            <td>{{$all_orders->firstItem() + $key}}</td>
+                                            <td>{{$order->id}}</td>
+                                            <td>
+                                                @if($order->order_status == 'pending')
+                                                    <span class="badge bg-danger">Pending</span>
+                                                @elseif($order->order_status == 'assigned')
+                                                    <span class="badge bg-warning">Assigned</span>
+                                                @elseif($order->order_status == 'onTheWay')
+                                                    <span class="badge bg-primary">On the Way</span>
+                                                @elseif($order->order_status == 'ready')
+                                                    <span class="badge bg-purple">Ready</span>
+                                                @else
+                                                    <span class="badge bg-success">Delivered</span>
+                                                @endif
+                                            </td>
+                                            <td><a href="{{route('orders',['search'=>$order->id])}}"
+                                                   class="btn btn-primary">View</a></td>
+                                        </tr>
+                                    @empty
+                                    @endforelse
+                                    </tbody>
+                                </table>
+                                {{$all_orders->links()}}
+                            </div>
+                            <!-- /.card-body -->
+                        </div>
+                    </div>
                 </div>
             </div><!-- /.container-fluid -->
         </div>

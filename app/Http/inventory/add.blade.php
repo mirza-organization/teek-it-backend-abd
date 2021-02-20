@@ -1,11 +1,4 @@
 @extends('layouts.shopkeeper.app')
-@section('styles')
-    <style>
-    .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #3a4b83;
-    }
-    </style>
-@endsection
 @section('content')
     <div class="content">
 
@@ -120,13 +113,27 @@
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6 text-left">
+                                                            <p for="">Colors: &emsp;
+                                                                <?php
+                                                                //                                                        echo $inventory->colors;die;
+                                                                if ($inventory->colors){
+                                                                    $colors1=[
+                                                                        'blue'=>false,'green'=>false,'red'=>false,'yellow'=>false
+                                                                    ];
 
-                                                                <select class="colors form-control" name="colors[]" multiple="multiple">
-                                                                    <option value="blue">Blue</option>
-                                                                    <option value="green">Green</option>
-                                                                    <option value="red">Red</option>
-                                                                    <option value="yellow">Yellow</option>
-                                                                </select>
+                                                                    $colors=json_decode($inventory->colors,true);
+                                                                    $colors=array_merge($colors1,$colors);
+                                                                }else{
+                                                                    $colors=[
+                                                                        'blue'=>false,'green'=>false,'red'=>false,'yellow'=>false
+                                                                    ];
+                                                                }
+                                                                ?>
+                                                                <input <?php if ($colors['blue']){ echo "checked";} ?> type="checkbox" name="color[]" value="blue" > Blue
+                                                                <input <?php if ($colors['green']){ echo "checked";} ?> type="checkbox" name="color[]" value="green" > Green
+                                                                <input <?php if ($colors['red']){ echo "checked";} ?> type="checkbox" name="color[]" value="Red" > Red
+                                                                <input <?php if ($colors['yellow']){ echo "checked";} ?> type="checkbox" name="color[]" value="yellow" > Yellow
+                                                            </p>
                                                             <div class="row">
 
                                                                 <div class="col-md-12 text-left">
@@ -194,16 +201,4 @@
             padding: 30px 50px!important;
         }
     </style>
-
-@endsection
-
-@section('scripts')
-    <script>
-        $(document).ready(function() {
-            $('.colors').select2({
-                placeholder: "Select Colors",
-                allowClear: true
-            });
-        });
-    </script>
 @endsection
