@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <meta content="ie=edge" http-equiv="x-ua-compatible">
-
+    <link rel="icon" href="{{asset('res/res/img/logo.png')}}" type="image/svg+xml"/>
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -422,8 +422,8 @@
                 if (data>my_order_countvr){
                     // alert("Maybe You Got New Order")
                     Swal.fire(
-                        'Be Alert!',
-                        'Maybe You Got New Order',
+                        'New Order Alert!!',
+                        'Please prepare the Order.',
                         'success'
                     )
                 }
