@@ -22,7 +22,7 @@
 
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>${{auth()->user()->total_withdraw}}</h3>
+                                <h3>£{{auth()->user()->total_withdraw}}</h3>
 
                                 <p>Total Withdrawals </p>
                             </div>
@@ -36,7 +36,7 @@
 
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>${{auth()->user()->pending_withdraw*0.9}}</h3>
+                                <h3>£{{auth()->user()->pending_withdraw*0.9}}</h3>
 
                                 <p>Balance</p>
                             </div>
@@ -50,7 +50,7 @@
 
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>${{auth()->user()->pending_withdraw*0.1}}</h3>
+                                <h3>£{{auth()->user()->pending_withdraw*0.1}}</h3>
 
                                 <p>Teekit Charges</p>
                             </div>

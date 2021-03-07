@@ -426,7 +426,7 @@ class OrdersController extends Controller
             Log::info(($totalFair - $fee) + $driver_money);
             $driver->pending_withdraw = ($totalFair - $fee) + $driver_money;
             $driver->save();
-            $order->driver_charges = $totalFair - 3.50;
+            $order->driver_charges = $totalFair - $fee  ;
             $order->driver_traveled_km = (round(($distance * 1.609344), 2));
             $order->save();
         } else {

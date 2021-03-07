@@ -51,11 +51,12 @@ class ForgotPasswordController extends Controller
                 return response()->json($response, 404);
             }
 
-            $token = $this->broker()->createToken($user);
+//            $token = $this->broker()->createToken($user);
+            $digits = 6;
+            $token = str_pad(rand(0, pow(10, $digits)-1), $digits, '0', STR_PAD_LEFT);
 
-            $FRONTEND_URL=env('FRONTEND_URL');
-
-            $password_reset_link=$FRONTEND_URL.'/password/reset?token='.$token;
+            $user->temp_code = $token;
+            $user->save();
 
             $html='<html>
                 Hi, '.$user->name.'<br><br>

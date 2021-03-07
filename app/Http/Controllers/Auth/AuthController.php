@@ -130,13 +130,13 @@ class AuthController extends Controller
         }
 
         $user = JWTAuth::user();
-        // if ($user->email_verified_at == null) {
-        //     return response()->json(['status' => false, 'message' => 'Email not verified, verify your email first.'], 401);
-        // }
+         if ($user->email_verified_at == null) {
+             return response()->json(['status' => false, 'message' => 'Email not verified, verify your email first.'], 401);
+         }
 
-        // if ($user->is_active == 0) {
-        //     return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
-        // }
+         if ($user->is_active == 0) {
+             return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
+         }
         $this->authenticated($request, $user, $token);
         return $this->respondWithToken($token);
     }

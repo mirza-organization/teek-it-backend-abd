@@ -149,9 +149,9 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="ratting pl-3 text-right text-bold">
-                                                    <del class="text-danger d-block">${{$inventory->price}}</del>
+                                                    <del class="text-danger d-block">£{{$inventory->price}}</del>
                                                     <span
-                                                        class="text-lg text-primary">${{$inventory->sale_price}}</span>
+                                                        class="text-lg text-primary">£{{$inventory->sale_price}}</span>
                                                 </div>
                                             </div>
                                         </div>

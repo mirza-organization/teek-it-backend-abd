@@ -110,7 +110,7 @@
 
                                         <div class="col-md-6 text-lg">
                                             <p>
-                                                <b>Placed on:</b> {{$order->created_at}} <b> Order Total: </b> ${{$order->order_total}}
+                                                <b>Placed on:</b> {{$order->created_at}} <b> Order Total: </b> £{{$order->order_total}}
                                             </p>
                                         </div>
                                         <div class="col-md-6">

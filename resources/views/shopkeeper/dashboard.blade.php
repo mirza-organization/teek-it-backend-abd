@@ -70,7 +70,7 @@
                         <!-- small box -->
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>${{$total_sales}}</h3>
+                                <h3>£{{$total_sales}}</h3>
 
                                 <p>Total Sales</p>
                             </div>
