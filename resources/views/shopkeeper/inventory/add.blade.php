@@ -83,12 +83,12 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" name="dimension" placeholder="Dimension" id="" value="{{$inventory->dimension}}">
+                                                                <input type="number" step="any" class="form-control" name="dimension" placeholder="Dimension (cm)" id="" value="{{$inventory->dimension}}">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="form-group">
-                                                                <input type="text" class="form-control" name="weight" placeholder="Weight" id="" value="{{$inventory->weight}}">
+                                                                <input type="number" step="any" class="form-control" name="weight" placeholder="Weight (Kg)" id="" value="{{$inventory->weight}}">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">
@@ -126,6 +126,15 @@
                                                                     <option value="green">Green</option>
                                                                     <option value="red">Red</option>
                                                                     <option value="yellow">Yellow</option>
+                                                                    <option value="white">White</option>
+                                                                    <option value="black">Black</option>
+                                                                    <option value="orange">Orange</option>
+                                                                    <option value="pink">Pink</option>
+                                                                    <option value="brown">Brown</option>
+                                                                    <option value="indigo">Indigo</option>
+                                                                    <option value="purple">Purple</option>
+                                                                    <option value="gray">Gray</option>
+                                                                    <option value="silver">Silver</option>
                                                                 </select>
                                                             <div class="row">
 
@@ -160,10 +169,10 @@
                                                             <p for="">
                                                                 <input @if($inventory->bike==1)
                                                                        checked
-                                                                       @endif type="checkbox" name="bike" value="1" > Bike &emsp;
+                                                                       @endif type="checkbox" name="bike" value="1" > Cycle/Bike &emsp;
                                                                 <input  @if($inventory->van==1)
                                                                         checked
-                                                                        @endif  type="checkbox" name="van" value="1" > Van
+                                                                        @endif  type="checkbox" name="van" value="1" > Car/Van
 
                                                             </p>
                                                         </div>

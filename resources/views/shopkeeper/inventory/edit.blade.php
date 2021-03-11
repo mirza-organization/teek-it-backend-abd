@@ -96,14 +96,14 @@
                                                     <div class="form-group">
 
                                                         <label for="" class="text-left d-block">Dimensions</label>
-                                                        <input type="text" class="form-control" name="dimension" placeholder="Dimension" id="" value="{{$inventory->dimension}}">
+                                                        <input type="number" step="any" class="form-control" name="dimension" placeholder="Dimension (cm)" id="" value="{{$inventory->dimension}}">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
 
                                                         <label for="" class="text-left d-block">Weight</label>
-                                                        <input type="text" class="form-control" name="weight" placeholder="Weight" id="" value="{{$inventory->weight}}">
+                                                        <input type="number" step="any" class="form-control" name="weight" placeholder="Weight (Kg)" id="" value="{{$inventory->weight}}">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -149,7 +149,16 @@
                                                         'red' => 'Red',
                                                         'green' => 'Green',
                                                         'yellow' => 'Yellow',
-                                                        'blue' => 'Blue'
+                                                        'blue' => 'Blue',
+                                                        'white' => 'White',
+                                                        'black' => 'Black',
+                                                        'orange' => 'Orange',
+                                                        'pink' => 'Pink',
+                                                        'brown' => 'Brown',
+                                                        'indigo' => 'Indigo',
+                                                        'purple' => 'Purple',
+                                                        'gray' => 'Gray',
+                                                        'silver' => 'Silver',
                                                     ];
                                                         if ($inventory->colors){
                                                             $colors = json_decode($inventory->colors,true);
@@ -198,10 +207,10 @@
                                                     <p for="">
                                                         <input @if($inventory->bike==1)
                                                                checked
-                                                               @endif type="checkbox" name="bike" value="1" > Bike &emsp;
+                                                               @endif type="checkbox" name="bike" value="1" > Cycle/Bike &emsp;
                                                         <input  @if($inventory->van==1)
                                                                 checked
-                                                                @endif  type="checkbox" name="van" value="1" > Van
+                                                                @endif  type="checkbox" name="van" value="1" > Car/Van
 
                                                     </p>
                                                 </div>
