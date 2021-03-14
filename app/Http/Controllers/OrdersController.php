@@ -380,20 +380,16 @@ class OrdersController extends Controller
         return $temp;
     }
 
-    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2, $unit = 'miles')
+    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
-        $theta = $longitude1 - $longitude2;
-        $distance = (sin(deg2rad($latitude1)) * sin(deg2rad($latitude2))) + (cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * cos(deg2rad($theta)));
-        $distance = acos($distance);
-        $distance = rad2deg($distance);
-        $distance = $distance * 60 * 1.1515;
-        switch ($unit) {
-            case 'miles':
-                break;
-            case 'kilometers' :
-                $distance = $distance * 1.609344;
-        }
-        return (round($distance, 2));
+        $address1 = $latitude1.', '.$longitude1;
+        $address2 = $latitude2.', '.$longitude2;
+        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=".urlencode($address1)."&destination=".urlencode($address2)."&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+        $query = file_get_contents($url);
+        $results = json_decode($query,true);
+        $distanceString = explode(' ',$results['routes'][0]['legs'][0]['distance']['text']);
+        $kms = (int)$distanceString[0];
+        return $kms*0.621371;
     }
 
     private function calculateDriverFair($order, $user)
