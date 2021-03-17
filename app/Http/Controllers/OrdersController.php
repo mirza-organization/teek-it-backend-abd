@@ -388,8 +388,8 @@ class OrdersController extends Controller
         $query = file_get_contents($url);
         $results = json_decode($query,true);
         $distanceString = explode(' ',$results['routes'][0]['legs'][0]['distance']['text']);
-        $kms = (int)$distanceString[0];
-        return $kms*0.621371;
+        $kms = (int)$distanceString[0] * 0.621371;
+        return $kms > 1 ? $kms : 1;
     }
 
     private function calculateDriverFair($order, $user)
@@ -411,7 +411,7 @@ class OrdersController extends Controller
         $fair_per_mile = 1.50;
         $pickup = 1.50;
         $drop_off = 1.10;
-        $fee = 3.50;
+        $fee = 0.20;
         if (is_null($order->parent_id)) {
             Log::info('if parent is null');
             $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $user->lat, $user->lon);
@@ -420,7 +420,8 @@ class OrdersController extends Controller
             Log::info('total fair');
             $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
             Log::info(($totalFair - $fee) + $driver_money);
-            $driver->pending_withdraw = ($totalFair - $fee) + $driver_money;
+            $teekitCharges = $totalFair * $fee;
+            $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
             $driver->save();
             $order->driver_charges = $totalFair - $fee  ;
             $order->driver_traveled_km = (round(($distance * 1.609344), 2));
@@ -434,7 +435,8 @@ class OrdersController extends Controller
             $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
             Log::info('fair');
             Log::info(($totalFair + $fee) + $driver_money);
-            $driver->pending_withdraw = ($totalFair + $fee) + $driver_money;
+            $teekitCharges = $totalFair * $fee;
+            $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
             $driver->save();
         }
     }
