@@ -79,11 +79,7 @@ class DriverController extends Controller
         if (!auth()->user()->has('driver')){
             abort(404);
         }
-        $user = \auth()->user();
-        $charges = $user->vehicle_type == 'bike' ? 20:15;
-        $teekit_fee = ($user->pending_withdraw * $charges)/100;
-        $amount = $user->pending_withdraw -$teekit_fee;
-        $amount = number_format((float)$amount, 2, '.', '');
+        $amount = number_format((float)\auth()->user()->pending_withdraw, 2, '.', '');
         return response()->json(['balance'=>$amount],200);
     }
 
