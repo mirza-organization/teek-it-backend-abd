@@ -94,9 +94,20 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-
-                                                        <label for="" class="text-left d-block">Dimensions</label>
-                                                        <input type="number" step="any" class="form-control" name="dimension" placeholder="Dimension (cm)" id="" value="{{$inventory->dimension}}">
+                                                        <label for="" class="text-left d-block">Height</label>
+                                                        <input type="number" step="any" class="form-control" name="height" placeholder="Height (cm)" id="" value="{{$inventory->height}}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="" class="text-left d-block">Width</label>
+                                                        <input type="number" step="any" class="form-control" name="width" placeholder="Width (cm)" id="" value="{{$inventory->width}}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="" class="text-left d-block">Length</label>
+                                                        <input type="number" step="any" class="form-control" name="length" placeholder="Length (cm)" id="" value="{{$inventory->length}}">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">

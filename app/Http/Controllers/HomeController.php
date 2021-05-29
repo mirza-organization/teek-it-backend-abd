@@ -453,65 +453,35 @@ class HomeController extends Controller
         $user_id = Auth::id();
 
         if ($request->hasFile('file')) {
-//            $file=$request->file('file');
-//            $filename=uniqid($user_id."_".time(). '_').".".$file->getClientOriginalExtension(); //create unique file name...
-////            echo $filename;die;
-//            Storage::disk('user_public')->put($filename,File::get($file));
-//            $data = Storage::disk('user_public')->get($filename);
-//            echo $data;die;
-//           print_r(json_decode($this->csvToJson($request->file('file'))));die;;
             $import_data = json_decode($this->csvToJson($request->file('file')), true);
-//            if (isset($import_data['is_valid']) && $import_data['is_valid']==true){
-//                unset($import_data['is_valid']);
+
             foreach ($import_data as $p) {
-//                    echo "<pre>";
-//                    print_r($p);die;
-//                    $p['category_id'] = $p['category']['id'];
-//                    unset($p['created_at']);
-//                    unset($p['updated_at']);
-//                    unset($p['id']);
-//                    unset($p['ratting']);
-//                    unset($p['category']);
-//                    unset($p['user_id']);
                 if (isset($p['images'])) {
                     $images = explode(',', $p['images']);
                     unset($p['images']);
                 }
-//                    $p['user_id'] = (int)$user_id;
                 if (is_array($p))
                     $ppt = array_keys($p);
-// print_r($p);
-// continue;
-// die;
                 $product = new Products();
                 foreach ($ppt as $t) {
-//                        echo $t;
-                    // echo $p[$t]."<br>";
-                    if (!empty($p[$t])) {
-
-                        $product->$t = $p[$t];
+                    if ($t == 'colors') {
+                        $colors = explode(',', $p[$t]);
+                        $product->$t = json_encode(array_fill_keys($colors, true));
+                    } elseif (($t == 'bike' && $p[$t] == null) || ($t == 'van' && $p[$t] == null)) {
+                        $product->$t = 0;
                     } else {
-                        if ($t == 'qty') {
-
-                            $product->$t = $p[$t];
-                        }
+                        $product->$t = $p[$t];
                     }
-
                 }
 
                 $product->user_id = $user_id;
                 $product->save();
                 $p_id = $product->id;
                 if (isset($images)) {
-//                        print_r($images);
                     foreach ($images as $image) {
                         $product_images = new productImages();
                         $product_images->product_id = (int)$p_id;
-//                            die;
                         $product_images->product_image = $image;
-//                            die;
-//                            echo $p_id;
-//                            echo $image['product_image'];
                         $product_images->save();
                     }
                 }
@@ -519,9 +489,6 @@ class HomeController extends Controller
 
             flash('Importing Complete');
         }
-
-
-//die;
         return redirect()->back();
     }
 
