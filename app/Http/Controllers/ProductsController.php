@@ -265,7 +265,9 @@ $images=$request->file('images');
     public function all(){
 
 
-        $products = Products::where('status',1)->paginate();
+        $products = Products::whereHas('user',function ($query){
+            $query->where('is_active', 1);
+        })->where('status',1)->paginate();
         $pagination = $products->toArray();
         if (!empty($products)){
             $products_data=[];
