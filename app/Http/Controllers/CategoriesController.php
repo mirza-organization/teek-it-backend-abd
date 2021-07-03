@@ -231,7 +231,9 @@ class CategoriesController extends Controller
     public function Products($category_id){
         $storeId = \request()->store_id;
         $products = Products::query();
-        $products = $products->where('category_id', '=', $category_id)
+        $products = $products->whereHas('user',function ($query){
+            $query->where('is_active', 1);
+        })->where('category_id', '=', $category_id)
             ->where('status',1);
         if (\request()->has('store_id')) $products->where('user_id', $storeId);
         $products = $products->paginate();
@@ -239,7 +241,7 @@ class CategoriesController extends Controller
         if (!empty($products)){
             $products_data=[];
             foreach ($products as $product) {
-//print_r($product);
+
                 $products_data[]= (new ProductsController())->get_product_info($product->id);
             }
             unset($pagination['data']);
