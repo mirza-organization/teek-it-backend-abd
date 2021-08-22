@@ -52,14 +52,10 @@ class OrdersController extends Controller
         $lng = \auth()->user()->lon;
         $orders = array();
         $assignedOrders = Orders::where('delivery_boy_id', \auth()->id())->where('delivery_status', 'assigned')->get();
-        Log::info('for delivered order');
-        Log::info($request->order_status);
         if ($request->has('order_status') && $request->order_status == 'delivered') {
-            Log::info('in delivered order status');
             $orders = Orders::query();
             $orders = $orders->where('order_status', '=', $request->order_status);
             $orders = $orders->orderByDesc('created_at')->paginate();
-            Log::info($orders);
             $pagination = $orders->toArray();
         } elseif ($request->has('order_status') && $request->order_status == 'ready') {
             if (count($assignedOrders) == 0) {
@@ -95,7 +91,8 @@ class OrdersController extends Controller
                         });
                     }
                 }
-                $orders = $orders->orderByDesc('created_at')->paginate();
+                $orders = $orders->where('type','delivery')
+                    ->orderByDesc('created_at')->paginate();
                 $pagination = $orders->toArray();
             } else {
                 $assignedOrders = $assignedOrders[0];
@@ -128,7 +125,8 @@ class OrdersController extends Controller
                         });
                     }
                 });
-                $orders = $orders->orderByDesc('created_at')->paginate();
+                $orders = $orders->where('type','delivery')
+                    ->orderByDesc('created_at')->paginate();
                 $pagination = $orders->toArray();
             }
         } else {
@@ -216,8 +214,6 @@ class OrdersController extends Controller
 
     public function update_assign(Request $request)
     {
-        Log::info('here in 1st line');
-        Log::info( $request->all());
         $products_data = [
             'data' => NULL,
             'status' => false,
@@ -225,26 +221,17 @@ class OrdersController extends Controller
 
         ];
         $order = Orders::find($request->order_id);
-        Log::info('order query');
-        Log::info($order);
         if (!empty($order)) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            Log::info('request data and then if condition');
-            Log::info($request->all());
-            Log::info(($request->order_status == 'complete' && $request->delivery_status == 'delivered'));
             if ($request->order_status == 'delivered' && $request->delivery_status == 'complete') {
-                Log::info('Pass the if condition of complete and delivered');
                 $user = User::find($order->seller_id);
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
-                Log::info($user);
                 $this->calculateDriverFair($order, $user);
             }
-            Log::info('logging data in main file and function');
-            Log::info($order);
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
@@ -268,6 +255,8 @@ class OrdersController extends Controller
                     'phone_number' => 'required',
                     'address' => 'required',
                     'house_no' => 'required',
+                    'delivery_charges'=>'required',
+                    'service_charges'=>'required'
                 ]);
                 if ($validatedData->fails()) {
                     return response()->json($validatedData->errors(), 422);
@@ -317,6 +306,8 @@ class OrdersController extends Controller
                 $new_order->address = $request->address;
                 $new_order->house_no = $request->house_no;
                 $new_order->flat = $request->flat;
+                $new_order->delivery_charges = $request->delivery_charges;
+                $new_order->service_charges = $request->service_charges;
             }
             $new_order->description = $request->description;
             $new_order->payment_status = $request->payment_status ?? "hidden";
@@ -367,6 +358,8 @@ class OrdersController extends Controller
                 $order->address = $request->address;
                 $order->house_no = $request->house_no;
                 $order->flat = $request->flat;
+                $order->delivery_charges = $request->delivery_charges;
+                $order->service_charges = $request->service_charges;
             }
             $order->description = $request->description;
             $order->payment_status = $request->payment_status;
@@ -421,18 +414,14 @@ class OrdersController extends Controller
 
     private function calculateDriverFair($order, $user)
     {
-        Log::info('in calculate funtion');
         $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
             ->where('id','!=',$order->id)
             ->where('order_status', 'onTheWay')->get();
-        Log::info('Child order data');
-        Log::info($childOrders);
         if (count($childOrders) > 0) {
             foreach ($childOrders as $childOrder) {
                 $childOrder->update(['parent_id' => $order->id]);
             }
         }
-        Log::info('driver info');
         $driver = User::find($order->delivery_boy_id);
         $driver_money = $driver->pending_withdraw;
         $fair_per_mile = 1.50;
@@ -440,13 +429,8 @@ class OrdersController extends Controller
         $drop_off = 1.10;
         $fee = 0.20;
         if (is_null($order->parent_id)) {
-            Log::info('if parent is null');
             $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $user->lat, $user->lon);
-            Log::info('distance');
-            Log::info($distance);
-            Log::info('total fair');
             $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
-            Log::info(($totalFair - $fee) + $driver_money);
             $teekitCharges = $totalFair * $fee;
             $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
             $driver->save();
@@ -454,14 +438,10 @@ class OrdersController extends Controller
             $order->driver_traveled_km = (round(($distance * 1.609344), 2));
             $order->save();
         } else {
-            Log::info('parent is not null, and old order data');
             $oldOrder = Orders::find($order->parent_id);
-            Log::info($oldOrder);
             $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
             $pickup_val = $oldOrder->seller_id == $order->seller_id ? 0.0 : $pickup;
             $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
-            Log::info('fair');
-            Log::info(($totalFair + $fee) + $driver_money);
             $teekitCharges = $totalFair * $fee;
             $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
             $driver->save();

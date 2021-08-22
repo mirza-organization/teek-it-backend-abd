@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Categories;
+use App\Mail\OrderIsReadyMail;
 use App\Mail\StoreRegisterMail;
 use App\OrderItems;
 use App\Orders;
@@ -494,7 +495,11 @@ class HomeController extends Controller
 
     public function change_order_status($order_id)
     {
-        Orders::where('id', '=', $order_id)->update(['order_status' => 'ready', 'is_viewed' => 1]);
+        $order = Orders::where('id', '=', $order_id)->first();
+        $user = $order->user;
+        $order->update(['order_status' => 'ready', 'is_viewed' => 1]);
+        Mail::to($user->email)
+            ->send(new OrderIsReadyMail($order));
         return Redirect::back();
     }
 

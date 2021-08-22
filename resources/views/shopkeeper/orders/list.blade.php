@@ -116,7 +116,12 @@
                                         <div class="col-md-6">
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    <b>Order Status:</b> <span class=" badge badge-warning">{{$order->order_status}}</span> <b>Payment Status:</b> <span class=" badge badge-primary">{{$order->payment_status}}</span>
+                                                    <b>Order Status:</b> <span
+                                                        class=" badge badge-warning">{{$order->order_status}}</span>
+                                                    <b>Order Type:</b> <span
+                                                        class=" badge badge-info">{{$order->type}}</span>
+                                                    <b>Payment Status:</b> <span
+                                                        class=" badge badge-primary">{{$order->payment_status}}</span>
                                                 </div>
                                             </div>
                                         </div>
