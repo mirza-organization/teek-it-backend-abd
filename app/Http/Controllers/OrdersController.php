@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class OrdersController extends Controller
 {
@@ -260,6 +261,21 @@ class OrdersController extends Controller
 
     public function new(Request $request)
     {
+        if ($request->has('type')) {
+            if ($request->type == 'delivery') {
+                $validatedData = Validator::make($request->all(), [
+                    'receiver_name' => 'required',
+                    'phone_number' => 'required',
+                    'address' => 'required',
+                    'house_no' => 'required',
+                ]);
+                if ($validatedData->fails()) {
+                    return response()->json($validatedData->errors(), 422);
+                }
+            }
+        } else {
+            return response()->json(['type' => ['The type field is required.']], 422);
+        }
         $grouped_seller = [];
         foreach ($request->items as $item) {
             $product_id = $item['product_id'];
@@ -277,7 +293,6 @@ class OrdersController extends Controller
 
         $order_arr = [];
         foreach ($grouped_seller as $seller_id => $order) {
-            $total = 0;
             $user_id = Auth()->id();
             $order_total = 0;
             $total_items = 0;
@@ -295,10 +310,15 @@ class OrdersController extends Controller
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
             $new_order->total_items = $total_items;
-            $new_order->lat = "NULL";
-            $new_order->lng = "NULL";
-            $new_order->phone_number = "NULL";
-            $new_order->address = "NULL";
+            $new_order->type = $request->type;
+            if ($request->type == 'delivery'){
+                $new_order->receiver_name = $request->receiver_name;
+                $new_order->phone_number = $request->phone_number;
+                $new_order->address = $request->address;
+                $new_order->house_no = $request->house_no;
+                $new_order->flat = $request->flat;
+            }
+            $new_order->description = $request->description;
             $new_order->payment_status = $request->payment_status ?? "hidden";
             $new_order->seller_id = $seller_id;
             $new_order->save();
@@ -340,8 +360,15 @@ class OrdersController extends Controller
             }
             $order->lat = $request->lat;
             $order->lng = $request->lng;
-            $order->phone_number = $request->phone_number;
-            $order->address = $request->address;
+            $order->type = $request->type;
+            if ($request->type == 'delivery'){
+                $order->receiver_name = $request->receiver_name;
+                $order->phone_number = $request->phone_number;
+                $order->address = $request->address;
+                $order->house_no = $request->house_no;
+                $order->flat = $request->flat;
+            }
+            $order->description = $request->description;
             $order->payment_status = $request->payment_status;
             $order->order_status = $request->order_status;
             $order->transaction_id = $request->transaction_id;

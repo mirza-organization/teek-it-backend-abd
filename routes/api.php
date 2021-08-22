@@ -36,6 +36,16 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('delivery_boys', 'Auth\AuthController@delivery_boys');
     Route::get('get_user/{user_id}', 'Auth\AuthController@get_delivery_boy_info');
 });
+
+Route::group(['prefix' => 'category'], function ($router) {
+//        Route::post('add', 'CategoriesController@add');
+//        Route::post('update/{product_id}', 'CategoriesController@update');
+    Route::get('all', 'CategoriesController@all');
+    Route::get('view/{category_id}', 'CategoriesController@Products');
+    Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
+
+});
+
 Route::group(['middleware' => ['jwt.verify']], function($router) {
 
 
@@ -75,15 +85,6 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
         Route::post('sendRequest', 'WithdrawalRequestsController@sendRequest');
     });
 
-//
-    Route::group(['prefix' => 'category'], function ($router) {
-//        Route::post('add', 'CategoriesController@add');
-//        Route::post('update/{product_id}', 'CategoriesController@update');
-        Route::get('all', 'CategoriesController@all');
-        Route::get('view/{category_id}', 'CategoriesController@Products');
-        Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
-
-    });
 
     Route::group(['prefix' => 'orders'], function ($router) {
         Route::get('', 'OrdersController@index');
