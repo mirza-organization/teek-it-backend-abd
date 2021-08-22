@@ -81,6 +81,7 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
 //        Route::post('update/{product_id}', 'CategoriesController@update');
         Route::get('all', 'CategoriesController@all');
         Route::get('view/{category_id}', 'CategoriesController@Products');
+        Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
 
     });
 

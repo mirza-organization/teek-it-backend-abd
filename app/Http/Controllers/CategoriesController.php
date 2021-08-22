@@ -4,21 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Categories;
 use Illuminate\Http\Request;
-use App\productImages;
 use App\Products;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use JWTAuth;
-use Jenssegers\Agent\Agent;
-use App\Models\JwtToken;
 use App\User;
-use App\Models\Role;
 use Crypt;
 use Hash;
 use Mail;
-use Carbon\Carbon;
 use Validator;
 
 class CategoriesController extends Controller
@@ -266,6 +260,23 @@ class CategoriesController extends Controller
     }
 
 
+    public function stores($category_id): \Illuminate\Http\JsonResponse
+    {
+        if (!Categories::where('id', $category_id)->exists()) {
+            return response()->json(['message' => 'Category Id is invalid.'], 422);
+        }
+        $ids = DB::table('categories')
+            ->select(DB::raw('distinct(user_id) as store_id'))
+            ->join('products','categories.id','=','products.category_id')
+            ->join('users', 'products.user_id','=','users.id')
+            ->where('qty','>',0)
+            ->where('status','=',1)
+            ->where('is_active','=',1)
+            ->where('categories.id','=',$category_id)
+            ->get()->pluck('store_id');
+        $stores = User::whereIn('id', $ids)->get()->toArray();
+        return response()->json(['stores' => $stores], 200);
+    }
 
 
 }
