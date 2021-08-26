@@ -73,6 +73,8 @@ Route::get('/stores', 'HomeController@admin_stores');
 Route::get('/customers', 'HomeController@admin_customers');
 Route::get('/drivers', 'HomeController@admin_drivers');
 Route::get('/aorders', 'HomeController@admin_orders');
+Route::get('/complete-orders', 'HomeController@complete_orders')->name('complete.order');
+Route::get('/mark-complete-order/{id}', 'HomeController@mark_complete_order')->name('mark.complete.order');
 Route::get('/asetting', 'HomeController@asetting');
 Route::get('/acategories', 'HomeController@all_cat');
 Route::post('/acategories/{id}/update', 'HomeController@update_cat')->name('update_cat');

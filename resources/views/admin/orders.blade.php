@@ -16,7 +16,7 @@
     <!-- Main content -->
     <div class="content">
         <div class="container-fluid">
-            
+
                 <form action="" class="w-100 mb-3">
                     <div class="row">
                         <div class="col-md-8">
@@ -70,7 +70,7 @@
                                                 <div class="col-md-4">
                                                     <h3 class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
                                                         <a href="#" class="d-block text-site-primary">{{$item->product->product_name}}</a>
-                                                        <a href="#" class="d-block text-site-primary">{{$item->product->category->category_name}}</a>
+                                                        <a href="#" class="d-block text-site-primary">{{$item->product->category->category_name ?? ''}}</a>
                                                         <a href="#" class="d-block text-site-primary">{{$item->product->sku}}</a>
                                                     </h3>
                                                 </div>

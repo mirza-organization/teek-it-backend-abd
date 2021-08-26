@@ -15,16 +15,18 @@ class Orders extends Model
         return $this->hasMany(OrderItems::class, 'order_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
-     */
-    public function order_item_products()
-    {
-        return $this->hasManyThrough(OrderItems::class,Products::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function delivery_boy()
+    {
+        return $this->belongsTo(User::class,'delivery_boy_id');
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(User::class,'seller_id');
     }
 }

@@ -17,6 +17,7 @@
     <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+    @yield('links')
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
@@ -114,13 +115,28 @@
                             </p>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ (request()->is('aorders')) ? 'active' : '' }} " href="/aorders">
+                    <li class="nav-item has-treeview {{ (request()->is('orders') || request()->is('complete-orders')) ? 'active' : '' }}">
+                        <a href="#" class="nav-link ">
                             <i class="nav-icon fas fa-clipboard-list"></i>
-                            <p class="ml-2">
+                            <p>
                                 Orders
+                                <i class="fas fa-angle-left right"></i>
                             </p>
                         </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="/aorders" class="nav-link">
+                                    <i class="fas fa-gears nav-icon"></i>
+                                    <p>Orders</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="/complete-orders" class="nav-link">
+                                    <i class="fas fa-money nav-icon"></i>
+                                    <p>Complete Orders</p>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="nav-item has-treeview {{ (request()->is('withdrawals-drivers') || request()->is('withdrawals')) ? 'active' : '' }}">
                         <a href="#" class="nav-link ">

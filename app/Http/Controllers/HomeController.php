@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Categories;
+use App\Mail\OrderIsCompletedMail;
 use App\Mail\OrderIsReadyMail;
 use App\Mail\StoreRegisterMail;
 use App\OrderItems;
@@ -913,5 +914,26 @@ class HomeController extends Controller
         }
     }
 
+    public function complete_orders()
+    {
+        $orders = Orders::with(['user','delivery_boy'])
+            ->has('user')
+            ->has('delivery_boy')
+        ->where('type', 'delivery')
+            ->where('delivery_status', '!=', 'complete')
+//            ->where('order_status', 'delivered')
+            ->get();
+        return view('admin.complete-orders',compact('orders'));
+    }
 
+    public function mark_complete_order($order_id)
+    {
+        $order = Orders::with(['user', 'delivery_boy'])
+            ->where('id', $order_id)->first();
+        $order->update(['delivery_status' => 'complete']);
+        flash('Order is successfully completed')->success();
+        Mail::to([$order->user->email, $order->delivery_boy->email])
+            ->send(new OrderIsCompletedMail($order));
+        return \redirect()->route('complete.order');
+    }
 }
