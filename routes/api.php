@@ -46,10 +46,19 @@ Route::group(['prefix' => 'category'], function ($router) {
 
 });
 
+Route::group(['prefix' => 'product'], function ($router) {
+    Route::post('search', 'ProductsController@search');
+    Route::get('all', 'ProductsController@all');
+});
+
+Route::group(['prefix' => 'page'], function ($router) {
+    Route::get('', 'PagesController@get_page');
+});
+Route::get('sellers', 'Auth\AuthController@sellers');
+
 Route::group(['middleware' => ['jwt.verify']], function($router) {
 
 
-    Route::get('sellers', 'Auth\AuthController@sellers');
     Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
 
 
@@ -63,8 +72,6 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
         Route::get('delete/{product_id}', 'ProductsController@delete');
         Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@delete_image');
 
-        Route::post('search', 'ProductsController@search');
-        Route::get('all', 'ProductsController@all');
         Route::get('sortbyprice', 'ProductsController@sortByPrice');
         Route::get('sortByLocation', 'ProductsController@sortByLocation');
 
@@ -101,10 +108,6 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
         Route::get('', 'NotificationsController@get_notifications');
         Route::get('delete/{notification_id}', 'NotificationsController@delete_notification');
         Route::post('send', 'NotificationsController@send_notification');
-    });
-    Route::group(['prefix' => 'page'], function ($router) {
-        Route::get('', 'PagesController@get_page');
-
     });
 
 

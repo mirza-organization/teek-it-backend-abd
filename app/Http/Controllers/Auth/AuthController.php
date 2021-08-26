@@ -433,7 +433,7 @@ class AuthController extends Controller
             $User->name = $request->name;
             $User->l_name = $request->l_name;
             $User->postal_code = $request->postal_code;
-
+            $User->phone = $request->phone;
             $User->address_1 = $request->address_1;
             $User->address_2 = $request->address_2;
             $User->user_img = $filename;
