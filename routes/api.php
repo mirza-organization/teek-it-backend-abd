@@ -55,11 +55,9 @@ Route::group(['prefix' => 'page'], function ($router) {
     Route::get('', 'PagesController@get_page');
 });
 Route::get('sellers', 'Auth\AuthController@sellers');
+Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
 
 Route::group(['middleware' => ['jwt.verify']], function($router) {
-
-
-    Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
 
 
     Route::group(['prefix' => 'product'], function ($router) {

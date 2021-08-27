@@ -39,6 +39,7 @@
                             <div class="card-body p-2 pl-5 pr-5 pb-5">
                                <div class="p-2 mb-2">Order #{{$order->id}}  @if($order->order_status=='pending')
                                        <a href="{{route('accept_order',['order_id'=>$order->id])}}" class=" d-block btn btn-warning float-right">Click when preparing order</a>
+                                       <a href="{{route('cancel_order',['order_id'=>$order->id])}}" onclick="cancelOrder(event)" class=" d-block btn btn-danger float-right" style="margin-right: 20px">Cancel Order</a>
                                    @else
                                                                                 @if(!empty($order->delivery_boy_id))
                                        <a href="" data-toggle="modal" data-target="#exampleModal{{$order->id}}" class=" btn btn-primary d-block float-right">View Driver Details</a>
@@ -182,4 +183,23 @@
         </div>
         <!-- /.content -->
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        function cancelOrder(ev){
+            ev.preventDefault();
+            var urlToRedirect = ev.currentTarget.getAttribute('href'); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Are you sure want to cancel this order?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed)
+                    window.location.href=urlToRedirect
+            });
+        }
+    </script>
 @endsection

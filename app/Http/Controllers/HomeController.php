@@ -936,4 +936,10 @@ class HomeController extends Controller
             ->send(new OrderIsCompletedMail($order));
         return \redirect()->route('complete.order');
     }
+
+    public function cancel_order($order_id)
+    {
+        $order = Orders::findOrFail($order_id);
+        $payment_intent = $order->transaction_id;
+    }
 }
