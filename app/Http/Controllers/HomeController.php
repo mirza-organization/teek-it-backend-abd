@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Categories;
+use App\Mail\OrderIsCanceledMail;
 use App\Mail\OrderIsCompletedMail;
 use App\Mail\OrderIsReadyMail;
 use App\Mail\StoreRegisterMail;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Stripe;
 
 class HomeController extends Controller
 {
@@ -940,6 +942,14 @@ class HomeController extends Controller
     public function cancel_order($order_id)
     {
         $order = Orders::findOrFail($order_id);
-        $payment_intent = $order->transaction_id;
+        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        Stripe\Refund::create(['payment_intent' => $order->transaction_id,]);
+        $order->order_status = 'canceled';
+        $order->save();
+        $order->update(['order_status' => 'ready']);
+        Mail::to([$order->user->email])
+            ->send(new OrderIsCanceledMail($order));
+        flash('Order is successfully canceled')->success();
+        return \redirect()->back();
     }
 }
