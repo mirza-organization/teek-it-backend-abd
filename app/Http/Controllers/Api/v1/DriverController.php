@@ -89,12 +89,13 @@ class DriverController extends Controller
             'branch_code' => 'required',
             'bank_name' => 'required',
             'account_number' => 'required',
+            'phone' => 'required'
         ]);
         if ($validator->fails()) {
             $responseArr['message'] = $validator->errors();;
             return response()->json($responseArr, 422);
         }
-        $data = ['branch' => $request->branch_code, 'bank_name' => $request->bank_name, 'account_number' => $request->account_number];
+        $data = ['branch' => $request->branch_code, 'bank_name' => $request->bank_name, 'account_number' => $request->account_number, 'phone' => $request->phone];
         $bankDetails = [1 => $data];
         auth()->user()->update(['bank_details' => json_encode($bankDetails)]);
         return response()->json(['message' => 'Bank Account details are successfully updated.'], 200);
