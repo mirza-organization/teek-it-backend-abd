@@ -934,15 +934,19 @@ class HomeController extends Controller
             ->where('id', $order_id)->first();
         $order->update(['delivery_status' => 'complete']);
         flash('Order is successfully completed')->success();
-        Mail::to([$order->user->email, $order->delivery_boy->email])
-            ->send(new OrderIsCompletedMail($order));
+        Mail::to([$order->user->email])
+            ->send(new OrderIsCompletedMail('user'));
+        Mail::to([$order->delivery_boy->email])
+            ->send(new OrderIsCompletedMail('driver'));
         return \redirect()->route('complete.order');
     }
 
     public function cancel_order($order_id)
     {
         $order = Orders::findOrFail($order_id);
-        Stripe\Stripe::setApiKey(env('STRIPE_SECRET'));
+        $order->load('user');
+        $order->load('store');
+        Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
         Stripe\Refund::create(['payment_intent' => $order->transaction_id,]);
         $order->order_status = 'canceled';
         $order->save();

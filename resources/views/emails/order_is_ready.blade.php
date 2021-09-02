@@ -8,6 +8,11 @@
     <title>Teek-it</title>
 </head>
 <body>
-Your order {{$order->id}} is ready
+<b>Dear customer your order #{{$order->id}} is ready to be picked up.</b>
+<br>
+<b>please pick it from the store.</b>
+<br>
+<br>
+<img src="{{asset('teekit.png')}}" alt="">
 </body>
 </html>

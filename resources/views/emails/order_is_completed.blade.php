@@ -8,6 +8,21 @@
     <title>Teek-it</title>
 </head>
 <body>
-Your order {{$order->id}} is successfully completed.
+
+@if($userType == 'driver')
+    <b>You have successfully completed your delivery.</b>
+@else
+    <b>You have successfully received your delivery.</b>
+@endif
+<br>
+<br>
+@if($userType != 'driver')
+    <b>If you experienced any issues with your delivery, please contact us via email at:</b><br>
+@else
+    <b>If you experienced any issues whilst delivering, or were not able to complete the delivery,</b><br>
+    <b>please contact us via email at:</b><br>
+@endif
+<b>admin@teekit.co.uk</b><br><br>
+<img src="{{asset('teekit.png')}}" alt="">
 </body>
 </html>

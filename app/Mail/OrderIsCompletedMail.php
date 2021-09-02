@@ -11,16 +11,16 @@ class OrderIsCompletedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $order;
+    public $userType;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($order)
+    public function __construct($userType)
     {
-        $this->order = $order;
+        $this->userType = $userType;
     }
 
     /**
@@ -30,8 +30,8 @@ class OrderIsCompletedMail extends Mailable
      */
     public function build()
     {
-        $order = $this->order;
-        return $this->view('emails.order_is_completed', compact('order'))
+        $userType = $this->userType;
+        return $this->view('emails.order_is_completed', compact('userType'))
             ->subject("Your order is successfully completed.");
     }
 }

@@ -123,6 +123,10 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+
+    'STRIPE_PUBLISH_KEY' => 'pk_test_51IY9sYIiDDGv1gaVP2DSlWvT0tnrFstp62txvamB1icDpBjwXy1KtrZmiWLFjrxHmxlMrTyWbnnBWNMblbNMizwS004MoCvzJB',
+    'STRIPE_SECRET' => 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q',
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

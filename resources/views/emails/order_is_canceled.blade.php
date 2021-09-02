@@ -8,6 +8,12 @@
     <title>Teek-it</title>
 </head>
 <body>
-Your order {{$order->id}} is canceled
+<b>Hello {{$order->user->name}}</b><br><br>
+<b>Your order from {{$order->store->name}} was unsuccessful.</b><br><br>
+<p>Unfortunately {{$order->store->name}} were unable to complete your order. You have not been
+    charged.</p><br>
+<b>If you need any assistance, please contact us via email at:</b><br>
+<b>admin@teekit.co.uk</b><br><br>
+<img src="{{asset('teekit.png')}}" alt="">
 </body>
 </html>
