@@ -12,6 +12,7 @@ use App\Orders;
 use App\Pages;
 use App\productImages;
 use App\Products;
+use App\Services\TwilioSmsService;
 use App\User;
 use App\WithdrawalRequests;
 use Illuminate\Http\Request;
@@ -928,12 +929,22 @@ class HomeController extends Controller
         return view('admin.complete-orders',compact('orders'));
     }
 
+    /**
+     * @throws \Twilio\Exceptions\TwilioException
+     * @throws \Twilio\Exceptions\ConfigurationException
+     */
     public function mark_complete_order($order_id)
     {
         $order = Orders::with(['user', 'delivery_boy'])
             ->where('id', $order_id)->first();
         $order->update(['delivery_status' => 'complete']);
         flash('Order is successfully completed')->success();
+        $message = "Thanks for your order " . $order->user->name . ".
+            Your order from " . $order->store->name . " has successfully been delivered.
+            If you experienced any issues with your order, please contact us via email at:
+            admin@teekit.co.uk";
+        $sms = new TwilioSmsService();
+        $sms->sendSms($order->user->phone, $message);
         Mail::to([$order->user->email])
             ->send(new OrderIsCompletedMail('user'));
         Mail::to([$order->delivery_boy->email])
@@ -941,6 +952,11 @@ class HomeController extends Controller
         return \redirect()->route('complete.order');
     }
 
+    /**
+     * @throws Stripe\Exception\ApiErrorException
+     * @throws \Twilio\Exceptions\TwilioException
+     * @throws \Twilio\Exceptions\ConfigurationException
+     */
     public function cancel_order($order_id)
     {
         $order = Orders::findOrFail($order_id);
@@ -951,6 +967,14 @@ class HomeController extends Controller
         $order->order_status = 'canceled';
         $order->save();
         $order->update(['order_status' => 'ready']);
+        $message = "Hello ".$order->user->name." .
+            Your order from ". $order->store->name ." was unsuccessful.
+            Unfortunately ".$order->store->name." were unable to complete your order. You have not been
+            charged.
+            If you need any assistance, please contact us via email at:
+            admin@teekit.co.uk";
+        $sms = new TwilioSmsService();
+        $sms->sendSms($order->user->phone, $message);
         Mail::to([$order->user->email])
             ->send(new OrderIsCanceledMail($order));
         flash('Order is successfully canceled')->success();

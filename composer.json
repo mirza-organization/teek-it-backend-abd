@@ -19,6 +19,7 @@
         "laravel/tinker": "^1.0",
         "league/flysystem-aws-s3-v3": "~1.0",
         "stripe/stripe-php": "7.3",
+        "twilio/sdk": "^6.28",
         "tymon/jwt-auth": "1.0.0-rc.5"
     },
     "require-dev": {
