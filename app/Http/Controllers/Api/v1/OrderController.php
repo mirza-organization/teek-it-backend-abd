@@ -27,7 +27,8 @@ class OrderController extends Controller
         if (!Orders::where('id', $order_id)->exists()) {
             return response()->json(['message' => 'Invalid Order id'], 422);
         }
-        $order = Orders::with(['user', 'delivery_boy', 'store','order_items'])->first();
+        $order = Orders::with(['user', 'delivery_boy', 'store', 'order_items'])
+            ->where('id', $order_id)->first();
         return response()->json(['order' => $order]);
     }
 }
