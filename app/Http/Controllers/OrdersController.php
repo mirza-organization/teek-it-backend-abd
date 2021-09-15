@@ -278,7 +278,7 @@ class OrdersController extends Controller
             $grouped_seller[$product_seller_id][] = $temp;
         }
 
-
+        $count = 0;
         $order_arr = [];
         foreach ($grouped_seller as $seller_id => $order) {
             $user_id = Auth()->id();
@@ -305,7 +305,7 @@ class OrdersController extends Controller
                 $new_order->address = $request->address;
                 $new_order->house_no = $request->house_no;
                 $new_order->flat = $request->flat;
-                $new_order->delivery_charges = $request->delivery_charges;
+                $new_order->delivery_charges = $request->delivery_charges[$count];
                 $new_order->service_charges = $request->service_charges;
             }
             $new_order->description = $request->description;
@@ -322,6 +322,7 @@ class OrdersController extends Controller
                 $new_order_item->product_qty = $order_item['qty'];
                 $new_order_item->save();
             }
+            $count++;
         }
         $return_data = $this->get_orders_from_ids($order_arr);
         $user_arr = [
@@ -338,6 +339,7 @@ class OrdersController extends Controller
     {
         $order_ids = $request->ids;
         $order_arr = explode(',', $order_ids);
+        $count = 0;
         foreach ($order_arr as $order_id) {
 
             $order = Orders::find($order_id);
@@ -357,7 +359,7 @@ class OrdersController extends Controller
                 $order->address = $request->address;
                 $order->house_no = $request->house_no;
                 $order->flat = $request->flat;
-                $order->delivery_charges = $request->delivery_charges;
+                $order->delivery_charges = $request->delivery_charges[$count];
                 $order->service_charges = $request->service_charges;
             }
             $order->description = $request->description;
@@ -368,7 +370,7 @@ class OrdersController extends Controller
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
-
+            $count++;
         }
         $return_data = $this->get_orders_from_ids($order_arr);
         $user_arr = [
