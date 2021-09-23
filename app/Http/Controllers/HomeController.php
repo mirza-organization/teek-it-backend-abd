@@ -502,8 +502,10 @@ class HomeController extends Controller
         $order = Orders::where('id', '=', $order_id)->first();
         $user = $order->user;
         $order->update(['order_status' => 'ready', 'is_viewed' => 1]);
-        Mail::to($user->email)
-            ->send(new OrderIsReadyMail($order));
+        if ($order->type == 'self-pickup') {
+            Mail::to($user->email)
+                ->send(new OrderIsReadyMail($order));
+        }
         return Redirect::back();
     }
 

@@ -445,7 +445,11 @@ $product = $this->get_product_info($product_id);
 
 
     public function get_product_price($product_id){
-        return Products::find($product_id)->price;
+        $product = Products::find($product_id);
+        if ($product->sale_price > 0 ){
+            return $product->sale_price * 1.2;
+        }
+        return $product->price * 1.2;
     }
     public function get_product_seller_id($product_id){
         return Products::find($product_id)->user_id;
