@@ -499,9 +499,9 @@ class HomeController extends Controller
 
     public function change_order_status($order_id)
     {
-        $order = Orders::where('id', '=', $order_id)->first();
+        Orders::where('id', '=', $order_id)->update(['order_status' => 'ready', 'is_viewed' => 1]);
+        $order = Orders::find($order_id);
         $user = $order->user;
-        $order->update(['order_status' => 'ready', 'is_viewed' => 1]);
         if ($order->type == 'self-pickup') {
             Mail::to($user->email)
                 ->send(new OrderIsReadyMail($order));
