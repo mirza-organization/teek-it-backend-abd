@@ -924,7 +924,7 @@ class HomeController extends Controller
         $orders = Orders::with(['user','delivery_boy'])
             ->has('user')
             ->has('delivery_boy')
-        ->where('type', 'delivery')
+            ->where('type', 'delivery')
             ->where('delivery_status', '!=', 'complete')
 //            ->where('order_status', 'delivered')
             ->get();
@@ -939,7 +939,8 @@ class HomeController extends Controller
     {
         $order = Orders::with(['user', 'delivery_boy'])
             ->where('id', $order_id)->first();
-        $order->update(['delivery_status' => 'complete']);
+        $order->delivery_status = 'complete';
+        $order->save();
         flash('Order is successfully completed')->success();
         $message = "Thanks for your order " . $order->user->name . ".
             Your order from " . $order->store->name . " has successfully been delivered.
