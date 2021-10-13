@@ -925,7 +925,7 @@ class HomeController extends Controller
             ->has('user')
             ->has('delivery_boy')
             ->where('type', 'delivery')
-            ->where('delivery_status', '!=', 'complete')
+            ->where('delivery_status', '=', 'pending_approval')
 //            ->where('order_status', 'delivered')
             ->get();
         return view('admin.complete-orders',compact('orders'));
@@ -941,6 +941,7 @@ class HomeController extends Controller
             ->where('id', $order_id)->first();
         $order->delivery_status = 'complete';
         $order->save();
+        (new OrdersController())->calculateDriverFair($order, $order->user);
         flash('Order is successfully completed')->success();
         $message = "Thanks for your order " . $order->user->name . ".
             Your order from " . $order->store->name . " has successfully been delivered.

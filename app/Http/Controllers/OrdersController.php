@@ -225,11 +225,12 @@ class OrdersController extends Controller
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
             if ($request->order_status == 'delivered' && $request->delivery_status == 'complete') {
+                $order->delivery_status = 'pending_approval';
                 $user = User::find($order->seller_id);
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
-                $this->calculateDriverFair($order, $user);
+//                $this->calculateDriverFair($order, $user);
             }
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
@@ -413,7 +414,7 @@ class OrdersController extends Controller
         return $kms > 1 ? $kms : 1;
     }
 
-    private function calculateDriverFair($order, $user)
+    public function calculateDriverFair($order, $user)
     {
         $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
             ->where('id','!=',$order->id)
