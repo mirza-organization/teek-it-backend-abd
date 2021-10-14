@@ -937,11 +937,11 @@ class HomeController extends Controller
      */
     public function mark_complete_order($order_id)
     {
-        $order = Orders::with(['user', 'delivery_boy'])
+        $order = Orders::with(['user', 'delivery_boy','store'])
             ->where('id', $order_id)->first();
         $order->delivery_status = 'complete';
         $order->save();
-        (new OrdersController())->calculateDriverFair($order, $order->user);
+        (new OrdersController())->calculateDriverFair($order, $order->store);
         flash('Order is successfully completed')->success();
         $message = "Thanks for your order " . $order->user->name . ".
             Your order from " . $order->store->name . " has successfully been delivered.

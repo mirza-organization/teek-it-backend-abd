@@ -414,7 +414,7 @@ class OrdersController extends Controller
         return $kms > 1 ? $kms : 1;
     }
 
-    public function calculateDriverFair($order, $user)
+    public function calculateDriverFair($order, $store)
     {
         $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
             ->where('id','!=',$order->id)
@@ -431,7 +431,7 @@ class OrdersController extends Controller
         $drop_off = 1.10;
         $fee = 0.20;
         if (is_null($order->parent_id)) {
-            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $user->lat, $user->lon);
+            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $store->lat, $store->lon);
             $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
             $teekitCharges = $totalFair * $fee;
             $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
