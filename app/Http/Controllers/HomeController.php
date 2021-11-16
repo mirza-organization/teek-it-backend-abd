@@ -967,7 +967,7 @@ class HomeController extends Controller
         $order->load('user');
         $order->load('store');
         Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
-        Stripe\Refund::create(['payment_intent' => $order->transaction_id,]);
+        Stripe\Refund::create(['charge' => $order->transaction_id]);
         $order->order_status = 'canceled';
         $order->save();
         $order->update(['order_status' => 'ready']);
@@ -982,6 +982,6 @@ class HomeController extends Controller
         Mail::to([$order->user->email])
             ->send(new OrderIsCanceledMail($order));
         flash('Order is successfully canceled')->success();
-        return \redirect()->back();
+        return back();
     }
 }
