@@ -24,7 +24,7 @@ class TwilioSmsService
      */
     public function sendSms($receiverNumber, $message)
     {
-        $receiverNumber = "+923006694349";
+//        $receiverNumber = "+923006694349";
         $client = new Client($this->sid, $this->token);
         $client->messages->create($receiverNumber, [
             'from' => $this->fromNumber,
