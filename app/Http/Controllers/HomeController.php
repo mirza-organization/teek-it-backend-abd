@@ -71,11 +71,10 @@ class HomeController extends Controller
             $categories = Categories::all();
             $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
-            $inventories = [];
+            $inventories = []; 
             foreach ($inventory as $in) {
                 $inventories[] = Products::get_product_info($in->id);
             }
-            //        Auth::user()->hasRole('seller');
             return view('shopkeeper.inventory.list', compact('inventories', 'inventory_p', 'categories'));
         } else {
             abort(404);
@@ -103,6 +102,15 @@ class HomeController extends Controller
             $categories = Categories::all();
             $inventory = new Products();
             return view('shopkeeper.inventory.add', compact('inventory', 'categories'));
+        } else {
+            abort(404);
+        }
+    }
+
+    public function inventory_add_bulk(Request $request)
+    {
+        if (Auth::user()->hasRole('seller')) {
+            return view('shopkeeper.inventory.add_bulk');
         } else {
             abort(404);
         }
@@ -441,44 +449,105 @@ class HomeController extends Controller
     public function importProducts(Request $request)
     {
         $user_id = Auth::id();
-
         if ($request->hasFile('file')) {
-            $import_data = json_decode($this->csvToJson($request->file('file')), true);
+            $file = $request->file('file');
+            $filename = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension(); //Get extension of uploaded file
+            $tempPath = $file->getRealPath();
+            $fileSize = $file->getSize(); //Get size of uploaded file in bytes
 
-            foreach ($import_data as $p) {
-                if (isset($p['images'])) {
-                    $images = explode(',', $p['images']);
-                    unset($p['images']);
-                }
-                if (is_array($p))
-                    $ppt = array_keys($p);
-                $product = new Products();
-                foreach ($ppt as $t) {
-                    if ($t == 'colors') {
-                        $colors = explode(',', $p[$t]);
-                        $product->$t = json_encode(array_fill_keys($colors, true));
-                    } elseif (($t == 'bike' && $p[$t] == null) || ($t == 'van' && $p[$t] == null)) {
-                        $product->$t = 0;
-                    } else {
-                        $product->$t = $p[$t];
-                    }
-                }
+            //Check for file extension and size
+            // $this->checkUploadedFileProperties($extension, $fileSize);
 
-                $product->user_id = $user_id;
-                $product->save();
-                $p_id = $product->id;
-                if (isset($images)) {
-                    foreach ($images as $image) {
-                        $product_images = new productImages();
-                        $product_images->product_id = (int)$p_id;
-                        $product_images->product_image = $image;
-                        $product_images->save();
-                    }
+            //Where uploaded file will be stored on the server 
+            $location = public_path('upload/csv');
+            // Upload file
+            $file->move($location, $filename);
+            // In case the uploaded file path is to be stored in the database 
+            $filepath = $location . "/" . $filename;
+            // Reading file
+            $file = fopen($filepath, "r");
+            // Read through the file and store the contents as an array
+            $importData_arr = array();
+            $i = 0;
+            //Read the contents of the uploaded file 
+            while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+                $num = count($filedata);
+                // Skip first row (Remove below comment if you want to skip the first row)
+                if ($i == 0) {
+                    $i++;
+                    continue;
                 }
+                for ($c = 0; $c < $num; $c++) {
+                    $importData_arr[$i][] = $filedata[$c];
+                }
+                $i++;
             }
-
-            flash('Importing Complete');
+            fclose($file); //Close after reading
+            $j = 0;
+            foreach ($importData_arr as $importData) {
+                $product = new Products();
+                $product->user_id = $user_id;
+                $product->category_id = $importData[0];
+                $product->product_name = $importData[1];
+                $product->sku = $importData[2];
+                $product->qty = $importData[3];
+                $product->price = $importData[4];
+                $product->sale_price = $importData[5];
+                $product->weight = $importData[6];
+                $product->brand = $importData[7];
+                $product->size = $importData[8];
+                $product->status = $importData[9];
+                $product->contact = $importData[10];
+                // $product->colors = $importData[11]; 
+                $product->bike = $importData[12];
+                $product->van = $importData[13];
+                $product->height = $importData[14];
+                $product->width = $importData[15];
+                $product->length = $importData[16];
+                $product->save();
+                $j++;
+            }
         }
+        flash('Your Bulk Products Have Been Imported Successfully!');
+        // if ($request->hasFile('file')) {
+        //     $import_data = json_decode($this->csvToJson($request->file('file')), true);
+        //     foreach ($import_data as $p) {
+        //         if (isset($p['images'])) {
+        //             $images = explode(',', $p['images']);
+        //             unset($p['images']);
+        //         }
+        //         if (is_array($p))
+        //             $ppt = array_keys($p);
+        //         $product = new Products();
+        //         print_r($product);
+        //         exit;
+        //         foreach ($ppt as $t) {
+        //             if ($t == 'colors') {
+        //                 $colors = explode(',', $p[$t]);
+        //                 $product->$t = json_encode(array_fill_keys($colors, true));
+        //             } elseif (($t == 'bike' && $p[$t] == null) || ($t == 'van' && $p[$t] == null)) {
+        //                 $product->$t = 0;
+        //             } else {
+        //                 $product->$t = $p[$t];
+        //             }
+        //         }
+
+        //         $product->user_id = $user_id;
+        //         $product->save();
+        //         $p_id = $product->id;
+        //         if (isset($images)) {
+        //             foreach ($images as $image) {
+        //                 $product_images = new productImages();
+        //                 $product_images->product_id = (int)$p_id;
+        //                 $product_images->product_image = $image;
+        //                 $product_images->save();
+        //             }
+        //         }
+        //     }
+
+        //     flash('Importing Complete');
+        // }
         return redirect()->back();
     }
 
