@@ -251,102 +251,102 @@ class OrdersController extends Controller
         return response()->json($products_data);
     }
 
-    public function new(Request $request)
-    {
-        if ($request->has('type')) {
-            if ($request->type == 'delivery') {
-                $validatedData = Validator::make($request->all(), [
-                    'receiver_name' => 'required',
-                    'phone_number' => 'required',
-                    'address' => 'required',
-                    'house_no' => 'required',
-                    'delivery_charges' => 'required',
-                    'service_charges' => 'required'
-                ]);
-                if ($validatedData->fails()) {
-                    return response()->json($validatedData->errors(), 422);
-                }
-            }
-        } else {
-            return response()->json(['type' => ['The type field is required.']], 422);
-        }
-        $grouped_seller = [];
-        foreach ($request->items as $item) {
-            $product_id = $item['product_id'];
-            $qty = $item['qty'];
-            $product_price = (new ProductsController())->get_product_price($product_id);
-            $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
-            $temp = [];
-            $temp['qty'] = $qty;
-            $temp['product_id'] = $product_id;
-            $temp['price'] = $product_price;
-            $temp['seller_id'] = $product_seller_id;
-            $grouped_seller[$product_seller_id][] = $temp;
-        }
+    // public function newOld(Request $request)
+    // {
+    //     if ($request->has('type')) {
+    //         if ($request->type == 'delivery') {
+    //             $validatedData = Validator::make($request->all(), [
+    //                 'receiver_name' => 'required',
+    //                 'phone_number' => 'required',
+    //                 'address' => 'required',
+    //                 'house_no' => 'required',
+    //                 'delivery_charges' => 'required',
+    //                 'service_charges' => 'required'
+    //             ]);
+    //             if ($validatedData->fails()) {
+    //                 return response()->json($validatedData->errors(), 422);
+    //             }
+    //         }
+    //     } else {
+    //         return response()->json(['type' => ['The type field is required.']], 422);
+    //     }
+    //     $grouped_seller = [];
+    //     foreach ($request->items as $item) {
+    //         $product_id = $item['product_id'];
+    //         $qty = $item['qty'];
+    //         $product_price = (new ProductsController())->get_product_price($product_id);
+    //         $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
+    //         $temp = [];
+    //         $temp['qty'] = $qty;
+    //         $temp['product_id'] = $product_id;
+    //         $temp['price'] = $product_price;
+    //         $temp['seller_id'] = $product_seller_id;
+    //         $grouped_seller[$product_seller_id][] = $temp;
+    //     }
 
-        $count = 0;
-        $order_arr = [];
-        foreach ($grouped_seller as $seller_id => $order) {
-            $user_id = Auth()->id(); 
-            // $user_id = 306; 
-            $order_total = 0;
-            $total_items = 0;
-            foreach ($order as $order_item) {
-                $total_items = $total_items + $order_item['qty'];
-                $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
-            }
+    //     $count = 0;
+    //     $order_arr = [];
+    //     foreach ($grouped_seller as $seller_id => $order) {
+    //         $user_id = Auth()->id(); 
+    //         // $user_id = 306; 
+    //         $order_total = 0;
+    //         $total_items = 0;
+    //         foreach ($order as $order_item) {
+    //             $total_items = $total_items + $order_item['qty'];
+    //             $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
+    //         }
 
-            $user = User::find($seller_id);
-            $user_money = $user->pending_withdraw;
-            $user->pending_withdraw = $order_total + $user_money;
-            $user->save();
+    //         $user = User::find($seller_id);
+    //         $user_money = $user->pending_withdraw;
+    //         $user->pending_withdraw = $order_total + $user_money;
+    //         $user->save();
 
-            $new_order = new Orders();
-            $new_order->user_id = $user_id;
-            $new_order->order_total = $order_total;
-            $new_order->total_items = $total_items;
-            $new_order->type = $request->type;
-            if ($request->type == 'delivery') {
-                $new_order->receiver_name = $request->receiver_name;
-                $new_order->phone_number = $request->phone_number;
-                $new_order->address = $request->address;
-                $new_order->house_no = $request->house_no;
-                $new_order->flat = $request->flat;
-                $new_order->delivery_charges = $request->delivery_charges[$count];
-                $new_order->service_charges = $request->service_charges;
-            }
-            $new_order->description = $request->description;
-            $new_order->payment_status = $request->payment_status ?? "hidden";
-            $new_order->seller_id = $seller_id;
-            $new_order->save();
-            $order_id = $new_order->id;
-            $order_arr[] = $order_id;
-            foreach ($order as $order_item) {
-                $new_order_item = new OrderItems();
-                $new_order_item->order_id = $order_id;
-                $new_order_item->product_id = $order_item['product_id'];
-                $new_order_item->product_price = $order_item['price'];
-                $new_order_item->product_qty = $order_item['qty'];
-                $new_order_item->save();
-            }
-            $count++;
-        }
-        $return_data = $this->get_orders_from_ids($order_arr);
-        $user_arr = [
-            'data' => $return_data,
-            'status' => true,
-            'message' => 'Order Added Successfully'
+    //         $new_order = new Orders();
+    //         $new_order->user_id = $user_id;
+    //         $new_order->order_total = $order_total;
+    //         $new_order->total_items = $total_items;
+    //         $new_order->type = $request->type;
+    //         if ($request->type == 'delivery') {
+    //             $new_order->receiver_name = $request->receiver_name;
+    //             $new_order->phone_number = $request->phone_number;
+    //             $new_order->address = $request->address;
+    //             $new_order->house_no = $request->house_no;
+    //             $new_order->flat = $request->flat;
+    //             $new_order->delivery_charges = $request->delivery_charges[$count];
+    //             $new_order->service_charges = $request->service_charges;
+    //         }
+    //         $new_order->description = $request->description;
+    //         $new_order->payment_status = $request->payment_status ?? "hidden";
+    //         $new_order->seller_id = $seller_id;
+    //         $new_order->save();
+    //         $order_id = $new_order->id;
+    //         $order_arr[] = $order_id;
+    //         foreach ($order as $order_item) {
+    //             $new_order_item = new OrderItems();
+    //             $new_order_item->order_id = $order_id;
+    //             $new_order_item->product_id = $order_item['product_id'];
+    //             $new_order_item->product_price = $order_item['price'];
+    //             $new_order_item->product_qty = $order_item['qty'];
+    //             $new_order_item->save();
+    //         }
+    //         $count++;
+    //     }
+    //     $return_data = $this->get_orders_from_ids($order_arr);
+    //     $user_arr = [
+    //         'data' => $return_data,
+    //         'status' => true,
+    //         'message' => 'Order Added Successfully'
 
-        ];
-        return response()->json($user_arr, 200);
-    }
+    //     ];
+    //     return response()->json($user_arr, 200);
+    // }
 
     /**
      * Inserts a newly arrived order
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function newLatest(Request $request)
+    public function new(Request $request)
     {
         if ($request->has('type')) {
             if ($request->type == 'delivery') {
@@ -373,10 +373,10 @@ class OrdersController extends Controller
                 'message' => 'The type field is required.'
             ], 422);
         }
-        $grouped_seller = []; 
+        $grouped_seller = [];
         foreach ($request->items as $item) {
             $product_id = $item['product_id'];
-            $qty = $item['qty'];
+            $qty = $item['qty']; 
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
             $temp = [];
@@ -390,7 +390,7 @@ class OrdersController extends Controller
         $order_arr = [];
         foreach ($grouped_seller as $seller_id => $order) {
             $user_id = Auth()->id();
-            // $user_id = $request->user_id;
+            // $user_id = 306;
             $order_total = 0;
             $total_items = 0;
             foreach ($order as $order_item) {
@@ -406,7 +406,7 @@ class OrdersController extends Controller
             $new_order->order_total = $order_total;
             $new_order->total_items = $total_items;
             $new_order->type = $request->type;
-            if ($request->type == 'delivery') { 
+            if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
                 $new_order->phone_number = $request->phone_number;
                 $new_order->address = $request->address;
@@ -417,7 +417,7 @@ class OrdersController extends Controller
             }
             $new_order->description = $request->description;
             $new_order->payment_status = $request->payment_status ?? "hidden";
-            $new_order->seller_id = $seller_id; 
+            $new_order->seller_id = $seller_id;
             $new_order->save();
             $order_id = $new_order->id;
             $order_arr[] = $order_id;

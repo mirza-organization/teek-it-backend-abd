@@ -89,7 +89,7 @@ class HomeController extends Controller
                 abort(404);
             }
             $categories = Categories::all();
-            $inventory = Products::get_product_info($product_id);
+            $inventory = Products::get_product_info($product_id); 
             return view('shopkeeper.inventory.edit', compact('inventory', 'categories'));
         } else {
             abort(404);
@@ -802,7 +802,6 @@ class HomeController extends Controller
 
     public function admin_orders(Request $request)
     {
-
         if (Auth::user()->hasRole('superadmin')) {
             $return_arr = [];
             $orders = Orders::query()->where('payment_status', '!=', 'hidden')->orderByDesc('id');
@@ -817,7 +816,6 @@ class HomeController extends Controller
             }
             $orders = $orders->paginate(10);
             $orders_p = $orders;
-
             foreach ($orders as $order) {
                 //            $order_items = [];
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
