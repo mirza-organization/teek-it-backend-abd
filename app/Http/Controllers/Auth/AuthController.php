@@ -461,9 +461,7 @@ class AuthController extends Controller
             'data' => $data,
             'status' => true,
             'message' => ''
-
         ];
-
         return response()->json($user_arr, 200);
     }
      /**

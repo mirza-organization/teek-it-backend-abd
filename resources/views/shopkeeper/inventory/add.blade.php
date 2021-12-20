@@ -26,8 +26,6 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <?php
-                    ?>
                     <div class="offset-xl-2 col-lg-12 col-xl-8  pb-4">
                         <div class="card">
                             <div class="card-body">
@@ -54,10 +52,8 @@
                                                         <div class="col-md-6">
                                                             <div class="form-group">
                                                                 <select class="form-control"  required name="category_id" id="">
-
                                                                     <option value="">Category*</option>
                                                                     @foreach($categories as $cat)
-
                                                                         <option @if($cat->id==$inventory->category_id)
                                                                                 selected
                                                                                 @endif
@@ -78,7 +74,7 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <div class="form-group">
-                                                                <input type="number" step="0.01" class="form-control" name="sale_price" placeholder="Discounted Price*" id="" value="{{$inventory->sale_price}}">
+                                                                <input type="number" step="0.01" class="form-control" name="discount_percentage" placeholder="Discount %" id="" value="{{$inventory->discount_percentage}}">
                                                             </div>
                                                         </div>
                                                         <div class="col-md-6">

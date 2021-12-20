@@ -19,7 +19,6 @@
     <!-- Main content -->
     <div class="content">
         <div class="container-fluid">
-
             <form action="" class="w-100">
                 <div class="row">
                     <div class="col-md-4">
@@ -31,7 +30,7 @@
                         <div class="form-group">
                             <select class="form-control" required name="category" id="">
                                 <option value="">Category*</option>
-                                @foreach($categories as $cat) 
+                                @foreach($categories as $cat)
                                 <option value="{{$cat->id}}">{{$cat->category_name}}</option>
                                 @endforeach
                             </select>
@@ -47,8 +46,6 @@
         </div>
         <div class="container-fluid">
             <div class="row">
-                <?php
-                ?>
                 @foreach($inventories as $inventory)
                 <div class="col-md-12 col-lg-6 col-xl-4  pb-4">
                     <div class="card change-height">
@@ -70,14 +67,11 @@
                                                 <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset($inventory->feature_img)}}" alt="">
                                             </span>
                                         </div>
-
-
                                         <div class="col-md-3 mt-1">
                                             @if($inventory->images)
                                             <?php $count = 0; ?>
                                             @foreach($inventory->images as $img)
                                             <?php if ($count == 3) break; ?>
-
                                             <span class="img-container mb-1">
                                                 <img class="d-block m-auto" src="{{asset($img->product_image)}}" alt="">
                                             </span>
@@ -101,7 +95,6 @@
                                         <div class="">
                                             <h4 class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
                                                 <?php
-
                                                 if ($inventory->colors) {
                                                     $colors = json_decode($inventory->colors, true);
                                                     foreach ($colors as $c_key => $color) :
@@ -117,7 +110,7 @@
                                     <div class="col-xl-5">
                                         <div class="">
                                             <h6 class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
-                                                <a href="#" class="d-block text-site-primary">{{$inventory->sku}}</a>
+                                                <a href="#" class="d-block text-site-primary">SKU:{{$inventory->sku}}</a>
                                             </h6>
                                         </div>
                                     </div>
@@ -135,16 +128,20 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="ratting pl-3 text-right text-bold">
+                                            @if ($inventory->discount_percentage == 0.00)
+                                            <span class="text-lg text-primary">£{{$inventory->price}}</span>
+                                            @else
                                             <del class="text-danger d-block">£{{$inventory->price}}</del>
-                                            <span class="text-lg text-primary">£{{$inventory->sale_price}}</span>
+                                            <span class="text-lg text-primary">£
+                                                <?php echo $inventory->price - (($inventory->discount_percentage / 100) * $inventory->price); ?>
+                                            </span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
-
                         </div>
                     </div>
                 </div>
-
                 @endforeach
             </div>
             <!-- /.row -->

@@ -125,6 +125,7 @@ Route::get('/queries', 'HomeController@admin_queries');
 Route::get('/customer/{user_id}/details', 'HomeController@admin_customer_details')->name('customer_details');
 Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndRoleController@updateApplicationFee')->name('application_fee');
 Route::post('/update_pages', 'HomeController@update_pages')->name('update_pages');
+Route::get('/users/{user_id}/status/{status}', 'HomeController@change_user_status')->name('change_user_status');
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route
@@ -132,4 +133,4 @@ Route::post('/update_pages', 'HomeController@update_pages')->name('update_pages'
 */
 Route::get('/my_order_count', 'HomeController@my_order_count')->name('my_order_count');
 
-Route::get('/users/{user_id}/status/{status}', 'HomeController@change_user_status')->name('change_user_status');
+

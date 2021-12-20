@@ -151,7 +151,7 @@
                                                 <div class="ratting pl-3 text-right text-bold">
                                                     <del class="text-danger d-block">${{$inventory->price}}</del>
                                                     <span
-                                                        class="text-lg text-primary">${{$inventory->sale_price}}</span>
+                                                        class="text-lg text-primary">${{$inventory->discount_percentage}}</span>
                                                 </div>
                                             </div>
                                         </div>

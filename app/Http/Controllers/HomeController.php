@@ -71,7 +71,7 @@ class HomeController extends Controller
             $categories = Categories::all();
             $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
-            $inventories = []; 
+            $inventories = [];
             foreach ($inventory as $in) {
                 $inventories[] = Products::get_product_info($in->id);
             }
@@ -89,7 +89,7 @@ class HomeController extends Controller
                 abort(404);
             }
             $categories = Categories::all();
-            $inventory = Products::get_product_info($product_id); 
+            $inventory = Products::get_product_info($product_id);
             return view('shopkeeper.inventory.edit', compact('inventory', 'categories'));
         } else {
             abort(404);
@@ -254,7 +254,6 @@ class HomeController extends Controller
     public function inventory_adddb(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
-
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')) {
@@ -263,23 +262,20 @@ class HomeController extends Controller
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
             }
-
             if (!isset($data['van'])) {
                 $data['van'] = 0;
             }
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
-
+            if (!isset($data['discount_percentage'])) {
+                $data['discount_percentage'] = 0.00;
+            }
             unset($data['gallery']);
-
-
             $user_id = Auth::id();
             $data['user_id'] = $user_id;
             $product = new Products();
             if (!empty($product)) {
-
-
                 $filename = $product->feature_img;
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
@@ -292,10 +288,7 @@ class HomeController extends Controller
                         info("file is not found :- " . $filename);
                     }
                 }
-
-
                 $data['feature_img'] = $filename;
-
                 foreach ($data as $key => $value) {
                     $product->$key = $value;
                 }
@@ -303,8 +296,6 @@ class HomeController extends Controller
                 if ($request->hasFile('gallery')) {
                     $images = $request->file('gallery');
                     foreach ($images as $image) {
-
-
                         $file = $image;
                         $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                         Storage::disk('user_public')->put($filename, File::get($file));
@@ -314,7 +305,6 @@ class HomeController extends Controller
                         } else {
                             info("file is not found :- " . $filename);
                         }
-
                         $product_images = new productImages();
                         $product_images->product_id = $product->id;
                         $product_images->product_image = $filename;
@@ -493,7 +483,7 @@ class HomeController extends Controller
                 $product->sku = $importData[2];
                 $product->qty = $importData[3];
                 $product->price = $importData[4];
-                $product->sale_price = $importData[5];
+                $product->discount_percentage = $importData[5];
                 $product->weight = $importData[6];
                 $product->brand = $importData[7];
                 $product->size = $importData[8];
@@ -610,7 +600,6 @@ class HomeController extends Controller
     public function admin_customer_details($user_id)
     {
         $return_arr = [];
-
         if (Auth::user()->hasRole('superadmin')) {
             $user = User::find($user_id);
             if ($user->hasRole('seller')) {
@@ -623,12 +612,9 @@ class HomeController extends Controller
                 $orders = Orders::query()->where('delivery_boy_id', '=', $user_id);
             }
             $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
-
             $orders = $orders->paginate(10);
             $orders_p = $orders;
-
             foreach ($orders as $order) {
-                //            $order_items = [];
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
@@ -639,9 +625,6 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
-            //        Auth::user()->hasRole('seller');
-            //        echo "<pre>";
-            //        print_r($return_arr);
             $orders = $return_arr;
             return view('admin.customer_details', compact('orders', 'orders_p', 'user'));
         } else {
@@ -910,22 +893,17 @@ class HomeController extends Controller
 
     public function change_user_status($user_id, $status)
     {
-        //        echo $user_id;
-        //        echo $status;
         User::query()->where('id', '=', $user_id)->update(['is_active' => $status]);
         if ($status == 1) {
             $user = User::findOrFail($user_id);
             $html = '<html>
             Hi, ' . $user->name . '<br><br>
-
             Thank you for registering on ' . env('APP_NAME') . '.
-
 <br>
             Your store has been approved. Please login to the
             <a href="' . env('FRONTEND_URL') . '">Store</a> to update your store
 <br><br><br>
         </html>';
-
             $subject = env('APP_NAME') . ': Account Approved!';
             Mail::to($user->email)
                 ->send(new StoreRegisterMail($html, $subject));

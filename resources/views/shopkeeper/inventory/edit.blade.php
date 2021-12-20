@@ -79,8 +79,8 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label class="text-left d-block">Discounted Percentage <span class="text-secondary">(Excluding VAT)</span></label>
-                                                            <input type="number" step="0.01" class="form-control" name="sale_price" placeholder="Discounted Price*" value="{{$inventory->sale_price}}">
+                                                            <label class="text-left d-block">Discount Percentage <span class="text-secondary">(Excluding VAT)</span></label>
+                                                            <input type="number" step="0.01" class="form-control" name="discount_percentage" placeholder="Discounted Price*" value="{{$inventory->discount_percentage}}">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">

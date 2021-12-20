@@ -37,38 +37,44 @@ Route::group(['prefix' => 'auth'], function ($router) {
 });
 
 Route::group(['prefix' => 'category'], function ($router) {
-    //        Route::post('add', 'CategoriesController@add');
-    //        Route::post('update/{product_id}', 'CategoriesController@update');
+    //Route::post('add', 'CategoriesController@add');
+    //Route::post('update/{product_id}', 'CategoriesController@update');
     Route::get('all', 'CategoriesController@all');
     Route::get('view/{category_id}', 'CategoriesController@Products');
     Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
 });
 
-Route::group(['prefix' => 'product'], function ($router) {
-    Route::post('search', 'ProductsController@search');
-    Route::get('all', 'ProductsController@all');
-});
-
 Route::group(['prefix' => 'page'], function ($router) {
     Route::get('', 'PagesController@get_page');
 });
+
 Route::get('sellers', 'Auth\AuthController@sellers');
 Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
-
+/*
+|--------------------------------------------------------------------------
+| Products API Routes Without JWT Authentication
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'product'], function ($router) {
+    Route::post('search', 'ProductsController@search');
+    Route::get('all', 'ProductsController@all');
+    Route::get('view/{product_id}', 'ProductsController@view');
+    Route::post('view/bulk', 'ProductsController@bulkView');
+    Route::get('sortbyprice', 'ProductsController@sortByPrice');
+    Route::get('sortByLocation', 'ProductsController@sortByLocation');
+});
+/*
+|--------------------------------------------------------------------------
+| API Routes With JWT Authentication
+|--------------------------------------------------------------------------
+*/
 Route::group(['middleware' => ['jwt.verify']], function ($router) {
     Route::group(['prefix' => 'product'], function ($router) {
         Route::post('add', 'ProductsController@add');
-        
-        Route::get('view/{product_id}', 'ProductsController@view');
-        Route::post('view/bulk', 'ProductsController@bulkView');
-        //        Route::get('edit/{id}', 'ProductsController@edit');
+        //Route::get('edit/{id}', 'ProductsController@edit');
         Route::post('update/{product_id}', 'ProductsController@update');
         Route::get('delete/{product_id}', 'ProductsController@delete');
         Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@delete_image');
-
-        Route::get('sortbyprice', 'ProductsController@sortByPrice');
-        Route::get('sortByLocation', 'ProductsController@sortByLocation');
-
         Route::post('ratings/add', 'RattingsController@add');
         Route::post('ratings/update', 'RattingsController@update');
         Route::get('ratings/delete/{ratting_id}', 'RattingsController@delete');
@@ -165,6 +171,7 @@ Route::get('time', function () {
 
 Route::fallback(function () {
     return response()->json([
+        'data' => [],
         'status' => false,
         'message' => 'Page Not Found.'
     ], 404);

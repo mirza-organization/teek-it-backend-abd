@@ -82,7 +82,7 @@
                                                     <div class="form-group">
 
                                                         <label for="" class="text-left d-block">Discounted Price</label>
-                                                        <input type="number" step="0.01" class="form-control" name="sale_price" placeholder="Discounted Price*" required id="" value="{{$inventory->sale_price}}">
+                                                        <input type="number" step="0.01" class="form-control" name="discount_percentage" placeholder="Discounted Price*" required id="" value="{{$inventory->discount_percentage}}">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">

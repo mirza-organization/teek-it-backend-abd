@@ -102,17 +102,15 @@ ProductsController extends Controller
     //    {
     //        //
     //    }
-
-
-
-
     public function add(Request $request)
     {
         $validate = Products::validator($request);
-
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.VALIDATION_ERROR')
+            ], 400);
         }
         $user_id = Auth::id();
         $product = new Products();
@@ -126,14 +124,10 @@ ProductsController extends Controller
         $product->price = $request->price;
         $product->qty = $request->qty;
         $product->user_id = $user_id;
-
         $product->save();
-
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             foreach ($images as $image) {
-
-
                 $file = $image;
                 $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                 Storage::disk('user_public')->put($filename, File::get($file));
@@ -143,7 +137,6 @@ ProductsController extends Controller
                 } else {
                     info("file is not found :- " . $filename);
                 }
-
                 $product_images = new productImages();
                 $product_images->product_id = $product->id;
                 $product_images->product_image = $filename;
@@ -151,25 +144,32 @@ ProductsController extends Controller
             }
         }
         $product =  $this->get_product_info($product->id);
-        $response = array('status' => true, 'message' => 'Product Added', 'data' => $product);
-        return response()->json($response, 200);;
+        return response()->json([
+            'data' => $product,
+            'status' => true,
+            'message' => config('constants.DATA_INSERTION_SUCCESS')
+        ], 200);
     }
 
     public function update(Request $request, $id)
     {
         $validate = Products::updateValidator($request);
-
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => $validate->messages(),
+                'status' => true,
+                'message' => config('constants.VALIDATION_ERROR')
+            ], 400);
         }
         $user_id = Auth::id();
         $product = Products::find($id);
         if (empty($product)) {
-            $response = array('status' => false, 'message' => 'No Product Found', 'data' => null);
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 400);
         }
-
         $product->category_id = $request->category_id;
         $product->product_name = $request->product_name;
         $product->product_description = $request->product_description;
@@ -184,8 +184,6 @@ ProductsController extends Controller
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             foreach ($images as $image) {
-
-
                 $file = $image;
                 $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                 Storage::disk('user_public')->put($filename, File::get($file));
@@ -195,18 +193,19 @@ ProductsController extends Controller
                 } else {
                     info("file is not found :- " . $filename);
                 }
-
                 $product_images = new productImages();
                 $product_images->product_id = $product->id;
                 $product_images->product_image = $filename;
                 $product_images->save();
             }
         }
-
         $product->save();
         $product =  $this->get_product_info($product->id);
-        $response = array('status' => true, 'message' => 'Product Updated', 'data' => $product);
-        return response()->json($response, 200);
+        return response()->json([
+            'data' => $product,
+            'status' => true,
+            'message' => config('constants.DATA_UPDATED_SUCCESS')
+        ], 200);
     }
 
     public function get_product_info($product_id)
@@ -217,22 +216,23 @@ ProductsController extends Controller
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
-
-
-
-
+    /**
+     * Search products
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
     public function search(Request $request)
     {
         $validate = Validator::make($request->all(), [
             'product_name' => 'required'
-
         ]);
-
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => $validate->messages(),
+                'status' => false,
+                'message' => config('constants.VALIDATION_ERROR')
+            ], 400);
         }
-
         $products = Products::query()
             ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
             ->paginate();
@@ -240,31 +240,26 @@ ProductsController extends Controller
         if (!empty($products)) {
             $products_data = [];
             foreach ($products as $product) {
-
                 $products_data[] = $this->get_product_info($product->id);
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $products_data,
                 'status' => true,
                 'message' => '',
                 'pagination' => $pagination,
-
-            ];
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-        return response()->json($products_data);
     }
+
     public function all()
     {
-
-
         $products = Products::whereHas('user', function ($query) {
             $query->where('is_active', 1);
         })->where('status', 1)->paginate();
@@ -277,90 +272,70 @@ ProductsController extends Controller
                 $products_data[] = $data;
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $products_data,
                 'status' => true,
                 'message' => '',
                 'pagination' => $pagination,
-
-            ];
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
+
     public function bulkView(Request $request)
     {
         $ids = explode(',', $request->ids);
-
         $products = Products::query()->whereIn('id', $ids)->paginate();
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];
             foreach ($products as $product) {
-                //print_r($product);
                 $products_data[] = $this->get_product_info($product->id);
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $products_data,
                 'status' => true,
                 'message' => '',
                 'pagination' => $pagination,
-
-            ];
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
-
-
-
-
 
     public function sortByPrice()
     {
-
-
         $products = Products::query()->paginate()->sortBy('price');
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];
             foreach ($products as $product) {
-                //print_r($product);
                 $products_data[] = $this->get_product_info($product->id);
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $products_data,
                 'status' => true,
                 'message' => '',
                 'pagination' => $pagination,
-
-            ];
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
 
     public function sortByLocation(Request $request)
@@ -368,9 +343,8 @@ ProductsController extends Controller
         $latitude = $request->get('lat');
         $longitude = $request->get('lng');
         $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
-        //        $products = Products::query()->paginate()->sortBy('price');
+        //$products = Products::query()->paginate()->sortBy('price');
         $pagination = $products->toArray();
-        //        return$products;
         if (!empty($products)) {
             $products_data = [];
             $i = 0;
@@ -379,85 +353,74 @@ ProductsController extends Controller
                     continue;
                 }
                 $i = $i + 1;
-                //print_r($product);
                 $t = $this->get_product_info($product->id);
                 $t->distance = $product->distance;
-                //                $t->distance = round($product->distance);
+                //$t->distance = round($product->distance);
                 $products_data[] = $t;
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $products_data,
                 'status' => true,
                 'message' => '',
-                //                'pagination'=>$pagination,
-
-            ];
+                //'pagination'=>$pagination,
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
-
-
+    /**
+     * View product w.r.t ID
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
     public function view($product_id)
     {
         $product = $this->get_product_info($product_id);
         if (!empty($product)) {
-            $products_data = [
+            return response()->json([
                 'data' => $product,
                 'status' => true,
                 'message' => '',
-
-            ];
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Product Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
-
 
     public function delete($product_id)
     {
-
         Products::find($product_id)->delete();
-
         return $this->all();
     }
+
     public function delete_image($image_id, $product_id)
     {
-        //    echo $image_id,$product_id;die;
         productImages::find($image_id)->delete();
         return $this->get_product_info($product_id);
     }
 
-
-
     public function get_product_price($product_id)
     {
         $product = Products::find($product_id);
-        if ($product->sale_price > 0) {
-            return $product->sale_price * 1.2;
+        if ($product->discount_percentage > 0) {
+            return $product->discount_percentage * 1.2;
         }
         return $product->price * 1.2;
     }
+
     public function get_product_seller_id($product_id)
     {
         return Products::find($product_id)->user_id;
     }
-
 
     public function exportProducts()
     {
@@ -490,7 +453,6 @@ ProductsController extends Controller
         //        $destinationPath=public_path()."/upload/json/";
         //        if (!is_dir($destinationPath)) {  mkdir($destinationPath,0777,true);  }
         //        File::put($destinationPath.$file,json_encode($all_products));
-
         $destinationPath = public_path() . "/upload/csv/";
         if (!is_dir($destinationPath)) {
             mkdir($destinationPath, 0777, true);
@@ -506,7 +468,6 @@ ProductsController extends Controller
         if (empty($json)) {
             die("The JSON string is empty!");
         }
-
         // If passed a string, turn it into an array
         if (is_array($json) === false) {
             $json = json_decode($json, true);

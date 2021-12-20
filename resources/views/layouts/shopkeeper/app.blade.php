@@ -8,7 +8,6 @@
     <link rel="icon" href="{{asset('res/res/img/logo.png')}}" type="image/svg+xml" />
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'Laravel') }}</title>
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -73,7 +72,6 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
-
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-5">
@@ -160,11 +158,13 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    <audio id="new_order_notification">
+    <audio id="new_order_notification1">
         <source src="{{ asset('audio/TeekItaa.mp4') }}" type="audio/mp4">
     </audio>
+    <audio id="new_order_notification2" loop>
+        <source src="{{ asset('audio/mixkit-bell-ring-buzzer-2962.mp3') }}" type="audio/mp3">
+    </audio>
     <!-- REQUIRED SCRIPTS -->
-
     <!-- jQuery -->
     <script src="{{ asset('res/plugins/jquery/jquery.min.js') }}"></script>
     <!-- Bootstrap 4 -->
@@ -425,13 +425,18 @@
                             'Please prepare the Order.',
                             'success'
                         )
-                        document.getElementById('new_order_notification').play();
+                        document.getElementById('new_order_notification1').play();
+                        document.getElementById('new_order_notification2').play();
                     }
                     total_orders = new_orders;
                     setTimeout(my_order_count, 2000);
                 }
             });
         }
+
+        $(window).mouseover(function() {
+            document.getElementById('new_order_notification2').pause();
+        });
 
         function change_height() {
             gpt_box = jQuery('.change-height');
@@ -448,9 +453,7 @@
             jQuery.each(gpt_box, function(index, value) {
                 jQuery(value).height(max);
             });
-            console.log('works;');
             setTimeout(change_height, 600);
-            // change_height();
         }
         change_height();
     </script>
