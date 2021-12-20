@@ -43,7 +43,7 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('seller')) {
-            $pending_orders = Orders::query()->where('order_status', '=', 'ready')->where('seller_id', '=', Auth::id())->count();
+            $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
             $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
             $total_products = Products::query()->where('user_id', '=', Auth::id())->count();
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', Auth::id())->sum('order_total');
@@ -51,7 +51,7 @@ class HomeController extends Controller
                 ->whereNotNull('order_status')
                 ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
                  when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
-                ->simplePaginate(10);
+                ->simplePaginate(5);
             return view('shopkeeper.dashboard', compact('pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
         } else {
             return $this->admin_home();

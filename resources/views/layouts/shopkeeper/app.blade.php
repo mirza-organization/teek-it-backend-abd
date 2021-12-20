@@ -162,8 +162,9 @@
         <source src="{{ asset('audio/TeekItaa.mp4') }}" type="audio/mp4">
     </audio>
     <audio id="new_order_notification2" loop>
-        <source src="{{ asset('audio/mixkit-bell-ring-buzzer-2962.mp3') }}" type="audio/mp3">
+        <source src="{{ asset('audio/TeekItNotificationMusic (mp3cut.net).mp3') }}" type="audio/mp3">
     </audio>
+
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
     <script src="{{ asset('res/plugins/jquery/jquery.min.js') }}"></script>
@@ -420,13 +421,20 @@
                 url: "/my_order_count",
                 success: function(new_orders) {
                     if (new_orders > total_orders) {
+                        document.getElementById('new_order_notification1').play();
                         Swal.fire(
                             'New Order Alert!!',
                             'Please prepare the Order.',
                             'success'
                         )
-                        document.getElementById('new_order_notification1').play();
-                        document.getElementById('new_order_notification2').play();
+                        /**
+                         * This timeout method is used to play 'new_order_notification2' music 
+                         * just after 1sec of the arrival of a new order so that the user can 
+                         * clearly listen 'new_order_notification1' sound
+                         */
+                        setTimeout(function() {
+                            document.getElementById('new_order_notification2').play();
+                        }, 1000);
                     }
                     total_orders = new_orders;
                     setTimeout(my_order_count, 2000);

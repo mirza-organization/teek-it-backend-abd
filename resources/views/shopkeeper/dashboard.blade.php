@@ -84,11 +84,18 @@
                 <div class="col-lg-6 col-md-6">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">All Orders</h3>
-                            <label class="switch float-right">
-                                <input type="checkbox" onclick="">
-                                <span class="slider round"></span>
-                            </label>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <h3 class="card-title">All Orders</h3>
+                                </div>
+                                <div class="col-md-7">
+                                    <!-- <label class="switch float-right">
+                                        <input type="checkbox" checked onclick="window.location.href='#'">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <h3 class="card-title float-right pr-3">Turn off notification music</h3> -->
+                                </div>
+                            </div>
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body p-0">
@@ -110,7 +117,7 @@
                                             @if($order->order_status == 'pending')
                                             <span class="badge bg-danger">Pending</span>
                                             @elseif($order->order_status == 'accepted')
-                                            <span class="badge bg-warning">Accepted</span>
+                                            <span class="badge bg-info">Accepted</span>
                                             <!-- @elseif($order->order_status == 'assigned')
                                             <span class="badge bg-warning">Assigned</span> -->
                                             @elseif($order->order_status == 'ready')
@@ -127,7 +134,9 @@
                                     @endforelse
                                 </tbody>
                             </table>
-                            {{$all_orders->links()}}
+                            <div class="d-flex justify-content-center" style="padding-top: 10px;">
+                                {{$all_orders->links()}}
+                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>
@@ -137,5 +146,4 @@
     </div>
     <!-- /.content -->
 </div>
-
 @endsection
