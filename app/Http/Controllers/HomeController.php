@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use Stripe;
 
 class HomeController extends Controller
@@ -250,10 +251,34 @@ class HomeController extends Controller
         flash('Store Image Successfully Updated')->success();
         return Redirect::back();
     }
-
+    /**
+     * Inserts a single store product
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
     public function inventory_adddb(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
+            $validatedData = Validator::make($request->all(), [
+                'product_name' => 'required',
+                'sku' => 'required',
+                'category_id' => 'required',
+                'qty' => 'required',
+                'price' => 'required',
+                'discount_percentage' => 'required',
+                'height' => 'required',
+                'width' => 'required',
+                'length' => 'required',
+                'weight' => 'required',
+                'status' => 'required',
+                'contact' => 'required',
+                'gallery' => 'required',
+                'feature_img' => 'required'
+            ]);
+            if ($validatedData->fails()) {
+                flash('Error in adding the product because some required field is missing.')->error();
+                return \redirect()->back();
+            }
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')) {

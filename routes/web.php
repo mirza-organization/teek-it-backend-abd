@@ -102,9 +102,7 @@ Route::post('/withdrawals', 'HomeController@withdrawals_request')->name('withdra
 
 Route::get('auth/verify', 'Auth\AuthController@verify');
 Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespace' => 'Admin'], function ($router) {
-
-    //    Route::get('/test', 'HomeController@index')->name('home');
-
+//Route::get('/test', 'HomeController@index')->name('home');
 });
 /*
 |--------------------------------------------------------------------------
