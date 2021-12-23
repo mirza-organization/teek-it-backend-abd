@@ -44,6 +44,7 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('seller')) {
+            $user_settings = User::select('settings')->where('id', '=', Auth::id())->get();
             $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
             $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
             $total_products = Products::query()->where('user_id', '=', Auth::id())->count();
@@ -53,7 +54,7 @@ class HomeController extends Controller
                 ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
                  when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
                 ->simplePaginate(5);
-            return view('shopkeeper.dashboard', compact('pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
+            return view('shopkeeper.dashboard', compact('user_settings','pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
         } else {
             return $this->admin_home();
         }
@@ -342,6 +343,16 @@ class HomeController extends Controller
         } else {
             abort(404);
         }
+    }
+     /**
+     * Changes user setting provided in the parameter
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function change_settings(Request $request)
+    {
+        User::where('id', '=', Auth::id())->update(['settings->'.$request->setting_name => $request->value]);
+        return \redirect()->route('home');
     }
 
     public function payment_settings()
@@ -650,7 +661,10 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
-            $orders = $return_arr;
+            // $loc = User::where('id', '=', $user_id)
+            // ->update(['business_location->lat' => 64.77]);
+            // dd($loc);
+            $orders = $return_arr; 
             return view('admin.customer_details', compact('orders', 'orders_p', 'user'));
         } else {
             abort(401);

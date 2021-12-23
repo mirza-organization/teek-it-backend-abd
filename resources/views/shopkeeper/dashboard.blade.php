@@ -89,11 +89,22 @@
                                     <h3 class="card-title">All Orders</h3>
                                 </div>
                                 <div class="col-md-7">
-                                    <!-- <label class="switch float-right">
-                                        <input type="checkbox" checked onclick="window.location.href='#'">
+                                    <?php
+                                    $settings = json_decode($user_settings[0]->settings);
+                                    ?>
+                                    @if ($settings->notification_music == 1)
+                                    <label class="switch float-right">
+                                        <input type="checkbox" checked onclick="window.location.href='{{route('change_settings',['setting_name'=>'notification_music','value'=>0])}}'">
                                         <span class="slider round"></span>
                                     </label>
-                                    <h3 class="card-title float-right pr-3">Turn off notification music</h3> -->
+                                    <h3 class="card-title float-right pr-3">Turn Off New Order Music</h3>
+                                    @else
+                                    <label class="switch float-right">
+                                        <input type="checkbox" onclick="window.location.href='{{route('change_settings',['setting_name'=>'notification_music','value'=>1])}}'">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <h3 class="card-title float-right pr-3">Turn On New Order Music</h3>
+                                    @endif
                                 </div>
                             </div>
                         </div>

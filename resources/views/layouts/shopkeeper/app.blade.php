@@ -432,6 +432,7 @@
                          * just after 1sec of the arrival of a new order so that the user can 
                          * clearly listen 'new_order_notification1' sound
                          */
+                        if(<?php echo $settings->notification_music ?> == 1)
                         setTimeout(function() {
                             document.getElementById('new_order_notification2').play();
                         }, 1000);

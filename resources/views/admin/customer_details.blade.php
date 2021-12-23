@@ -69,10 +69,8 @@
                                                         @endif
                                                         @endforeach
                                                         <div class="col-md-12">
-
                                                             <div class="form-group">
                                                                 <label for="" class="mt-5">
-
                                                                     @if($user->is_active==0)
                                                                     <a href="{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}"> <span class="text-success">Click here to Enable Account</span></a>
                                                                     @else
@@ -93,7 +91,6 @@
                                     </div>
                                     <div class="p-2 mb-2">
                                         @if($user->is_active==0)
-
                                         <label class="switch float-right">
                                             <input type="checkbox" onclick="window.location.href='{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}'">
                                             <span class="slider round"></span>
@@ -131,12 +128,11 @@
                                                 'is_active',
                                                 'updated_at',
                                                 'created_at',
-                                                'email_verified_at'
-                                                //                                        'business_name'
+                                                'email_verified_at',
+                                                'settings',
+                                                'user_img'
                                             ];
-
                                             ?>
-
                                             @foreach(json_decode($user) as $key=>$u)
                                             @if(!is_null($u) && !in_array($key,$fields))
                                             <?php
