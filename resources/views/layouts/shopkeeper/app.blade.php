@@ -420,7 +420,7 @@
             $.ajax({
                 url: "/my_order_count",
                 success: function(new_orders) {
-                    if (new_orders > total_orders) {
+                    if (new_orders.total_orders > total_orders) {
                         document.getElementById('new_order_notification1').play();
                         Swal.fire(
                             'New Order Alert!!',
@@ -432,12 +432,12 @@
                          * just after 1sec of the arrival of a new order so that the user can 
                          * clearly listen 'new_order_notification1' sound
                          */
-                        if(<?php echo $settings->notification_music ?> == 1)
-                        setTimeout(function() {
-                            document.getElementById('new_order_notification2').play();
-                        }, 1000);
+                        if (JSON.parse(new_orders.user_settings[0].settings).notification_music == 1)
+                                setTimeout(function() {
+                                    document.getElementById('new_order_notification2').play();
+                                }, 1000);
                     }
-                    total_orders = new_orders;
+                    total_orders = new_orders.total_orders;
                     setTimeout(my_order_count, 2000);
                 }
             });

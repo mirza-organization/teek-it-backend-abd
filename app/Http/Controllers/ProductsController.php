@@ -257,7 +257,11 @@ ProductsController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * All products listing
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
     public function all()
     {
         $products = Products::whereHas('user', function ($query) {
@@ -382,6 +386,7 @@ ProductsController extends Controller
     {
         $product = $this->get_product_info($product_id);
         if (!empty($product)) {
+            $product->store = User::find($product->user_id);
             return response()->json([
                 'data' => $product,
                 'status' => true,

@@ -36,12 +36,12 @@
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for=""><img class="img img-fluid img-thumbnail" src="{{asset(auth()->user()->user_img)}}" alt="No Image Uploaded"></label>
+                                                            <label><img class="img img-fluid img-thumbnail" src="{{asset(auth()->user()->user_img)}}" alt="No Image Uploaded"></label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for=""><input type="file" accept="image/*" name="user_img" required></label>
+                                                            <label><input type="file" accept="image/*" name="user_img" required></label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
@@ -87,12 +87,12 @@
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for="" data-toggle="modal" data-target="#myModal">Set Location: &emsp; <i class="fa fa-map-marker text-danger"></i> {{substr($address, 0, 15) . '...'}}</label>
+                                                            <label data-toggle="modal" data-target="#myModal">Set Location: &emsp; <i class="fa fa-map-marker text-danger"></i> {{substr($address, 0, 15) . '...'}}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for="" data-toggle="modal" data-target="#myModal">Use Current Location: &emsp; <i class="fa fa-map-marked text-primary"></i></label>
+                                                            <label data-toggle="modal" data-target="#myModal">Use Current Location: &emsp; <i class="fa fa-map-marked text-primary"></i></label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
@@ -118,7 +118,7 @@
             <!-- /.row -->
 
         </div><!-- /.container-fluid -->
-       
+
         <!-- <div class="container-fluid">
             <div class="row">
 
@@ -139,7 +139,7 @@
                                                 <div class="row form-inline">
                                                     <div class="col-md-8">
                                                         <div class="form-group">
-                                                            <label for="">Browse Data: &emsp;</label>
+                                                            <label >Browse Data: &emsp;</label>
                                                             <input required name="file" accept="application/csvm+json" type="file">
                                                         </div>
                                                     </div>
@@ -166,7 +166,7 @@
             </div>
         </div>
          -->
-         <!-- /.container-fluid -->
+        <!-- /.container-fluid -->
         <div class="container-fluid">
             <div class="row">
 
@@ -185,7 +185,7 @@
                                             <div class="row form-inline">
                                                 <div class="col-md-8">
                                                     <div class="form-group">
-                                                        {{-- <label for="">Browse Data: &emsp;</label>--}}
+                                                        {{-- <label >Browse Data: &emsp;</label>--}}
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
@@ -234,18 +234,19 @@
                                                             if ($business_hours) {
                                                                 $bh = json_decode($business_hours, true);
                                                             } else {
-                                                                $bh['open'] = "";
-                                                                $bh['close'] = "";
+                                                                $bh['time']['open'] = "";
+                                                                $bh['time']['close'] = "";
+
                                                             }
                                                             ?>
-                                                            <label for="">Open Time: &emsp;</label>
-                                                            <input required type="text" name="time[open]" value="{{$bh['open']}}" class="stimepicker form-control">
+                                                            <label>Open: &emsp;</label>
+                                                            <input required type="text" name="time[open]" value="{{$bh['time']['open']}}" class="stimepicker form-control">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label for="">Close: &emsp;</label>
-                                                            <input required type="text" name="time[close]" value="{{$bh['close']}}" class="etimepicker form-control">
+                                                            <label>Close: &emsp;</label>
+                                                            <input required type="text" name="time[close]" value="{{$bh['time']['close']}}" class="etimepicker form-control">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
@@ -253,6 +254,25 @@
                                                             <div class="text-center">
                                                                 <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" type="submit">{{__('Update')}}</button>
                                                             </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-9">
+                                                        <div class="form-group">
+                                                            <label>Days: &emsp;</label>
+                                                            <input <?php echo (isset($bh['days']['mon'])) ? 'checked':''; ?> type="checkbox" name="days[mon]" value="open">
+                                                            <span>&nbsp;Mon&nbsp;</span>
+                                                            <input <?php echo (isset($bh['days']['tue'])) ? 'checked':''; ?> type="checkbox" name="days[tue]" value="open">
+                                                            <span>&nbsp;Tue&nbsp;</span>
+                                                            <input <?php echo (isset($bh['days']['wed'])) ? 'checked':''; ?> type="checkbox" name="days[wed]" value="open">
+                                                            <span>&nbsp;Wed&nbsp;</span>
+                                                            <input <?php echo (isset($bh['days']['thurs'])) ? 'checked':''; ?> type="checkbox" name="days[thurs]" value="open">
+                                                            <span>&nbsp;Thurs&nbsp;</span>
+                                                            <input <?php echo (isset($bh['days']['fri'])) ? 'checked':''; ?> type="checkbox" name="days[fri]" value="open">
+                                                            <span>&nbsp;Fri&nbsp;</span>
+                                                            <input <?php echo (isset($bh['days']['sat'])) ? 'checked':''; ?> type="checkbox" name="days[sat]" value="open">
+                                                            <span>&nbsp;Sat&nbsp;</span>
+                                                            <input <?php echo (isset($bh['days']['sun'])) ? 'checked':''; ?> type="checkbox" name="days[sun]" value="open">
+                                                            <span>&nbsp;Sun&nbsp;</span>
                                                         </div>
                                                     </div>
                                                 </div>
