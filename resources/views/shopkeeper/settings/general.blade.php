@@ -22,7 +22,7 @@
                 <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                     <h4 class="text-left text-primary">Store Image</h4>
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body-custom">
                             <div class=" d-block text-right">
                                 <div class="card-text">
                                     <div class="row">
@@ -73,7 +73,7 @@
                 <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                     <h4 class="text-left text-primary">Location</h4>
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body-custom">
                             <div class=" d-block text-right">
                                 <div class="card-text">
                                     <div class="row">
@@ -125,7 +125,7 @@
                 <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                     <h4 class="text-left text-primary">Import Products</h4>
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body-custom">
                             <div class=" d-block text-right">
                                 <div class="card-text">
                                     <div class="row">
@@ -173,7 +173,7 @@
                 <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                     <h4 class="text-left text-primary">Export Products</h4>
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body-custom">
                             <div class=" d-block text-right">
                                 <div class="card-text">
                                     <div class="row">
@@ -217,7 +217,7 @@
                 <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                     <h4 class="text-left text-primary">Set Store Hours</h4>
                     <div class="card">
-                        <div class="card-body">
+                        <div class="card-body-custom">
                             <div class=" d-block text-right">
                                 <div class="card-text">
                                     <div class="row">
@@ -228,55 +228,64 @@
                                             <form action="{{route('time_update')}}" method="POST" enctype="multipart/form-data">
                                                 {{csrf_field()}}
                                                 <div class="row form-inline">
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-2 col-2">
                                                         <div class="form-group">
-                                                            <?php
-                                                            if ($business_hours) {
-                                                                $bh = json_decode($business_hours, true);
-                                                            } else {
-                                                                $bh['time']['open'] = "";
-                                                                $bh['time']['close'] = "";
-
-                                                            }
-                                                            ?>
-                                                            <label>Open: &emsp;</label>
-                                                            <input required type="text" name="time[open]" value="{{$bh['time']['open']}}" class="stimepicker form-control">
+                                                            <label>Day &emsp;</label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div class="col-md-4 col-4">
                                                         <div class="form-group">
-                                                            <label>Close: &emsp;</label>
-                                                            <input required type="text" name="time[close]" value="{{$bh['time']['close']}}" class="etimepicker form-control">
+                                                            <label>Opening Time &emsp;</label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4">
-                                                        <div class="">
-                                                            <div class="text-center">
-                                                                <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" type="submit">{{__('Update')}}</button>
-                                                            </div>
+                                                    <div class="col-md-4 col-4">
+                                                        <div class="form-group">
+                                                            <label>Closing Time &emsp;</label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-9">
+                                                    <div class="col-md-2 col-2">
                                                         <div class="form-group">
-                                                            <label>Days: &emsp;</label>
-                                                            <input <?php echo (isset($bh['days']['mon'])) ? 'checked':''; ?> type="checkbox" name="days[mon]" value="open">
-                                                            <span>&nbsp;Mon&nbsp;</span>
-                                                            <input <?php echo (isset($bh['days']['tue'])) ? 'checked':''; ?> type="checkbox" name="days[tue]" value="open">
-                                                            <span>&nbsp;Tue&nbsp;</span>
-                                                            <input <?php echo (isset($bh['days']['wed'])) ? 'checked':''; ?> type="checkbox" name="days[wed]" value="open">
-                                                            <span>&nbsp;Wed&nbsp;</span>
-                                                            <input <?php echo (isset($bh['days']['thurs'])) ? 'checked':''; ?> type="checkbox" name="days[thurs]" value="open">
-                                                            <span>&nbsp;Thurs&nbsp;</span>
-                                                            <input <?php echo (isset($bh['days']['fri'])) ? 'checked':''; ?> type="checkbox" name="days[fri]" value="open">
-                                                            <span>&nbsp;Fri&nbsp;</span>
-                                                            <input <?php echo (isset($bh['days']['sat'])) ? 'checked':''; ?> type="checkbox" name="days[sat]" value="open">
-                                                            <span>&nbsp;Sat&nbsp;</span>
-                                                            <input <?php echo (isset($bh['days']['sun'])) ? 'checked':''; ?> type="checkbox" name="days[sun]" value="open">
-                                                            <span>&nbsp;Sun&nbsp;</span>
+                                                            <label>Closed &emsp;</label>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <?php
+                                                $bh = json_decode($business_hours, true);
+                                                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                                                for ($i = 0; $i < count($days); $i++) {
+                                                ?>
+                                                    <!-- Day & Time Sect Begin -->
+                                                    <div class="row form-inline">
+                                                        <div class="col-md-2 col-3">
+                                                            <div class="form-group">
+                                                                <p class="day">{{$days[$i]}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-4">
+                                                            <div class="form-group">
+                                                                <input type="text" name="time[{{$days[$i]}}][open]" id="time[{{$days[$i]}}][open]" value="<?php echo (isset($bh['time'][$days[$i]]['open'])) ? $bh['time'][$days[$i]]['open'] : '' ?>" class="stimepicker form-control <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? 'disabled-input-field' : '' ?>" <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? '' : 'required' ?>>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-4">
+                                                            <div class="form-group">
+                                                                <input type="text" name="time[{{$days[$i]}}][close]" id="time[{{$days[$i]}}][close]" value="<?php echo (isset($bh['time'][$days[$i]]['close'])) ? $bh['time'][$days[$i]]['close'] : '' ?>" class="etimepicker form-control <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? 'disabled-input-field' : '' ?>" <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? '' : 'required' ?>>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 col-1">
+                                                            <div class="form-group">
+                                                                &emsp;
+                                                                <input type="checkbox" name="time[{{$days[$i]}}][closed]" onclick="closed('<?php echo $days[$i] ?>')" <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? 'checked' : '' ?>>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Day & Time Sect End -->
+                                                <?php
+                                                }
+                                                ?>
 
+                                                <div class="col-md-12 text-center">
+                                                    <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" type="submit">{{__('Update')}}</button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
@@ -295,12 +304,6 @@
     </div>
     <!-- /.content -->
 </div>
-<style>
-    .card-body {
-        padding: 30px 50px !important;
-    }
-</style>
-
 
 <div class="modal fade " id="myModal">
     <div class="modal-dialog modal-lg  modal-dialog-centered">
@@ -318,7 +321,7 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="card">
-                            <div class="card-body">
+                            <div class="card-body-custom">
                                 <div class="container">
                                     <div class="row">
                                         <div class="col-md-12 mt-3 mb-3">
@@ -511,17 +514,28 @@
 
 
     }
-
-
-
-
-
     google.maps.event.addDomListener(window, 'load', initialize);
-</script>
 
-<style>
-    .pac-container {
-        z-index: 100000000000000000000000000000000000;
+    function closed(day) {
+        let listOfClasses = document.getElementById("time[" + day + "][open]").className;
+        if (listOfClasses.search("disabled-input-field") < 0) {
+            // To disable the input fields
+            document.getElementById("time[" + day + "][open]").value = null;
+            document.getElementById("time[" + day + "][close]").value = null;
+            // To disable the input fields
+            document.getElementById("time[" + day + "][open]").classList.add('disabled-input-field');
+            document.getElementById("time[" + day + "][close]").classList.add('disabled-input-field');
+            // To remove the required attribute from the input fields 
+            document.getElementById("time[" + day + "][open]").required = false;
+            document.getElementById("time[" + day + "][close]").required = false;
+        } else {
+            // To enable the input fields
+            document.getElementById("time[" + day + "][open]").classList.remove('disabled-input-field');
+            document.getElementById("time[" + day + "][close]").classList.remove('disabled-input-field');
+            // To add the required attribute from the input fields 
+            document.getElementById("time[" + day + "][open]").required = true;
+            document.getElementById("time[" + day + "][close]").required = true;
+        }
     }
-</style>
+</script>
 @endsection

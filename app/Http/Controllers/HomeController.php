@@ -369,11 +369,15 @@ class HomeController extends Controller
         $business_location = $user->business_location;
         return view('shopkeeper.settings.general', compact('business_hours', 'address', 'business_location'));
     }
-
+    /**
+     * Update's business hours of a store
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     public function time_update(Request $request)
-    {
+    {   //dd(json_encode($request->time));
         $data['time'] = $request->time;
-        $data['days'] = $request->days;
+        // $data['days'] = $request->days;
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
         $user->save();

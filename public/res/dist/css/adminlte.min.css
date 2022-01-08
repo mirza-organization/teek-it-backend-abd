@@ -65,3 +65,27 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+.day{
+    margin-top: 20px;
+}
+
+.pac-container {
+    z-index: 100000000000000000000000000000000000;
+}
+
+.disabled-input-field {
+    border-bottom-color: gray !important;
+    pointer-events: none;
+}
+
+.card-body-custom {
+    padding: 30px 50px !important;
+}
+
+/* *************************Media Queries************************* */
+@media only screen and (max-width: 425px){  
+    .day{
+        font-size: 12px;
+    }
+}
