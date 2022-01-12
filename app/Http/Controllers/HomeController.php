@@ -167,16 +167,10 @@ class HomeController extends Controller
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
-            //        print_r($data);die;
-
-
             unset($data['gallery']);
-
 
             $product = Products::find($product_id);
             if (!empty($product)) {
-
-
                 $filename = $product->feature_img;
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
@@ -266,7 +260,7 @@ class HomeController extends Controller
                 'category_id' => 'required',
                 'qty' => 'required',
                 'price' => 'required',
-                'discount_percentage' => 'required',
+                // 'discount_percentage' => 'required',
                 'height' => 'required',
                 'width' => 'required',
                 'length' => 'required',

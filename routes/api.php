@@ -158,7 +158,6 @@ Route::get('payment_intent', function () {
     }
     curl_close($ch);
     return response()->json(json_decode($result), 200);
-    // json_decode($result);
 });
 
 Route::get('time', function () {

@@ -120,9 +120,10 @@
                                             $rating = round($inventory->ratting['average']);
                                             for ($i = 1; $i <= 5; $i++) :
                                             ?>
-                                                <span class="fa fa-star <?php if ($i <= $rating) {
-                                                                            echo "checked";
-                                                                        } ?>"></span>
+                                                <span class="fa fa-star 
+                                                <?php if ($i <= $rating) 
+                                                {echo "checked"; } ?>">
+                                                </span>
                                             <?php endfor; ?>
                                         </div>
                                     </div>
