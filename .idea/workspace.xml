@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="07d4aa82-b430-4fca-875a-7ef3c766b465" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/routes/api.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/app/Http/Controllers/OrdersController.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="ProjectId" id="1jsXcX65AiBJiYNwPxlondbSKaR" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/Http/Controllers/Api/v1/DriverController.php" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="two.files.diff.last.used.file" value="$PROJECT_DIR$/app/Http/Controllers/Api/v1/DriverController.php" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration name="phpunit.xml" type="PHPUnitRunConfigurationType" factoryName="PHPUnit">
+      <TestRunner scope="XML" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="07d4aa82-b430-4fca-875a-7ef3c766b465" name="Default Changelist" comment="" />
+      <created>1604593853027</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1604593853027</updated>
+      <workItem from="1604593854145" duration="2442000" />
+      <workItem from="1604641264874" duration="624000" />
+      <workItem from="1604686249836" duration="6085000" />
+      <workItem from="1604777467380" duration="2464000" />
+      <workItem from="1604826904485" duration="8281000" />
+      <workItem from="1604903267530" duration="576000" />
+      <workItem from="1604987041661" duration="778000" />
+      <workItem from="1605022441379" duration="6604000" />
+      <workItem from="1605072322464" duration="2536000" />
+      <workItem from="1605107278656" duration="1498000" />
+      <workItem from="1605333642333" duration="3712000" />
+      <workItem from="1605579305583" duration="471000" />
+      <workItem from="1605587711658" duration="1033000" />
+      <workItem from="1605591124112" duration="348000" />
+      <workItem from="1605614514717" duration="247000" />
+      <workItem from="1605618828291" duration="644000" />
+      <workItem from="1605625449361" duration="1729000" />
+      <workItem from="1605638660989" duration="3000" />
+      <workItem from="1605638671438" duration="2952000" />
+      <workItem from="1605681653445" duration="1642000" />
+      <workItem from="1606632739445" duration="3489000" />
+      <workItem from="1606712706151" duration="606000" />
+      <workItem from="1606880653601" duration="3687000" />
+      <workItem from="1606886563011" duration="5695000" />
+      <workItem from="1606906851606" duration="722000" />
+      <workItem from="1606977242961" duration="653000" />
+      <workItem from="1607014587746" duration="2193000" />
+      <workItem from="1607055082593" duration="599000" />
+      <workItem from="1607058180497" duration="1210000" />
+      <workItem from="1607091525747" duration="20000" />
+      <workItem from="1607541016600" duration="222000" />
+      <workItem from="1607565743863" duration="12000" />
+      <workItem from="1607665765787" duration="1189000" />
+      <workItem from="1608052178340" duration="1108000" />
+      <workItem from="1608094852383" duration="1587000" />
+      <workItem from="1608096913339" duration="620000" />
+      <workItem from="1608211209456" duration="1649000" />
+      <workItem from="1608216834076" duration="90000" />
+      <workItem from="1608273865122" duration="913000" />
+      <workItem from="1608356388616" duration="46000" />
+      <workItem from="1608531435233" duration="293000" />
+      <workItem from="1609437397603" duration="730000" />
+      <workItem from="1609899137407" duration="795000" />
+      <workItem from="1609913101324" duration="366000" />
+      <workItem from="1610025500333" duration="1234000" />
+      <workItem from="1610026942895" duration="47000" />
+      <workItem from="1610609971714" duration="211000" />
+      <workItem from="1610611619773" duration="1310000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="167" y="125" width="1653" height="855" key="DiffContextDialog" timestamp="1605682905555">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="167" y="125" width="1653" height="855" key="DiffContextDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1605682905555" />
+    <state x="776" y="310" width="424" height="484" key="FileChooserDialogImpl" timestamp="1605682606523">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="776" y="310" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053@67.27.1853.1053" timestamp="1605682606523" />
+    <state x="789" y="474" width="399" height="157" key="NewPhpFileDialog" timestamp="1605682642015">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="789" y="474" width="399" height="157" key="NewPhpFileDialog/67.27.1853.1053@67.27.1853.1053" timestamp="1605682642015" />
+    <state width="690" height="446" key="SwitcherDM" timestamp="1610611661885">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="690" height="446" key="SwitcherDM/67.27.1853.1053@67.27.1853.1053" timestamp="1610611661885" />
+    <state x="685" y="275" width="616" height="554" key="find.popup" timestamp="1605640145243">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="685" y="275" width="616" height="554" key="find.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1605640145243" />
+    <state x="657" y="253" key="run.anything.popup" timestamp="1613849002612">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="657" y="253" key="run.anything.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1613849002612" />
+    <state x="656" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1610612129327">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state x="656" y="257" width="672" height="678" key="search.everywhere.popup/67.27.1853.1053@67.27.1853.1053" timestamp="1610612129327" />
+  </component>
+</project>

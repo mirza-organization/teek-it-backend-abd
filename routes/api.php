@@ -23,6 +23,10 @@ Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');
 Route::get('auth/verify', 'Auth\AuthController@verify');
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 // Authentication Routes
 Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('login', 'Auth\AuthController@login');
@@ -37,16 +41,64 @@ Route::group(['prefix' => 'auth'], function ($router) {
 });
 
 Route::group(['prefix' => 'category'], function ($router) {
+<<<<<<< HEAD
+//        Route::post('add', 'CategoriesController@add');
+//        Route::post('update/{product_id}', 'CategoriesController@update');
+    Route::get('all', 'CategoriesController@all');
+    Route::get('view/{category_id}', 'CategoriesController@Products');
+    Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
+
+});
+
+Route::group(['prefix' => 'product'], function ($router) {
+    Route::post('search', 'ProductsController@search');
+    Route::get('all', 'ProductsController@all');
+=======
     //Route::post('add', 'CategoriesController@add');
     //Route::post('update/{product_id}', 'CategoriesController@update');
     Route::get('all', 'CategoriesController@all');
     Route::get('view/{category_id}', 'CategoriesController@Products');
     Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 });
 
 Route::group(['prefix' => 'page'], function ($router) {
     Route::get('', 'PagesController@get_page');
 });
+<<<<<<< HEAD
+Route::get('sellers', 'Auth\AuthController@sellers');
+Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
+
+Route::group(['middleware' => ['jwt.verify']], function($router) {
+
+
+    Route::group(['prefix' => 'product'], function ($router) {
+        Route::post('add', 'ProductsController@add');
+        Route::get('view/{product_id}', 'ProductsController@view');
+
+        Route::post('view/bulk', 'ProductsController@bulkView');
+//        Route::get('edit/{id}', 'ProductsController@edit');
+        Route::post('update/{product_id}', 'ProductsController@update');
+        Route::get('delete/{product_id}', 'ProductsController@delete');
+        Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@delete_image');
+
+        Route::get('sortbyprice', 'ProductsController@sortByPrice');
+        Route::get('sortByLocation', 'ProductsController@sortByLocation');
+
+
+
+
+
+        Route::post('ratings/add', 'RattingsController@add');
+        Route::post('ratings/update', 'RattingsController@update');
+        Route::get('ratings/delete/{ratting_id}', 'RattingsController@delete');
+
+    });
+
+
+    Route::group(['prefix' => 'withdrawal'], function ($router) {
+
+=======
 
 Route::get('sellers', 'Auth\AuthController@sellers');
 Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
@@ -81,10 +133,15 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
     });
 
     Route::group(['prefix' => 'withdrawal'], function ($router) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         Route::get('getRequests', 'WithdrawalRequestsController@getRequests');
         Route::post('sendRequest', 'WithdrawalRequestsController@sendRequest');
     });
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     Route::group(['prefix' => 'orders'], function ($router) {
         Route::get('', 'OrdersController@index');
         Route::get('seller', 'OrdersController@seller_orders');
@@ -94,16 +151,26 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('new', 'OrdersController@new');
         Route::post('update', 'OrdersController@updateOrder');
         Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
+<<<<<<< HEAD
+        Route::get('/get-order-details/{id}','Api\v1\OrderController@getOrderDetails');
+    });
+=======
         Route::get('/get-order-details/{id}', 'Api\v1\OrderController@getOrderDetails');
     });
 
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     Route::group(['prefix' => 'notifications'], function ($router) {
         Route::get('', 'NotificationsController@get_notifications');
         Route::get('delete/{notification_id}', 'NotificationsController@delete_notification');
         Route::post('send', 'NotificationsController@send_notification');
     });
 
+<<<<<<< HEAD
+
+    Route::group(['prefix'=>'driver'],function (){
+=======
     Route::group(['prefix' => 'driver'], function () {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         Route::get('/info/{id}', 'Api\v1\DriverController@info');
         Route::post('/add-lat-lng', 'Api\v1\DriverController@addLatLng');
         Route::get('/withdrawable-balance', 'Api\v1\DriverController@getWithdrawalBalance');
@@ -139,6 +206,42 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
 //
 //});
 
+<<<<<<< HEAD
+
+Route::get('payment_intent',function(){
+    $ch = curl_init();
+$amount=$_REQUEST['amount'];
+curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/payment_intents');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, "amount=$amount&currency=eur&metadata[integration_check]=accept_a_payment");
+curl_setopt($ch, CURLOPT_USERPWD, 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q' . ':' . '');
+
+$headers = array();
+$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+$result = curl_exec($ch);
+if (curl_errno($ch)) {
+    echo 'Error:' . curl_error($ch);
+}
+curl_close($ch);
+return response()->json(json_decode($result), 200);
+    // json_decode($result);
+});
+
+
+Route::get('time',function(){
+    return response()->json([
+        'data'=>time(),
+        'status'=>true,
+        'message' => ''], 200);
+});
+Route::fallback(function(){
+    return response()->json([
+        'status'=>false,
+        'message' => 'Page Not Found.'], 404);
+=======
 Route::get('payment_intent', function () {
     $ch = curl_init();
     $amount = $_REQUEST['amount'];
@@ -174,4 +277,5 @@ Route::fallback(function () {
         'status' => false,
         'message' => 'Page Not Found.'
     ], 404);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 });
