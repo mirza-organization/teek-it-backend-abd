@@ -59,12 +59,24 @@ class OrdersController extends Controller
         } elseif ($request->has('order_status') && $request->order_status == 'ready') {
             if (count($assignedOrders) == 0) {
                 $users = DB::table("users")
+<<<<<<< HEAD
                     ->select("users.id", "users.name"
                         , DB::raw("3959 * acos(cos(radians(" . $lat . "))
                             * cos(radians(users.lat))
                             * cos(radians(users.lon) - radians(" . $lng . "))
                             + sin(radians(" . $lat . "))
                             * sin(radians(users.lat))) AS distance"))
+=======
+                    ->select(
+                        "users.id",
+                        "users.name",
+                        DB::raw("3959 * acos(cos(radians(" . $lat . "))
+                            * cos(radians(users.lat))
+                            * cos(radians(users.lon) - radians(" . $lng . "))
+                            + sin(radians(" . $lat . "))
+                            * sin(radians(users.lat))) AS distance")
+                    )
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                     ->join('role_user', 'users.id', '=', 'role_user.user_id')
                     ->join('roles', 'roles.id', '=', 'role_user.role_id')
                     ->where('roles.id', 2)
@@ -90,18 +102,33 @@ class OrdersController extends Controller
                         });
                     }
                 }
+<<<<<<< HEAD
                 $orders = $orders->where('type','delivery')
+=======
+                $orders = $orders->where('type', 'delivery')
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                     ->orderByDesc('created_at')->paginate();
                 $pagination = $orders->toArray();
             } else {
                 $assignedOrders = $assignedOrders[0];
                 $nearbyOrders = DB::table("orders")
+<<<<<<< HEAD
                     ->select("orders.id"
                         , DB::raw("3959 * acos(cos(radians(" . $assignedOrders->lat . "))
                         * cos(radians(orders.lat))
                         * cos(radians(orders.lng) - radians(" . $assignedOrders->lng . "))
                         + sin(radians(" . $assignedOrders->lat . "))
                         * sin(radians(orders.lat))) AS distance"))
+=======
+                    ->select(
+                        "orders.id",
+                        DB::raw("3959 * acos(cos(radians(" . $assignedOrders->lat . "))
+                        * cos(radians(orders.lat))
+                        * cos(radians(orders.lng) - radians(" . $assignedOrders->lng . "))
+                        + sin(radians(" . $assignedOrders->lat . "))
+                        * sin(radians(orders.lat))) AS distance")
+                    )
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                     ->where(function ($q) {
                         $q->where('order_status', 'pending')
                             ->orWhere('order_status', 'ready');
@@ -124,7 +151,11 @@ class OrdersController extends Controller
                         });
                     }
                 });
+<<<<<<< HEAD
                 $orders = $orders->where('type','delivery')
+=======
+                $orders = $orders->where('type', 'delivery')
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                     ->orderByDesc('created_at')->paginate();
                 $pagination = $orders->toArray();
             }
@@ -230,7 +261,11 @@ class OrdersController extends Controller
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
+<<<<<<< HEAD
 //                $this->calculateDriverFair($order, $user);
+=======
+                //                $this->calculateDriverFair($order, $user);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             }
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
@@ -246,6 +281,104 @@ class OrdersController extends Controller
         return response()->json($products_data);
     }
 
+<<<<<<< HEAD
+=======
+    // public function newOld(Request $request)
+    // {
+    //     if ($request->has('type')) {
+    //         if ($request->type == 'delivery') {
+    //             $validatedData = Validator::make($request->all(), [
+    //                 'receiver_name' => 'required',
+    //                 'phone_number' => 'required',
+    //                 'address' => 'required',
+    //                 'house_no' => 'required',
+    //                 'delivery_charges' => 'required',
+    //                 'service_charges' => 'required'
+    //             ]);
+    //             if ($validatedData->fails()) {
+    //                 return response()->json($validatedData->errors(), 422);
+    //             }
+    //         }
+    //     } else {
+    //         return response()->json(['type' => ['The type field is required.']], 422);
+    //     }
+    //     $grouped_seller = [];
+    //     foreach ($request->items as $item) {
+    //         $product_id = $item['product_id'];
+    //         $qty = $item['qty'];
+    //         $product_price = (new ProductsController())->get_product_price($product_id);
+    //         $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
+    //         $temp = [];
+    //         $temp['qty'] = $qty;
+    //         $temp['product_id'] = $product_id;
+    //         $temp['price'] = $product_price;
+    //         $temp['seller_id'] = $product_seller_id;
+    //         $grouped_seller[$product_seller_id][] = $temp;
+    //     }
+
+    //     $count = 0;
+    //     $order_arr = [];
+    //     foreach ($grouped_seller as $seller_id => $order) {
+    //         $user_id = Auth()->id(); 
+    //         // $user_id = 306; 
+    //         $order_total = 0;
+    //         $total_items = 0;
+    //         foreach ($order as $order_item) {
+    //             $total_items = $total_items + $order_item['qty'];
+    //             $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
+    //         }
+
+    //         $user = User::find($seller_id);
+    //         $user_money = $user->pending_withdraw;
+    //         $user->pending_withdraw = $order_total + $user_money;
+    //         $user->save();
+
+    //         $new_order = new Orders();
+    //         $new_order->user_id = $user_id;
+    //         $new_order->order_total = $order_total;
+    //         $new_order->total_items = $total_items;
+    //         $new_order->type = $request->type;
+    //         if ($request->type == 'delivery') {
+    //             $new_order->receiver_name = $request->receiver_name;
+    //             $new_order->phone_number = $request->phone_number;
+    //             $new_order->address = $request->address;
+    //             $new_order->house_no = $request->house_no;
+    //             $new_order->flat = $request->flat;
+    //             $new_order->delivery_charges = $request->delivery_charges[$count];
+    //             $new_order->service_charges = $request->service_charges;
+    //         }
+    //         $new_order->description = $request->description;
+    //         $new_order->payment_status = $request->payment_status ?? "hidden";
+    //         $new_order->seller_id = $seller_id;
+    //         $new_order->save();
+    //         $order_id = $new_order->id;
+    //         $order_arr[] = $order_id;
+    //         foreach ($order as $order_item) {
+    //             $new_order_item = new OrderItems();
+    //             $new_order_item->order_id = $order_id;
+    //             $new_order_item->product_id = $order_item['product_id'];
+    //             $new_order_item->product_price = $order_item['price'];
+    //             $new_order_item->product_qty = $order_item['qty'];
+    //             $new_order_item->save();
+    //         }
+    //         $count++;
+    //     }
+    //     $return_data = $this->get_orders_from_ids($order_arr);
+    //     $user_arr = [
+    //         'data' => $return_data,
+    //         'status' => true,
+    //         'message' => 'Order Added Successfully'
+
+    //     ];
+    //     return response()->json($user_arr, 200);
+    // }
+
+    /**
+     * Inserts a newly arrived order
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function new(Request $request)
     {
         if ($request->has('type')) {
@@ -255,6 +388,7 @@ class OrdersController extends Controller
                     'phone_number' => 'required',
                     'address' => 'required',
                     'house_no' => 'required',
+<<<<<<< HEAD
                     'delivery_charges'=>'required',
                     'service_charges'=>'required'
                 ]);
@@ -264,11 +398,34 @@ class OrdersController extends Controller
             }
         } else {
             return response()->json(['type' => ['The type field is required.']], 422);
+=======
+                    'delivery_charges' => 'required',
+                    'service_charges' => 'required'
+                ]);
+                if ($validatedData->fails()) {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => $validatedData->errors()
+                    ], 422);
+                }
+            }
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => 'The type field is required.'
+            ], 422);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         }
         $grouped_seller = [];
         foreach ($request->items as $item) {
             $product_id = $item['product_id'];
+<<<<<<< HEAD
             $qty = $item['qty'];
+=======
+            $qty = $item['qty']; 
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
             $temp = [];
@@ -278,29 +435,46 @@ class OrdersController extends Controller
             $temp['seller_id'] = $product_seller_id;
             $grouped_seller[$product_seller_id][] = $temp;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         $count = 0;
         $order_arr = [];
         foreach ($grouped_seller as $seller_id => $order) {
             $user_id = Auth()->id();
+<<<<<<< HEAD
+=======
+            // $user_id = 306;
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $order_total = 0;
             $total_items = 0;
             foreach ($order as $order_item) {
                 $total_items = $total_items + $order_item['qty'];
                 $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
+<<<<<<< HEAD
 
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $user = User::find($seller_id);
             $user_money = $user->pending_withdraw;
             $user->pending_withdraw = $order_total + $user_money;
             $user->save();
+<<<<<<< HEAD
 
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
             $new_order->total_items = $total_items;
             $new_order->type = $request->type;
+<<<<<<< HEAD
             if ($request->type == 'delivery'){
+=======
+            if ($request->type == 'delivery') {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $new_order->receiver_name = $request->receiver_name;
                 $new_order->phone_number = $request->phone_number;
                 $new_order->address = $request->address;
@@ -325,6 +499,7 @@ class OrdersController extends Controller
             }
             $count++;
         }
+<<<<<<< HEAD
         $return_data = $this->get_orders_from_ids($order_arr);
         $user_arr = [
             'data' => $return_data,
@@ -336,6 +511,15 @@ class OrdersController extends Controller
     }
 
 
+=======
+        return response()->json([
+            'data' => $this->get_orders_from_ids($order_arr),
+            'status' => true,
+            'message' => 'Order added successfully.'
+        ], 200);
+    }
+
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function updateOrder(Request $request)
     {
         $order_ids = $request->ids;
@@ -349,12 +533,20 @@ class OrdersController extends Controller
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
+<<<<<<< HEAD
 //                $this->calculateDriverFair($order, $user);
+=======
+                //                $this->calculateDriverFair($order, $user);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             }
             $order->lat = $request->lat;
             $order->lng = $request->lng;
             $order->type = $request->type;
+<<<<<<< HEAD
             if ($request->type == 'delivery'){
+=======
+            if ($request->type == 'delivery') {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $order->receiver_name = $request->receiver_name;
                 $order->phone_number = $request->phone_number;
                 $order->address = $request->address;
@@ -404,12 +596,21 @@ class OrdersController extends Controller
 
     public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
+<<<<<<< HEAD
         $address1 = $latitude1.', '.$longitude1;
         $address2 = $latitude2.', '.$longitude2;
         $url = "https://maps.googleapis.com/maps/api/directions/json?origin=".urlencode($address1)."&destination=".urlencode($address2)."&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
         $query = file_get_contents($url);
         $results = json_decode($query,true);
         $distanceString = explode(' ',$results['routes'][0]['legs'][0]['distance']['text']);
+=======
+        $address1 = $latitude1 . ', ' . $longitude1;
+        $address2 = $latitude2 . ', ' . $longitude2;
+        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+        $query = file_get_contents($url);
+        $results = json_decode($query, true);
+        $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         $kms = (int)$distanceString[0] * 0.621371;
         return $kms > 1 ? $kms : 1;
     }
@@ -417,7 +618,11 @@ class OrdersController extends Controller
     public function calculateDriverFair($order, $store)
     {
         $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
+<<<<<<< HEAD
             ->where('id','!=',$order->id)
+=======
+            ->where('id', '!=', $order->id)
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             ->where('order_status', 'onTheWay')->get();
         if (count($childOrders) > 0) {
             foreach ($childOrders as $childOrder) {
@@ -436,7 +641,11 @@ class OrdersController extends Controller
             $teekitCharges = $totalFair * $fee;
             $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
             $driver->save();
+<<<<<<< HEAD
             $order->driver_charges = $totalFair - $fee  ;
+=======
+            $order->driver_charges = $totalFair - $fee;
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $order->driver_traveled_km = (round(($distance * 1.609344), 2));
             $order->save();
         } else {
@@ -449,5 +658,8 @@ class OrdersController extends Controller
             $driver->save();
         }
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 }

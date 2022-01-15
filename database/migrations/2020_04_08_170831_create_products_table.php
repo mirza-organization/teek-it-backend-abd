@@ -21,7 +21,11 @@ class CreateProductsTable extends Migration
             $table->string('sku');
             $table->string('qty');
             $table->string('price');
+<<<<<<< HEAD
             $table->string('sale_price');
+=======
+            $table->string('discount_percentage');
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $table->string('dimension')->nullable();
             $table->string('weight')->nullable();
             $table->string('brand')->nullable();
