@@ -1,6 +1,20 @@
 @extends('layouts.shopkeeper.app')
 @section('content')
     <div class="content">
+<<<<<<< HEAD
+=======
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
+                    <h4 class="text-left text-primary">Store Image</h4>
+                    <div class="card">
+                        <div class="card-body-custom">
+                            <div class=" d-block text-right">
+                                <div class="card-text">
+                                    <div class="row">
+                                        <div class="col-md-12">
+>>>>>>> origin/staging
 
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -70,6 +84,7 @@
             <div class="container-fluid">
                 <div class="row">
 
+<<<<<<< HEAD
                     <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                         <h4 class="text-left text-primary">Location</h4>
                         <div class="card">
@@ -78,6 +93,16 @@
                                     <div class="card-text">
                                         <div class="row">
                                             <div class="col-md-12">
+=======
+                <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
+                    <h4 class="text-left text-primary">Location</h4>
+                    <div class="card">
+                        <div class="card-body-custom">
+                            <div class=" d-block text-right">
+                                <div class="card-text">
+                                    <div class="row">
+                                        <div class="col-md-12">
+>>>>>>> origin/staging
 
                                             </div>
                                             <div class="col-md-12">
@@ -121,6 +146,7 @@
             <div class="container-fluid">
                 <div class="row">
 
+<<<<<<< HEAD
                     <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                         <h4 class="text-left text-primary">Import Products</h4>
                         <div class="card">
@@ -129,6 +155,16 @@
                                     <div class="card-text">
                                         <div class="row">
                                             <div class="col-md-12">
+=======
+                <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
+                    <h4 class="text-left text-primary">Import Products</h4>
+                    <div class="card">
+                        <div class="card-body-custom">
+                            <div class=" d-block text-right">
+                                <div class="card-text">
+                                    <div class="row">
+                                        <div class="col-md-12">
+>>>>>>> origin/staging
 
                                             </div>
                                             <div class="col-md-12">
@@ -163,7 +199,25 @@
 
                     </div>
                 </div>
+<<<<<<< HEAD
                 <!-- /.row -->
+=======
+            </div>
+        </div>
+         -->
+        <!-- /.container-fluid -->
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
+                    <h4 class="text-left text-primary">Export Products</h4>
+                    <div class="card">
+                        <div class="card-body-custom">
+                            <div class=" d-block text-right">
+                                <div class="card-text">
+                                    <div class="row">
+                                        <div class="col-md-12">
+>>>>>>> origin/staging
 
             </div><!-- /.container-fluid -->
             <div class="container-fluid">
@@ -213,6 +267,7 @@
             <div class="container-fluid">
                 <div class="row">
 
+<<<<<<< HEAD
                     <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                         <h4 class="text-left text-primary">Set Store Hours</h4>
                         <div class="card">
@@ -258,6 +313,81 @@
 
                                                 </form>
                                             </div>
+=======
+                <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
+                    <h4 class="text-left text-primary">Set Store Hours</h4>
+                    <div class="card">
+                        <div class="card-body-custom">
+                            <div class=" d-block text-right">
+                                <div class="card-text">
+                                    <div class="row">
+                                        <div class="col-md-12">
+
+                                        </div>
+                                        <div class="col-md-12">
+                                            <form action="{{route('time_update')}}" method="POST" enctype="multipart/form-data">
+                                                {{csrf_field()}}
+                                                <div class="row form-inline">
+                                                    <div class="col-md-2 col-2">
+                                                        <div class="form-group">
+                                                            <label>Day &emsp;</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 col-4">
+                                                        <div class="form-group">
+                                                            <label>Opening Time &emsp;</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4 col-4">
+                                                        <div class="form-group">
+                                                            <label>Closing Time &emsp;</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-2 col-2">
+                                                        <div class="form-group">
+                                                            <label>Closed &emsp;</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php
+                                                $bh = json_decode($business_hours, true);
+                                                $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                                                for ($i = 0; $i < count($days); $i++) {
+                                                ?>
+                                                    <!-- Day & Time Sect Begin -->
+                                                    <div class="row form-inline">
+                                                        <div class="col-md-2 col-3">
+                                                            <div class="form-group">
+                                                                <p class="day">{{$days[$i]}}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-4">
+                                                            <div class="form-group">
+                                                                <input type="text" name="time[{{$days[$i]}}][open]" id="time[{{$days[$i]}}][open]" value="<?php echo (isset($bh['time'][$days[$i]]['open'])) ? $bh['time'][$days[$i]]['open'] : '' ?>" class="stimepicker form-control <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? 'disabled-input-field' : '' ?>" <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? '' : 'required' ?>>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4 col-4">
+                                                            <div class="form-group">
+                                                                <input type="text" name="time[{{$days[$i]}}][close]" id="time[{{$days[$i]}}][close]" value="<?php echo (isset($bh['time'][$days[$i]]['close'])) ? $bh['time'][$days[$i]]['close'] : '' ?>" class="etimepicker form-control <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? 'disabled-input-field' : '' ?>" <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? '' : 'required' ?>>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 col-1">
+                                                            <div class="form-group">
+                                                                &emsp;
+                                                                <input type="checkbox" name="time[{{$days[$i]}}][closed]" onclick="closed('<?php echo $days[$i] ?>')" <?php echo (isset($bh['time'][$days[$i]]['closed'])) ? 'checked' : '' ?>>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Day & Time Sect End -->
+                                                <?php
+                                                }
+                                                ?>
+
+                                                <div class="col-md-12 text-center">
+                                                    <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" type="submit">{{__('Update')}}</button>
+                                                </div>
+                                            </form>
+>>>>>>> origin/staging
                                         </div>
                                     </div>
 
@@ -274,16 +404,35 @@
         </div>
         <!-- /.content -->
     </div>
+<<<<<<< HEAD
     <style>
         .card-body {
             padding: 30px 50px!important;
         }
     </style>
+=======
+    <!-- /.content -->
+</div>
+
+<div class="modal fade " id="myModal">
+    <div class="modal-dialog modal-lg  modal-dialog-centered">
+        <div class="modal-content">
+>>>>>>> origin/staging
 
 
+<<<<<<< HEAD
     <div class="modal fade " id="myModal">
         <div class="modal-dialog modal-lg  modal-dialog-centered">
             <div class="modal-content">
+=======
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="card">
+                            <div class="card-body-custom">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-12 mt-3 mb-3">
+>>>>>>> origin/staging
 
                 <!-- Modal Header -->
                 <div class="modal-header">
@@ -489,6 +638,7 @@
                     ].join(' ');
                 }
 
+<<<<<<< HEAD
             });
 
 
@@ -508,3 +658,32 @@
         }
     </style>
 @endsection
+=======
+        });
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+    function closed(day) {
+        let listOfClasses = document.getElementById("time[" + day + "][open]").className;
+        if (listOfClasses.search("disabled-input-field") < 0) {
+            // To disable the input fields
+            document.getElementById("time[" + day + "][open]").value = null;
+            document.getElementById("time[" + day + "][close]").value = null;
+            // To disable the input fields
+            document.getElementById("time[" + day + "][open]").classList.add('disabled-input-field');
+            document.getElementById("time[" + day + "][close]").classList.add('disabled-input-field');
+            // To remove the required attribute from the input fields 
+            document.getElementById("time[" + day + "][open]").required = false;
+            document.getElementById("time[" + day + "][close]").required = false;
+        } else {
+            // To enable the input fields
+            document.getElementById("time[" + day + "][open]").classList.remove('disabled-input-field');
+            document.getElementById("time[" + day + "][close]").classList.remove('disabled-input-field');
+            // To add the required attribute from the input fields 
+            document.getElementById("time[" + day + "][open]").required = true;
+            document.getElementById("time[" + day + "][close]").required = true;
+        }
+    }
+</script>
+@endsection
+>>>>>>> origin/staging

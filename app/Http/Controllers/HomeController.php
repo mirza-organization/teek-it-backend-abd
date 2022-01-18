@@ -161,16 +161,10 @@ class HomeController extends Controller
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
-//        print_r($data);die;
-
-
             unset($data['gallery']);
-
 
             $product = Products::find($product_id);
             if (!empty($product)) {
-
-
                 $filename = $product->feature_img;
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
@@ -255,7 +249,26 @@ class HomeController extends Controller
     public function inventory_adddb(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
-
+            $validatedData = Validator::make($request->all(), [
+                'product_name' => 'required',
+                'sku' => 'required',
+                'category_id' => 'required',
+                'qty' => 'required',
+                'price' => 'required',
+                // 'discount_percentage' => 'required',
+                'height' => 'required',
+                'width' => 'required',
+                'length' => 'required',
+                'weight' => 'required',
+                'status' => 'required',
+                'contact' => 'required',
+                'gallery' => 'required',
+                'feature_img' => 'required'
+            ]);
+            if ($validatedData->fails()) {
+                flash('Error in adding the product because some required field is missing.')->error();
+                return \redirect()->back();
+            }
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')){
@@ -348,11 +361,15 @@ class HomeController extends Controller
         $business_location = $user->business_location;
         return view('shopkeeper.settings.general', compact('business_hours', 'address', 'business_location'));
     }
-
+    /**
+     * Update's business hours of a store
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     public function time_update(Request $request)
-    {
-        $data = $request->time;
-//        business_hours
+    {   //dd(json_encode($request->time));
+        $data['time'] = $request->time;
+        // $data['days'] = $request->days;
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
         $user->save();

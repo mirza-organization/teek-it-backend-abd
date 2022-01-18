@@ -148,6 +148,7 @@ Route::group(['middleware' => ['jwt.verify']], function($router) {
 
 Route::get('payment_intent',function(){
     $ch = curl_init();
+<<<<<<< HEAD
 $amount=$_REQUEST['amount'];
 curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/payment_intents');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -166,6 +167,25 @@ if (curl_errno($ch)) {
 curl_close($ch);
 return response()->json(json_decode($result), 200);
     // json_decode($result);
+=======
+    $amount = $_REQUEST['amount'];
+    curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/payment_intents');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, "amount=$amount&currency=eur&metadata[integration_check]=accept_a_payment");
+    curl_setopt($ch, CURLOPT_USERPWD, 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q' . ':' . '');
+
+    $headers = array();
+    $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+    $result = curl_exec($ch);
+    if (curl_errno($ch)) {
+        echo 'Error:' . curl_error($ch);
+    }
+    curl_close($ch);
+    return response()->json(json_decode($result), 200);
+>>>>>>> origin/staging
 });
 
 

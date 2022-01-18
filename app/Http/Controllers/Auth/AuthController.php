@@ -331,7 +331,11 @@ class AuthController extends Controller
         ];
         return response()->json($user_arr);
     }
-
+    /**
+     * Fetch seller/store information w.r.t ID
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     private function get_seller_info($seller_info)
     {
         $user = $seller_info;
@@ -343,6 +347,7 @@ class AuthController extends Controller
             'email' => $user->email,
             'business_name' => $user->business_name,
             'business_location' => $user->business_location,
+            'business_hours' => $user->business_hours,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'address_1' => $user->address_1,
@@ -350,7 +355,6 @@ class AuthController extends Controller
             'roles' => $user->roles->pluck('name'),
             'user_img' => $user->user_img
         );
-
         return $data_info;
     }
 
@@ -399,19 +403,13 @@ class AuthController extends Controller
 
     public function updateUser(Request $request)
     {
-
         $validate = User::updateValidator($request);
-
         if ($validate->fails()) {
             $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
             return response()->json($response, 400);
         }
         $user = JWTAuth::user();
-
-
         $User = User::find($user->id);
-
-
         if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {
@@ -428,8 +426,6 @@ class AuthController extends Controller
 
 
             }
-
-
             $User->name = $request->name;
             $User->l_name = $request->l_name;
             $User->postal_code = $request->postal_code;
@@ -438,10 +434,13 @@ class AuthController extends Controller
             $User->address_2 = $request->address_2;
             $User->user_img = $filename;
             $User->save();
-
             $response = $this->me();
             return $response;
+<<<<<<< HEAD
 //            return response()->json($response, 200);
+=======
+            //return response()->json($response, 200);
+>>>>>>> origin/staging
         } else {
             $response = array('status' => false, 'message' => 'User not found.');
             return response()->json($response, 404);
@@ -456,26 +455,34 @@ class AuthController extends Controller
         $response = $this->me();
         return $response;
     }
-
+    /**
+     * Listing of all Sellers/Stores
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
     public function sellers()
     {
         $users = User::with('seller')
             ->where('is_active', '=', 1)->get();
-        $data = [];
-        foreach ($users as $user) {
+        $data = []; 
+        foreach ($users as $user) { 
             if ($user->hasRole('seller')) {
                 $user->where('is_active', 1);
                 $data[] = $this->get_seller_info($user);
             }
         }
-        $user_arr = [
+        return response()->json([
             'data' => $data,
             'status' => true,
             'message' => ''
+<<<<<<< HEAD
 
         ];
 
         return response()->json($user_arr, 200);
+=======
+        ], 200);
+>>>>>>> origin/staging
     }
 
     public function seller_products($seller_id)
