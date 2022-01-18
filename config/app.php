@@ -67,7 +67,15 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'timezone' => 'Asia/Kolkata',
+=======
+<<<<<<< HEAD
+    'timezone' => 'Asia/Kolkata',
+=======
+    'timezone' => 'UTC',
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
 
     /*
     |--------------------------------------------------------------------------

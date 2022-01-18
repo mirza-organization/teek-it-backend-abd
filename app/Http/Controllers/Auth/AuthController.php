@@ -52,7 +52,15 @@ class AuthController extends Controller
         $User = User::create([
             'name' => $request->get('name'),
             'l_name' => $request->l_name,
+<<<<<<< HEAD
             'phone'=>$request->phone,
+=======
+<<<<<<< HEAD
+            'phone'=>$request->phone,
+=======
+            'phone' => $request->phone,
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
             'business_name' => $request->business_name,
@@ -78,8 +86,16 @@ class AuthController extends Controller
                 } else {
                     info("file is not found :- " . $filename);
                 }
+<<<<<<< HEAD
 
 
+=======
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
             }
         }
         $User->user_img = $filename;
@@ -122,13 +138,22 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+<<<<<<< HEAD
 
 
+=======
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         $credentials = $request->only('email', 'password');
 
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['status' => false, 'message' => 'Invalid credentials'], 401);
         }
+<<<<<<< HEAD
 
         $user = JWTAuth::user();
          if ($user->email_verified_at == null) {
@@ -138,6 +163,27 @@ class AuthController extends Controller
          if ($user->is_active == 0) {
              return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
          }
+=======
+<<<<<<< HEAD
+
+        $user = JWTAuth::user();
+         if ($user->email_verified_at == null) {
+             return response()->json(['status' => false, 'message' => 'Email not verified, verify your email first.'], 401);
+         }
+
+         if ($user->is_active == 0) {
+             return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
+         }
+=======
+        $user = JWTAuth::user();
+        if ($user->email_verified_at == null) {
+            return response()->json(['status' => false, 'message' => 'Email not verified, verify your email first.'], 401);
+        }
+        if ($user->is_active == 0) {
+            return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
+        }
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         $this->authenticated($request, $user, $token);
         return $this->respondWithToken($token);
     }
@@ -180,7 +226,14 @@ class AuthController extends Controller
             echo "Account successfully verified";
             return;
             return response()->json($response, 200);
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         } else {
             $response = array('status' => false, 'message' => 'Invalid verification token');
 
@@ -249,7 +302,16 @@ class AuthController extends Controller
             'last_login' => $user->last_login,
             'seller_info' => $this->get_seller_info($seller_info),
             'roles' => $user->roles->pluck('name'),
+<<<<<<< HEAD
             'expires_in' => JWTAuth::factory()->getTTL() * 60,);
+=======
+<<<<<<< HEAD
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,);
+=======
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        );
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         $user_arr = [
             'data' => $data_info,
             'status' => true,
@@ -298,7 +360,14 @@ class AuthController extends Controller
         $imagePath = $user['user_img'];
 
         $data_info = array(
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
             'id' => $user->id,
             'name' => $user->name,
             'l_name' => $user->l_name,
@@ -315,19 +384,45 @@ class AuthController extends Controller
             'bank_details' => $user->bank_details,
             'last_login' => $user->last_login,
             'roles' => $user->roles->pluck('name'),
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
             'user_img' => $imagePath,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'seller_info' => $this->get_seller_info($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
+<<<<<<< HEAD
             'expires_in' => JWTAuth::factory()->getTTL() * 60,);
+=======
+<<<<<<< HEAD
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,);
+=======
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        );
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         $user_arr = [
             'data' => $data_info,
             'status' => true,
             'message' => AppConst::loginSuccessMsg
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+        ];
+        return response()->json($user_arr);
+    }
+
+=======
+>>>>>>> revert-2-master
         ];
         return response()->json($user_arr);
     }
@@ -336,6 +431,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     private function get_seller_info($seller_info)
     {
         $user = $seller_info;
@@ -347,7 +443,10 @@ class AuthController extends Controller
             'email' => $user->email,
             'business_name' => $user->business_name,
             'business_location' => $user->business_location,
+<<<<<<< HEAD
+=======
             'business_hours' => $user->business_hours,
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'address_1' => $user->address_1,
@@ -355,6 +454,10 @@ class AuthController extends Controller
             'roles' => $user->roles->pluck('name'),
             'user_img' => $user->user_img
         );
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         return $data_info;
     }
 
@@ -370,11 +473,27 @@ class AuthController extends Controller
     protected function authenticated($request, $user, $token)
     {
         $olduser = $user;
+<<<<<<< HEAD
 //        echo date("Y-m-d H:i:s");die;
 //        print_r($user);
         $user->last_login = date("Y-m-d H:i:s");
         $user->save();
 //die;
+=======
+<<<<<<< HEAD
+//        echo date("Y-m-d H:i:s");die;
+//        print_r($user);
+        $user->last_login = date("Y-m-d H:i:s");
+        $user->save();
+//die;
+=======
+        //        echo date("Y-m-d H:i:s");die;
+        //        print_r($user);
+        $user->last_login = date("Y-m-d H:i:s");
+        $user->save();
+        //die;
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         $agent = new Agent();
 
         $isDesktop = $agent->isDesktop();
@@ -391,7 +510,14 @@ class AuthController extends Controller
 
             $jwtToken->phone = 1;
             $jwtToken->save();
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         } else {
             JwtToken::where('user_id', $user->id)->where('desktop', 1)->delete();
 
@@ -403,13 +529,27 @@ class AuthController extends Controller
 
     public function updateUser(Request $request)
     {
+<<<<<<< HEAD
+
         $validate = User::updateValidator($request);
+
+=======
+        $validate = User::updateValidator($request);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         if ($validate->fails()) {
             $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
             return response()->json($response, 400);
         }
         $user = JWTAuth::user();
+<<<<<<< HEAD
+
+
         $User = User::find($user->id);
+
+
+=======
+        $User = User::find($user->id);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {
@@ -423,9 +563,18 @@ class AuthController extends Controller
                 } else {
                     info("file is not found :- " . $filename);
                 }
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> revert-2-master
 
 
             }
+
+
+=======
+            }
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $User->name = $request->name;
             $User->l_name = $request->l_name;
             $User->postal_code = $request->postal_code;
@@ -434,13 +583,23 @@ class AuthController extends Controller
             $User->address_2 = $request->address_2;
             $User->user_img = $filename;
             $User->save();
+<<<<<<< HEAD
+
+            $response = $this->me();
+            return $response;
+//            return response()->json($response, 200);
+=======
             $response = $this->me();
             return $response;
 <<<<<<< HEAD
 //            return response()->json($response, 200);
 =======
             //return response()->json($response, 200);
+<<<<<<< HEAD
 >>>>>>> origin/staging
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
         } else {
             $response = array('status' => false, 'message' => 'User not found.');
             return response()->json($response, 404);
@@ -455,22 +614,43 @@ class AuthController extends Controller
         $response = $this->me();
         return $response;
     }
+<<<<<<< HEAD
+
+=======
     /**
      * Listing of all Sellers/Stores
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function sellers()
     {
         $users = User::with('seller')
             ->where('is_active', '=', 1)->get();
+<<<<<<< HEAD
+        $data = [];
+        foreach ($users as $user) {
+=======
         $data = []; 
         foreach ($users as $user) { 
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             if ($user->hasRole('seller')) {
                 $user->where('is_active', 1);
                 $data[] = $this->get_seller_info($user);
             }
         }
+<<<<<<< HEAD
+        $user_arr = [
+            'data' => $data,
+            'status' => true,
+            'message' => ''
+
+        ];
+
+        return response()->json($user_arr, 200);
+    }
+
+=======
         return response()->json([
             'data' => $data,
             'status' => true,
@@ -484,12 +664,25 @@ class AuthController extends Controller
         ], 200);
 >>>>>>> origin/staging
     }
+<<<<<<< HEAD
 
+=======
+     /**
+     * Listing of all products w.r.t Seller/Store 'id'
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
     public function seller_products($seller_id)
     {
         $user = User::find($seller_id);
         $data = [];
         if ($user->hasRole('seller')) {
+<<<<<<< HEAD
+            $info = $this->get_seller_info($user);
+=======
+<<<<<<< HEAD
             $info = $this->get_seller_info($user);
             $products = Products::query()->where('user_id', '=', $user->id)->paginate();
 
@@ -526,6 +719,48 @@ class AuthController extends Controller
     }
 
 
+=======
+            // $info = $this->get_seller_info($user); 
+>>>>>>> revert-2-master
+            $products = Products::query()->where('user_id', '=', $user->id)->paginate();
+
+            $pagination = $products->toArray();
+            if (!empty($products)) {
+                $products_data = [];
+                foreach ($products as $product) {
+
+                    $products_data[] = (new ProductsController())->get_product_info($product->id);
+                }
+
+                $info['products'] = $products_data;
+                unset($pagination['data']);
+                $products_data = [
+                    'data' => $products_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination,
+
+                ];
+                $user_arr = $products_data;
+            } else {
+                $user_arr = [
+                    'data' => null,
+                    'status' => false,
+                    'message' => 'No Data Found'
+
+                ];
+            }
+
+
+            return response()->json($user_arr, 200);
+        }
+    }
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
     public function delivery_boys()
     {
         $users = User::query()->where('seller_id', '=', Auth::id())->get();
@@ -574,8 +809,20 @@ class AuthController extends Controller
 
         return response()->json($user_arr, 200);
 
+<<<<<<< HEAD
 //        return $data_info;
     }
 
 
+=======
+<<<<<<< HEAD
+//        return $data_info;
+    }
+
+
+=======
+        //        return $data_info;
+    }
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
 }

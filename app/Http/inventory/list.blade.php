@@ -151,7 +151,15 @@
                                                 <div class="ratting pl-3 text-right text-bold">
                                                     <del class="text-danger d-block">${{$inventory->price}}</del>
                                                     <span
+<<<<<<< HEAD
                                                         class="text-lg text-primary">${{$inventory->sale_price}}</span>
+=======
+<<<<<<< HEAD
+                                                        class="text-lg text-primary">${{$inventory->sale_price}}</span>
+=======
+                                                        class="text-lg text-primary">${{$inventory->discount_percentage}}</span>
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
+>>>>>>> revert-2-master
                                                 </div>
                                             </div>
                                         </div>
