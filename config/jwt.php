@@ -275,11 +275,7 @@ return [
         |
         */
 
-<<<<<<< HEAD
-        'jwt' => Tymon\JWTAuth\Providers\JWT\Lcobucci::class,
-=======
         'jwt' => Tymon\JWTAuth\Providers\JWT\Namshi::class,
->>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 
         /*
         |--------------------------------------------------------------------------
