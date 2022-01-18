@@ -21,7 +21,10 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+<<<<<<< HEAD
+=======
 use Illuminate\Support\Facades\Validator;
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 use Stripe;
 
 class HomeController extends Controller
@@ -44,8 +47,13 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('seller')) {
+<<<<<<< HEAD
+
+            $pending_orders = Orders::query()->where('order_status', '=', 'ready')->where('seller_id', '=', Auth::id())->count();
+=======
             $user_settings = User::select('settings')->where('id', '=', Auth::id())->get();
             $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
             $total_products = Products::query()->where('user_id', '=', Auth::id())->count();
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', Auth::id())->sum('order_total');
@@ -54,8 +62,16 @@ class HomeController extends Controller
                 ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
                  when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
                 ->simplePaginate(5);
+<<<<<<< HEAD
+//                ->get();
+//            dd($all_orders);
+            return view('shopkeeper.dashboard', compact('pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
+        } else {
+
+=======
             return view('shopkeeper.dashboard', compact('user_settings', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
         } else {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             return $this->admin_home();
         }
     }
@@ -77,6 +93,10 @@ class HomeController extends Controller
             foreach ($inventory as $in) {
                 $inventories[] = Products::get_product_info($in->id);
             }
+<<<<<<< HEAD
+//        Auth::user()->hasRole('seller');
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             return view('shopkeeper.inventory.list', compact('inventories', 'inventory_p', 'categories'));
         } else {
             abort(404);
@@ -109,6 +129,8 @@ class HomeController extends Controller
         }
     }
 
+<<<<<<< HEAD
+=======
     public function inventory_add_bulk(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
@@ -118,6 +140,7 @@ class HomeController extends Controller
         }
     }
 
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function delete_img($image_id)
     {
         if (Auth::user()->hasRole('seller')) {
@@ -152,12 +175,20 @@ class HomeController extends Controller
         if (Auth::user()->hasRole('seller')) {
             $data = $request->all();
             unset($data['_token']);
+<<<<<<< HEAD
+            if ($request->has('colors')){
+=======
             if ($request->has('colors')) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $keys = $data['colors'];
                 unset($data['color']);
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
+<<<<<<< HEAD
+            }else{
+=======
             } else {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $data['colors'] = null;
             }
 
@@ -167,10 +198,23 @@ class HomeController extends Controller
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
+<<<<<<< HEAD
+//        print_r($data);die;
+
+
+            unset($data['gallery']);
+
+
+            $product = Products::find($product_id);
+            if (!empty($product)) {
+
+
+=======
             unset($data['gallery']);
 
             $product = Products::find($product_id);
             if (!empty($product)) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $filename = $product->feature_img;
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
@@ -182,6 +226,11 @@ class HomeController extends Controller
                     } else {
                         info("file is not found :- " . $filename);
                     }
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 }
 
 
@@ -222,6 +271,10 @@ class HomeController extends Controller
         } else {
             abort(404);
         }
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     }
 
     public function user_img_update(Request $request)
@@ -239,6 +292,11 @@ class HomeController extends Controller
             } else {
                 info("file is not found :- " . $filename);
             }
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         }
         $user->user_img = $filename;
         $user->save();
@@ -246,6 +304,16 @@ class HomeController extends Controller
         flash('Store Image Successfully Updated')->success();
         return Redirect::back();
     }
+<<<<<<< HEAD
+
+    public function inventory_adddb(Request $request)
+    {
+        if (Auth::user()->hasRole('seller')) {
+
+            $data = $request->all();
+            unset($data['_token']);
+            if ($request->has('colors')){
+=======
     /**
      * Inserts a single store product
      * @author Mirza Abdullah Izhar
@@ -277,25 +345,42 @@ class HomeController extends Controller
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $keys = $data['colors'];
                 unset($data['color']);
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
             }
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             if (!isset($data['van'])) {
                 $data['van'] = 0;
             }
             if (!isset($data['bike'])) {
                 $data['bike'] = 0;
             }
+<<<<<<< HEAD
+
+            unset($data['gallery']);
+
+
+=======
             if (!isset($data['discount_percentage'])) {
                 $data['discount_percentage'] = 0.00;
             }
             unset($data['gallery']);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $user_id = Auth::id();
             $data['user_id'] = $user_id;
             $product = new Products();
             if (!empty($product)) {
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $filename = $product->feature_img;
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
@@ -307,8 +392,18 @@ class HomeController extends Controller
                     } else {
                         info("file is not found :- " . $filename);
                     }
+<<<<<<< HEAD
+
+
+                }
+
+
+                $data['feature_img'] = $filename;
+
+=======
                 }
                 $data['feature_img'] = $filename;
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 foreach ($data as $key => $value) {
                     $product->$key = $value;
                 }
@@ -316,6 +411,11 @@ class HomeController extends Controller
                 if ($request->hasFile('gallery')) {
                     $images = $request->file('gallery');
                     foreach ($images as $image) {
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                         $file = $image;
                         $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                         Storage::disk('user_public')->put($filename, File::get($file));
@@ -325,6 +425,10 @@ class HomeController extends Controller
                         } else {
                             info("file is not found :- " . $filename);
                         }
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                         $product_images = new productImages();
                         $product_images->product_id = $product->id;
                         $product_images->product_image = $filename;
@@ -337,6 +441,10 @@ class HomeController extends Controller
         } else {
             abort(404);
         }
+<<<<<<< HEAD
+
+
+=======
     }
     /**
      * Changes user setting provided in the parameter
@@ -347,6 +455,7 @@ class HomeController extends Controller
     {
         User::where('id', '=', Auth::id())->update(['settings->' . $request->setting_name => $request->value]);
         return \redirect()->route('home');
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     }
 
     public function payment_settings()
@@ -363,6 +472,13 @@ class HomeController extends Controller
         $business_location = $user->business_location;
         return view('shopkeeper.settings.general', compact('business_hours', 'address', 'business_location'));
     }
+<<<<<<< HEAD
+
+    public function time_update(Request $request)
+    {
+        $data = $request->time;
+//        business_hours
+=======
     /**
      * Update's business hours of a store
      * @author Mirza Abdullah Izhar
@@ -372,6 +488,7 @@ class HomeController extends Controller
     {   //dd(json_encode($request->time));
         $data['time'] = $request->time;
         // $data['days'] = $request->days;
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
         $user->save();
@@ -411,12 +528,22 @@ class HomeController extends Controller
 
     public function orders(Request $request)
     {
+<<<<<<< HEAD
+//        $inventory = Products::query()->where('user_id','=',Auth::id())->paginate(9);
+//        $inventory_p = $inventory;
+//        $inventories = [];
+//        foreach ($inventory as $in){
+//            $inventories[] = Products::get_product_info($in->id);
+//        }
+
+=======
         //        $inventory = Products::query()->where('user_id','=',Auth::id())->paginate(9);
         //        $inventory_p = $inventory;
         //        $inventories = [];
         //        foreach ($inventory as $in){
         //            $inventories[] = Products::get_product_info($in->id);
         //        }
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         $return_arr = [];
         $orders = Orders::query()->where('seller_id', '=', Auth::id())->where('payment_status', '!=', 'hidden')->orderByDesc('id');
         if ($request->search) {
@@ -429,7 +556,11 @@ class HomeController extends Controller
         $orders_p = $orders;
 
         foreach ($orders as $order) {
+<<<<<<< HEAD
+//            $order_items = [];
+=======
             //            $order_items = [];
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
             $item_arr = [];
             foreach ($items as $item) {
@@ -440,14 +571,25 @@ class HomeController extends Controller
             $order['items'] = $item_arr;
             $return_arr[] = $order;
         }
+<<<<<<< HEAD
+//        Auth::user()->hasRole('seller');
+//        echo "<pre>";
+//        print_r($return_arr);
+=======
         //        Auth::user()->hasRole('seller');
         //        echo "<pre>";
         //        print_r($return_arr);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         $orders = $return_arr;
         return view('shopkeeper.orders.list', compact('orders', 'orders_p'));
     }
 
+<<<<<<< HEAD
+
+    function csvToJson($fname)
+=======
     public function csvToJson($fname)
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     {
         // open csv file
         if (!($fp = fopen($fname, 'r'))) {
@@ -473,6 +615,46 @@ class HomeController extends Controller
     public function importProducts(Request $request)
     {
         $user_id = Auth::id();
+<<<<<<< HEAD
+
+        if ($request->hasFile('file')) {
+            $import_data = json_decode($this->csvToJson($request->file('file')), true);
+
+            foreach ($import_data as $p) {
+                if (isset($p['images'])) {
+                    $images = explode(',', $p['images']);
+                    unset($p['images']);
+                }
+                if (is_array($p))
+                    $ppt = array_keys($p);
+                $product = new Products();
+                foreach ($ppt as $t) {
+                    if ($t == 'colors') {
+                        $colors = explode(',', $p[$t]);
+                        $product->$t = json_encode(array_fill_keys($colors, true));
+                    } elseif (($t == 'bike' && $p[$t] == null) || ($t == 'van' && $p[$t] == null)) {
+                        $product->$t = 0;
+                    } else {
+                        $product->$t = $p[$t];
+                    }
+                }
+
+                $product->user_id = $user_id;
+                $product->save();
+                $p_id = $product->id;
+                if (isset($images)) {
+                    foreach ($images as $image) {
+                        $product_images = new productImages();
+                        $product_images->product_id = (int)$p_id;
+                        $product_images->product_image = $image;
+                        $product_images->save();
+                    }
+                }
+            }
+
+            flash('Importing Complete');
+        }
+=======
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
@@ -572,6 +754,7 @@ class HomeController extends Controller
 
         //     flash('Importing Complete');
         // }
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         return redirect()->back();
     }
 
@@ -589,7 +772,13 @@ class HomeController extends Controller
 
     public function admin_home()
     {
+<<<<<<< HEAD
+
         if (Auth::user()->hasRole('superadmin')) {
+
+=======
+        if (Auth::user()->hasRole('superadmin')) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
             $help_page = Pages::query()->where('page_type', '=', 'help')->first();
             $faq_page = Pages::query()->where('page_type', '=', 'faq')->first();
@@ -632,6 +821,10 @@ class HomeController extends Controller
     public function admin_customer_details($user_id)
     {
         $return_arr = [];
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         if (Auth::user()->hasRole('superadmin')) {
             $user = User::find($user_id);
             if ($user->hasRole('seller')) {
@@ -644,9 +837,18 @@ class HomeController extends Controller
                 $orders = Orders::query()->where('delivery_boy_id', '=', $user_id);
             }
             $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
+<<<<<<< HEAD
+
+            $orders = $orders->paginate(10);
+            $orders_p = $orders;
+
+            foreach ($orders as $order) {
+//            $order_items = [];
+=======
             $orders = $orders->paginate(10);
             $orders_p = $orders;
             foreach ($orders as $order) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
@@ -657,9 +859,15 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
+<<<<<<< HEAD
+//        Auth::user()->hasRole('seller');
+//        echo "<pre>";
+//        print_r($return_arr);
+=======
             // $loc = User::where('id', '=', $user_id)
             // ->update(['business_location->lat' => 64.77]);
             // dd($loc);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $orders = $return_arr;
             return view('admin.customer_details', compact('orders', 'orders_p', 'user'));
         } else {
@@ -667,6 +875,20 @@ class HomeController extends Controller
         }
     }
 
+<<<<<<< HEAD
+
+    public function all_cat()
+    {
+
+
+        $categories = Categories::paginate();
+        //echo"work";die;
+        return view('admin.categories', compact('categories'));
+
+    }
+
+
+=======
     public function all_cat()
     {
         $categories = Categories::paginate();
@@ -674,6 +896,7 @@ class HomeController extends Controller
         return view('admin.categories', compact('categories'));
     }
 
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function add_cat(Request $request)
     {
         // $validate = Categories::validator($request);
@@ -749,9 +972,17 @@ class HomeController extends Controller
         //echo response()->json($response, 200);
     }
 
+<<<<<<< HEAD
+
     public function update_pages(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
+            // echo "oK";
+=======
+    public function update_pages(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->update(['page_content' => $request->tos]);
             $help_page = Pages::query()->where('page_type', '=', 'help')->update(['page_content' => $request->help]);
             $faq_page = Pages::query()->where('page_type', '=', 'faq')->update(['page_content' => $request->faq]);
@@ -761,6 +992,10 @@ class HomeController extends Controller
         }
     }
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function admin_stores(Request $request)
     {
 
@@ -782,6 +1017,10 @@ class HomeController extends Controller
 
     public function admin_customers(Request $request)
     {
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
                 $query->where('role_id', 3);
@@ -820,6 +1059,10 @@ class HomeController extends Controller
 
     public function admin_orders(Request $request)
     {
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         if (Auth::user()->hasRole('superadmin')) {
             $return_arr = [];
             $orders = Orders::query()->where('payment_status', '!=', 'hidden')->orderByDesc('id');
@@ -834,8 +1077,14 @@ class HomeController extends Controller
             }
             $orders = $orders->paginate(10);
             $orders_p = $orders;
+<<<<<<< HEAD
+
+            foreach ($orders as $order) {
+//            $order_items = [];
+=======
             foreach ($orders as $order) {
                 //            $order_items = [];
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
@@ -846,17 +1095,30 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
+<<<<<<< HEAD
+//        Auth::user()->hasRole('seller');
+//        echo "<pre>";
+//        print_r($return_arr);
+            $orders = $return_arr;
+            return view('admin.orders', compact('orders', 'orders_p'));
+//            return view('admin.orders');
+=======
             //        Auth::user()->hasRole('seller');
             //        echo "<pre>";
             //        print_r($return_arr);
             $orders = $return_arr;
             return view('admin.orders', compact('orders', 'orders_p'));
             //            return view('admin.orders');
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         } else {
             abort(404);
         }
     }
 
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     public function withdrawals()
     {
         if (Auth::user()->hasRole('seller')) {
@@ -911,10 +1173,17 @@ class HomeController extends Controller
                 flash('Request Sent')->success();
             }
             return Redirect::back();
+<<<<<<< HEAD
+//            $user_id = Auth::id();
+//            $return_data = WithdrawalRequests::query()->where('user_id','=',$user_id)->get();
+//            $transactions =$return_data;
+//            return view('shopkeeper.withdrawal', compact('transactions'));
+=======
             //            $user_id = Auth::id();
             //            $return_data = WithdrawalRequests::query()->where('user_id','=',$user_id)->get();
             //            $transactions =$return_data;
             //            return view('shopkeeper.withdrawal', compact('transactions'));
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         }
         if (Auth::user()->hasRole('superadmin')) {
             $with = WithdrawalRequests::find($request->id);
@@ -928,17 +1197,32 @@ class HomeController extends Controller
 
     public function change_user_status($user_id, $status)
     {
+<<<<<<< HEAD
+//        echo $user_id;
+//        echo $status;
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         User::query()->where('id', '=', $user_id)->update(['is_active' => $status]);
         if ($status == 1) {
             $user = User::findOrFail($user_id);
             $html = '<html>
             Hi, ' . $user->name . '<br><br>
+<<<<<<< HEAD
+
             Thank you for registering on ' . env('APP_NAME') . '.
+
+=======
+            Thank you for registering on ' . env('APP_NAME') . '.
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
 <br>
             Your store has been approved. Please login to the
             <a href="' . env('FRONTEND_URL') . '">Store</a> to update your store
 <br><br><br>
         </html>';
+<<<<<<< HEAD
+
+=======
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             $subject = env('APP_NAME') . ': Account Approved!';
             Mail::to($user->email)
                 ->send(new StoreRegisterMail($html, $subject));
@@ -948,7 +1232,13 @@ class HomeController extends Controller
 
     public function admin_queries()
     {
+<<<<<<< HEAD
+
         if (Auth::user()->hasRole('superadmin')) {
+
+=======
+        if (Auth::user()->hasRole('superadmin')) {
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             return view('admin.queries');
         } else {
             abort(404);
@@ -957,6 +1247,20 @@ class HomeController extends Controller
 
     public function my_order_count()
     {
+<<<<<<< HEAD
+//        Auth::user()->hasRole('seller');
+        if (Auth::user()->hasRole('seller')) {
+
+//            $pending_orders = Orders::query()->where('order_status','=','ready')->where('seller_id','=',Auth::id())->count();
+//            $total_products = Orders::query()->where('payment_status','!=','hidden')->where('seller_id','=',Auth::id())->count();
+            $total_orders = Orders::query()->where('seller_id', '=', Auth::id())->count();
+//            $total_sales = Orders::query()->where('payment_status','=','paid')->where('seller_id','=',Auth::id())->sum('order_total');
+//            return $this->inventory();
+            echo $total_orders;
+            // return view('shopkeeper.dashboard',compact('pending_orders','total_products','total_orders','total_sales'));
+        } else {
+
+=======
         if (Auth::user()->hasRole('seller')) {
             //$pending_orders = Orders::query()->where('order_status','=','ready')->where('seller_id','=',Auth::id())->count();
             //$total_products = Orders::query()->where('payment_status','!=','hidden')->where('seller_id','=',Auth::id())->count();
@@ -966,19 +1270,30 @@ class HomeController extends Controller
             //return $this->inventory();
             $response = array('total_orders' => $total_orders, 'user_settings' => $user_settings);
             return response()->json($response);
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
         }
     }
 
     public function complete_orders()
     {
+<<<<<<< HEAD
+        $orders = Orders::with(['user','delivery_boy'])
+=======
         $orders = Orders::with(['user', 'delivery_boy'])
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             ->has('user')
             ->has('delivery_boy')
             ->where('type', 'delivery')
             ->where('delivery_status', '=', 'pending_approval')
+<<<<<<< HEAD
+//            ->where('order_status', 'delivered')
+            ->get();
+        return view('admin.complete-orders',compact('orders'));
+=======
             //            ->where('order_status', 'delivered')
             ->get();
         return view('admin.complete-orders', compact('orders'));
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
     }
 
     /**
@@ -987,7 +1302,11 @@ class HomeController extends Controller
      */
     public function mark_complete_order($order_id)
     {
+<<<<<<< HEAD
+        $order = Orders::with(['user', 'delivery_boy','store'])
+=======
         $order = Orders::with(['user', 'delivery_boy', 'store'])
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             ->where('id', $order_id)->first();
         $order->delivery_status = 'complete';
         $order->save();
@@ -1021,9 +1340,15 @@ class HomeController extends Controller
         $order->order_status = 'canceled';
         $order->save();
         $order->update(['order_status' => 'ready']);
+<<<<<<< HEAD
+        $message = "Hello ".$order->user->name." .
+            Your order from ". $order->store->name ." was unsuccessful.
+            Unfortunately ".$order->store->name." were unable to complete your order. You have not been
+=======
         $message = "Hello " . $order->user->name . " .
             Your order from " . $order->store->name . " was unsuccessful.
             Unfortunately " . $order->store->name . " were unable to complete your order. You have not been
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
             charged.
             If you need any assistance, please contact us via email at:
             admin@teekit.co.uk";
@@ -1034,4 +1359,8 @@ class HomeController extends Controller
         flash('Order is successfully canceled')->success();
         return back();
     }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> bc40bab051467a571c4fee195a934ea1931e57a7
