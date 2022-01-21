@@ -39,7 +39,7 @@
                     <div class="form-group row">
 
                         <div class="col-md-12">
-                            <input id="password" placeholder="Password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+                            <input id="password" placeholder="Password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" minlength="8" required>
 
                             @if ($errors->has('password'))
                                 <span class="invalid-feedback" role="alert">

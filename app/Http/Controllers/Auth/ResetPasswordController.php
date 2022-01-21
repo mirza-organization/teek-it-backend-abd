@@ -48,7 +48,6 @@ class ResetPasswordController extends Controller
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|confirmed|min:8',
-
         ]);
         if ($validate->fails()) {
             $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
