@@ -60,7 +60,7 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
 //            'username' => 'required|string|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
 //            'address' => 'required|string|max:255',
 //            'city' => 'required|string|max:255',
 //            'postcode' => 'required|string|max:255',
@@ -100,8 +100,6 @@ class RegisterController extends Controller
             'business_name' => $data['company_name'],
             'business_phone' => $data['company_phone'],
             'is_active' => 0,
-
-
         ]);
 
         $User->roles()->sync($role->id);
