@@ -260,7 +260,6 @@ class HomeController extends Controller
                 'category_id' => 'required',
                 'qty' => 'required',
                 'price' => 'required',
-                // 'discount_percentage' => 'required',
                 'height' => 'required',
                 'width' => 'required',
                 'length' => 'required',
@@ -300,10 +299,12 @@ class HomeController extends Controller
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    Storage::disk('user_public')->put($filename, File::get($file));
-                    if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                    // Storage::disk('user_public')->put($filename, File::get($file));
+                    Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
+                    // if (Storage::disk('user_public')->exists($filename))
+                    if (Storage::disk('digitaloceanspaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
-                        $filename = "/user_imgs/" . $filename;
+                        // $filename = "/user_imgs/" . $filename;
                     } else {
                         info("file is not found :- " . $filename);
                     }
@@ -317,11 +318,15 @@ class HomeController extends Controller
                     $images = $request->file('gallery');
                     foreach ($images as $image) {
                         $file = $image;
-                        $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        Storage::disk('user_public')->put($filename, File::get($file));
-                        if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                        // $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                        $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
+                        print_r($filename); exit;
+                        // Storage::disk('user_public')->put($filename, File::get($file));
+                        Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
+                        // if (Storage::disk('user_public')->exists($filename))
+                        if (Storage::disk('digitaloceanspaces')->exists($filename)) {  // check file exists in directory or not
                             info("file is store successfully : " . $filename);
-                            $filename = "/user_imgs/" . $filename;
+                            // $filename = "/user_imgs/" . $filename;
                         } else {
                             info("file is not found :- " . $filename);
                         }
@@ -371,10 +376,10 @@ class HomeController extends Controller
     public function time_update(Request $request)
     {   //dd($request->time);
         $time = $request->time;
-        foreach($time as $key => $value) {
-            if(!in_array("on",$time[$key]))
+        foreach ($time as $key => $value) {
+            if (!in_array("on", $time[$key]))
                 $time[$key] += ["closed" => null];
-        } 
+        }
         $data['time'] = $time;
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);

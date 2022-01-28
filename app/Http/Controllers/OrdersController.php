@@ -12,37 +12,39 @@ use Illuminate\Support\Facades\Validator;
 
 class OrdersController extends Controller
 {
+    /**
+     * List orders w.r.t Seller ID
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function index(Request $request)
     {
         $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id());
+
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
         }
-        $orders = $orders->paginate(100);
+        $orders = $orders->paginate(20);
         $pagination = $orders->toArray();
-        if (!empty($orders)) {
+        if (!$orders->isEmpty()) {
             $order_data = [];
             foreach ($orders as $order) {
                 $order_data[] = $this->get_single_order($order->id);
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $order_data,
                 'status' => true,
                 'message' => '',
-                'pagination' => $pagination,
-
-            ];
+                'pagination' => $pagination
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
 
     public function seller_orders(Request $request)
@@ -139,93 +141,86 @@ class OrdersController extends Controller
             $orders = $orders->orderByDesc('created_at')->paginate();
             $pagination = $orders->toArray();
         }
-        if (!empty($orders)) {
+        if (!$orders->isEmpty()) {
             $order_data = [];
             foreach ($orders as $order) {
                 $order_data[] = $this->get_single_order($order->id);
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $order_data,
                 'status' => true,
                 'message' => '',
-                'pagination' => $pagination,
-
-            ];
+                'pagination' => $pagination
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-        return response()->json($products_data);
     }
 
     public function delivery_boy_orders(Request $request, $delivery_boy_id)
     {
         $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)->where('delivery_status', '=', $request->delivery_status)->paginate();
         $pagination = $orders->toArray();
-        if (!empty($orders)) {
+        if (!$orders->isEmpty()) {
             $order_data = [];
             foreach ($orders as $order) {
                 $order_data[] = $this->get_single_order($order->id);
             }
             unset($pagination['data']);
-            $products_data = [
+            return response()->json([
                 'data' => $order_data,
                 'status' => true,
                 'message' => '',
-                'pagination' => $pagination,
-
-            ];
+                'pagination' => $pagination
+            ], 200);
         } else {
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-
-            ];
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-        return response()->json($products_data);
     }
-
+     /**
+     * Assigns an order to a specific delivery boy
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function assign_order(Request $request)
     {
-        $products_data = [
-            'data' => NULL,
-            'status' => false,
-            'message' => 'No Record Found'
-
-        ];
         $order = Orders::find($request->order_id);
-        if (!empty($order)) {
+        if (!$order->isEmpty()) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
             $order->save();
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => true,
-                'message' => 'Assigned'
-
-            ];
+                'message' => config('constants.ORDER_ASSIGNED')
+            ], 200);
+        }else{
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-        return response()->json($products_data);
     }
-
-
+    /**
+     * Updates an assigned order
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function update_assign(Request $request)
     {
-        $products_data = [
-            'data' => NULL,
-            'status' => false,
-            'message' => 'No Record Found'
-
-        ];
         $order = Orders::find($request->order_id);
-        if (!empty($order)) {
+        if (!$order->isEmpty()) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
@@ -235,20 +230,23 @@ class OrdersController extends Controller
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
-                //                $this->calculateDriverFair($order, $user);
+                //$this->calculateDriverFair($order, $user);
             }
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
-            $products_data = [
-                'data' => NULL,
+            return response()->json([
+                'data' => [],
                 'status' => true,
-                'message' => 'Updated'
-
-            ];
+                'message' => config('constants.ORDER_UPDATED')
+            ], 200);
+        }else{
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
-
-        return response()->json($products_data);
     }
 
     // public function newOld(Request $request)
@@ -451,7 +449,7 @@ class OrdersController extends Controller
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
                 $user->save();
-                //                $this->calculateDriverFair($order, $user);
+                //$this->calculateDriverFair($order, $user);
             }
             $order->lat = $request->lat;
             $order->lng = $request->lng;
@@ -500,7 +498,7 @@ class OrdersController extends Controller
         $order = Orders::find($order_id);
         $temp['order'] = $order;
         $temp['order_items'] = OrderItems::query()->with('products.user')->where('order_id', '=', $order_id)->get();
-        $temp['seller'] = User::find($order->seller_id);
+        // $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
 
