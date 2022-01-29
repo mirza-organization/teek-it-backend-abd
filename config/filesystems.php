@@ -55,11 +55,18 @@ return [
             'visibility' => 'public',
         ],
 
-        'user_public' => [
+        // 'user_public' => [
+        //     'driver' => 'local',
+        //     'root'   => public_path() . '/user_imgs',
+        //     'visibility' => 'public',
+        // ],
+
+        'digitaloceanspaces' => [
             'driver' => 'local',
-            'root'   => public_path() . '/user_imgs',
+            'root'   => 'https://user-imgs.sgp1.digitaloceanspaces.com',
             'visibility' => 'public',
         ],
+        
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

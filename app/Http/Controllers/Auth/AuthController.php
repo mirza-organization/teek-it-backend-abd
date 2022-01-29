@@ -31,7 +31,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products', 'search_seller_products']]);
     }
 
     public function register(Request $request)
@@ -444,8 +444,8 @@ class AuthController extends Controller
     {
         $users = User::with('seller')
             ->where('is_active', '=', 1)->get();
-        $data = []; 
-        foreach ($users as $user) { 
+        $data = [];
+        foreach ($users as $user) {
             if ($user->hasRole('seller')) {
                 $user->where('is_active', 1);
                 $data[] = $this->get_seller_info($user);
@@ -457,7 +457,7 @@ class AuthController extends Controller
             'message' => ''
         ], 200);
     }
-     /**
+    /**
      * Listing of all products w.r.t Seller/Store 'id'
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
@@ -468,35 +468,76 @@ class AuthController extends Controller
         $data = [];
         if ($user->hasRole('seller')) {
             // $info = $this->get_seller_info($user); 
-            $products = Products::query()->where('user_id', '=', $user->id)->paginate();
+            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate();
             $pagination = $products->toArray();
-            if (!empty($products)) {
+            if (!$products->isEmpty()) {
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->get_product_info($product->id);
                 }
                 // $info['products'] = $products_data;
                 unset($pagination['data']);
-                $aAPIResponse = [
+                return response()->json([
                     'data' => $data,
                     'status' => true,
                     'message' => '',
-                    'pagination' => $pagination,
-                ];
+                    'pagination' => $pagination
+                ], 200);
             } else {
-                $aAPIResponse = [
+                return response()->json([
                     'data' => [],
                     'status' => false,
-                    'message' => 'This seller have no products right now.'
-                ];
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
             }
         } else {
-            $aAPIResponse = [
+            return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => 'No seller found against this id.'
-            ];
+                'message' => config('constants.NO_SELLER')
+            ], 200);
         }
-        return response()->json($aAPIResponse, 200);
+    }
+    /**
+     * Search products w.r.t Seller/Store 'id' & Product Name
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
+    public function search_seller_products($seller_id, $product_name)
+    {
+        $user = User::find($seller_id);
+        $data = [];
+        if ($user->hasRole('seller')) {
+            $products = Products::query()
+                ->where('user_id', '=', $user->id)
+                ->where('status', '=', 1)
+                ->where('product_name', 'LIKE', '%' . $product_name . '%')->paginate();
+            $pagination = $products->toArray();
+            if (!$products->isEmpty()) {
+                foreach ($products as $product) {
+                    $data[] = (new ProductsController())->get_product_info($product->id);
+                }
+                // $info['products'] = $products_data;
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_SELLER')
+            ], 200);
+        }
     }
 
     public function delivery_boys()
@@ -505,7 +546,6 @@ class AuthController extends Controller
         $data = [];
         foreach ($users as $user) {
             if ($user->hasRole('delivery_boy')) {
-
                 $data[] = $this->get_seller_info($user);
             }
         }

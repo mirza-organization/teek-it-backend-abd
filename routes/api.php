@@ -16,14 +16,20 @@ use Illuminate\Http\Request;
 Route::get('/', function (Request $request) {
     return 'Working';
 });
-
-// Registration, confirmations and verification
+/*
+|--------------------------------------------------------------------------
+| Registration, confirmations and verification
+|--------------------------------------------------------------------------
+*/
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');
 Route::get('auth/verify', 'Auth\AuthController@verify');
-
-// Authentication Routes
+/*
+|--------------------------------------------------------------------------
+| Authentication API Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('login', 'Auth\AuthController@login');
     Route::post('change-password', 'Auth\AuthController@changePassword');
@@ -35,7 +41,11 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('delivery_boys', 'Auth\AuthController@delivery_boys');
     Route::get('get_user/{user_id}', 'Auth\AuthController@get_delivery_boy_info');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Category API Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'category'], function ($router) {
     //Route::post('add', 'CategoriesController@add');
     //Route::post('update/{product_id}', 'CategoriesController@update');
@@ -43,13 +53,22 @@ Route::group(['prefix' => 'category'], function ($router) {
     Route::get('view/{category_id}', 'CategoriesController@Products');
     Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Page API Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'page'], function ($router) {
     Route::get('', 'PagesController@get_page');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Seller API Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('sellers', 'Auth\AuthController@sellers');
 Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
+Route::get('sellers/{seller_id}/{product_name}', 'Auth\AuthController@search_seller_products');
 /*
 |--------------------------------------------------------------------------
 | Products API Routes Without JWT Authentication
