@@ -38,40 +38,44 @@ class ForgotPasswordController extends Controller
     {
         $validate = Validator::make($request->all(), [
             'email' => 'required|string|email',
-
         ]);
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => $validate->messages(),
+                'status' => false,
+                'message' => config('constants.VALIDATION_ERROR')
+            ], 400);
         }
         if ($request) {
             $user = User::where('email', $request->get('email'))->first();
             if (!$user) {
-                $response = array('status' => false,'message'=>trans('passwords.user'));
-                return response()->json($response, 404);
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => trans('passwords.user')
+                ], 404);
             }
-
-//            $token = $this->broker()->createToken($user);
+            //$token = $this->broker()->createToken($user);
             $digits = 6;
-            $token = str_pad(rand(0, pow(10, $digits)-1), $digits, '0', STR_PAD_LEFT);
+            $token = str_pad(rand(0, pow(10, $digits) - 1), $digits, '0', STR_PAD_LEFT);
 
             $user->temp_code = $token;
             $user->save();
 
-            $html='<html>
-                Hi, '.$user->name.'<br><br>
+            $html = '<html>
+                Hi, ' . $user->name . '<br><br>
 
-                You have requested to reset password on '.env('APP_NAME').'.
+                You have requested to reset password on ' . env('APP_NAME') . '.
 
                 Here is your Password reset Code. <br><br> <code style="background:lightgray">' . $token . '</code>
             </html>';
 
-            Mail::send('emails.general',["html"=>$html] , function($message) use ($request,$user){
+            Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $user) {
                 $message->to($request->email, $user->name)
-                ->subject(env('APP_NAME').': Password Reset');
+                    ->subject(env('APP_NAME') . ': Password Reset');
             });
 
-            $response = array('status' => true,'message'=>'Password reset link sent on your email.');
+            $response = array('status' => true, 'message' => 'Password reset link sent on your email.');
             return response()->json($response, 200);
         }
     }

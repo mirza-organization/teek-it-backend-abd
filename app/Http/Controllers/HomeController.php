@@ -427,7 +427,8 @@ class HomeController extends Controller
         //            $inventories[] = Products::get_product_info($in->id);
         //        }
         $return_arr = [];
-        $orders = Orders::query()->where('seller_id', '=', Auth::id())->where('payment_status', '!=', 'hidden')->orderByDesc('id');
+        // $orders = Orders::query()->where('seller_id', '=', Auth::id())->where('payment_status', '!=', 'hidden')->orderByDesc('id');
+        $orders = Orders::query()->where('seller_id', '=', Auth::id())->orderByDesc('id');
         if ($request->search) {
             $order = Orders::find($request->search);
             $order->is_viewed = 1;
@@ -449,9 +450,6 @@ class HomeController extends Controller
             $order['items'] = $item_arr;
             $return_arr[] = $order;
         }
-        //        Auth::user()->hasRole('seller');
-        //        echo "<pre>";
-        //        print_r($return_arr);
         $orders = $return_arr;
         return view('shopkeeper.orders.list', compact('orders', 'orders_p'));
     }

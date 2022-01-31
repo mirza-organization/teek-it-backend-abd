@@ -373,7 +373,7 @@ class OrdersController extends Controller
         }
         $grouped_seller = [];
         foreach ($request->items as $item) {
-            $product_id = $item['product_id'];
+            $product_id = $item['product_id']; 
             $qty = $item['qty'];
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
@@ -383,6 +383,7 @@ class OrdersController extends Controller
             $temp['price'] = $product_price;
             $temp['seller_id'] = $product_seller_id;
             $grouped_seller[$product_seller_id][] = $temp;
+            (new ProductsController())->update_qty($product_id,$qty,"subtract");
         }
         $count = 0;
         $order_arr = [];
