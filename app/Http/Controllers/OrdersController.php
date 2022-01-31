@@ -186,7 +186,7 @@ class OrdersController extends Controller
             ], 200);
         }
     }
-     /**
+    /**
      * Assigns an order to a specific delivery boy
      * @author Huzaifa Haleem
      * @version 1.1.0
@@ -204,7 +204,7 @@ class OrdersController extends Controller
                 'status' => true,
                 'message' => config('constants.ORDER_ASSIGNED')
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'data' => [],
                 'status' => false,
@@ -240,7 +240,7 @@ class OrdersController extends Controller
                 'status' => true,
                 'message' => config('constants.ORDER_UPDATED')
             ], 200);
-        }else{
+        } else {
             return response()->json([
                 'data' => [],
                 'status' => false,
@@ -374,7 +374,7 @@ class OrdersController extends Controller
         $grouped_seller = [];
         foreach ($request->items as $item) {
             $product_id = $item['product_id'];
-            $qty = $item['qty']; 
+            $qty = $item['qty'];
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
             $temp = [];
