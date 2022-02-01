@@ -468,7 +468,7 @@ class AuthController extends Controller
         $data = [];
         if ($user->hasRole('seller')) {
             // $info = $this->get_seller_info($user); 
-            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate();
+            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {
