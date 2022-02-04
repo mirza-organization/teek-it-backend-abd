@@ -61,11 +61,11 @@ return [
         //     'visibility' => 'public',
         // ],
 
-        'digitaloceanspaces' => [
-            'driver' => 'local',
-            'root'   => 'https://user-imgs.sgp1.digitaloceanspaces.com',
-            'visibility' => 'public',
-        ],
+        // 'digitaloceanspaces' => [
+        //     'driver' => 'local',
+        //     'root'   => 'https://user-imgs.sgp1.digitaloceanspaces.com',
+        //     'visibility' => 'public',
+        // ],
         
         's3' => [
             'driver' => 's3',

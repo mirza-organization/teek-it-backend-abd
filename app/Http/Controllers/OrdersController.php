@@ -373,7 +373,7 @@ class OrdersController extends Controller
         }
         $grouped_seller = [];
         foreach ($request->items as $item) {
-            $product_id = $item['product_id']; 
+            $product_id = $item['product_id'];
             $qty = $item['qty'];
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
@@ -383,7 +383,7 @@ class OrdersController extends Controller
             $temp['price'] = $product_price;
             $temp['seller_id'] = $product_seller_id;
             $grouped_seller[$product_seller_id][] = $temp;
-            (new ProductsController())->update_qty($product_id,$qty,"subtract");
+            (new ProductsController())->update_qty($product_id, $qty, "subtract");
         }
         $count = 0;
         $order_arr = [];
@@ -436,6 +436,72 @@ class OrdersController extends Controller
             'message' => 'Order added successfully.'
         ], 200);
     }
+    /**
+     * Cancel's a customer order
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function customer_cancel_order(Request $request)
+    {
+        $order = Orders::find($request->order_id);
+        $product_ids = explode(',', $request->product_ids);
+        $count = 0;
+        print_r($product_ids);
+        exit;
+        if (!is_null($order)) {
+            /**
+             * Order cenceled by user & not accepted by store then full refund
+             */
+            if ($order->order_status == "pending") {
+                $order->order_status = 'canceled';
+                $order->save();
+                // foreach ($product_ids as $product_id) {
+                //     $count++;
+                // }
+                return response()->json([
+                    'data' => $order,
+                    'status' => true,
+                    'message' => config('constants.ORDER_CANCELED')
+                ], 200);
+            }
+            /**
+             * Order cenceled by user & accepted by store but not picked by the driver then deduct handling charges
+             */
+            else if ($order->order_status == "accepted" || $order->order_status == "ready") {
+                $order->order_status = 'canceled';
+                $order->save();
+                // foreach ($product_ids as $product_id) {
+                //     $count++;
+                // }
+                return response()->json([
+                    'data' => $order,
+                    'status' => true,
+                    'message' => config('constants.ORDER_CANCELED')
+                ], 200);
+            }
+            /**
+             * Order cenceled by user, accepted by store & picked by the driver then multiply driver's fee by 2 plus add handling charge & service fee
+             */
+            else if ($order->order_status == "onTheWay") {
+                $order->order_status = 'canceled';
+                $order->save();
+                // foreach ($product_ids as $product_id) {
+                //     $count++;
+                // }
+                return response()->json([
+                    'data' => $order,
+                    'status' => true,
+                    'message' => config('constants.ORDER_CANCELED')
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
+        }
+    }
 
     public function updateOrder(Request $request)
     {
@@ -443,7 +509,6 @@ class OrdersController extends Controller
         $order_arr = explode(',', $order_ids);
         $count = 0;
         foreach ($order_arr as $order_id) {
-
             $order = Orders::find($order_id);
             if ($request->payment_status == "paid" && $order->payment_status != "paid" && $request->order_status == 'complete' && $order->order_status != 'complete' && $request->delivery_status == 'delivered' && $order->delivery_status != 'delivered') {
                 $user = User::find($order->seller_id);
@@ -475,12 +540,11 @@ class OrdersController extends Controller
             $count++;
         }
         $return_data = $this->get_orders_from_ids($order_arr);
-        $user_arr = [
+        return response()->json([
             'data' => $return_data,
             'status' => true,
             'message' => 'Order Added Successfully'
-        ];
-        return response()->json($user_arr, 200);
+        ], 200);
     }
 
 

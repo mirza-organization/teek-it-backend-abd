@@ -300,10 +300,13 @@ class HomeController extends Controller
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                     // Storage::disk('user_public')->put($filename, File::get($file));
-                    Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
+                    Storage::disk('spaces')->put($filename, File::get($file));
                     // if (Storage::disk('user_public')->exists($filename))
-                    if (Storage::disk('digitaloceanspaces')->exists($filename)) {  // check file exists in directory or not
+                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
+                        echo "File Uploded Successfully: ";
+                        print_r($filename); exit;
+                        //echo "File uploaded"; exit;
                         // $filename = "/user_imgs/" . $filename;
                     } else {
                         info("file is not found :- " . $filename);

@@ -117,16 +117,15 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
         if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['status' => false, 'message' => 'Invalid credentials'], 401);
+            return response()->json(['data' => [],'status' => false,'message' => config('constants.INVALID_CREDENTIALS')], 401);
         }
         $user = JWTAuth::user();
         if ($user->email_verified_at == null) {
-            return response()->json(['status' => false, 'message' => 'Email not verified, verify your email first.'], 401);
+            return response()->json(['data' => [],'status' => false,'message' => config('constants.EMAIL_NOT_VERIFIED')], 401);
         }
         if ($user->is_active == 0) {
-            return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
+            return response()->json(['data' => [],'status' => false,'message' => config('constants.ACCOUNT_DEACTIVATED')], 401);
         }
         $this->authenticated($request, $user, $token);
         return $this->respondWithToken($token);

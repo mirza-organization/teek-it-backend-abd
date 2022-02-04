@@ -111,6 +111,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('assign_order', 'OrdersController@assign_order');
         Route::get('update_assign', 'OrdersController@update_assign');
         Route::post('new', 'OrdersController@new');
+        Route::post('customer_cancel_order', 'OrdersController@customer_cancel_order');
         Route::post('update', 'OrdersController@updateOrder');
         Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
         Route::get('/get-order-details/{id}', 'Api\v1\OrderController@getOrderDetails');
