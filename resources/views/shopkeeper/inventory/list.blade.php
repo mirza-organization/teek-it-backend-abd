@@ -64,7 +64,11 @@
                                         </div>
                                         <div class="col-md-9">
                                             <span class="img-container pt-30 pb-30 mb-3">
+                                                @if(str_contains($inventory->feature_img, 'https://'))
                                                 <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset($inventory->feature_img)}}" alt="">
+                                                @else
+                                                <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset('user_imgs/' . $inventory->feature_img)}}" alt="">
+                                                @endif
                                             </span>
                                         </div>
                                         <div class="col-md-3 mt-1">
@@ -73,7 +77,11 @@
                                             @foreach($inventory->images as $img)
                                             <?php if ($count == 3) break; ?>
                                             <span class="img-container mb-1">
+                                                @if(str_contains($img->product_image, 'https://'))
                                                 <img class="d-block m-auto" src="{{asset($img->product_image)}}" alt="">
+                                                @else
+                                                <img class="d-block m-auto" src="{{asset('user_imgs/' . $img->product_image)}}" alt="">
+                                                @endif
                                             </span>
                                             <?php $count++; ?>
                                             @endforeach
@@ -121,8 +129,9 @@
                                             for ($i = 1; $i <= 5; $i++) :
                                             ?>
                                                 <span class="fa fa-star 
-                                                <?php if ($i <= $rating) 
-                                                {echo "checked"; } ?>">
+                                                <?php if ($i <= $rating) {
+                                                    echo "checked";
+                                                } ?>">
                                                 </span>
                                             <?php endfor; ?>
                                         </div>

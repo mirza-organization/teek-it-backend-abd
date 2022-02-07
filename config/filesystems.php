@@ -55,11 +55,11 @@ return [
             'visibility' => 'public',
         ],
 
-        // 'user_public' => [
-        //     'driver' => 'local',
-        //     'root'   => public_path() . '/user_imgs',
-        //     'visibility' => 'public',
-        // ],
+        'user_public' => [
+            'driver' => 'local',
+            'root'   => public_path() . '/user_imgs',
+            'visibility' => 'public',
+        ],
 
         // 'digitaloceanspaces' => [
         //     'driver' => 'local',

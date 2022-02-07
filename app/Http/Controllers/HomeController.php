@@ -44,7 +44,7 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('seller')) {
-            $user_settings = User::select('settings')->where('id', '=', Auth::id())->get();
+            $user = User::query()->where('id', '=', Auth::id())->get(); 
             $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
             $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
             $total_products = Products::query()->where('user_id', '=', Auth::id())->count();
@@ -54,7 +54,7 @@ class HomeController extends Controller
                 ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
                  when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
                 ->simplePaginate(5);
-            return view('shopkeeper.dashboard', compact('user_settings', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
+            return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
         } else {
             return $this->admin_home();
         }
@@ -63,7 +63,7 @@ class HomeController extends Controller
     public function inventory(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
-            $inventory = Products::query()->where('user_id', '=', Auth::id());
+            $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
             if ($request->search) {
                 $inventory = $inventory->where('product_name', 'LIKE', $request->search);
             }
@@ -223,10 +223,13 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * It updates/uploads user image
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     public function user_img_update(Request $request)
     {
-
         $user = User::find(\auth()->id());
         $filename = \auth()->user()->name;
         if ($request->hasFile('user_img')) {
@@ -235,14 +238,13 @@ class HomeController extends Controller
             Storage::disk('user_public')->put($filename, File::get($file));
             if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
                 info("file is store successfully : " . $filename);
-                $filename = "/user_imgs/" . $filename;
+                // $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
             }
         }
         $user->user_img = $filename;
         $user->save();
-
         flash('Store Image Successfully Updated')->success();
         return Redirect::back();
     }
@@ -265,14 +267,14 @@ class HomeController extends Controller
                 'length' => 'required',
                 'weight' => 'required',
                 'status' => 'required',
-                'contact' => 'required',
+                'contact' => 'required|max:10',
                 'gallery' => 'required',
                 'feature_img' => 'required'
             ]);
             if ($validatedData->fails()) {
                 flash('Error in adding the product because some required field is missing.')->error();
                 return \redirect()->back();
-            }
+            } 
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')) {
@@ -299,14 +301,15 @@ class HomeController extends Controller
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    // Storage::disk('user_public')->put($filename, File::get($file));
-                    Storage::disk('spaces')->put($filename, File::get($file));
-                    // if (Storage::disk('user_public')->exists($filename))
-                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                    Storage::disk('user_public')->put($filename, File::get($file));
+                    // Storage::disk('spaces')->put($filename, File::get($file));
+                    // Storage::disk('spaces')->exists($filename)
+                    if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
-                        echo "File Uploded Successfully: ";
-                        print_r($filename);
-                        exit;
+                        // echo "File Uploded Successfully: ";
+                        // print_r($filename);
+                        // exit;
+
                         //echo "File uploaded"; exit;
                         // $filename = "/user_imgs/" . $filename;
                     } else {
@@ -322,14 +325,11 @@ class HomeController extends Controller
                     $images = $request->file('gallery');
                     foreach ($images as $image) {
                         $file = $image;
-                        // $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        print_r($filename);
-                        exit;
-                        // Storage::disk('user_public')->put($filename, File::get($file));
-                        Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
-                        // if (Storage::disk('user_public')->exists($filename))
-                        if (Storage::disk('digitaloceanspaces')->exists($filename)) {  // check file exists in directory or not
+                        Storage::disk('user_public')->put($filename, File::get($file));
+                        // Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
+                        // Storage::disk('spaces')->exists($filename)
+                        if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
                             info("file is store successfully : " . $filename);
                             // $filename = "/user_imgs/" . $filename;
                         } else {

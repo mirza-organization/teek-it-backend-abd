@@ -86,11 +86,11 @@
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-md-5">
-                                    <h3 class="card-title">All Orders</h3>
+                                    <h3 class="card-title"><strong>All Orders</strong></h3>
                                 </div>
                                 <div class="col-md-7">
                                     <?php
-                                    $settings = json_decode($user_settings[0]->settings);
+                                    $settings = json_decode($user[0]->settings);
                                     ?>
                                     @if ($settings->notification_music == 1)
                                     <label class="switch float-right">
@@ -143,6 +143,46 @@
                                     </tr>
                                     @empty
                                     @endforelse
+                                </tbody>
+                            </table>
+                            <div class="d-flex justify-content-center" style="padding-top: 10px;">
+                                {{$all_orders->links()}}
+                            </div>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+                <!-- User Info Card -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <h3 class="card-title"><strong>User Info</strong></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body p-0">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>Name</th>
+                                        <td>{{$user[0]->name}} {{$user[0]->l_name}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td>{{$user[0]->email}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone</th>
+                                        <td>{{$user[0]->phone}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Company Phone</th>
+                                        <td>{{$user[0]->business_phone}}</td>
+                                    </tr>
+
                                 </tbody>
                             </table>
                             <div class="d-flex justify-content-center" style="padding-top: 10px;">

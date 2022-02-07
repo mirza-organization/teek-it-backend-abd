@@ -120,12 +120,16 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <input type="tel" class="form-control" name="contact" placeholder="Contact*" required id="" value="{{$inventory->contact}}">
+                                                        <div class="form-group row">
+                                                            &nbsp;
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text">+44</span>
+                                                            </div>
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <input type="text" class="form-control col-md-9" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" placeholder="Contact*" id="contact" name="contact" value="{{$inventory->contact}}" required>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 text-left">
-
                                                         <select class="colors form-control" name="colors[]" multiple="multiple">
                                                             <option value="blue">Blue</option>
                                                             <option value="green">Green</option>

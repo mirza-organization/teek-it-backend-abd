@@ -36,7 +36,7 @@
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label><img class="img img-fluid img-thumbnail" src="{{asset(auth()->user()->user_img)}}" alt="No Image Uploaded"></label>
+                                                            <label><img class="img img-fluid img-thumbnail" src="{{asset('user_imgs/' . auth()->user()->user_img)}}" alt="No Image Uploaded"></label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
