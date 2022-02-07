@@ -305,7 +305,8 @@ class HomeController extends Controller
                     if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
                         echo "File Uploded Successfully: ";
-                        print_r($filename); exit;
+                        print_r($filename);
+                        exit;
                         //echo "File uploaded"; exit;
                         // $filename = "/user_imgs/" . $filename;
                     } else {
@@ -323,7 +324,8 @@ class HomeController extends Controller
                         $file = $image;
                         // $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        print_r($filename); exit;
+                        print_r($filename);
+                        exit;
                         // Storage::disk('user_public')->put($filename, File::get($file));
                         Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
                         // if (Storage::disk('user_public')->exists($filename))
@@ -530,16 +532,23 @@ class HomeController extends Controller
                 $product->discount_percentage = $importData[5];
                 $product->weight = $importData[6];
                 $product->brand = $importData[7];
-                $product->size = $importData[8];
+                $product->size = ($importData[8] == "null") ? NULL : $importData[8];
                 $product->status = $importData[9];
                 $product->contact = $importData[10];
-                // $product->colors = $importData[11]; 
+                $product->colors = ($importData[11] == "null") ? NULL : $importData[11];
                 $product->bike = $importData[12];
                 $product->van = $importData[13];
+                $product->feature_img = $importData[17];
                 $product->height = $importData[14];
                 $product->width = $importData[15];
                 $product->length = $importData[16];
                 $product->save();
+
+                $product_images = new productImages();
+                $product_images->product_id = (int)$product->id;
+                $product_images->product_image = $importData[17];
+                $product_images->save();
+
                 $j++;
             }
         }
