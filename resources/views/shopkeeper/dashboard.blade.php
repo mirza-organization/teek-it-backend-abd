@@ -185,9 +185,6 @@
 
                                 </tbody>
                             </table>
-                            <div class="d-flex justify-content-center" style="padding-top: 10px;">
-                                {{$all_orders->links()}}
-                            </div>
                         </div>
                         <!-- /.card-body -->
                     </div>

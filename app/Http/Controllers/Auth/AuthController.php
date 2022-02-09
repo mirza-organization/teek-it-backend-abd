@@ -62,7 +62,6 @@ class AuthController extends Controller
             'is_active' => $is_active,
             'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
         ]);
-
         if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {

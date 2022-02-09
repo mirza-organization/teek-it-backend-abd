@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Services\TwilioSmsService;
 
 class OrdersController extends Controller
 {
@@ -20,7 +21,6 @@ class OrdersController extends Controller
     public function index(Request $request)
     {
         $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id());
-
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
         }
@@ -350,11 +350,22 @@ class OrdersController extends Controller
             if ($request->type == 'delivery') {
                 $validatedData = Validator::make($request->all(), [
                     'receiver_name' => 'required',
-                    'phone_number' => 'required',
+                    'phone_number' => 'required|string|min:10|max:10',
                     'address' => 'required',
                     'house_no' => 'required',
                     'delivery_charges' => 'required',
                     'service_charges' => 'required'
+                ]);
+                if ($validatedData->fails()) {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => $validatedData->errors()
+                    ], 422);
+                }
+            } elseif ($request->type == 'self-pickup') {
+                $validatedData = Validator::make($request->all(), [
+                    'phone_number' => 'string|min:10|max:10'
                 ]);
                 if ($validatedData->fails()) {
                     return response()->json([
@@ -397,6 +408,13 @@ class OrdersController extends Controller
                 $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
             $user = User::find($seller_id);
+            // To restrict new order SMS notifications for only UK numbers
+            if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
+                $message = "A new order has been received. Please check TeekIt's platform, or sign in here now:https://app.teekit.co.uk/login";
+                $sms = new TwilioSmsService();
+                // $sms->sendSms('+447976621849', $message);
+                $sms->sendSms($user->business_phone, $message);
+            }
             $user_money = $user->pending_withdraw;
             $user->pending_withdraw = $order_total + $user_money;
             $user->save();
@@ -407,7 +425,7 @@ class OrdersController extends Controller
             $new_order->type = $request->type;
             if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
-                $new_order->phone_number = $request->phone_number;
+                $new_order->phone_number = '+44' . $request->phone_number;
                 $new_order->address = $request->address;
                 $new_order->house_no = $request->house_no;
                 $new_order->flat = $request->flat;

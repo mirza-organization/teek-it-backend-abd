@@ -129,7 +129,7 @@ return [
 
     'TWILIO_SID' => 'AC111bcbe5a67369f76fe3d8ec63e7d58f',
     'TWILIO_TOKEN' => '6d64ae8220a96bb56e48e5d5b6ffa65f',
-    'TWILIO_FROM' => '+44 7897 024349',
+    'TWILIO_FROM' => 'TeekIt',
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

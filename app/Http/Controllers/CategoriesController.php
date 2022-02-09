@@ -179,10 +179,9 @@ class CategoriesController extends Controller
             ];
         } else {
             $products_data = [
-                'data' => NULL,
+                'data' => [],
                 'status' => false,
                 'message' => 'No Record Found'
-
             ];
         }
         return response()->json($products_data);
@@ -191,7 +190,7 @@ class CategoriesController extends Controller
     public function stores($category_id): \Illuminate\Http\JsonResponse
     {
         if (!Categories::where('id', $category_id)->exists()) {
-            return response()->json(['message' => 'Category Id is invalid.'], 422);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.NO_RECORD')], 422);
         }
         $ids = DB::table('categories')
             ->select(DB::raw('distinct(user_id) as store_id'))

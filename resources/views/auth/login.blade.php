@@ -50,9 +50,11 @@
                 </div>
 
                 <div class="form-group row">
-
-                    <div class="col-md-12">
-                        <input id="phone" type="text" placeholder="Phone Number" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone" value="{{ old('phone') }}" required autofocus>
+                    <div class="col-md-12 input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">+44</span>
+                        </div>
+                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" placeholder="Phone Number" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" id="phone" name="phone" value="{{ old('phone') }}" required autofocus>
 
                         @if ($errors->has('phone'))
                         <span class="invalid-feedback" role="alert">
@@ -62,7 +64,6 @@
                     </div>
                 </div>
                 <div class="form-group row">
-
                     <div class="col-md-12">
                         <input id="company_name" type="text" placeholder="Company Name" class="form-control{{ $errors->has('company_name') ? ' is-invalid' : '' }}" name="company_name" value="{{ old('company_name') }}" required autofocus>
 
@@ -74,9 +75,11 @@
                     </div>
                 </div>
                 <div class="form-group row">
-
-                    <div class="col-md-12">
-                        <input id="company_phone" type="text" placeholder="Company Phone" class="form-control{{ $errors->has('company_phone') ? ' is-invalid' : '' }}" name="company_phone" value="{{ old('company_phone') }}" required autofocus>
+                    <div class="col-md-12 input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">+44</span>
+                        </div>
+                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" placeholder="Company Phone" class="form-control{{ $errors->has('company_phone') ? ' is-invalid' : '' }}" id="company_phone" name="company_phone" value="{{ old('company_phone') }}" required autofocus>
 
                         @if ($errors->has('company_phone'))
                         <span class="invalid-feedback" role="alert">
@@ -85,7 +88,6 @@
                         @endif
                     </div>
                 </div>
-
                 <div class="form-group row mb-0">
                     <div class="col-md-12">
                         <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="/* padding: 5px 25px; */display: block;width: 100%;margin-top: 15px!important;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0; ">Sign up</button>

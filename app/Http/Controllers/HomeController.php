@@ -267,13 +267,13 @@ class HomeController extends Controller
                 'length' => 'required',
                 'weight' => 'required',
                 'status' => 'required',
-                'contact' => 'required|max:10',
+                'contact' => 'required|min:10|max:10',
                 'gallery' => 'required',
                 'feature_img' => 'required'
             ]);
             if ($validatedData->fails()) {
                 flash('Error in adding the product because some required field is missing.')->error();
-                return \redirect()->back();
+                return Redirect::back()->withInput($request->input());
             } 
             $data = $request->all();
             unset($data['_token']);
@@ -318,8 +318,8 @@ class HomeController extends Controller
                 }
                 $data['feature_img'] = $filename;
                 foreach ($data as $key => $value) {
-                    $product->$key = $value;
-                }
+                    $product->$key = ($key == 'contact') ? '+44' . $value : $value;
+                } 
                 $product->save();
                 if ($request->hasFile('gallery')) {
                     $images = $request->file('gallery');
