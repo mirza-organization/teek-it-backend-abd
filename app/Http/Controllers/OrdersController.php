@@ -350,7 +350,7 @@ class OrdersController extends Controller
             if ($request->type == 'delivery') {
                 $validatedData = Validator::make($request->all(), [
                     'receiver_name' => 'required',
-                    'phone_number' => 'required|string|min:10|max:10',
+                    'phone_number' => 'required|string|min:13|max:13',
                     'address' => 'required',
                     'house_no' => 'required',
                     'delivery_charges' => 'required',
@@ -365,7 +365,7 @@ class OrdersController extends Controller
                 }
             } elseif ($request->type == 'self-pickup') {
                 $validatedData = Validator::make($request->all(), [
-                    'phone_number' => 'string|min:10|max:10'
+                    'phone_number' => 'string|min:13|max:13'
                 ]);
                 if ($validatedData->fails()) {
                     return response()->json([
@@ -425,7 +425,7 @@ class OrdersController extends Controller
             $new_order->type = $request->type;
             if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
-                $new_order->phone_number = '+44' . $request->phone_number;
+                $new_order->phone_number = $request->phone_number;
                 $new_order->address = $request->address;
                 $new_order->house_no = $request->house_no;
                 $new_order->flat = $request->flat;
