@@ -44,7 +44,7 @@ class HomeController extends Controller
     public function index()
     {
         if (Auth::user()->hasRole('seller')) {
-            $user = User::query()->where('id', '=', Auth::id())->get(); 
+            $user = User::query()->where('id', '=', Auth::id())->get();
             $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
             $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
             $total_products = Products::query()->where('user_id', '=', Auth::id())->count();
@@ -274,7 +274,7 @@ class HomeController extends Controller
             if ($validatedData->fails()) {
                 flash('Error in adding the product because some required field is missing.')->error();
                 return Redirect::back()->withInput($request->input());
-            } 
+            }
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')) {
@@ -301,17 +301,11 @@ class HomeController extends Controller
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    Storage::disk('user_public')->put($filename, File::get($file));
-                    // Storage::disk('spaces')->put($filename, File::get($file));
-                    // Storage::disk('spaces')->exists($filename)
-                    if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                    // Storage::disk('user_public')->put($filename, File::get($file));
+                    Storage::disk('spaces')->put($filename, File::get($file));
+                    // Storage::disk('user_public')->exists($filename)
+                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
-                        // echo "File Uploded Successfully: ";
-                        // print_r($filename);
-                        // exit;
-
-                        //echo "File uploaded"; exit;
-                        // $filename = "/user_imgs/" . $filename;
                     } else {
                         info("file is not found :- " . $filename);
                     }
@@ -319,19 +313,18 @@ class HomeController extends Controller
                 $data['feature_img'] = $filename;
                 foreach ($data as $key => $value) {
                     $product->$key = ($key == 'contact') ? '+44' . $value : $value;
-                } 
+                }
                 $product->save();
                 if ($request->hasFile('gallery')) {
                     $images = $request->file('gallery');
                     foreach ($images as $image) {
                         $file = $image;
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        Storage::disk('user_public')->put($filename, File::get($file));
-                        // Storage::disk('digitaloceanspaces')->put($filename, File::get($file));
-                        // Storage::disk('spaces')->exists($filename)
-                        if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                        // Storage::disk('user_public')->put($filename, File::get($file));
+                        Storage::disk('spaces')->put($filename, File::get($file));
+                        // Storage::disk('user_public')->exists($filename)
+                        if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                             info("file is store successfully : " . $filename);
-                            // $filename = "/user_imgs/" . $filename;
                         } else {
                             info("file is not found :- " . $filename);
                         }
@@ -527,8 +520,8 @@ class HomeController extends Controller
                 $product->category_id = $importData[0];
                 $product->product_name = $importData[1];
                 $product->sku = $importData[2];
-                $product->qty = $importData[3];
-                $product->price = $importData[4];
+                $product->qty = ($importData[3] == "") ? 0 : $importData[3];
+                $product->price = str_replace(',', '', $importData[4]);
                 $product->discount_percentage = $importData[5];
                 $product->weight = $importData[6];
                 $product->brand = $importData[7];
