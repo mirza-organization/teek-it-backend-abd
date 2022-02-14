@@ -522,7 +522,7 @@ class HomeController extends Controller
                 $product->sku = $importData[2];
                 $product->qty = ($importData[3] == "") ? 0 : $importData[3];
                 $product->price = str_replace(',', '', $importData[4]);
-                $product->discount_percentage = $importData[5];
+                $product->discount_percentage = ($importData[5] == "") ? 0 : $importData[5];
                 $product->weight = $importData[6];
                 $product->brand = $importData[7];
                 $product->size = ($importData[8] == "null") ? NULL : $importData[8];
