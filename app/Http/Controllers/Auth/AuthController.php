@@ -33,14 +33,18 @@ class AuthController extends Controller
     {
         $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products', 'search_seller_products']]);
     }
-
+     /**
+     * Register For Mobile App
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function register(Request $request)
     {
         $validate = User::validator($request);
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
+            $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
             return response()->json($response, 400);
-        }
+        } 
         $role = Role::where('name', $request->get('role'))->first();
         if ($request->get('role') == 'buyer') {
             $is_active = 1;
