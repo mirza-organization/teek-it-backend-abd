@@ -8,7 +8,7 @@
             <h1 class="text-white text-center">{{ __('Sign Up') }}</h1>
             <h1 class="text-white text-center d-none">{{ __('Login') }}</h1>
 
-            <form method="POST" action="{{ route('register_web') }}">
+            <form method="POST" action="{{ route('register') }}">
                 @csrf
 
                 <div class="form-group row">
