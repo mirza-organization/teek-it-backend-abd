@@ -60,12 +60,6 @@ return [
             'root'   => public_path() . '/user_imgs',
             'visibility' => 'public',
         ],
-
-        // 'digitaloceanspaces' => [
-        //     'driver' => 'local',
-        //     'root'   => 'https://user-imgs.sgp1.digitaloceanspaces.com',
-        //     'visibility' => 'public',
-        // ],
         
         's3' => [
             'driver' => 's3',
@@ -83,6 +77,7 @@ return [
             'endpoint' => env('DO_SPACES_ENDPOINT'),
             'region' => env('DO_SPACES_REGION'),
             'bucket' => env('DO_SPACES_BUCKET'),
+            'visibility' => 'public',
         ],
 
     ],

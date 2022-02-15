@@ -59,9 +59,9 @@ class RegisterController extends Controller
             'name' => 'required|string|max:80',
             'email' => 'required|string|email|max:80|unique:users',
             'password' => 'required|string|min:8|max:50',
-            'phone' => 'required|string|max:10',
+            'phone' => 'required|string|min:10|max:10',
             'company_name' => 'required|string|max:80',
-            'company_phone' => 'required|string|max:10',
+            'company_phone' => 'required|string|min:10|max:10',
             
 //            'username' => 'required|string|max:255|unique:users',
 //            'address' => 'required|string|max:255',
@@ -83,7 +83,7 @@ class RegisterController extends Controller
      * @param array $data
      * @return User|\Illuminate\Http\RedirectResponse
      */
-    protected function register(Request $request)
+    protected function register_web(Request $request)
     {
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
@@ -91,8 +91,8 @@ class RegisterController extends Controller
             return Redirect::back()->withInput($request->input())
                 ->withErrors(['name.required', 'Name is required']);
         }
-        $data = $request->toArray();
-        
+        $data = $request->toArray(); 
+   
         $role = Role::where('name', 'seller')->first();
         $User = User::create([
             'name' => $data['name'],

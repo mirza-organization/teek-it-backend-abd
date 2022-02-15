@@ -17,6 +17,7 @@ use App\User;
 use App\WithdrawalRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
@@ -127,17 +128,25 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * Disable's a single product
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function inventory_disable($product_id)
     {
         $product = Products::find($product_id);
         $product->status = 0;
-        $product->qty = 0;
+        // $product->qty = 0;
         $product->save();
         flash('Product Disabled Successfully')->success();
         return Redirect::back();
     }
-
+    /**
+     * Enable's a single product
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function inventory_enable($product_id)
     {
         $product = Products::find($product_id);
@@ -146,106 +155,30 @@ class HomeController extends Controller
         flash('Product Enabled Successfully')->success();
         return Redirect::back();
     }
-
-    public function inventory_update(Request $request, $product_id)
-    {
-        if (Auth::user()->hasRole('seller')) {
-            $data = $request->all();
-            unset($data['_token']);
-            if ($request->has('colors')) {
-                $keys = $data['colors'];
-                unset($data['color']);
-                $a = array_fill_keys($keys, true);
-                $data['colors'] = json_encode($a);
-            } else {
-                $data['colors'] = null;
-            }
-
-            if (!isset($data['van'])) {
-                $data['van'] = 0;
-            }
-            if (!isset($data['bike'])) {
-                $data['bike'] = 0;
-            }
-            unset($data['gallery']);
-
-            $product = Products::find($product_id);
-            if (!empty($product)) {
-                $filename = $product->feature_img;
-                if ($request->hasFile('feature_img')) {
-                    $file = $request->file('feature_img');
-                    $filename = uniqid($product->id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    Storage::disk('user_public')->put($filename, File::get($file));
-                    if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
-                        info("file is store successfully : " . $filename);
-                        $filename = "/user_imgs/" . $filename;
-                    } else {
-                        info("file is not found :- " . $filename);
-                    }
-                }
-
-
-                $data['feature_img'] = $filename;
-
-                $user_id = Auth::id();
-
-                if ($request->hasFile('gallery')) {
-                    $images = $request->file('gallery');
-                    foreach ($images as $image) {
-
-
-                        $file = $image;
-                        $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        Storage::disk('user_public')->put($filename, File::get($file));
-                        if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
-                            info("file is store successfully : " . $filename);
-                            $filename = "/user_imgs/" . $filename;
-                        } else {
-                            info("file is not found :- " . $filename);
-                        }
-
-                        $product_images = new productImages();
-                        $product_images->product_id = $product->id;
-                        $product_images->product_image = $filename;
-                        $product_images->save();
-                    }
-                }
-
-
-                foreach ($data as $key => $value) {
-                    $product->$key = $value;
-                }
-                $product->save();
-                flash('Inventory updated successfully.')->success();
-                return \redirect()->route('inventory');
-            }
-        } else {
-            abort(404);
-        }
-    }
     /**
-     * It updates/uploads user image
+     * Disable's all products of logged-in user
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function user_img_update(Request $request)
+    public function inventory_disable_all(Request $request)
     {
-        $user = User::find(\auth()->id());
-        $filename = \auth()->user()->name;
-        if ($request->hasFile('user_img')) {
-            $file = $request->file('user_img');
-            $filename = uniqid($user->id . '_' . $user->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
-                info("file is store successfully : " . $filename);
-                // $filename = "/user_imgs/" . $filename;
-            } else {
-                info("file is not found :- " . $filename);
-            }
-        }
-        $user->user_img = $filename;
-        $user->save();
-        flash('Store Image Successfully Updated')->success();
+        DB::table('products')
+            ->where('user_id', Auth::id())
+            ->update(['status' => 0]);
+        flash('All Products Disabled Successfully')->success();
+        return Redirect::back();
+    }
+    /**
+     * Enable's all products of logged-in user
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function inventory_enable_all(Request $request)
+    {
+        DB::table('products')
+            ->where('user_id', Auth::id())
+            ->update(['status' => 1]);
+        flash('All Products Enabled Successfully')->success();
         return Redirect::back();
     }
     /**
@@ -301,9 +234,9 @@ class HomeController extends Controller
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    // Storage::disk('user_public')->put($filename, File::get($file));
+                    // Storage::disk('spaces')->put($filename, File::get($file));
                     Storage::disk('spaces')->put($filename, File::get($file));
-                    // Storage::disk('user_public')->exists($filename)
+                    // Storage::disk('spaces')->exists($filename)
                     if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
                     } else {
@@ -320,9 +253,9 @@ class HomeController extends Controller
                     foreach ($images as $image) {
                         $file = $image;
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        // Storage::disk('user_public')->put($filename, File::get($file));
+                        // Storage::disk('spaces')->put($filename, File::get($file));
                         Storage::disk('spaces')->put($filename, File::get($file));
-                        // Storage::disk('user_public')->exists($filename)
+                        // Storage::disk('spaces')->exists($filename)
                         if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                             info("file is store successfully : " . $filename);
                         } else {
@@ -342,6 +275,102 @@ class HomeController extends Controller
         }
     }
     /**
+     * It updates a single product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
+    public function inventory_update(Request $request, $product_id)
+    {
+        if (Auth::user()->hasRole('seller')) {
+            $data = $request->all();
+            unset($data['_token']);
+            if ($request->has('colors')) {
+                $keys = $data['colors'];
+                unset($data['color']);
+                $a = array_fill_keys($keys, true);
+                $data['colors'] = json_encode($a);
+            } else {
+                $data['colors'] = null;
+            }
+
+            if (!isset($data['van'])) {
+                $data['van'] = 0;
+            }
+            if (!isset($data['bike'])) {
+                $data['bike'] = 0;
+            }
+            unset($data['gallery']);
+            $product = Products::find($product_id);
+            if (!empty($product)) {
+                $filename = $product->feature_img;
+                if ($request->hasFile('feature_img')) {
+                    $file = $request->file('feature_img');
+                    $filename = uniqid($product->id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                    Storage::disk('spaces')->put($filename, File::get($file));
+                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                        info("file is store successfully : " . $filename);
+                        // $filename = "/user_imgs/" . $filename;
+                    } else {
+                        info("file is not found :- " . $filename);
+                    }
+                }
+                $data['feature_img'] = $filename;
+                $user_id = Auth::id();
+                if ($request->hasFile('gallery')) {
+                    $images = $request->file('gallery');
+                    foreach ($images as $image) {
+                        $file = $image;
+                        $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
+                        Storage::disk('spaces')->put($filename, File::get($file));
+                        if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                            info("file is store successfully : " . $filename);
+                            // $filename = "/user_imgs/" . $filename;
+                        } else {
+                            info("file is not found :- " . $filename);
+                        }
+                        $product_images = new productImages();
+                        $product_images->product_id = $product->id;
+                        $product_images->product_image = $filename;
+                        $product_images->save();
+                    }
+                }
+                foreach ($data as $key => $value) {
+                    $product->$key = $value;
+                }
+                $product->save();
+                flash('Inventory updated successfully.')->success();
+                return \redirect()->route('inventory');
+            }
+        } else {
+            abort(404);
+        }
+    }
+    /**
+     * It updates/uploads user image
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function user_img_update(Request $request)
+    {
+        $user = User::find(\auth()->id());
+        $filename = \auth()->user()->name;
+        if ($request->hasFile('user_img')) {
+            $file = $request->file('user_img');
+            $filename = uniqid($user->id . '_' . $user->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+            Storage::disk('spaces')->put($filename, File::get($file));
+            if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                info("file is store successfully : " . $filename);
+                // $filename = "/user_imgs/" . $filename;
+            } else {
+                info("file is not found :- " . $filename);
+            }
+        }
+        $user->user_img = $filename;
+        $user->save();
+        flash('Store Image Successfully Updated')->success();
+        return Redirect::back();
+    }
+    /**
      * Changes user setting provided in the parameter
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
@@ -351,13 +380,21 @@ class HomeController extends Controller
         User::where('id', '=', Auth::id())->update(['settings->' . $request->setting_name => $request->value]);
         return \redirect()->route('home');
     }
-
+    /**
+     * Display's payment view
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function payment_settings()
     {
         $payment_settings = User::find(Auth::id())->bank_details;
         return view('shopkeeper.settings.payment', compact('payment_settings'));
     }
-
+    /**
+     * Display's store general settings
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function general_settings()
     {
         $user = User::find(Auth::id());
@@ -385,7 +422,11 @@ class HomeController extends Controller
         flash('Business Hours Updated');
         return redirect()->back();
     }
-
+    /**
+     * Update's user location
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function location_update(Request $request)
     {
         $data = $request->Address;
@@ -399,7 +440,11 @@ class HomeController extends Controller
         flash('Location Updated');
         return redirect()->back();
     }
-
+    /**
+     * Update's payment settings
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function payment_settings_update(Request $request)
     {
         $data = $request->all();
@@ -437,7 +482,7 @@ class HomeController extends Controller
         $orders_p = $orders;
 
         foreach ($orders as $order) {
-            //            $order_items = [];
+            //$order_items = [];
             $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
             $item_arr = [];
             foreach ($items as $item) {
@@ -451,7 +496,11 @@ class HomeController extends Controller
         $orders = $return_arr;
         return view('shopkeeper.orders.list', compact('orders', 'orders_p'));
     }
-
+    /**
+     * Convert's CSV file to JSON
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function csvToJson($fname)
     {
         // open csv file
@@ -474,7 +523,11 @@ class HomeController extends Controller
         // encode array to json
         return json_encode($json);
     }
-
+    /**
+     * Upload's bulk products
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function importProducts(Request $request)
     {
         $user_id = Auth::id();
@@ -586,7 +639,11 @@ class HomeController extends Controller
         // }
         return redirect()->back();
     }
-
+    /**
+     * Change's order status
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function change_order_status($order_id)
     {
         Orders::where('id', '=', $order_id)->update(['order_status' => 'ready', 'is_viewed' => 1]);
@@ -598,7 +655,11 @@ class HomeController extends Controller
         }
         return Redirect::back();
     }
-
+    /**
+     * Return's admin home view
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function admin_home()
     {
         if (Auth::user()->hasRole('superadmin')) {
@@ -618,12 +679,14 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * Return's admin settings view
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function asetting()
     {
-
         if (Auth::user()->hasRole('superadmin')) {
-
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
             $help_page = Pages::query()->where('page_type', '=', 'help')->first();
             $faq_page = Pages::query()->where('page_type', '=', 'faq')->first();
@@ -640,7 +703,11 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * Return's customer details view
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function admin_customer_details($user_id)
     {
         $return_arr = [];
@@ -678,87 +745,90 @@ class HomeController extends Controller
             abort(401);
         }
     }
-
+    /**
+     * Return's admin categories view
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function all_cat()
     {
         $categories = Categories::paginate();
-        //echo"work";die;
         return view('admin.categories', compact('categories'));
     }
-
+    /**
+     * Insert's a new category
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function add_cat(Request $request)
     {
         // $validate = Categories::validator($request);
-
         // if ($validate->fails()) {
         //     $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
         //     return response()->json($response, 400);
         // }
         $category = new Categories();
         $category->category_name = $request->category_name;
-
-
         if ($request->hasFile('category_image')) {
             $image = $request->file('category_image');
-
             $file = $image;
-
             $cat_name = str_replace(' ', '_', $category->category_name);
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+            Storage::disk('spaces')->put($filename, File::get($file));
+            if (Storage::disk('spaces')->exists($filename)) {  //check file exists in directory or not
                 info("file is store successfully : " . $filename);
-                $filename = "/user_imgs/" . $filename;
+                // $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
             }
-
-
             $category->category_image = $filename;
         }
-
         $category->save();
-
         flash('Added')->success();
         return Redirect::back();
     }
-
+    /**
+     * Update's a specific category
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function update_cat(Request $request, $id)
     {
         //$validate = Categories::updateValidator($request);
-
-
         // if ($validate->fails()) {
         //     $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
         //     return response()->json($response, 400);
         // }
         $category = Categories::find($id);
         $category->category_name = $request->category_name;
-
-
         if ($request->hasFile('category_image')) {
             $image = $request->file('category_image');
-
             $file = $image;
             $cat_name = str_replace(' ', '_', $category->category_name);
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+            Storage::disk('spaces')->put($filename, File::get($file));
+            if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                 info("file is store successfully : " . $filename);
-                $filename = "/user_imgs/" . $filename;
+                // $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
             }
-
-
             $category->category_image = $filename;
         }
-
         $category->save();
         flash('Updated')->success();
         return Redirect::back();
-        //$response = array('status' => true, 'message' => 'Category', 'data' => $category);
-        //echo response()->json($response, 200);
+    }
+    /**
+     * Delete's a specific category
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
+    public function delete_cat(Request $request)
+    {
+        DB::table('categories')->where('id', '=', $request->id)->delete();
+        flash('Category Deleted Successfully')->success();
+        return Redirect::back();
     }
 
     public function update_pages(Request $request)
@@ -772,7 +842,11 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * Render stores listing view for admin
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function admin_stores(Request $request)
     {
 
