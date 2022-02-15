@@ -78,12 +78,12 @@ class RegisterController extends Controller
     }
 
     /**
+     * register_web function (It is only used for the registration of web users)
      * Create a new user instance after a valid registration.
-     *
      * @param array $data
      * @return User|\Illuminate\Http\RedirectResponse
      */
-    protected function register_web(Request $request)
+    protected function register(Request $request)
     {
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
