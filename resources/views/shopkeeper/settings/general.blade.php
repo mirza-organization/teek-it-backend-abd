@@ -32,11 +32,10 @@
                                         <div class="col-md-12">
                                             <form action="{{route('user_img_update')}}" method="POST" enctype="multipart/form-data">
                                                 {{csrf_field()}}
-
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label><img class="img img-fluid img-thumbnail" src="{{asset('user_imgs/' . auth()->user()->user_img)}}" alt="No Image Uploaded"></label>
+                                                            <label><img class="img img-fluid img-thumbnail" src="{{asset('https://user-imgs.sgp1.digitaloceanspaces.com/' . auth()->user()->user_img)}}" alt="No Image Uploaded"></label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
