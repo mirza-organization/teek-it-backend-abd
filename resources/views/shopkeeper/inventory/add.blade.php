@@ -96,16 +96,16 @@
                                                             <input type="number" step="any" required class="form-control" name="weight" placeholder="Weight (Kg)*" id="" value="{{$inventory->weight}}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-12">
                                                         <div class="form-group">
                                                             <input type="text" class="form-control" name="brand" placeholder="Brand" id="" value="{{$inventory->brand}}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <!-- <div class="col-md-6">
                                                         <div class="form-group">
                                                             <input type="text" class="form-control" name="size" placeholder="Size" id="" value="{{$inventory->size}}">
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <select class="form-control" required name="status" id="">
@@ -146,10 +146,8 @@
                                                             <option value="silver">Silver</option>
                                                         </select>
                                                         <div class="row">
-
                                                             <div class="col-md-12 text-left">
-
-                                                                <p for="">Upload Image Gallery: &emsp;
+                                                                <p>Upload Image Gallery: &emsp;
                                                                     <input type="file" accept="image/*" required name="gallery[]" multiple>
                                                                 </p>
                                                                 <div class="img-to-del-container">
@@ -166,7 +164,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 text-left">
-                                                        <p for="">Upload Feature Image: &emsp;
+                                                        <p>Upload Feature Image: &emsp;
                                                             <input type="file" accept="image/*" required name="feature_img">
                                                         </p>
 
@@ -175,13 +173,16 @@
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 offset-md-3 text-center">
-                                                        <p for="">
+                                                        <p>
                                                             <input @if($inventory->bike==1)
                                                             checked
-                                                            @endif type="checkbox" name="bike" value="1" > Cycle/Bike &emsp;
+                                                            @endif type="radio" name="vehicle" value="bike" required> Cycle/Bike &emsp;
+                                                            <input @if($inventory->car==1)
+                                                            checked
+                                                            @endif type="radio" name="vehicle" value="car" required> Car &emsp;
                                                             <input @if($inventory->van==1)
                                                             checked
-                                                            @endif type="checkbox" name="van" value="1" > Car/Van
+                                                            @endif type="radio" name="vehicle" value="van" required> Van &emsp;
                                                         </p>
                                                     </div>
                                                     <div class="col-md-6 offset-md-3 text-center">

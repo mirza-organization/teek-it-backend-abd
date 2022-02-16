@@ -107,18 +107,18 @@
                                                             <input type="number" step="any" required class="form-control" name="weight" placeholder="Weight (Kg)" value="{{$inventory->weight}}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <div class="col-md-12">
                                                         <div class="form-group">
                                                             <label class="text-left d-block">Brand</label>
                                                             <input type="text" class="form-control" name="brand" placeholder="Brand" value="{{$inventory->brand}}">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                    <!-- <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label class="text-left d-block">Size</label>
                                                             <input type="text" class="form-control" name="size" placeholder="Size" value="{{$inventory->size}}">
                                                         </div>
-                                                    </div>
+                                                    </div> -->
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label class="text-left d-block">Status</label>
@@ -136,7 +136,14 @@
                                                     <div class="col-md-6">
                                                         <div class="form-group">
                                                             <label class="text-left d-block">Contact*</label>
-                                                            <input type="tel" class="form-control" name="contact" placeholder="Contact*" required value="{{$inventory->contact}}">
+                                                            <div class="form-group row">
+                                                                &nbsp;
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text">+44</span>
+                                                                </div>
+                                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                <input type="text" class="form-control col-md-9" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" placeholder="Contact*" id="contact" name="contact" value="{{str_replace('+44','',$inventory->contact) }}" required>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 text-left">
@@ -192,7 +199,7 @@
                                                             <img class="img-fluid" src="{{asset($inventory->feature_img)}}" alt="">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6 offset-md-3 text-center">
+                                                    <!-- <div class="col-md-6 offset-md-3 text-center">
                                                         <p>
                                                             <input @if($inventory->bike==1)
                                                             checked
@@ -201,6 +208,19 @@
                                                             checked
                                                             @endif type="checkbox" name="van" value="1" > Car/Van
 
+                                                        </p>
+                                                    </div> -->
+                                                    <div class="col-md-6 offset-md-3 text-center">
+                                                        <p>
+                                                            <input @if($inventory->bike==1)
+                                                            checked
+                                                            @endif type="radio" name="vehicle" value="bike" required> Cycle/Bike &emsp;
+                                                            <input @if($inventory->car==1)
+                                                            checked
+                                                            @endif type="radio" name="vehicle" value="car" required> Car &emsp;
+                                                            <input @if($inventory->van==1)
+                                                            checked
+                                                            @endif type="radio" name="vehicle" value="van" required> Van &emsp;
                                                         </p>
                                                     </div>
                                                     <div class="col-md-6 offset-md-3 text-center">

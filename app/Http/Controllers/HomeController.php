@@ -186,7 +186,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function inventory_adddb(Request $request)
+    public function inventory_add_db(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             $validatedData = Validator::make($request->all(), [
@@ -202,10 +202,11 @@ class HomeController extends Controller
                 'status' => 'required',
                 'contact' => 'required|min:10|max:10',
                 'gallery' => 'required',
-                'feature_img' => 'required'
+                'feature_img' => 'required',
+                'vehicle' => 'required'
             ]);
             if ($validatedData->fails()) {
-                flash('Error in adding the product because some required field is missing.')->error();
+                flash('Error in adding the product because some required field is missing or invalid data.')->error();
                 return Redirect::back()->withInput($request->input());
             }
             $data = $request->all();
@@ -216,15 +217,10 @@ class HomeController extends Controller
                 $a = array_fill_keys($keys, true);
                 $data['colors'] = json_encode($a);
             }
-            if (!isset($data['van'])) {
-                $data['van'] = 0;
-            }
-            if (!isset($data['bike'])) {
-                $data['bike'] = 0;
-            }
-            if (!isset($data['discount_percentage'])) {
-                $data['discount_percentage'] = 0.00;
-            }
+            $data['bike'] = ($data['vehicle'] == 'bike') ? 1 : 0;
+            $data['car'] = ($data['vehicle'] == 'car') ? 1 : 0;
+            $data['van'] = ($data['vehicle'] == 'van') ? 1 : 0;
+            $data['discount_percentage'] = (!isset($data['discount_percentage'])) ? 0.00 : $data['discount_percentage'];
             unset($data['gallery']);
             $user_id = Auth::id();
             $data['user_id'] = $user_id;
@@ -245,6 +241,7 @@ class HomeController extends Controller
                 }
                 $data['feature_img'] = $filename;
                 foreach ($data as $key => $value) {
+                    if ($key == 'vehicle') continue;
                     $product->$key = ($key == 'contact') ? '+44' . $value : $value;
                 }
                 $product->save();
@@ -282,6 +279,24 @@ class HomeController extends Controller
     public function inventory_update(Request $request, $product_id)
     {
         if (Auth::user()->hasRole('seller')) {
+            $validatedData = Validator::make($request->all(), [
+                'product_name' => 'required',
+                'sku' => 'required',
+                'category_id' => 'required',
+                'qty' => 'required',
+                'price' => 'required',
+                'height' => 'required',
+                'width' => 'required',
+                'length' => 'required',
+                'weight' => 'required',
+                'status' => 'required',
+                'contact' => 'required|min:10|max:10',
+                'vehicle' => 'required'
+            ]);
+            if ($validatedData->fails()) {
+                flash('Error in updating the product because some required field is missing or invalid data.')->error();
+                return Redirect::back()->withInput($request->input());
+            }
             $data = $request->all();
             unset($data['_token']);
             if ($request->has('colors')) {
@@ -292,13 +307,10 @@ class HomeController extends Controller
             } else {
                 $data['colors'] = null;
             }
-
-            if (!isset($data['van'])) {
-                $data['van'] = 0;
-            }
-            if (!isset($data['bike'])) {
-                $data['bike'] = 0;
-            }
+            $data['bike'] = ($data['vehicle'] == 'bike') ? 1 : 0;
+            $data['car'] = ($data['vehicle'] == 'car') ? 1 : 0;
+            $data['van'] = ($data['vehicle'] == 'van') ? 1 : 0;
+            $data['discount_percentage'] = (!isset($data['discount_percentage'])) ? 0.00 : $data['discount_percentage'];
             unset($data['gallery']);
             $product = Products::find($product_id);
             if (!empty($product)) {
@@ -335,7 +347,8 @@ class HomeController extends Controller
                     }
                 }
                 foreach ($data as $key => $value) {
-                    $product->$key = $value;
+                    if ($key == 'vehicle') continue;
+                    $product->$key = ($key == 'contact') ? '+44' . $value : $value;
                 }
                 $product->save();
                 flash('Inventory updated successfully.')->success();

@@ -8,10 +8,20 @@
             <div class="row mb-2">
                 <div class="col-sm-12">
                     <h1 class="m-0 text-dark text-center">Inventory</h1>
-                    <a class="float-right add-prod-btn" href="/inventory/add_bulk">Add Bulk</a>
-                    <a class="float-right add-prod-btn" href="/inventory/add">Add New</a>
-                    <a class="float-right add-prod-btn" href="/inventory/enable_all">Enable All</a>
-                    <a class="float-right add-prod-btn" href="/inventory/disable_all">Disable All</a>
+                    <div class="float-right">
+                        <button type="button" class="btn btn-warning">
+                            <a class="text-white" href="/inventory/enable_all">Enable All</a>
+                        </button>
+                        <button type="button" class="btn btn-danger">
+                            <a class="text-white" href="/inventory/disable_all"  onclick="disableAll(event)">Disable All</a>
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            <a class="text-white" href="/inventory/add">Add New</a>
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            <a class="text-white" href="/inventory/add_bulk">Add Bulk</a>
+                        </button>
+                    </div>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -168,4 +178,24 @@
     </div>
     <!-- /.content -->
 </div>
+@endsection
+
+
+@section('scripts')
+<script>
+    function disableAll(ev) {
+        ev.preventDefault();
+        var urlToRedirect = ev.currentTarget.getAttribute('href'); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
+        Swal.fire({
+            title: 'Warning!',
+            text: 'Are you sure you want to disable all the products of your store?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes'
+        }).then((result) => {
+            if (result.isConfirmed)
+                window.location.href = urlToRedirect
+        });
+    }
+</script>
 @endsection

@@ -67,7 +67,7 @@ Route::get('/inventory', 'HomeController@inventory')->name('inventory');
 Route::get('/inventory/edit/{product_id}', 'HomeController@inventory_edit');
 Route::get('/inventory/add', 'HomeController@inventory_add');
 Route::get('/inventory/add_bulk', 'HomeController@inventory_add_bulk');
-Route::post('/inventory/add', 'HomeController@inventory_adddb')->name('add_inventory');
+Route::post('/inventory/add', 'HomeController@inventory_add_db')->name('add_inventory');
 Route::get('/inventory/image/delete/{image_id}', 'HomeController@delete_img');
 Route::post('/inventory/update/{product_id}', 'HomeController@inventory_update')->name('update_inventory');
 Route::get('/inventory/disable/{product_id}', 'HomeController@inventory_disable')->name('inventory_disable');
