@@ -199,17 +199,6 @@
                                                             <img class="img-fluid" src="{{asset($inventory->feature_img)}}" alt="">
                                                         </div>
                                                     </div>
-                                                    <!-- <div class="col-md-6 offset-md-3 text-center">
-                                                        <p>
-                                                            <input @if($inventory->bike==1)
-                                                            checked
-                                                            @endif type="checkbox" name="bike" value="1" > Cycle/Bike &emsp;
-                                                            <input @if($inventory->van==1)
-                                                            checked
-                                                            @endif type="checkbox" name="van" value="1" > Car/Van
-
-                                                        </p>
-                                                    </div> -->
                                                     <div class="col-md-6 offset-md-3 text-center">
                                                         <p>
                                                             <input @if($inventory->bike==1)

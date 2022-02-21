@@ -597,7 +597,7 @@ class HomeController extends Controller
                 $product->colors = ($importData[11] == "null") ? NULL : $importData[11];
                 $product->bike = $importData[12];
                 $product->van = $importData[13];
-                $product->feature_img = $importData[17];
+                $product->feature_img = $importData[18];
                 $product->height = $importData[14];
                 $product->width = $importData[15];
                 $product->length = $importData[16];
@@ -605,7 +605,7 @@ class HomeController extends Controller
 
                 $product_images = new productImages();
                 $product_images->product_id = (int)$product->id;
-                $product_images->product_image = $importData[17];
+                $product_images->product_image = $importData[18];
                 $product_images->save();
 
                 $j++;
