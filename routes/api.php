@@ -168,7 +168,10 @@ Route::get('payment_intent', function () {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, "amount=$amount&currency=$currency&metadata[integration_check]=accept_a_payment");
     curl_setopt($ch, CURLOPT_USERPWD, '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' . ':' . '');
+    
+    // Test Account Key
     // curl_setopt($ch, CURLOPT_USERPWD, 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q' . ':' . '');
+
     $headers = array();
     $headers[] = 'Content-Type: application/x-www-form-urlencoded';
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
