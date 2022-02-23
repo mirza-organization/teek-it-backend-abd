@@ -308,6 +308,7 @@ class AuthController extends Controller
             'user_img' => $imagePath,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
+            'vehicle_type' => $user->vehicle_type,
             'seller_info' => $this->get_seller_info($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -359,13 +360,10 @@ class AuthController extends Controller
     protected function authenticated($request, $user, $token)
     {
         $olduser = $user;
-        //        echo date("Y-m-d H:i:s");die;
-        //        print_r($user);
         $user->last_login = date("Y-m-d H:i:s");
-        $user->save();
-        //die;
-        $agent = new Agent();
+        $user->save(); 
 
+        $agent = new Agent();
         $isDesktop = $agent->isDesktop();
         $isPhone = $agent->isPhone();
         $jwtToken = new JwtToken();

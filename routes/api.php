@@ -109,6 +109,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('seller', 'OrdersController@seller_orders');
         Route::get('delivery_boy_orders/{delivery_boy_id}', 'OrdersController@delivery_boy_orders');
         Route::get('assign_order', 'OrdersController@assign_order');
+        Route::get('cancel_order', 'OrdersController@cancel_order');
         Route::get('update_assign', 'OrdersController@update_assign');
         Route::post('new', 'OrdersController@new');
         Route::post('customer_cancel_order', 'OrdersController@customer_cancel_order');
@@ -168,7 +169,7 @@ Route::get('payment_intent', function () {
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_POSTFIELDS, "amount=$amount&currency=$currency&metadata[integration_check]=accept_a_payment");
     curl_setopt($ch, CURLOPT_USERPWD, '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' . ':' . '');
-    
+
     // Test Account Key
     // curl_setopt($ch, CURLOPT_USERPWD, 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q' . ':' . '');
 

@@ -16,5 +16,5 @@ return [
 
     'ORDER_ASSIGNED' => 'Assigned.',
     'ORDER_UPDATED' => 'Updated.',
-    'ORDER_CANCELED' => 'Canceled.',
+    'ORDER_CANCELLED' => 'Cancelled.',
 ];

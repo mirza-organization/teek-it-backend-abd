@@ -19,7 +19,7 @@ class OrdersController extends Controller
      * @version 1.1.0
      */
     public function index(Request $request)
-    {      
+    {
         $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderBy('id', 'desc');
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
@@ -46,19 +46,24 @@ class OrdersController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * List all ready or delivered or assigned (to delivery boy) orders
+     * Or list all orders of a specific delivery boy
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function seller_orders(Request $request)
-    {
+    { 
         $lat = \auth()->user()->lat;
         $lng = \auth()->user()->lon;
         $orders = array();
-        $assignedOrders = Orders::where('delivery_boy_id', \auth()->id())->where('delivery_status', 'assigned')->get();
         if ($request->has('order_status') && $request->order_status == 'delivered') {
             $orders = Orders::query();
             $orders = $orders->where('order_status', '=', $request->order_status);
             $orders = $orders->orderByDesc('created_at')->paginate();
             $pagination = $orders->toArray();
         } elseif ($request->has('order_status') && $request->order_status == 'ready') {
+            $assignedOrders = Orders::where('delivery_boy_id', \auth()->id())->where('delivery_status', 'assigned')->get();
             if (count($assignedOrders) == 0) {
                 $users = DB::table("users")
                     ->select(
@@ -194,7 +199,7 @@ class OrdersController extends Controller
     public function assign_order(Request $request)
     {
         $order = Orders::find($request->order_id);
-        if (!$order->isEmpty()) {
+        if ($order) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
@@ -203,6 +208,32 @@ class OrdersController extends Controller
                 'data' => [],
                 'status' => true,
                 'message' => config('constants.ORDER_ASSIGNED')
+            ], 200);
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
+        }
+    }
+    /**
+     * A delivery boy can cancel a specific order through this function
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function cancel_order(Request $request)
+    {
+        $order = Orders::find($request->order_id);
+        if ($order) {
+            $order->delivery_boy_id = NULL;
+            $order->order_status = "ready";
+            $order->delivery_status = "cancelled";
+            $order->save();
+            return response()->json([
+                'data' => [],
+                'status' => true,
+                'message' => config('constants.ORDER_CANCELLED')
             ], 200);
         } else {
             return response()->json([
@@ -248,97 +279,6 @@ class OrdersController extends Controller
             ], 200);
         }
     }
-
-    // public function newOld(Request $request)
-    // {
-    //     if ($request->has('type')) {
-    //         if ($request->type == 'delivery') {
-    //             $validatedData = Validator::make($request->all(), [
-    //                 'receiver_name' => 'required',
-    //                 'phone_number' => 'required',
-    //                 'address' => 'required',
-    //                 'house_no' => 'required',
-    //                 'delivery_charges' => 'required',
-    //                 'service_charges' => 'required'
-    //             ]);
-    //             if ($validatedData->fails()) {
-    //                 return response()->json($validatedData->errors(), 422);
-    //             }
-    //         }
-    //     } else {
-    //         return response()->json(['type' => ['The type field is required.']], 422);
-    //     }
-    //     $grouped_seller = [];
-    //     foreach ($request->items as $item) {
-    //         $product_id = $item['product_id'];
-    //         $qty = $item['qty'];
-    //         $product_price = (new ProductsController())->get_product_price($product_id);
-    //         $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
-    //         $temp = [];
-    //         $temp['qty'] = $qty;
-    //         $temp['product_id'] = $product_id;
-    //         $temp['price'] = $product_price;
-    //         $temp['seller_id'] = $product_seller_id;
-    //         $grouped_seller[$product_seller_id][] = $temp;
-    //     }
-
-    //     $count = 0;
-    //     $order_arr = [];
-    //     foreach ($grouped_seller as $seller_id => $order) {
-    //         $user_id = Auth()->id(); 
-    //         // $user_id = 306; 
-    //         $order_total = 0;
-    //         $total_items = 0;
-    //         foreach ($order as $order_item) {
-    //             $total_items = $total_items + $order_item['qty'];
-    //             $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
-    //         }
-
-    //         $user = User::find($seller_id);
-    //         $user_money = $user->pending_withdraw;
-    //         $user->pending_withdraw = $order_total + $user_money;
-    //         $user->save();
-
-    //         $new_order = new Orders();
-    //         $new_order->user_id = $user_id;
-    //         $new_order->order_total = $order_total;
-    //         $new_order->total_items = $total_items;
-    //         $new_order->type = $request->type;
-    //         if ($request->type == 'delivery') {
-    //             $new_order->receiver_name = $request->receiver_name;
-    //             $new_order->phone_number = $request->phone_number;
-    //             $new_order->address = $request->address;
-    //             $new_order->house_no = $request->house_no;
-    //             $new_order->flat = $request->flat;
-    //             $new_order->delivery_charges = $request->delivery_charges[$count];
-    //             $new_order->service_charges = $request->service_charges;
-    //         }
-    //         $new_order->description = $request->description;
-    //         $new_order->payment_status = $request->payment_status ?? "hidden";
-    //         $new_order->seller_id = $seller_id;
-    //         $new_order->save();
-    //         $order_id = $new_order->id;
-    //         $order_arr[] = $order_id;
-    //         foreach ($order as $order_item) {
-    //             $new_order_item = new OrderItems();
-    //             $new_order_item->order_id = $order_id;
-    //             $new_order_item->product_id = $order_item['product_id'];
-    //             $new_order_item->product_price = $order_item['price'];
-    //             $new_order_item->product_qty = $order_item['qty'];
-    //             $new_order_item->save();
-    //         }
-    //         $count++;
-    //     }
-    //     $return_data = $this->get_orders_from_ids($order_arr);
-    //     $user_arr = [
-    //         'data' => $return_data,
-    //         'status' => true,
-    //         'message' => 'Order Added Successfully'
-
-    //     ];
-    //     return response()->json($user_arr, 200);
-    // }
-
     /**
      * Inserts a newly arrived order
      * @author Mirza Abdullah Izhar
@@ -471,7 +411,7 @@ class OrdersController extends Controller
              * Order cenceled by user & not accepted by store then full refund
              */
             if ($order->order_status == "pending") {
-                $order->order_status = 'canceled';
+                $order->order_status = 'cancelled';
                 $order->save();
                 // foreach ($product_ids as $product_id) {
                 //     $count++;
@@ -479,14 +419,14 @@ class OrdersController extends Controller
                 return response()->json([
                     'data' => $order,
                     'status' => true,
-                    'message' => config('constants.ORDER_CANCELED')
+                    'message' => config('constants.ORDER_CANCELLED')
                 ], 200);
             }
             /**
              * Order cenceled by user & accepted by store but not picked by the driver then deduct handling charges
              */
             else if ($order->order_status == "accepted" || $order->order_status == "ready") {
-                $order->order_status = 'canceled';
+                $order->order_status = 'cancelled';
                 $order->save();
                 // foreach ($product_ids as $product_id) {
                 //     $count++;
@@ -494,14 +434,14 @@ class OrdersController extends Controller
                 return response()->json([
                     'data' => $order,
                     'status' => true,
-                    'message' => config('constants.ORDER_CANCELED')
+                    'message' => config('constants.ORDER_CANCELLED')
                 ], 200);
             }
             /**
              * Order cenceled by user, accepted by store & picked by the driver then multiply driver's fee by 2 plus add handling charge & service fee
              */
             else if ($order->order_status == "onTheWay") {
-                $order->order_status = 'canceled';
+                $order->order_status = 'cancelled';
                 $order->save();
                 // foreach ($product_ids as $product_id) {
                 //     $count++;
@@ -509,7 +449,7 @@ class OrdersController extends Controller
                 return response()->json([
                     'data' => $order,
                     'status' => true,
-                    'message' => config('constants.ORDER_CANCELED')
+                    'message' => config('constants.ORDER_CANCELLED')
                 ], 200);
             }
         } else {
