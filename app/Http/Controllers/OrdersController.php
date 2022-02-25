@@ -251,7 +251,7 @@ class OrdersController extends Controller
     public function update_assign(Request $request)
     {
         $order = Orders::find($request->order_id);
-        if (!$order->isEmpty()) {
+        if ($order) {
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
