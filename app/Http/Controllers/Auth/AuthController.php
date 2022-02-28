@@ -33,7 +33,7 @@ class AuthController extends Controller
     {
         $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products', 'search_seller_products']]);
     }
-     /**
+    /**
      * Register For Mobile App
      * @author Huzaifa Haleem
      * @version 1.1.0
@@ -44,7 +44,7 @@ class AuthController extends Controller
         if ($validate->fails()) {
             $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
             return response()->json($response, 400);
-        } 
+        }
         $role = Role::where('name', $request->get('role'))->first();
         if ($request->get('role') == 'buyer') {
             $is_active = 1;
@@ -93,22 +93,22 @@ class AuthController extends Controller
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
         $html = '<html>
-            Hi, ' . $User->name . '<br><br>
-
-            Thank you for registering on ' . env('APP_NAME') . '.
-
-<br>
-            Here is your account verification link. Click on below link to verify you account. <br><br>
+        Congratulations ' . $User->name . '!<br><br>
+        You have successfully registered on ' . env('APP_NAME') . '.
+        <br>
+        There is just one more step to go. Click on the link below to verify your account so you can start purchasing products on TeekIT today!  <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
             ' . $account_verification_link . '
-<br><br><br>
+        <br><br><br>
+        For more information please visit https://teekit.co.uk/ 
+        If you have any further inquiries please email admin@teekit.co.uk
         </html>';
 
         Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $User) {
             $message->to($request->email, $User->name)
                 ->subject(env('APP_NAME') . ': Account Verification');
         });
-        $response = array('status' => true, 'role' => $request->role, 'message' => 'You are registered successfully, check email and click on verification link to activate your account.');
+        $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
         return response()->json($response, 200);
     }
 
@@ -121,14 +121,14 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
         if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['data' => [],'status' => false,'message' => config('constants.INVALID_CREDENTIALS')], 401);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.INVALID_CREDENTIALS')], 401);
         }
         $user = JWTAuth::user();
         if ($user->email_verified_at == null) {
-            return response()->json(['data' => [],'status' => false,'message' => config('constants.EMAIL_NOT_VERIFIED')], 401);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.EMAIL_NOT_VERIFIED')], 401);
         }
         if ($user->is_active == 0) {
-            return response()->json(['data' => [],'status' => false,'message' => config('constants.ACCOUNT_DEACTIVATED')], 401);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.ACCOUNT_DEACTIVATED')], 401);
         }
         $this->authenticated($request, $user, $token);
         return $this->respondWithToken($token);
@@ -361,7 +361,7 @@ class AuthController extends Controller
     {
         $olduser = $user;
         $user->last_login = date("Y-m-d H:i:s");
-        $user->save(); 
+        $user->save();
 
         $agent = new Agent();
         $isDesktop = $agent->isDesktop();

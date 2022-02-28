@@ -653,7 +653,7 @@ class HomeController extends Controller
         return redirect()->back();
     }
     /**
-     * Change's order status
+     * Change's order status to "ready"
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
