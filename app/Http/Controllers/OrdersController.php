@@ -47,13 +47,13 @@ class OrdersController extends Controller
         }
     }
     /**
-     * List all ready or delivered or assigned (to delivery boy) orders
-     * Or list all orders of a specific delivery boy
+     * List all ready or delivered orders
+     * for a specific delivery boy
      * @author Huzaifa Haleem
-     * @version 1.1.0
+     * @version 1.1.1
      */
     public function seller_orders(Request $request)
-    { 
+    {
         $lat = \auth()->user()->lat;
         $lng = \auth()->user()->lon;
         $orders = array();
@@ -142,8 +142,11 @@ class OrdersController extends Controller
             }
         } else {
             $orders = Orders::query();
-            $orders = $orders->where('delivery_boy_id', \auth()->id());
-            $orders = $orders->orderByDesc('created_at')->paginate();
+            $orders = $orders->where('type', '=', 'delivery')
+            ->where('order_status', 'ready')
+            ->where('delivery_boy_id', NULL)
+            ->orderByDesc('created_at')
+            ->paginate();
             $pagination = $orders->toArray();
         }
         if (!$orders->isEmpty()) {
@@ -166,10 +169,18 @@ class OrdersController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * List all (assigned,complete,pending_approval,cancelled) orders 
+     * for a specific delivery boy
+     * @author Huzaifa Haleem
+     * @version 1.1.1
+     */
     public function delivery_boy_orders(Request $request, $delivery_boy_id)
-    {
-        $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)->where('delivery_status', '=', $request->delivery_status)->paginate();
+    {   //delivery_status:assigned,complete,pending_approval,cancelled
+        $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)
+        ->where('delivery_status', '=', $request->delivery_status)
+        ->where('type', '=', 'delivery')
+        ->paginate();
         $pagination = $orders->toArray();
         if (!$orders->isEmpty()) {
             $order_data = [];
@@ -218,32 +229,6 @@ class OrdersController extends Controller
         }
     }
     /**
-     * A delivery boy can cancel a specific order through this function
-     * @author Mirza Abdullah Izhar
-     * @version 1.0.0
-     */
-    public function cancel_order(Request $request)
-    {
-        $order = Orders::find($request->order_id);
-        if ($order) {
-            $order->delivery_boy_id = NULL;
-            $order->order_status = "ready";
-            $order->delivery_status = "cancelled";
-            $order->save();
-            return response()->json([
-                'data' => [],
-                'status' => true,
-                'message' => config('constants.ORDER_CANCELLED')
-            ], 200);
-        } else {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
-        }
-    }
-    /**
      * Updates an assigned order
      * @author Huzaifa Haleem
      * @version 1.1.0
@@ -270,6 +255,32 @@ class OrdersController extends Controller
                 'data' => [],
                 'status' => true,
                 'message' => config('constants.ORDER_UPDATED')
+            ], 200);
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
+        }
+    }
+    /**
+     * A delivery boy can cancel a specific order through this function
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function cancel_order(Request $request)
+    {
+        $order = Orders::find($request->order_id);
+        if ($order) {
+            $order->delivery_boy_id = NULL;
+            $order->order_status = "ready";
+            $order->delivery_status = "cancelled";
+            $order->save();
+            return response()->json([
+                'data' => [],
+                'status' => true,
+                'message' => config('constants.ORDER_CANCELLED')
             ], 200);
         } else {
             return response()->json([
@@ -348,13 +359,18 @@ class OrdersController extends Controller
                 $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
             $user = User::find($seller_id);
+            $sms = new TwilioSmsService();
+            $message = "A new order has been received. Please check TeekIt's platform, or sign in here now:https://app.teekit.co.uk/login";
             // To restrict new order SMS notifications for only UK numbers
             if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
-                $message = "A new order has been received. Please check TeekIt's platform, or sign in here now:https://app.teekit.co.uk/login";
-                $sms = new TwilioSmsService();
                 // $sms->sendSms('+447976621849', $message);
                 $sms->sendSms($user->business_phone, $message);
             }
+            $sms->sendSms('+447976621849', $message); //Azim Number
+            $sms->sendSms('+447490020063', $message); //Eesa Number
+            $sms->sendSms('+447817332090', $message); //Junaid Number
+            $sms->sendSms('+923170155625', $message);
+
             $user_money = $user->pending_withdraw;
             $user->pending_withdraw = $order_total + $user_money;
             $user->save();
