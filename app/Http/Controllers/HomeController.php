@@ -461,12 +461,11 @@ class HomeController extends Controller
     public function payment_settings_update(Request $request)
     {
         $data = $request->all();
-        if (empty($data['bank'][2]['bank_name']) || empty($data['bank'][2]['account_number']) || empty($data['bank'][2]['branch'])) {
-            unset($data['bank'][2]);
+        if (empty($data['bank']['two']['bank_name']) || empty($data['bank']['two']['account_number']) || empty($data['bank']['two']['branch'])) {
+            unset($data['bank']['two']);
         }
         unset($data['_token']);
         $data = $data['bank'];
-        print_r($data);
         $user = User::find(Auth::id());
         $user->bank_details = json_encode($data);
         $user->save();
@@ -862,7 +861,6 @@ class HomeController extends Controller
      */
     public function admin_stores(Request $request)
     {
-
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
                 $query->where('role_id', 2);
@@ -878,7 +876,11 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * Render customers listing view for admin
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function admin_customers(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
@@ -896,10 +898,13 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * Render drivers listing view for admin
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function admin_drivers(Request $request)
     {
-
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
                 $query->where('role_id', 4);

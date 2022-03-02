@@ -71,7 +71,7 @@
                         <div class="card-text">
                             <div class="col-md-12">
                                 <span class="img-container">
-                                    <img class="d-block m-auto" src="{{asset('https://user-imgs.sgp1.digitaloceanspaces.com/' .$user->category_image)}}">
+                                    <img class="d-block m-auto" src="{{config('constants.BUCKET') . $user->category_image}}">
                                 </span>
                             </div>
                         </div>

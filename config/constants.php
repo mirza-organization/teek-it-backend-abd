@@ -17,4 +17,6 @@ return [
     'ORDER_ASSIGNED' => 'Assigned.',
     'ORDER_UPDATED' => 'Updated.',
     'ORDER_CANCELLED' => 'Cancelled.',
+
+    'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
 ];

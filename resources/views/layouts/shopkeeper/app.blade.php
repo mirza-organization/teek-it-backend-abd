@@ -35,7 +35,7 @@
                 </ul>
 
                 <!-- SEARCH FORM -->
-                <form class="d-block w-100 ml-3">
+                <!-- <form class="d-block w-100 ml-3">
                     <div class="input-group input-group-sm" style=" border-bottom: 1px solid #d4d4d4; ">
                         <div class="input-group-append">
                             <button class="bg-transparent  btn btn-navbar" type="submit">
@@ -43,9 +43,8 @@
                             </button>
                         </div>
                         <input aria-label="Search" class="bg-transparent  form-control form-control-navbar w-100" placeholder="Search" type="search">
-
                     </div>
-                </form>
+                </form> -->
 
                 <!-- Right navbar links -->
                 <ul class="navbar-nav ml-sm-5">

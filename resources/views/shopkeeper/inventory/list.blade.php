@@ -80,7 +80,7 @@
                                                 <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset($inventory->feature_img)}}" alt="">
                                                 @else
                                                 <!-- <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset('user_imgs/' . $inventory->feature_img)}}" alt=""> -->
-                                                <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset('https://user-imgs.sgp1.digitaloceanspaces.com/' . $inventory->feature_img)}}" alt="">
+                                                <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{asset(config('constants.BUCKET') . $inventory->feature_img)}}" alt="">
                                                 @endif
                                             </span>
                                         </div>
@@ -94,7 +94,7 @@
                                                 <img class="d-block m-auto" src="{{asset($img->product_image)}}" alt="">
                                                 @else
                                                 <!-- <img class="d-block m-auto" src="{{asset('user_imgs/' . $img->product_image)}}" alt=""> -->
-                                                <img class="d-block m-auto" src="{{asset('https://user-imgs.sgp1.digitaloceanspaces.com/' . $img->product_image)}}" alt="">
+                                                <img class="d-block m-auto" src="{{asset(config('constants.BUCKET') . $img->product_image)}}" alt="">
                                                 @endif
                                             </span>
                                             <?php $count++; ?>
