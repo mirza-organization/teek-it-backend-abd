@@ -5,11 +5,12 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <meta content="ie=edge" http-equiv="x-ua-compatible">
-
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name') }}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('res/res/img/logo.png') }}">
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <!-- Font Awesome Icons -->
@@ -45,9 +46,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5">
-
                                 <div class="form-group">
-
                                     <input class="form-control mr-sm-2" type="password" autocomplete="off" placeholder="Password" name="password" required>
                                     <p for="">
                                         <a class="text-dark" href="{{ route('password.request') }}">Forgot Password?</a>
