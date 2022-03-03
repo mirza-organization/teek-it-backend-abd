@@ -13,13 +13,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::get('/', function () {
-//    $routes = collect(\Route::getRoutes())->map(function ($route) { return $route->uri(); });
-//    \Artisan::call('route:list', ['--sort'=>'method','--path' => 'api']);
-//    $output = \Artisan::output();
-//
-//    return view('welcome',compact('output'));
-//});
+Route::get('/testing', function () {
+   return response("Hello World!");
+});
 Route::get('send-message', function () {
     $receiverNumber = "+923006694349";
     $message = "This is testing from teek-it";
@@ -38,13 +34,6 @@ Route::get('send-message', function () {
         dd("Error: " . $e->getMessage());
     }
 });
-
-// Route::post(
-//     'upload',
-//     function () {
-//         Storage::disk('spaces')->putFile('uploads', request()->file, 'public');
-//     }
-// );
 
 /*
 |--------------------------------------------------------------------------
