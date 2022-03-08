@@ -668,6 +668,17 @@ class HomeController extends Controller
         return Redirect::back();
     }
     /**
+     * Change's order status to "complete"
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function mark_as_completed($order_id)
+    {
+        Orders::where('id', '=', $order_id)->update(['order_status' => 'complete']);
+        flash('This Order Has Been Marked As Completed')->success();
+        return Redirect::back();
+    }
+    /**
      * Return's admin home view
      * @author Huzaifa Haleem
      * @version 1.0.0

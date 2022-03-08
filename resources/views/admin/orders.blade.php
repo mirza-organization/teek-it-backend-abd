@@ -40,6 +40,8 @@
                             @if($order->order_status=='pending')
                             <a href="{{route('accept_order',['order_id'=>$order->id])}}" class=" d-block float-right">Click here if Order is Ready</a>
                             <a href="{{route('cancel_order',['order_id'=>$order->id])}}" onclick="cancelOrder(event)" class=" d-block btn btn-danger float-right" style="margin-right: 20px">Cancel Order</a>
+                            @elseif ($order->order_status=='delivered')
+                            <a href="{{route('mark_as_completed',['order_id'=>$order->id])}}" class="d-block float-right text-success">Mark as completed</a>
                             @endif
                         </div>
 

@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/testing', function () {
-   return response("Hello World!");
-});
 Route::get('send-message', function () {
     $receiverNumber = "+923006694349";
     $message = "This is testing from teek-it";
@@ -89,6 +86,7 @@ Route::post('/importProducts', 'HomeController@importProducts')->name('importPro
 */
 Route::get('/orders', 'HomeController@orders')->name('orders');
 Route::get('/orders/ready_state/{order_id}', 'HomeController@change_order_status')->name('accept_order');
+Route::get('/orders/mark_as_completed/{order_id}', 'HomeController@mark_as_completed')->name('mark_as_completed');
 Route::get('/orders/cancel/{order_id}', 'HomeController@cancel_order')->name('cancel_order');
 /*
 |--------------------------------------------------------------------------
