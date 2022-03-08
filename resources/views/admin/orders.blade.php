@@ -44,10 +44,8 @@
                             <a href="{{route('mark_as_completed',['order_id'=>$order->id])}}" class="d-block float-right text-success">Mark as completed</a>
                             @endif
                         </div>
-
                         <div class="card-text">
                             <div class="row">
-
                                 <div class="col-md-6">
                                     <p>
                                         Placed on {{$order->created_at}}
@@ -62,7 +60,6 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-
                                 <hr>
                             </div>
                             <div class="col-md-12">
@@ -84,8 +81,13 @@
                                             <a href="#" class="d-block text-site-primary">{{$item->product->sku}}</a>
                                         </h3>
                                     </div>
-                                    <div class="col-md-2 mt-5">
-                                        QTY: {{$item->product_qty}}
+                                    <div class="col-md-6 mt-5">
+                                        <strong class="text-site-primary"> Receiver Name: </strong> {{$order->receiver_name}} <br>
+                                        <strong class="text-site-primary"> Contact: </strong> {{$order->phone_number}} <br>
+                                        <strong class="text-site-primary"> Address: </strong> {{$order->address}} <br>
+                                        <strong class="text-site-primary"> House#: </strong> {{$order->house_no}} <br>
+                                        <strong class="text-site-primary"> Flat: </strong> {{$order->flat}} <br>
+                                        <strong class="text-site-primary"> QTY: </strong> {{$item->product_qty}}
                                     </div>
                                     <div class="col-md-12"><br></div>
                                 </div>

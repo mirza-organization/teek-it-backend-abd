@@ -950,7 +950,6 @@ class HomeController extends Controller
             $orders = $orders->paginate(10);
             $orders_p = $orders;
             foreach ($orders as $order) {
-                //            $order_items = [];
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
@@ -961,12 +960,8 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
-            //        Auth::user()->hasRole('seller');
-            //        echo "<pre>";
-            //        print_r($return_arr);
             $orders = $return_arr;
             return view('admin.orders', compact('orders', 'orders_p'));
-            //            return view('admin.orders');
         } else {
             abort(404);
         }
