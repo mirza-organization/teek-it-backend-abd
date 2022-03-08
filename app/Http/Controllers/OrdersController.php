@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\OrderItems;
 use App\Orders;
+use App\Products;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -143,10 +144,10 @@ class OrdersController extends Controller
         } else {
             $orders = Orders::query();
             $orders = $orders->where('type', '=', 'delivery')
-            ->where('order_status', 'ready')
-            ->where('delivery_boy_id', NULL)
-            ->orderByDesc('created_at')
-            ->paginate();
+                ->where('order_status', 'ready')
+                ->where('delivery_boy_id', NULL)
+                ->orderByDesc('created_at')
+                ->paginate();
             $pagination = $orders->toArray();
         }
         if (!$orders->isEmpty()) {
@@ -178,9 +179,9 @@ class OrdersController extends Controller
     public function delivery_boy_orders(Request $request, $delivery_boy_id)
     {   //delivery_status:assigned,complete,pending_approval,cancelled
         $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)
-        ->where('delivery_status', '=', $request->delivery_status)
-        ->where('type', '=', 'delivery')
-        ->paginate();
+            ->where('delivery_status', '=', $request->delivery_status)
+            ->where('type', '=', 'delivery')
+            ->paginate();
         $pagination = $orders->toArray();
         if (!$orders->isEmpty()) {
             $order_data = [];
@@ -520,8 +521,11 @@ class OrdersController extends Controller
             'message' => 'Order Added Successfully'
         ], 200);
     }
-
-
+    /**
+     * It is used to fetch the information of multiple orders w.r.t their ID's
+     * @author Huzaif Haleem
+     * @version 1.0.0
+     */
     public function get_orders_from_ids($ids)
     {
         $raw_data = [];
@@ -530,7 +534,11 @@ class OrdersController extends Controller
         }
         return $raw_data;
     }
-
+    /**
+     * It is used to fetch the information of a single order w.r.t it's ID
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function get_single_order($order_id)
     {
         $temp = [];
@@ -552,7 +560,11 @@ class OrdersController extends Controller
         $kms = (int)$distanceString[0] * 0.621371;
         return $kms > 1 ? $kms : 1;
     }
-
+    /**
+     * It will calculate the fair for a driver
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function calculateDriverFair($order, $store)
     {
         $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
@@ -586,6 +598,80 @@ class OrdersController extends Controller
             $teekitCharges = $totalFair * $fee;
             $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
             $driver->save();
+        }
+    }
+    /**
+     * This function will return back store open/close & product in-stock/out-of-stock status
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function recheck_products(Request $request)
+    {
+        // print_r($request->items);
+        // $orders = DB::table('orders')
+        //     ->whereIn('id', [190, 191, 192])
+        //     ->get();
+        // print_r($orders);
+        foreach ($request->items as $item) {
+            // $order_data['store'] = User::query()->select('business_hours->>time')->where('id', '=', $item['store_id'])->get();
+            $order_data['store'] =  User::query()->select(\DB::raw("JSON_UNQUOTE(JSON_EXTRACT(business_hours, '$.time')) as time"))->where('id', '=', $item['store_id'])->get();
+            $order_data['product'] = Products::query()->select('qty')->where('id', '=', $item['product_id'])->get();
+            // print_r($product);
+            return response()->json([
+                'data' => $order_data,
+                'status' => true,
+                'message' => ''
+            ], 200);
+            exit;
+
+            $qty = $item['qty'];
+            $product_price = (new ProductsController())->get_product_price($product_id);
+            $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
+            $temp = [];
+            $temp['qty'] = $qty;
+            $temp['product_id'] = $product_id;
+            $temp['price'] = $product_price;
+            $temp['seller_id'] = $product_seller_id;
+            $grouped_seller[$product_seller_id][] = $temp;
+            (new ProductsController())->update_qty($product_id, $qty, "subtract");
+        }
+        exit;
+        // foreach ($request->items as $item) {
+        //     $product_id = $item['product_id'];
+        //     $qty = $item['qty'];
+        //     $product_price = (new ProductsController())->get_product_price($product_id);
+        //     $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
+        //     $temp = [];
+        //     $temp['qty'] = $qty;
+        //     $temp['product_id'] = $product_id;
+        //     $temp['price'] = $product_price;
+        //     $temp['seller_id'] = $product_seller_id;
+        //     $grouped_seller[$product_seller_id][] = $temp;
+        //     (new ProductsController())->update_qty($product_id, $qty, "subtract");
+        // }
+        $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)
+            ->where('delivery_status', '=', $request->delivery_status)
+            ->where('type', '=', 'delivery')
+            ->paginate();
+        $pagination = $orders->toArray();
+        if (!$orders->isEmpty()) {
+            $order_data = [];
+            foreach ($orders as $order) {
+                $order_data[] = $this->get_single_order($order->id);
+            }
+            unset($pagination['data']);
+            return response()->json([
+                'data' => $order_data,
+                'status' => true,
+                'message' => '',
+                'pagination' => $pagination
+            ], 200);
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
         }
     }
 }
