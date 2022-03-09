@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Services\TwilioSmsService;
+use Throwable;
 
 class OrdersController extends Controller
 {
@@ -601,72 +602,37 @@ class OrdersController extends Controller
         }
     }
     /**
-     * This function will return back store open/close & product in-stock/out-of-stock status
+     * This function will return back store open/close & product qty status
+     * If the store is active & product is live
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
     public function recheck_products(Request $request)
     {
-        // print_r($request->items);
-        // $orders = DB::table('orders')
-        //     ->whereIn('id', [190, 191, 192])
-        //     ->get();
-        // print_r($orders);
-        foreach ($request->items as $item) {
-            // $order_data['store'] = User::query()->select('business_hours->>time')->where('id', '=', $item['store_id'])->get();
-            $order_data['store'] =  User::query()->select(\DB::raw("JSON_UNQUOTE(JSON_EXTRACT(business_hours, '$.time')) as time"))->where('id', '=', $item['store_id'])->get();
-            $order_data['product'] = Products::query()->select('qty')->where('id', '=', $item['product_id'])->get();
-            // print_r($product);
+        try {
+            $i = 0;
+            foreach ($request->items as $item) {
+                $closed_status = User::query()->select('business_hours->time->' . $request->day . '->closed as closed')
+                    ->where('id', '=', $item['store_id'])
+                    ->where('is_active', '=', 1)->get();
+
+                $qty = Products::query()->select('qty')
+                    ->where('id', '=', $item['product_id'])
+                    ->where('user_id', '=', $item['store_id'])
+                    ->where('status', '=', 1)
+                    ->get();
+
+                $order_data[$i]['closed'] = $closed_status[0]->closed;
+                $order_data[$i]['qty'] = $qty[0]->qty;
+                $i++;
+            }
             return response()->json([
                 'data' => $order_data,
                 'status' => true,
                 'message' => ''
             ], 200);
-            exit;
-
-            $qty = $item['qty'];
-            $product_price = (new ProductsController())->get_product_price($product_id);
-            $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
-            $temp = [];
-            $temp['qty'] = $qty;
-            $temp['product_id'] = $product_id;
-            $temp['price'] = $product_price;
-            $temp['seller_id'] = $product_seller_id;
-            $grouped_seller[$product_seller_id][] = $temp;
-            (new ProductsController())->update_qty($product_id, $qty, "subtract");
-        }
-        exit;
-        // foreach ($request->items as $item) {
-        //     $product_id = $item['product_id'];
-        //     $qty = $item['qty'];
-        //     $product_price = (new ProductsController())->get_product_price($product_id);
-        //     $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
-        //     $temp = [];
-        //     $temp['qty'] = $qty;
-        //     $temp['product_id'] = $product_id;
-        //     $temp['price'] = $product_price;
-        //     $temp['seller_id'] = $product_seller_id;
-        //     $grouped_seller[$product_seller_id][] = $temp;
-        //     (new ProductsController())->update_qty($product_id, $qty, "subtract");
-        // }
-        $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)
-            ->where('delivery_status', '=', $request->delivery_status)
-            ->where('type', '=', 'delivery')
-            ->paginate();
-        $pagination = $orders->toArray();
-        if (!$orders->isEmpty()) {
-            $order_data = [];
-            foreach ($orders as $order) {
-                $order_data[] = $this->get_single_order($order->id);
-            }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $order_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination
-            ], 200);
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
