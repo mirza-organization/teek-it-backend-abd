@@ -604,6 +604,7 @@ class OrdersController extends Controller
     /**
      * This function will return back store open/close & product qty status
      * If the store is active & product is live
+     * But if they are not then it will send "NA"
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
@@ -614,7 +615,8 @@ class OrdersController extends Controller
             foreach ($request->items as $item) {
                 $closed_status = User::query()->select('business_hours->time->' . $request->day . '->closed as closed')
                     ->where('id', '=', $item['store_id'])
-                    ->where('is_active', '=', 1)->get();
+                    ->where('is_active', '=', 1)
+                    ->get();
 
                 $qty = Products::query()->select('qty')
                     ->where('id', '=', $item['product_id'])
@@ -622,8 +624,8 @@ class OrdersController extends Controller
                     ->where('status', '=', 1)
                     ->get();
 
-                $order_data[$i]['closed'] = $closed_status[0]->closed;
-                $order_data[$i]['qty'] = $qty[0]->qty;
+                $order_data[$i]['closed'] = (isset($closed_status[0]->closed)) ? $closed_status[0]->closed : "NA";
+                $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : "NA";
                 $i++;
             }
             return response()->json([
