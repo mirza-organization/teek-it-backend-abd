@@ -38,10 +38,12 @@
                     <div class="card-body p-2 pl-5 pr-5 pb-5">
                         <div class="p-2 mb-2">Order #{{$order->id}}
                             @if($order->order_status=='pending')
-                            <a href="{{route('accept_order',['order_id'=>$order->id])}}" class=" d-block float-right">Click here if Order is Ready</a>
-                            <a href="{{route('cancel_order',['order_id'=>$order->id])}}" onclick="cancelOrder(event)" class=" d-block btn btn-danger float-right" style="margin-right: 20px">Cancel Order</a>
+                            <a href="{{route('accept_order',['order_id'=>$order->id])}}" class="d-block btn btn-success float-right">Click Here If Order Is Ready</a>
+                            <a href="{{route('cancel_order',['order_id'=>$order->id])}}" class="d-block btn btn-danger float-right" onclick="cancelOrder(event)" style="margin-right: 20px">Cancel Order</a>
+                            @elseif ($order->order_status=='ready')
+                            <a href="{{route('mark_as_delivered',['order_id'=>$order->id])}}" class="d-block btn btn-success float-right">Mark As Delivered</a>
                             @elseif ($order->order_status=='delivered')
-                            <a href="{{route('mark_as_completed',['order_id'=>$order->id])}}" class="d-block float-right text-success">Mark as completed</a>
+                            <a href="{{route('mark_as_completed',['order_id'=>$order->id])}}" class="d-block btn btn-success float-right">Mark As Completed</a>
                             @endif
                         </div>
                         <div class="card-text">

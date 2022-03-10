@@ -668,6 +668,17 @@ class HomeController extends Controller
         return Redirect::back();
     }
     /**
+     * Change's order status to "delivered"
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function mark_as_delivered($order_id)
+    {
+        Orders::where('id', '=', $order_id)->update(['order_status' => 'delivered']);
+        flash('This Order Has Been Marked As Delivered')->success();
+        return Redirect::back();
+    }
+    /**
      * Change's order status to "complete"
      * @author Mirza Abdullah Izhar
      * @version 1.0.0

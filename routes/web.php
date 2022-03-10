@@ -86,6 +86,7 @@ Route::post('/importProducts', 'HomeController@importProducts')->name('importPro
 */
 Route::get('/orders', 'HomeController@orders')->name('orders');
 Route::get('/orders/ready_state/{order_id}', 'HomeController@change_order_status')->name('accept_order');
+Route::get('/orders/mark_as_delivered/{order_id}', 'HomeController@mark_as_delivered')->name('mark_as_delivered');
 Route::get('/orders/mark_as_completed/{order_id}', 'HomeController@mark_as_completed')->name('mark_as_completed');
 Route::get('/orders/cancel/{order_id}', 'HomeController@cancel_order')->name('cancel_order');
 /*
