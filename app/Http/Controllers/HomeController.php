@@ -14,6 +14,7 @@ use App\productImages;
 use App\Products;
 use App\Services\TwilioSmsService;
 use App\User;
+use App\VerificationCodes;
 use App\WithdrawalRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -679,14 +680,24 @@ class HomeController extends Controller
         return Redirect::back();
     }
     /**
-     * Change's order status to "complete"
+     * It change's the order_status & delivery_status to "complete"
+     * Only if the driver is failed to enter the correct verification code
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function mark_as_completed($order_id)
     {
-        Orders::where('id', '=', $order_id)->update(['order_status' => 'complete']);
-        flash('This Order Has Been Marked As Completed')->success();
+        $verification_codes = VerificationCodes::query()->select('code->driver_failed_to_enter_code as driver_failed_to_enter_code')
+            ->where('order_id', '=', $order_id)
+            ->get();
+        if (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "Yes") {
+            Orders::where('id', '=', $order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
+            flash('This Order Has Been Marked As Completed')->success();
+        } elseif (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "No") {
+            flash('This Order Is Already Marked As Completed')->success();
+        } elseif (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "NULL") {
+            flash('This Order Cant Be Marked As Completed Because The Verification Code Has Not Been Provided By The Driver Yet')->success();
+        }
         return Redirect::back();
     }
     /**

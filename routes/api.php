@@ -132,6 +132,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('/request-withdrawal-balance', 'Api\v1\DriverController@submitWithdrawal');
         Route::post('/bank-details', 'Api\v1\DriverController@submitBankAccountDetails');
         Route::get('/all-withdrawals', 'Api\v1\DriverController@driverAllWithdrawalRequests');
+        Route::post('/check_verification_code/{order_id}', 'Api\v1\DriverController@checkVerificationCode');
     });
 });
 

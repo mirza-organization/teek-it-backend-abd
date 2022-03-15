@@ -18,5 +18,10 @@ return [
     'ORDER_UPDATED' => 'Updated.',
     'ORDER_CANCELLED' => 'Cancelled.',
 
+    'MISSING_OR_INVALID_DATA' => 'Required fields missing or invalid data.',
+
+    'VERIFICATION_SUCCESS' => 'Verification Successful.',
+    'VERIFICATION_FAILED' => 'You have entered a invalid verification code.',
+
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
 ];

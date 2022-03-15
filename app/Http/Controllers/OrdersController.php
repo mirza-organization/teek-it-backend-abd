@@ -6,11 +6,12 @@ use App\OrderItems;
 use App\Orders;
 use App\Products;
 use App\User;
+use App\Services\TwilioSmsService;
+use App\VerificationCodes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use App\Services\TwilioSmsService;
 use Throwable;
 
 class OrdersController extends Controller
@@ -242,8 +243,8 @@ class OrdersController extends Controller
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            if ($request->order_status == 'delivered' && $request->delivery_status == 'complete') {
-                $order->delivery_status = 'pending_approval';
+            if ($request->order_status == 'delivered' && $request->delivery_status == 'pending_approval') {
+                $order->delivery_status = 'complete';
                 $user = User::find($order->seller_id);
                 $user_money = $user->pending_withdraw;
                 $user->pending_withdraw = $order->order_total + $user_money;
@@ -361,21 +362,10 @@ class OrdersController extends Controller
                 $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
             $user = User::find($seller_id);
-            $sms = new TwilioSmsService();
-            $message = "A new order has been received. Please check TeekIt's platform, or sign in here now:https://app.teekit.co.uk/login";
-            // To restrict new order SMS notifications for only UK numbers
-            if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
-                // $sms->sendSms('+447976621849', $message);
-                $sms->sendSms($user->business_phone, $message);
-            }
-            $sms->sendSms('+447976621849', $message); //Azim Number
-            $sms->sendSms('+447490020063', $message); //Eesa Number
-            $sms->sendSms('+447817332090', $message); //Junaid Number
-            $sms->sendSms('+923170155625', $message);
-
             $user_money = $user->pending_withdraw;
             $user->pending_withdraw = $order_total + $user_money;
             $user->save();
+
             $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
@@ -389,12 +379,35 @@ class OrdersController extends Controller
                 $new_order->flat = $request->flat;
                 $new_order->delivery_charges = $request->delivery_charges[$count];
                 $new_order->service_charges = $request->service_charges;
+                // For sending SMS notification for "New Order" 
+                $sms = new TwilioSmsService();
+                $verification_code = '';
+                while (strlen($verification_code) < 6) {
+                    $rand_number = rand(0, time());
+                    $verification_code = $verification_code . substr($rand_number, 0, 1);
+                }
+                $message_for_admin = "A new order has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
+                $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery";
+                // To restrict "New Order" SMS notifications only for UK numbers
+                if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
+                    $sms->sendSms($user->business_phone, $message_for_customer);
+                }
+                $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
+                $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number
+                $sms->sendSms('+447817332090', $message_for_admin); //Junaid Number
+                $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number
             }
             $new_order->description = $request->description;
             $new_order->payment_status = $request->payment_status ?? "hidden";
             $new_order->seller_id = $seller_id;
             $new_order->save();
             $order_id = $new_order->id;
+            if ($request->type == 'delivery') {
+                $verification_codes = new VerificationCodes();
+                $verification_codes->order_id = $order_id;
+                $verification_codes->code = '{"code": "' . $verification_code . '", "driver_failed_to_enter_code": "NULL"}';
+                $verification_codes->save();
+            }
             $order_arr[] = $order_id;
             foreach ($order as $order_item) {
                 $new_order_item = new OrderItems();
