@@ -401,7 +401,7 @@ class OrdersController extends Controller
             $new_order->payment_status = $request->payment_status ?? "hidden";
             $new_order->seller_id = $seller_id;
             $new_order->save();
-            $order_id = $new_order->id;
+            $order_id = $new_order->id; 
             if ($request->type == 'delivery') {
                 $verification_codes = new VerificationCodes();
                 $verification_codes->order_id = $order_id;

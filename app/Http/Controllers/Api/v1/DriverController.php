@@ -153,20 +153,56 @@ class DriverController extends Controller
             $given_code = $request->verification_code;
             $driver_failed_to_enter_code = ($saved_code != $given_code) ? "Yes" : "No";
             // Update table
-            $verification_codes = DB::table('verification_codes')
-                ->where('order_id', $request->order_id)
-                ->update(['code->driver_failed_to_enter_code' => $driver_failed_to_enter_code]);
+            // DB::table('verification_codes')
+            //     ->where('order_id', $request->order_id)
+            //     ->update(['code->driver_failed_to_enter_code' => $driver_failed_to_enter_code]);
+
             // If the driver is failed to enter the right verification code
             if ($driver_failed_to_enter_code == "Yes") {
-                $message =  config('constants.VERIFICATION_FAILED');
+                // $message =  config('constants.VERIFICATION_FAILED');
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.VERIFICATION_FAILED')
+                ], 200);
             } else {
-                $message =  config('constants.VERIFICATION_SUCCESS');
+                // $message =  config('constants.VERIFICATION_SUCCESS');
                 Orders::where('id', '=', $request->order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.VERIFICATION_SUCCESS')
+                ]);
             }
+        }
+    }
+    /**
+     * If the driver does not have the verfication code 
+     * Then this function will be used to 
+     * Update "code->driver_failed_to_enter_code" column
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function driverFailedToEnterCode(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'order_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => false,
+                'message' => config('constants.MISSING_OR_INVALID_DATA')
+            ], 422);
+        } else {
+            // Update table
+            DB::table('verification_codes')
+                ->where('order_id', $request->order_id)
+                ->update(['code->driver_failed_to_enter_code' => "Yes"]);
             return response()->json([
                 'data' => [],
-                'status' => true,
-                'message' => $message
+                'status' => false,
+                'message' => config('constants.ORDER_UPDATED')
             ], 200);
         }
     }
