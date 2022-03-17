@@ -62,7 +62,7 @@ class OrdersController extends Controller
         $orders = array();
         if ($request->has('order_status') && $request->order_status == 'delivered') {
             $orders = Orders::query();
-            $orders = $orders->where('order_status', '=', $request->order_status);
+            $orders = $orders->where('order_status', '=', 'delivered');
             $orders = $orders->orderByDesc('created_at')->paginate();
             $pagination = $orders->toArray();
         } elseif ($request->has('order_status') && $request->order_status == 'ready') {
@@ -388,6 +388,10 @@ class OrdersController extends Controller
                 }
                 $message_for_admin = "A new order has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
                 $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery";
+
+                $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
+                $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
+
                 // To restrict "New Order" SMS notifications only for UK numbers
                 if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
                     $sms->sendSms($user->business_phone, $message_for_customer);

@@ -74,7 +74,11 @@ class DriverController extends Controller
         $with->bank_detail = $user->bank_details;
         $with->save();
         $user->save();
-        return response()->json(['message' => 'Withdrawal request is successfully submitted.'], 200);
+        return response()->json([
+            'data' => [],
+            'status' => true,
+            'message' => config("constants.WITHDRAWAL_REQUEST_SUBMITTED")
+        ], 200);
     }
 
     public function getWithdrawalBalance()
@@ -83,7 +87,11 @@ class DriverController extends Controller
             abort(404);
         }
         $amount = number_format((float)\auth()->user()->pending_withdraw, 2, '.', '');
-        return response()->json(['balance' => $amount], 200);
+        return response()->json([
+            'data' => $amount,
+            'status' => true,
+            'message' => ""
+        ], 200);
     }
 
     public function submitBankAccountDetails(Request $request)
@@ -95,13 +103,20 @@ class DriverController extends Controller
             'phone' => 'required'
         ]);
         if ($validator->fails()) {
-            $responseArr['message'] = $validator->errors();
-            return response()->json($responseArr, 422);
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => false,
+                'message' => ""
+            ], 422);
         }
         $data = ['branch' => $request->branch_code, 'bank_name' => $request->bank_name, 'account_number' => $request->account_number, 'phone' => $request->phone];
         $bankDetails = [1 => $data];
         auth()->user()->update(['bank_details' => json_encode($bankDetails)]);
-        return response()->json(['message' => 'Bank Account details are successfully updated.'], 200);
+        return response()->json([
+            'data' => [],
+            'status' => true,
+            'message' => config("constants.BANK_DETAILS_UPDATED")
+        ], 200);
     }
 
     public function driverAllWithdrawalRequests()
@@ -123,7 +138,11 @@ class DriverController extends Controller
             $data[$key]['updated_at'] = $withdrawal->updated_at;
             $data[$key]['transaction_id'] = $withdrawal->transaction_id;
         }
-        return response()->json(['data' => $data], 200);
+        return response()->json([
+            'data' => $data,
+            'status' => true,
+            'message' => ""
+        ], 200);
     }
     /**
      * It will confirm that either the entered verification code
@@ -172,7 +191,7 @@ class DriverController extends Controller
                     'data' => [],
                     'status' => true,
                     'message' => config('constants.VERIFICATION_SUCCESS')
-                ]);
+                ], 200);
             }
         }
     }

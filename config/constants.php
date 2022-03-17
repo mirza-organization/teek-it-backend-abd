@@ -18,10 +18,14 @@ return [
     'ORDER_UPDATED' => 'Updated.',
     'ORDER_CANCELLED' => 'Cancelled.',
 
+    'BANK_DETAILS_UPDATED' => 'Bank Account details are successfully updated.',
+
     'MISSING_OR_INVALID_DATA' => 'Required fields missing or invalid data.',
 
     'VERIFICATION_SUCCESS' => 'Verification Successful.',
     'VERIFICATION_FAILED' => 'You have entered a invalid verification code.',
+
+    'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
 ];
