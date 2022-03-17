@@ -16,14 +16,20 @@ use Illuminate\Http\Request;
 Route::get('/', function (Request $request) {
     return 'Working';
 });
-
-// Registration, confirmations and verification
+/*
+|--------------------------------------------------------------------------
+| Registration, confirmations and verification
+|--------------------------------------------------------------------------
+*/
 Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');
 Route::get('auth/verify', 'Auth\AuthController@verify');
-
-// Authentication Routes
+/*
+|--------------------------------------------------------------------------
+| Authentication API Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('login', 'Auth\AuthController@login');
     Route::post('change-password', 'Auth\AuthController@changePassword');
@@ -35,7 +41,11 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('delivery_boys', 'Auth\AuthController@delivery_boys');
     Route::get('get_user/{user_id}', 'Auth\AuthController@get_delivery_boy_info');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Category API Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'category'], function ($router) {
     //Route::post('add', 'CategoriesController@add');
     //Route::post('update/{product_id}', 'CategoriesController@update');
@@ -43,13 +53,22 @@ Route::group(['prefix' => 'category'], function ($router) {
     Route::get('view/{category_id}', 'CategoriesController@Products');
     Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Page API Routes
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'page'], function ($router) {
     Route::get('', 'PagesController@get_page');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Seller API Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('sellers', 'Auth\AuthController@sellers');
 Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
+Route::get('sellers/{seller_id}/{product_name}', 'Auth\AuthController@search_seller_products');
 /*
 |--------------------------------------------------------------------------
 | Products API Routes Without JWT Authentication
@@ -90,11 +109,14 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('seller', 'OrdersController@seller_orders');
         Route::get('delivery_boy_orders/{delivery_boy_id}', 'OrdersController@delivery_boy_orders');
         Route::get('assign_order', 'OrdersController@assign_order');
+        Route::get('cancel_order', 'OrdersController@cancel_order');
         Route::get('update_assign', 'OrdersController@update_assign');
         Route::post('new', 'OrdersController@new');
+        Route::post('customer_cancel_order', 'OrdersController@customer_cancel_order');
         Route::post('update', 'OrdersController@updateOrder');
         Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
         Route::get('/get-order-details/{id}', 'Api\v1\OrderController@getOrderDetails');
+        Route::post('recheck_products', 'OrdersController@recheck_products');
     });
 
     Route::group(['prefix' => 'notifications'], function ($router) {
@@ -110,6 +132,8 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('/request-withdrawal-balance', 'Api\v1\DriverController@submitWithdrawal');
         Route::post('/bank-details', 'Api\v1\DriverController@submitBankAccountDetails');
         Route::get('/all-withdrawals', 'Api\v1\DriverController@driverAllWithdrawalRequests');
+        Route::post('/check_verification_code/{order_id}', 'Api\v1\DriverController@checkVerificationCode');
+        Route::post('/driver_failed_to_enter_code/{order_id}', 'Api\v1\DriverController@driverFailedToEnterCode');
     });
 });
 
@@ -142,11 +166,15 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
 Route::get('payment_intent', function () {
     $ch = curl_init();
     $amount = $_REQUEST['amount'];
+    $currency = $_REQUEST['currency'];
     curl_setopt($ch, CURLOPT_URL, 'https://api.stripe.com/v1/payment_intents');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, "amount=$amount&currency=eur&metadata[integration_check]=accept_a_payment");
-    curl_setopt($ch, CURLOPT_USERPWD, 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q' . ':' . '');
+    curl_setopt($ch, CURLOPT_POSTFIELDS, "amount=$amount&currency=$currency&metadata[integration_check]=accept_a_payment");
+    curl_setopt($ch, CURLOPT_USERPWD, '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' . ':' . '');
+
+    // Test Account Key
+    // curl_setopt($ch, CURLOPT_USERPWD, 'sk_test_51IY9sYIiDDGv1gaVKsxU0EXr96lHcCvwXHwYAdN81Cqrj1TBL4HErJpczWJpYFIQ1qbCOQxnxIM3UfsBtWC2MKeD00QRkUKg6q' . ':' . '');
 
     $headers = array();
     $headers[] = 'Content-Type: application/x-www-form-urlencoded';

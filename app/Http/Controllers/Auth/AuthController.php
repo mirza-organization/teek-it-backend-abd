@@ -31,14 +31,18 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products', 'search_seller_products']]);
     }
-
+    /**
+     * Register For Mobile App
+     * @author Huzaifa Haleem
+     * @version 1.1.0
+     */
     public function register(Request $request)
     {
         $validate = User::validator($request);
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
+            $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
             return response()->json($response, 400);
         }
         $role = Role::where('name', $request->get('role'))->first();
@@ -62,7 +66,6 @@ class AuthController extends Controller
             'is_active' => $is_active,
             'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
         ]);
-
         if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {
@@ -90,22 +93,22 @@ class AuthController extends Controller
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
         $html = '<html>
-            Hi, ' . $User->name . '<br><br>
-
-            Thank you for registering on ' . env('APP_NAME') . '.
-
-<br>
-            Here is your account verification link. Click on below link to verify you account. <br><br>
+        Congratulations ' . $User->name . '!<br><br>
+        You have successfully registered on ' . env('APP_NAME') . '.
+        <br>
+        There is just one more step to go. Click on the link below to verify your account so you can start purchasing products on TeekIT today!  <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
             ' . $account_verification_link . '
-<br><br><br>
+        <br><br><br>
+        For more information please visit https://teekit.co.uk/ 
+        If you have any further inquiries please email admin@teekit.co.uk
         </html>';
 
         Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $User) {
             $message->to($request->email, $User->name)
                 ->subject(env('APP_NAME') . ': Account Verification');
         });
-        $response = array('status' => true, 'role' => $request->role, 'message' => 'You are registered successfully, check email and click on verification link to activate your account.');
+        $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
         return response()->json($response, 200);
     }
 
@@ -117,16 +120,15 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
         if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['status' => false, 'message' => 'Invalid credentials'], 401);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.INVALID_CREDENTIALS')], 401);
         }
         $user = JWTAuth::user();
         if ($user->email_verified_at == null) {
-            return response()->json(['status' => false, 'message' => 'Email not verified, verify your email first.'], 401);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.EMAIL_NOT_VERIFIED')], 401);
         }
         if ($user->is_active == 0) {
-            return response()->json(['status' => false, 'message' => 'You are deactivated, kindly contact admin.'], 401);
+            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.ACCOUNT_DEACTIVATED')], 401);
         }
         $this->authenticated($request, $user, $token);
         return $this->respondWithToken($token);
@@ -306,6 +308,7 @@ class AuthController extends Controller
             'user_img' => $imagePath,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
+            'vehicle_type' => $user->vehicle_type,
             'seller_info' => $this->get_seller_info($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -357,13 +360,10 @@ class AuthController extends Controller
     protected function authenticated($request, $user, $token)
     {
         $olduser = $user;
-        //        echo date("Y-m-d H:i:s");die;
-        //        print_r($user);
         $user->last_login = date("Y-m-d H:i:s");
         $user->save();
-        //die;
-        $agent = new Agent();
 
+        $agent = new Agent();
         $isDesktop = $agent->isDesktop();
         $isPhone = $agent->isPhone();
         $jwtToken = new JwtToken();
@@ -444,8 +444,8 @@ class AuthController extends Controller
     {
         $users = User::with('seller')
             ->where('is_active', '=', 1)->get();
-        $data = []; 
-        foreach ($users as $user) { 
+        $data = [];
+        foreach ($users as $user) {
             if ($user->hasRole('seller')) {
                 $user->where('is_active', 1);
                 $data[] = $this->get_seller_info($user);
@@ -457,7 +457,7 @@ class AuthController extends Controller
             'message' => ''
         ], 200);
     }
-     /**
+    /**
      * Listing of all products w.r.t Seller/Store 'id'
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
@@ -468,35 +468,76 @@ class AuthController extends Controller
         $data = [];
         if ($user->hasRole('seller')) {
             // $info = $this->get_seller_info($user); 
-            $products = Products::query()->where('user_id', '=', $user->id)->paginate();
+            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
             $pagination = $products->toArray();
-            if (!empty($products)) {
+            if (!$products->isEmpty()) {
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->get_product_info($product->id);
                 }
                 // $info['products'] = $products_data;
                 unset($pagination['data']);
-                $aAPIResponse = [
+                return response()->json([
                     'data' => $data,
                     'status' => true,
                     'message' => '',
-                    'pagination' => $pagination,
-                ];
+                    'pagination' => $pagination
+                ], 200);
             } else {
-                $aAPIResponse = [
+                return response()->json([
                     'data' => [],
                     'status' => false,
-                    'message' => 'This seller have no products right now.'
-                ];
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
             }
         } else {
-            $aAPIResponse = [
+            return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => 'No seller found against this id.'
-            ];
+                'message' => config('constants.NO_SELLER')
+            ], 200);
         }
-        return response()->json($aAPIResponse, 200);
+    }
+    /**
+     * Search products w.r.t Seller/Store 'id' & Product Name
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
+    public function search_seller_products($seller_id, $product_name)
+    {
+        $user = User::find($seller_id);
+        $data = [];
+        if ($user->hasRole('seller')) {
+            $products = Products::query()
+                ->where('user_id', '=', $user->id)
+                ->where('status', '=', 1)
+                ->where('product_name', 'LIKE', '%' . $product_name . '%')->paginate();
+            $pagination = $products->toArray();
+            if (!$products->isEmpty()) {
+                foreach ($products as $product) {
+                    $data[] = (new ProductsController())->get_product_info($product->id);
+                }
+                // $info['products'] = $products_data;
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_SELLER')
+            ], 200);
+        }
     }
 
     public function delivery_boys()
@@ -505,7 +546,6 @@ class AuthController extends Controller
         $data = [];
         foreach ($users as $user) {
             if ($user->hasRole('delivery_boy')) {
-
                 $data[] = $this->get_seller_info($user);
             }
         }

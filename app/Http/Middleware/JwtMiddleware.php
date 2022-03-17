@@ -23,13 +23,13 @@
                 $user = JWTAuth::parseToken()->authenticate();
             } catch (Exception $e) {
                 if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException){
-                    $response = array('status' => false,'message'=>'Token is Invalid');
+                    $response = array('data' => [],'status' => false,'message'=>'Token is Invalid');
                     return response()->json($response, 401);
                 }else if ($e instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException){
-                    $response = array('status' => false,'message'=>'Token is Expired');
+                    $response = array('data' => [],'status' => false,'message'=>'Token is Expired');
                     return response()->json($response, 401);
                 }else{
-                    $response = array('status' => false,'message'=>'Authorization Token not found');
+                    $response = array('data' => [],'status' => false,'message'=>'Authorization Token not found');
                     return response()->json($response, 401);
                 }
             }

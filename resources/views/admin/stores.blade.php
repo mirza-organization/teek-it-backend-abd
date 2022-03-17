@@ -59,8 +59,6 @@
 
                                         @foreach(json_decode($user) as $key=>$u)
                                             @if(!empty($u) && !in_array($key,$fields))
-
-
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="" class="text-capitalize">{{str_replace('_',' ',$key)}}</label>
@@ -73,7 +71,6 @@
 
                                             <div class="form-group">
                                                 <label for="" class="mt-5">
-
                                                     @if($user->is_active==0)
                                                         <a href="{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}"> <span class="text-success">Click here to Enable Account</span></a>
                                                     @else
@@ -105,9 +102,9 @@
 
                                 <div class="card-text">
                                     <div class="col-md-12">
-                    <span class="img-container">
+                    <span class="img-container"> 
                     <img class="d-block m-auto" src=@if($user->user_img)
-                        "{{asset($user->user_img)}}"
+                        "{{config('constants.BUCKET') . $user->user_img}}"
                         @else
                             "{{asset('/res/res/img/store_logo.png')}}"
                         @endif alt="">

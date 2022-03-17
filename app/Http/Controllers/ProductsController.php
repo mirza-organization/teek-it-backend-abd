@@ -24,8 +24,7 @@ use Mail;
 use Carbon\Carbon;
 use Validator;
 
-class
-ProductsController extends Controller
+class ProductsController extends Controller
 {
     //    /**
     //     * Display a listing of the resource.
@@ -129,11 +128,11 @@ ProductsController extends Controller
             $images = $request->file('images');
             foreach ($images as $image) {
                 $file = $image;
-                $filename = uniqid($user_id . "_" . $product->id . "_" . $product->product_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name..
                 Storage::disk('user_public')->put($filename, File::get($file));
                 if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
                     info("file is store successfully : " . $filename);
-                    $filename = "/user_imgs/" . $filename;
+                    // $filename = "/user_imgs/" . $filename;
                 } else {
                     info("file is not found :- " . $filename);
                 }
@@ -425,6 +424,20 @@ ProductsController extends Controller
     public function get_product_seller_id($product_id)
     {
         return Products::find($product_id)->user_id;
+    }
+    /**
+     * Subtracts or Add qty
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function update_qty($product_id, $qty, $operation)
+    {
+        if ($operation == 'subtract') {
+            Products::where('id', '=',$product_id)
+                ->decrement('qty', $qty);
+        }
+        // DB::table('users')->increment('posts', 5);
+        // DB::table('users')->decrement('likes', 3);
     }
 
     public function exportProducts()

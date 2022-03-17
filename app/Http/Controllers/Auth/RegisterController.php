@@ -55,12 +55,15 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-//        print_r($data);die;
         return Validator::make($data, [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'name' => 'required|string|max:80',
+            'email' => 'required|string|email|max:80|unique:users',
+            'password' => 'required|string|min:8|max:50',
+            'phone' => 'required|string|min:10|max:10',
+            'company_name' => 'required|string|max:80',
+            'company_phone' => 'required|string|min:10|max:10',
+            
 //            'username' => 'required|string|max:255|unique:users',
-            'password' => 'required|string|min:8',
 //            'address' => 'required|string|max:255',
 //            'city' => 'required|string|max:255',
 //            'postcode' => 'required|string|max:255',
@@ -75,8 +78,8 @@ class RegisterController extends Controller
     }
 
     /**
+     * register_web function (It is only used for the registration of web users)
      * Create a new user instance after a valid registration.
-     *
      * @param array $data
      * @return User|\Illuminate\Http\RedirectResponse
      */
@@ -84,29 +87,26 @@ class RegisterController extends Controller
     {
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
-            \flash('Email Already Exists')->error();
+            \flash('Email Already Exists Or Incorrect Values In Other Form Fields')->error();
             return Redirect::back()->withInput($request->input())
                 ->withErrors(['name.required', 'Name is required']);
         }
-        $data = $request->toArray();
-
+        $data = $request->toArray(); 
+   
         $role = Role::where('name', 'seller')->first();
-
         $User = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'phone' => $data['phone'],
+            'phone' => '+44' . $data['phone'],
             'business_name' => $data['company_name'],
-            'business_phone' => $data['company_phone'],
+            'business_phone' => '+44' . $data['company_phone'],
             'is_active' => 0,
         ]);
 
         $User->roles()->sync($role->id);
         $verification_code = Crypt::encrypt($User->email);
-
         $FRONTEND_URL = env('FRONTEND_URL');
-
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
         $html = '<html>

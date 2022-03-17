@@ -93,19 +93,18 @@
             <div class="col-md-4 pl-4 pr-4 pb-4">
                 <div class="card @if($user->is_active==0)
                             bg-danger
-@else
+                            @else
                             bg-success
-@endif">
+                            @endif">
                     <div class="card-body">
-                        <a href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right" title="Edit"><img class="img-size-16" src="/res/res/img/edit.png" alt=""></a>
-                        <a href="/aorders?user_id={{$user->id}}" class="d-block text-right mr-3 float-right mb-3" title="Orders"><i class="fas fa-clipboard-list" style="    font-size: 30px;
-    color: #3a4b83;"></i></a>
-
+                        <a href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right" title="Edit">
+                            <img class="img-size-16" src="/res/res/img/edit.png" alt=""></a>
+                        <a href="/aorders?user_id={{$user->id}}" class="d-block text-right mr-3 float-right mb-3" title="Orders"><i class="fas fa-clipboard-list" style="font-size: 30px; color: #3a4b83;"></i></a>
                         <div class="card-text">
                             <div class="col-md-12">
                                 <span class="img-container">
                                     <img class="d-block m-auto" src=@if($user->user_img)
-                                    "{{asset($user->user_img)}}"
+                                    "{{config('constants.BUCKET') . $user->user_img}}"
                                     @else
                                     "{{asset('/res/res/img/customer.png')}}"
                                     @endif alt="">

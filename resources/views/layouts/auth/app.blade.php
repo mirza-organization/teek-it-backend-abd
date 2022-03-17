@@ -5,11 +5,12 @@
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <meta content="ie=edge" http-equiv="x-ua-compatible">
-
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name') }}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('res/res/img/logo.png') }}">
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <!-- Font Awesome Icons -->
@@ -28,7 +29,7 @@
 
                 <a class="navbar-brand" href="/"><img style=" max-height: 50px; " src="{{ asset('res/res/img/logo.png') }}" alt=""></a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+                    <span class="fas fa-bars"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -45,9 +46,7 @@
                                 </div>
                             </div>
                             <div class="col-md-5">
-
                                 <div class="form-group">
-
                                     <input class="form-control mr-sm-2" type="password" autocomplete="off" placeholder="Password" name="password" required>
                                     <p for="">
                                         <a class="text-dark" href="{{ route('password.request') }}">Forgot Password?</a>
@@ -116,8 +115,11 @@
             border-color: #4a7ed6;
             padding-left: 3px;
             background: transparent;
-
             background-color: transparent !important;
+        }
+
+        input.form-control::placeholder {
+            color: white;
         }
 
         .form-control:focus {

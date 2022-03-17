@@ -114,8 +114,8 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <span class="img-container">
-                                                <img style="    height: 250px;" class="d-block m-auto" src=@if($user->user_img)
-                                                "{{asset($user->user_img)}}"
+                                                <img style="height: 250px;" class="d-block m-auto" src=@if($user->user_img)
+                                                "{{config('constants.BUCKET') . $user->user_img}}"
                                                 @else
                                                 "{{asset('/res/res/img/customer.png')}}"
                                                 @endif alt="">
@@ -124,6 +124,7 @@
                                         <div class="col-md-9">
                                             <?php
                                             $fields = [
+                                                'business_location',
                                                 'is_online',
                                                 'is_active',
                                                 'updated_at',
@@ -143,20 +144,70 @@
                                                 $key = "Last_name";
                                             }
                                             ?>
-                                            <h5 class="text-primary font-weight-bold text-capitalize">{{str_replace('_',' ',$key)}}:
-                                                <span class="font-weight-normal ">
-                                                    @if($key!='application_fee')
-                                                    {{$u}}
-                                                    @elseif($user->roles[0]->name=='seller')
-                                                    <input data-id="{{json_decode($user)->id}}" id="application_fee" type="number" name="application_fee" value="{{$u}}" step="0.01">
-                                                    @else
-                                                    {{$u}}
-                                                    @endif
-                                                </span>
-                                                @if($key=='application_fee' && $user->roles[0]->name=='seller')
-                                                <button class="btn btn-primary" id="application_fee_update">Update</button>
-                                                @endif
-                                            </h5>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" class="col-md-3 align-top font-weight-bold text-capitalize">{{str_replace('_',' ',$key)}}</th>
+                                                        <th scope="col">
+                                                        <span class="font-weight-normal">
+                                                                @if($key!='application_fee' && $key!='business_hours' && $key!='bank_details')
+                                                                {{$u}}
+                                                                @elseif($key=='business_hours')
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">Day</th>
+                                                                            <th scope="col">Opening Time</th>
+                                                                            <th scope="col">Closing Time</th>
+                                                                            <th scope="col">Closed</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <?php $business_hours = json_decode($u); ?>
+                                                                        @foreach ($business_hours->time as $day => $time)
+                                                                        <tr>
+                                                                            <th scope="row">{{$day}}</th>
+                                                                            <td>{{$time->open}}</td>
+                                                                            <td>{{$time->close}}</td>
+                                                                            <td>{{($time->closed == 'on') ? 'Yes' : ''}}</td>
+                                                                        </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                                @elseif($key=='bank_details')
+                                                                <table class="table">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">Name</th>
+                                                                            <th scope="col">Account #</th>
+                                                                            <th scope="col">Branch</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <?php $bank_details = json_decode($u); ?>
+                                                                        @foreach ($bank_details as $k => $v)
+                                                                        <tr>
+                                                                            <th scope="row">{{$v->bank_name}}</th>
+                                                                            <td>{{$v->account_number}}</td>
+                                                                            <td>{{$v->branch}}</td>
+                                                                        </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                                @elseif($user->roles[0]->name=='seller')
+                                                                <input type="number" class="form-control" data-id="{{json_decode($user)->id}}" id="application_fee" name="application_fee" value="{{$u}}" step="0.01">
+                                                                @else
+                                                                {{$u}}
+                                                                @endif
+                                                            </span>
+                                                            @if($key=='application_fee' && $user->roles[0]->name=='seller')
+                                                            <br>
+                                                            <button class="btn btn-primary" id="application_fee_update">Update</button>
+                                                            @endif
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
                                             @endif
                                             @endforeach
                                         </div>
@@ -205,7 +256,11 @@
                                 <div class="row mb-2">
                                     <div class="col-md-2">
                                         <span class="img-container">
-                                            <img class="d-block m-auto" src="{{asset($item->product->feature_img)}}" alt="">
+                                            @if(str_contains($item->product->feature_img, 'https://'))
+                                            <img class="d-block m-auto " src="{{$item->product->feature_img}}" alt="">
+                                            @else
+                                            <img class="d-block m-auto " src="{{config('constants.BUCKET') . $item->product->feature_img}}" alt="">
+                                            @endif
                                         </span>
                                     </div>
                                     <div class="col-md-4">
