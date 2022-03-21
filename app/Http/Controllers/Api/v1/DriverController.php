@@ -170,22 +170,14 @@ class DriverController extends Controller
                 ->get();
             $saved_code = $verification_codes[0]->verification_code;
             $given_code = $request->verification_code;
-            $driver_failed_to_enter_code = ($saved_code != $given_code) ? "Yes" : "No";
-            // Update table
-            // DB::table('verification_codes')
-            //     ->where('order_id', $request->order_id)
-            //     ->update(['code->driver_failed_to_enter_code' => $driver_failed_to_enter_code]);
-
             // If the driver is failed to enter the right verification code
-            if ($driver_failed_to_enter_code == "Yes") {
-                // $message =  config('constants.VERIFICATION_FAILED');
+            if ($saved_code != $given_code) {
                 return response()->json([
                     'data' => [],
                     'status' => false,
                     'message' => config('constants.VERIFICATION_FAILED')
                 ], 200);
             } else {
-                // $message =  config('constants.VERIFICATION_SUCCESS');
                 Orders::where('id', '=', $request->order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
                 return response()->json([
                     'data' => [],
@@ -198,7 +190,8 @@ class DriverController extends Controller
     /**
      * If the driver does not have the verfication code 
      * Then this function will be used to 
-     * Update "code->driver_failed_to_enter_code" column
+     * Update 'code->driver_failed_to_enter_code' column &
+     * It will mark the 'delivery_status' as 'complete'
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
@@ -218,9 +211,12 @@ class DriverController extends Controller
             DB::table('verification_codes')
                 ->where('order_id', $request->order_id)
                 ->update(['code->driver_failed_to_enter_code' => "Yes"]);
+            /* Because the driver was not able to enter the code due to some reasons but still he has delivered the product. Therefore we will mark the 'delivery_status' as 'complete' & 'order_status' as 'delivered' */
+            Orders::where('id', '=', $request->order_id)->update(['order_status' => 'delivered', 'delivery_status' => 'complete']);
+
             return response()->json([
                 'data' => [],
-                'status' => false,
+                'status' => true,
                 'message' => config('constants.ORDER_UPDATED')
             ], 200);
         }
