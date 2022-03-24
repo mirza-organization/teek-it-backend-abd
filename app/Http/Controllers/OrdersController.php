@@ -303,6 +303,8 @@ class OrdersController extends Controller
         if ($request->has('type')) {
             if ($request->type == 'delivery') {
                 $validatedData = Validator::make($request->all(), [
+                    'lat' => 'required',
+                    'lon' => 'required',
                     'receiver_name' => 'required',
                     'phone_number' => 'required|string|min:13|max:13',
                     'address' => 'required',
@@ -342,10 +344,14 @@ class OrdersController extends Controller
             $qty = $item['qty'];
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
+            $product_volumn = (new ProductsController())->get_product_volumn($product_id);
+            $product_weight = (new ProductsController())->get_product_weight($product_id);
             $temp = [];
             $temp['qty'] = $qty;
             $temp['product_id'] = $product_id;
             $temp['price'] = $product_price;
+            $temp['weight'] = $product_weight;
+            $temp['volumn'] = $product_volumn;
             $temp['seller_id'] = $product_seller_id;
             $grouped_seller[$product_seller_id][] = $temp;
             (new ProductsController())->update_qty($product_id, $qty, "subtract");
@@ -354,10 +360,13 @@ class OrdersController extends Controller
         $order_arr = [];
         foreach ($grouped_seller as $seller_id => $order) {
             $user_id = Auth()->id();
-            // $user_id = 306;
+            $total_weight = 0;
+            $total_volumn = 0;
             $order_total = 0;
             $total_items = 0;
             foreach ($order as $order_item) {
+                $total_weight = $total_weight + $order_item['weight'];
+                $total_volumn = $total_volumn + $order_item['volumn'];
                 $total_items = $total_items + $order_item['qty'];
                 $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
@@ -366,10 +375,22 @@ class OrdersController extends Controller
             $user->pending_withdraw = $order_total + $user_money;
             $user->save();
 
+            $customer_lat = $request->lat;
+            $customer_lon = $request->lon;
+            $store_lat = $user->lat;
+            $store_lon = $user->lon;
+            $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
+            // print_r($distance); exit;
+            // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
+            // print_r($distance); exit;
+            $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
+
             $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
             $new_order->total_items = $total_items;
+            $new_order->lat = $customer_lat;
+            $new_order->lng = $customer_lon;
             $new_order->type = $request->type;
             if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
@@ -377,7 +398,8 @@ class OrdersController extends Controller
                 $new_order->address = $request->address;
                 $new_order->house_no = $request->house_no;
                 $new_order->flat = $request->flat;
-                $new_order->delivery_charges = $request->delivery_charges[$count];
+                $new_order->driver_charges = $driver_charges;
+                $new_order->delivery_charges = $request->delivery_charges;
                 $new_order->service_charges = $request->service_charges;
                 // For sending SMS notification for "New Order" 
                 $sms = new TwilioSmsService();
@@ -405,7 +427,7 @@ class OrdersController extends Controller
             $new_order->payment_status = $request->payment_status ?? "hidden";
             $new_order->seller_id = $seller_id;
             $new_order->save();
-            $order_id = $new_order->id; 
+            $order_id = $new_order->id;
             if ($request->type == 'delivery') {
                 $verification_codes = new VerificationCodes();
                 $verification_codes->order_id = $order_id;
@@ -569,54 +591,21 @@ class OrdersController extends Controller
 
     public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
-        $address1 = $latitude1 . ', ' . $longitude1;
-        $address2 = $latitude2 . ', ' . $longitude2;
-        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+        $address1 = $latitude1 . ',' . $longitude1;
+        $address2 = $latitude2 . ',' . $longitude2;
+
+        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+
+        // Google Distance Matrix
+        // $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=".$latitude1.",".$longitude1."&destinations=".$latitude2.",".$longitude2."&mode=driving&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+
         $query = file_get_contents($url);
         $results = json_decode($query, true);
         $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
-        $kms = (int)$distanceString[0] * 0.621371;
-        return $kms > 1 ? $kms : 1;
-    }
-    /**
-     * It will calculate the fair for a driver
-     * @author Huzaifa Haleem
-     * @version 1.0.0
-     */
-    public function calculateDriverFair($order, $store)
-    {
-        $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
-            ->where('id', '!=', $order->id)
-            ->where('order_status', 'onTheWay')->get();
-        if (count($childOrders) > 0) {
-            foreach ($childOrders as $childOrder) {
-                $childOrder->update(['parent_id' => $order->id]);
-            }
-        }
-        $driver = User::find($order->delivery_boy_id);
-        $driver_money = $driver->pending_withdraw;
-        $fair_per_mile = 1.50;
-        $pickup = 1.50;
-        $drop_off = 1.10;
-        $fee = 0.20;
-        if (is_null($order->parent_id)) {
-            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $store->lat, $store->lon);
-            $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
-            $teekitCharges = $totalFair * $fee;
-            $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
-            $driver->save();
-            $order->driver_charges = $totalFair - $fee;
-            $order->driver_traveled_km = (round(($distance * 1.609344), 2));
-            $order->save();
-        } else {
-            $oldOrder = Orders::find($order->parent_id);
-            $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
-            $pickup_val = $oldOrder->seller_id == $order->seller_id ? 0.0 : $pickup;
-            $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
-            $teekitCharges = $totalFair * $fee;
-            $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
-            $driver->save();
-        }
+
+        $miles = (int)$distanceString[0] * 0.621371;
+        // return $miles > 1 ? $miles : 1;
+        return $miles;
     }
     /**
      * This function will return back store open/close & product qty status
@@ -641,7 +630,9 @@ class OrdersController extends Controller
                     ->where('status', '=', 1)
                     ->get();
 
-                $order_data[$i]['closed'] = (isset($closed_status[0]->closed)) ? $closed_status[0]->closed : "NA";
+                $order_data[$i]['store_id'] = $item['store_id'];
+                $order_data[$i]['product_id'] = $item['product_id'];
+                $order_data[$i]['closed'] = ($closed_status[0]->closed == "null") ? "No" : "Yes";
                 $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : "NA";
                 $i++;
             }
@@ -657,6 +648,90 @@ class OrdersController extends Controller
                 'status' => false,
                 'message' => config('constants.NO_RECORD')
             ], 200);
+        }
+    }
+    /**
+     * It will calculate the total distance between client & store location & then
+     * It will return the total distance in Miles
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    function calculateDistance($latitudeFrom, $longitudeFrom, $latitudeTo, $longitudeTo)
+    {
+        $long1 = deg2rad($longitudeFrom);
+        $long2 = deg2rad($longitudeTo);
+        $lat1 = deg2rad($latitudeFrom);
+        $lat2 = deg2rad($latitudeTo);
+
+        //Haversine Formula
+        $dlong = $long2 - $long1;
+        $dlati = $lat2 - $lat1;
+        $val = pow(sin($dlati / 2), 2) + cos($lat1) * cos($lat2) * pow(sin($dlong / 2), 2);
+        $res = 2 * asin(sqrt($val));
+
+        //Radius of Earth in Miles
+        $radius = 3958.8;
+
+        //$miles = round($res*$radius);
+        $miles = $res * $radius;
+
+        return ($miles);
+    }
+    /**
+     * It will calculate the fair for a driver
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
+    // public function calculateDriverFair($order, $store)
+    // {
+    //     $childOrders = Orders::where('delivery_boy_id', $order->delivery_boy_id)
+    //         ->where('id', '!=', $order->id)
+    //         ->where('order_status', 'onTheWay')->get();
+    //     if (count($childOrders) > 0) {
+    //         foreach ($childOrders as $childOrder) {
+    //             $childOrder->update(['parent_id' => $order->id]);
+    //         }
+    //     }
+    //     $driver = User::find($order->delivery_boy_id);
+    //     $driver_money = $driver->pending_withdraw;
+    //     $fair_per_mile = 1.50;
+    //     $pickup = 1.50;
+    //     $drop_off = 1.10;
+    //     $fee = 0.20;
+    //     if (is_null($order->parent_id)) {
+    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $store->lat, $store->lon);
+    //         $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
+    //         $teekitCharges = $totalFair * $fee;
+    //         $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
+    //         $driver->save();
+    //         $order->driver_charges = $totalFair - $fee;
+    //         $order->driver_traveled_km = (round(($distance * 1.609344), 2));
+    //         $order->save();
+    //     } else {
+    //         $oldOrder = Orders::find($order->parent_id);
+    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
+    //         $pickup_val = $oldOrder->seller_id == $order->seller_id ? 0.0 : $pickup;
+    //         $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
+    //         $teekitCharges = $totalFair * $fee;
+    //         $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
+    //         $driver->save();
+    //     }
+    // }
+    /**
+     * It will calculate the fair for a driver
+     * The formulas used inside this function are pre-defined by Eesa & Team
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function calculateDriverFair2($total_weight, $total_volumn, $distance)
+    {
+        // 38cm*38cm*38cm = 54,872cm
+        if ($total_weight <= 12 || $total_volumn <= 54872) {
+            // Calculate fair for Bike driver
+            return round((2.6 + (1.5 * $distance)) * 0.75);
+        } else {
+            // Calculate fair for Car/Van driver
+            return round(((2.6 + (1.75 * $distance)) + ((($total_weight - 12) / 15) * ($distance / 4))) * 0.8);
         }
     }
 }

@@ -411,7 +411,11 @@ class ProductsController extends Controller
         productImages::find($image_id)->delete();
         return $this->get_product_info($product_id);
     }
-
+    /**
+     * It find's the price of the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function get_product_price($product_id)
     {
         $product = Products::find($product_id);
@@ -420,7 +424,37 @@ class ProductsController extends Controller
         }
         return $product->price * 1.2;
     }
-
+    /**
+     * It find's the volumn of the given product
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function get_product_volumn($product_id)
+    {
+        $product = DB::table('products')
+            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
+            ->where('id', $product_id)
+            ->get();
+        return $product[0]->volumn;
+    }
+    /**
+     * It find's the weight of the given product
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function get_product_weight($product_id)
+    {
+        $product = DB::table('products')
+            ->select('weight')
+            ->where('id', $product_id)
+            ->get();
+        return $product[0]->weight;
+    }
+    /**
+     * It find's the seller_id of the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function get_product_seller_id($product_id)
     {
         return Products::find($product_id)->user_id;
@@ -433,7 +467,7 @@ class ProductsController extends Controller
     public function update_qty($product_id, $qty, $operation)
     {
         if ($operation == 'subtract') {
-            Products::where('id', '=',$product_id)
+            Products::where('id', '=', $product_id)
                 ->decrement('qty', $qty);
         }
         // DB::table('users')->increment('posts', 5);

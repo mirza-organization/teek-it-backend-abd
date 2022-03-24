@@ -1123,11 +1123,11 @@ class HomeController extends Controller
             ->where('id', $order_id)->first();
         $order->delivery_status = 'complete';
         $order->save();
-        (new OrdersController())->calculateDriverFair($order, $order->store);
+        // (new OrdersController())->calculateDriverFair($order, $order->store);
         flash('Order is successfully completed')->success();
         $message = "Thanks for your order " . $order->user->name . ".
             Your order from " . $order->store->name . " has successfully been delivered.
-            If you experienced any issues with your order, please contact us via email at:
+            If you have experienced any issues with your order, please contact us via email at:
             admin@teekit.co.uk";
         $sms = new TwilioSmsService();
         $sms->sendSms($order->user->phone, $message);
