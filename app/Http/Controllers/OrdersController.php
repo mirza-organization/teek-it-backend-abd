@@ -609,8 +609,8 @@ class OrdersController extends Controller
     }
     /**
      * This function will return back store open/close & product qty status
+     * Along with this information it will also send store_id & product_id
      * If the store is active & product is live
-     * But if they are not then it will send "NA"
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
