@@ -619,7 +619,12 @@ class OrdersController extends Controller
         try {
             $i = 0;
             foreach ($request->items as $item) {
-                $closed_status = User::query()->select('business_hours->time->' . $request->day . '->closed as closed')
+                $open_time = User::query()->select('business_hours->time->' . $request->day . '->open as open')
+                    ->where('id', '=', $item['store_id'])
+                    ->where('is_active', '=', 1)
+                    ->get();
+
+                $close_time = User::query()->select('business_hours->time->' . $request->day . '->close as close')
                     ->where('id', '=', $item['store_id'])
                     ->where('is_active', '=', 1)
                     ->get();
@@ -632,7 +637,7 @@ class OrdersController extends Controller
 
                 $order_data[$i]['store_id'] = $item['store_id'];
                 $order_data[$i]['product_id'] = $item['product_id'];
-                $order_data[$i]['closed'] = ($closed_status[0]->closed == "null") ? "No" : "Yes";
+                $order_data[$i]['closed'] = (strtotime($request->time) >= strtotime($open_time[0]->open) && strtotime($request->time) <= strtotime($close_time[0]->close)) ? "No" : "Yes";
                 $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : "NA";
                 $i++;
             }
