@@ -50,7 +50,7 @@ class ResetPasswordController extends Controller
             'password' => 'required|confirmed|min:8',
         ]);
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
+            $response = array('data' => $validate->messages(), 'status' => false, 'message' => 'Validation error');
             return response()->json($response, 400);
         }
         // Here we will attempt to reset the user's password. If it is successful we

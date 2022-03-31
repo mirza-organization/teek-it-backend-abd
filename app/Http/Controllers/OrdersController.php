@@ -612,10 +612,22 @@ class OrdersController extends Controller
      * Along with this information it will also send store_id & product_id
      * If the store is active & product is live
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function recheck_products(Request $request)
     {
+        $validatedData = Validator::make($request->all(), [
+            'items' => 'required|array',
+            'day' => 'required|string',
+            'time' => 'required|string'
+        ]);
+        if ($validatedData->fails()) {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $validatedData->errors()
+            ], 422);
+        }
         try {
             $i = 0;
             foreach ($request->items as $item) {
@@ -638,7 +650,7 @@ class OrdersController extends Controller
                 $order_data[$i]['store_id'] = $item['store_id'];
                 $order_data[$i]['product_id'] = $item['product_id'];
                 $order_data[$i]['closed'] = (strtotime($request->time) >= strtotime($open_time[0]->open) && strtotime($request->time) <= strtotime($close_time[0]->close)) ? "No" : "Yes";
-                $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : "NA";
+                $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : NULL;
                 $i++;
             }
             return response()->json([

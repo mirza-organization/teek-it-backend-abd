@@ -62,7 +62,7 @@ Route::get('/inventory/enable_all', 'HomeController@inventory_enable_all')->name
 Route::get('/inventory/disable_all', 'HomeController@inventory_disable_all')->name('disable_all');
 /*
 |--------------------------------------------------------------------------
-| Settings Routes
+| User Settings Routes
 |--------------------------------------------------------------------------
 */
 Route::get('/settings/general', 'HomeController@general_settings');
@@ -71,6 +71,7 @@ Route::post('/settings/payment/update', 'HomeController@payment_settings_update'
 Route::post('/settings/user_img/update', 'HomeController@user_img_update')->name('user_img_update');
 Route::post('/settings/time_update', 'HomeController@time_update')->name('time_update');
 Route::post('/settings/location_update', 'HomeController@location_update')->name('location_update');
+Route::post('/settings/password/update', 'HomeController@password_update')->name('password_update');
 Route::get('/settings/change_settings/{setting_name}/{value}', 'HomeController@change_settings')->name('change_settings')->where(['setting_name' => '^[a-z_]*$', 'value' => '[0-9]+']);
 /*
 |--------------------------------------------------------------------------

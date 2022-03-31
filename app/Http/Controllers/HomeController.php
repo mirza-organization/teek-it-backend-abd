@@ -423,7 +423,7 @@ class HomeController extends Controller
      * @version 1.1.0
      */
     public function time_update(Request $request)
-    {   //dd($request->time);
+    {  
         $time = $request->time;
         foreach ($time as $key => $value) {
             if (!in_array("on", $time[$key]))
@@ -445,6 +445,36 @@ class HomeController extends Controller
     {
         $data = $request->Address;
         $location = $request->location_text;
+        $user = User::find(Auth::id());
+        $user->business_location = json_encode($data);
+        $user->address_1 = $location;
+        $user->lat = $data['lat'];
+        $user->lon = $data['long'];
+        $user->save();
+        flash('Location Updated');
+        return redirect()->back();
+    }
+    /**
+     * Update's user password
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function password_update(Request $request)
+    {
+        $old_password = $request->old_password;
+        $new_password = $request->new_password;
+        // print_r($old_password); 
+        // exit;
+        $validate = Validator::make($request->all(), [
+            'old_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8'
+        ]);
+        if ($validate->fails()) {
+            flash('Missing or invalid data.')->error();
+            return Redirect::back();
+        } 
+        exit;
+        // Hash::make($data['password']),
         $user = User::find(Auth::id());
         $user->business_location = json_encode($data);
         $user->address_1 = $location;
