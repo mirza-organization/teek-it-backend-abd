@@ -27,7 +27,9 @@
         <nav class="navbar navbar-expand-lg" style="background: white">
             <div class="container-fluid">
 
-                <a class="navbar-brand" href="/"><img style=" max-height: 50px; " src="{{ asset('res/res/img/logo.png') }}" alt=""></a>
+                <a class="navbar-brand" target="_blank" href="https://teekit.co.uk/">
+                    <img style=" max-height: 50px;" src="{{ asset('res/res/img/logo.png') }}" alt="TeekIt Logo">
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="fas fa-bars"></span>
                 </button>
@@ -79,7 +81,6 @@
                     <img style="max-height: 540px;margin: 0 auto;display: block;width: auto;max-width: 500px;height: 100%;width: 100%;object-fit: contain;" src="{{asset('bike.png')}}" alt="">
                 </div>
                 <div class="col-md-4">
-
                     @yield('content')
                 </div>
             </div>

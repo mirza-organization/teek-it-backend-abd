@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
@@ -423,7 +424,7 @@ class HomeController extends Controller
      * @version 1.1.0
      */
     public function time_update(Request $request)
-    {  
+    {
         $time = $request->time;
         foreach ($time as $key => $value) {
             if (!in_array("on", $time[$key]))
@@ -461,27 +462,26 @@ class HomeController extends Controller
      */
     public function password_update(Request $request)
     {
-        $old_password = $request->old_password;
-        $new_password = $request->new_password;
-        // print_r($old_password); 
-        // exit;
         $validate = Validator::make($request->all(), [
             'old_password' => 'required|string|min:8',
             'new_password' => 'required|string|min:8'
         ]);
         if ($validate->fails()) {
-            flash('Missing or invalid data.')->error();
+            flash('Password must be 8 characters long.')->error();
             return Redirect::back();
-        } 
-        exit;
-        // Hash::make($data['password']),
+        }
+
+        $old_password = $request->old_password;
+        $new_password = $request->new_password;
+       
         $user = User::find(Auth::id());
-        $user->business_location = json_encode($data);
-        $user->address_1 = $location;
-        $user->lat = $data['lat'];
-        $user->lon = $data['long'];
-        $user->save();
-        flash('Location Updated');
+        if (Hash::check($old_password, $user->password)) {
+            $user->password = Hash::make($new_password);
+            $user->save();
+            flash('Your password has been updated successfully.')->success();
+        } else {
+            flash('Your old password is incorrect.')->error();
+        }
         return redirect()->back();
     }
     /**

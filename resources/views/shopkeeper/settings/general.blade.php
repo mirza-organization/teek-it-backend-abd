@@ -129,7 +129,6 @@
                                         <div class="col-md-12">
                                             <form action="{{route('password_update')}}" method="POST">
                                                 {{csrf_field()}}
-
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
