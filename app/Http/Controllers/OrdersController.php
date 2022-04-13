@@ -231,10 +231,14 @@ class OrdersController extends Controller
             ], 200);
         }
     }
+
     /**
-     * Updates an assigned order
+     * Updates an assigned order for the driver only
+     * This API is consumed on two occasions 
+     * 1) When the driver is "ACCEPTING" the order
+     * 2) When the driver is "COMPLETING" the order  
      * @author Huzaifa Haleem
-     * @version 1.1.0
+     * @version 1.1.1
      */
     public function update_assign(Request $request)
     {
@@ -243,14 +247,14 @@ class OrdersController extends Controller
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            if ($request->order_status == 'delivered' && $request->delivery_status == 'pending_approval') {
-                $order->delivery_status = 'complete';
-                $user = User::find($order->seller_id);
-                $user_money = $user->pending_withdraw;
-                $user->pending_withdraw = $order->order_total + $user_money;
-                $user->save();
-                //$this->calculateDriverFair($order, $user);
-            }
+            // if ($request->order_status == 'delivered' && $request->delivery_status == 'pending_approval') {
+            //     $order->delivery_status = 'complete';
+            //     $user = User::find($order->seller_id);
+            //     $user_money = $user->pending_withdraw;
+            //     $user->pending_withdraw = $order->order_total + $user_money;
+            //     $user->save();
+            //     //$this->calculateDriverFair($order, $user);
+            // }
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
@@ -409,7 +413,7 @@ class OrdersController extends Controller
                     $verification_code = $verification_code . substr($rand_number, 0, 1);
                 }
                 $message_for_admin = "A new order has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
-                $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery";
+                $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
 
                 $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
                 $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number

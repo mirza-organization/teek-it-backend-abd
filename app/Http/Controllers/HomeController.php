@@ -473,7 +473,7 @@ class HomeController extends Controller
 
         $old_password = $request->old_password;
         $new_password = $request->new_password;
-       
+
         $user = User::find(Auth::id());
         if (Hash::check($old_password, $user->password)) {
             $user->password = Hash::make($new_password);
