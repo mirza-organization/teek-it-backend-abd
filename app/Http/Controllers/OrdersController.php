@@ -231,7 +231,6 @@ class OrdersController extends Controller
             ], 200);
         }
     }
-
     /**
      * Updates an assigned order for the driver only
      * This API is consumed on two occasions 
@@ -255,7 +254,7 @@ class OrdersController extends Controller
             //     $user->save();
             //     //$this->calculateDriverFair($order, $user);
             // }
-            $order->driver_charges = $request->driver_charges;
+            // $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
             return response()->json([
