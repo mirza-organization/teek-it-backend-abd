@@ -135,6 +135,8 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('/check_verification_code/{order_id}', 'Api\v1\DriverController@checkVerificationCode');
         Route::post('/driver_failed_to_enter_code/{order_id}', 'Api\v1\DriverController@driverFailedToEnterCode');
     });
+
+    Route::get('keys', 'Auth\AuthController@keys');
 });
 
 // Superadmin Routes

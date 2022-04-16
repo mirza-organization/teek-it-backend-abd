@@ -80,7 +80,12 @@ class DriverController extends Controller
             'message' => config("constants.WITHDRAWAL_REQUEST_SUBMITTED")
         ], 200);
     }
-
+    /**
+     * It will fetch & show the driver's 
+     * Withdrawal balance
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function getWithdrawalBalance()
     {
         if (!auth()->user()->has('driver')) {
@@ -155,8 +160,9 @@ class DriverController extends Controller
     public function checkVerificationCode(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'order_id' => 'required',
-            'verification_code' => 'required|min:6|max:6'
+            'order_id' => 'required|integer',
+            'verification_code' => 'required|min:6|max:6',
+            'delivery_boy_id' => 'required|integer'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -179,6 +185,10 @@ class DriverController extends Controller
                 ], 200);
             } else {
                 Orders::where('id', '=', $request->order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
+                $driver = User::find($request->delivery_boy_id);
+                $order = Orders::find($request->order_id);
+                $driver->pending_withdraw = $order->driver_charges + $driver->pending_withdraw;
+                $driver->save();
                 return response()->json([
                     'data' => [],
                     'status' => true,

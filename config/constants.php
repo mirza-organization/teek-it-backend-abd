@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
+
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',
 

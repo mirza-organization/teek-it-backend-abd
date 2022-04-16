@@ -232,9 +232,12 @@ class OrdersController extends Controller
         }
     }
     /**
-     * Updates an assigned order
+     * Updates an assigned order for the driver only
+     * This API is consumed on two occasions 
+     * 1) When the driver is "ACCEPTING" the order
+     * 2) When the driver is "COMPLETING" the order  
      * @author Huzaifa Haleem
-     * @version 1.1.0
+     * @version 1.1.1
      */
     public function update_assign(Request $request)
     {
@@ -243,15 +246,15 @@ class OrdersController extends Controller
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            if ($request->order_status == 'delivered' && $request->delivery_status == 'pending_approval') {
-                $order->delivery_status = 'complete';
-                $user = User::find($order->seller_id);
-                $user_money = $user->pending_withdraw;
-                $user->pending_withdraw = $order->order_total + $user_money;
-                $user->save();
-                //$this->calculateDriverFair($order, $user);
-            }
-            $order->driver_charges = $request->driver_charges;
+            // if ($request->order_status == 'delivered' && $request->delivery_status == 'pending_approval') {
+            //     $order->delivery_status = 'complete';
+            //     $user = User::find($order->seller_id);
+            //     $user_money = $user->pending_withdraw;
+            //     $user->pending_withdraw = $order->order_total + $user_money;
+            //     $user->save();
+            //     //$this->calculateDriverFair($order, $user);
+            // }
+            // $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
             return response()->json([
@@ -409,7 +412,7 @@ class OrdersController extends Controller
                     $verification_code = $verification_code . substr($rand_number, 0, 1);
                 }
                 $message_for_admin = "A new order has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
-                $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery";
+                $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
 
                 $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
                 $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
@@ -609,17 +612,34 @@ class OrdersController extends Controller
     }
     /**
      * This function will return back store open/close & product qty status
+     * Along with this information it will also send store_id & product_id
      * If the store is active & product is live
-     * But if they are not then it will send "NA"
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function recheck_products(Request $request)
     {
+        $validatedData = Validator::make($request->all(), [
+            'items' => 'required|array',
+            'day' => 'required|string',
+            'time' => 'required|string'
+        ]);
+        if ($validatedData->fails()) {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $validatedData->errors()
+            ], 422);
+        }
         try {
             $i = 0;
             foreach ($request->items as $item) {
-                $closed_status = User::query()->select('business_hours->time->' . $request->day . '->closed as closed')
+                $open_time = User::query()->select('business_hours->time->' . $request->day . '->open as open')
+                    ->where('id', '=', $item['store_id'])
+                    ->where('is_active', '=', 1)
+                    ->get();
+
+                $close_time = User::query()->select('business_hours->time->' . $request->day . '->close as close')
                     ->where('id', '=', $item['store_id'])
                     ->where('is_active', '=', 1)
                     ->get();
@@ -632,8 +652,8 @@ class OrdersController extends Controller
 
                 $order_data[$i]['store_id'] = $item['store_id'];
                 $order_data[$i]['product_id'] = $item['product_id'];
-                $order_data[$i]['closed'] = ($closed_status[0]->closed == "null") ? "No" : "Yes";
-                $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : "NA";
+                $order_data[$i]['closed'] = (strtotime($request->time) >= strtotime($open_time[0]->open) && strtotime($request->time) <= strtotime($close_time[0]->close)) ? "No" : "Yes";
+                $order_data[$i]['qty'] = (isset($qty[0]->qty)) ? $qty[0]->qty : NULL;
                 $i++;
             }
             return response()->json([

@@ -46,23 +46,22 @@ class ForgotPasswordController extends Controller
                 'message' => config('constants.VALIDATION_ERROR')
             ], 400);
         }
-        if ($request) {
-            $user = User::where('email', $request->get('email'))->first();
-            if (!$user) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => trans('passwords.user')
-                ], 404);
-            }
-            //$token = $this->broker()->createToken($user);
-            $digits = 6;
-            $token = str_pad(rand(0, pow(10, $digits) - 1), $digits, '0', STR_PAD_LEFT);
+        $user = User::where('email', $request->get('email'))->first();
+        if (!$user) {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => trans('passwords.user')
+            ], 404);
+        }
+        //$token = $this->broker()->createToken($user);
+        $digits = 6;
+        $token = str_pad(rand(0, pow(10, $digits) - 1), $digits, '0', STR_PAD_LEFT);
 
-            $user->temp_code = $token;
-            $user->save();
+        $user->temp_code = $token;
+        $user->save();
 
-            $html = '<html>
+        $html = '<html>
                 Hi, ' . $user->name . '<br><br>
 
                 You have requested to reset password on ' . env('APP_NAME') . '.
@@ -70,13 +69,12 @@ class ForgotPasswordController extends Controller
                 Here is your Password reset Code. <br><br> <code style="background:lightgray">' . $token . '</code>
             </html>';
 
-            Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $user) {
-                $message->to($request->email, $user->name)
-                    ->subject(env('APP_NAME') . ': Password Reset');
-            });
+        Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $user) {
+            $message->to($request->email, $user->name)
+                ->subject(env('APP_NAME') . ': Password Reset');
+        });
 
-            $response = array('status' => true, 'message' => 'Password reset link sent on your email.');
-            return response()->json($response, 200);
-        }
+        $response = array('status' => true, 'message' => 'Password reset link sent on your email.');
+        return response()->json($response, 200);
     }
 }

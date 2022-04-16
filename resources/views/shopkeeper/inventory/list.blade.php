@@ -13,14 +13,22 @@
                             <a class="text-white" href="/inventory/enable_all">Enable All</a>
                         </button>
                         <button type="button" class="btn btn-danger">
-                            <a class="text-white" href="/inventory/disable_all"  onclick="disableAll(event)">Disable All</a>
+                            <a class="text-white" href="/inventory/disable_all" onclick="disableAll(event)">Disable All</a>
                         </button>
                         <button type="button" class="btn btn-primary">
                             <a class="text-white" href="/inventory/add">Add New</a>
                         </button>
+                        <?php
+
+                        use Illuminate\Support\Facades\Auth;
+
+                        $user_id = Auth::id();
+                        ?>
+                        @if ($user_id == 306 || $user_id == 365) 
                         <button type="button" class="btn btn-primary">
                             <a class="text-white" href="/inventory/add_bulk">Add Bulk</a>
                         </button>
+                        @endif
                     </div>
                 </div><!-- /.col -->
             </div><!-- /.row -->

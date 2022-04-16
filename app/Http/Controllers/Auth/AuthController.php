@@ -7,6 +7,7 @@ use App\Products;
 use App\Utils\Constants\AppConst;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Keys;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -139,12 +140,14 @@ class AuthController extends Controller
         $validate = Validator::make($request->all(), [
             'token' => 'required'
         ]);
-
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
             echo "Validation error";
             return;
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $validate->messages()
+            ], 400);
         }
 
         $token = $request->token;
@@ -156,27 +159,35 @@ class AuthController extends Controller
 
         if ($user) {
             if ($user->email_verified_at != null) {
-
-                $response = array('status' => false, 'message' => 'Account Already verified');
                 echo "Account Already verified";
                 return;
-                return response()->json($response, 200);
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => 'Account Already verified'
+                ], 200);
             }
             $user->email_verified_at = $email_verified_at;
             $user->is_active = 1;
             $user->save();
 
-            $response = array('status' => true, 'message' => 'Account successfully verified');
-
             echo "Account successfully verified";
             return;
-            return response()->json($response, 200);
-        } else {
-            $response = array('status' => false, 'message' => 'Invalid verification token');
 
+            return response()->json([
+                'data' => [],
+                'status' => true,
+                'message' => 'Account successfully verified'
+            ], 200);
+        } else {
             echo "Invalid verification token";
             return;
-            return response()->json($response, 401);
+
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => 'Invalid verification token'
+            ], 401);
         }
     }
 
@@ -187,19 +198,28 @@ class AuthController extends Controller
         ]);
 
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' =>  $validate->messages()
+            ], 400);
         }
 
         $User = JWTAuth::user();
         if ($User) {
             $User->password = Hash::make($request->password);
             $User->save();
-            $response = array('status' => true, 'message' => 'Password changed successfully.');
-            return response()->json($response, 200);
+            return response()->json([
+                'data' => [],
+                'status' => true,
+                'message' =>  'Password changed successfully.'
+            ], 200);
         } else {
-            $response = array('status' => false, 'message' => 'User not found');
-            return response()->json($response, 404);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' =>  'User not found.'
+            ], 404);
         }
     }
 
@@ -241,14 +261,11 @@ class AuthController extends Controller
             'roles' => $user->roles->pluck('name'),
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         );
-        $user_arr = [
+        return response()->json([
             'data' => $data_info,
             'status' => true,
-            'message' => AppConst::updateMsg
-
-        ];
-
-        return response()->json($user_arr);
+            'message' => config('constants.DATA_UPDATED_SUCCESS')
+        ], 200);
     }
 
     /**
@@ -259,7 +276,11 @@ class AuthController extends Controller
     public function logout()
     {
         JWTAuth::parseToken()->invalidate();
-        return response()->json(['status' => true, 'message' => 'Successfully logged out']);
+        return response()->json([
+            'data' => [],
+            'status' => true,
+            'message' =>  'Successfully logged out.'
+        ], 200);
     }
 
     /**
@@ -314,12 +335,11 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         );
-        $user_arr = [
+        return response()->json([
             'data' => $data_info,
             'status' => true,
-            'message' => AppConst::loginSuccessMsg
-        ];
-        return response()->json($user_arr);
+            'message' =>  config('constants.LOGIN_SUCCESS')
+        ], 200);
     }
     /**
      * Fetch seller/store information w.r.t ID
@@ -352,8 +372,6 @@ class AuthController extends Controller
     public function get_user($user_id)
     {
         $data_info = $this->get_seller_info(User::find($user_id));
-
-
         return $data_info;
     }
 
@@ -375,12 +393,10 @@ class AuthController extends Controller
         $mobileHeader = $request->header('x_platform');
         if (isset($mobileHeader) && $mobileHeader == 'mobile') {
             JwtToken::where('user_id', $user->id)->where('phone', 1)->delete();
-
             $jwtToken->phone = 1;
             $jwtToken->save();
         } else {
             JwtToken::where('user_id', $user->id)->where('desktop', 1)->delete();
-
             $jwtToken->desktop = 1;
             $jwtToken->save();
         }
@@ -391,8 +407,11 @@ class AuthController extends Controller
     {
         $validate = User::updateValidator($request);
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
-            return response()->json($response, 400);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $validate->messages()
+            ], 400);
         }
         $user = JWTAuth::user();
         $User = User::find($user->id);
@@ -422,8 +441,11 @@ class AuthController extends Controller
             return $response;
             //return response()->json($response, 200);
         } else {
-            $response = array('status' => false, 'message' => 'User not found.');
-            return response()->json($response, 404);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => 'User not found.'
+            ], 404);
         }
     }
 
@@ -516,7 +538,6 @@ class AuthController extends Controller
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->get_product_info($product->id);
                 }
-                // $info['products'] = $products_data;
                 unset($pagination['data']);
                 return response()->json([
                     'data' => $data,
@@ -549,22 +570,23 @@ class AuthController extends Controller
                 $data[] = $this->get_seller_info($user);
             }
         }
-        $user_arr = [
+        return response()->json([
             'data' => $data,
             'status' => true,
             'message' => ''
-
-        ];
-
-        return response()->json($user_arr, 200);
+        ], 200);
     }
-
 
     public function get_delivery_boy_info($delivery_boy_info)
     {
         $user = User::find($delivery_boy_info);
-        if (!$user)
-            return null;
+        if (!$user) {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => 'User not found.'
+            ], 404);
+        }
         $data_info = array(
             'id' => $user->id,
             'name' => $user->name,
@@ -578,15 +600,24 @@ class AuthController extends Controller
             'roles' => $user->roles->pluck('name'),
             'user_img' => $user->user_img
         );
-        $user_arr = [
+        return response()->json([
             'data' => $data_info,
             'status' => true,
             'message' => ''
-
-        ];
-
-        return response()->json($user_arr, 200);
-
-        //        return $data_info;
+        ], 200);
+    }
+    /**
+     * Listing of all SECRET KEYS
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function keys()
+    {
+        $keys = Keys::all();
+        return response()->json([
+            'data' => $keys,
+            'status' => true,
+            'message' => ''
+        ], 200);
     }
 }
