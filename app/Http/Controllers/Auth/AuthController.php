@@ -86,11 +86,9 @@ class AuthController extends Controller
         $User->save();
 
         $User->roles()->sync($role->id);
-
         $verification_code = Crypt::encrypt($User->email);
 
         $FRONTEND_URL = env('FRONTEND_URL');
-
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
         $html = '<html>
@@ -112,7 +110,6 @@ class AuthController extends Controller
         $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
         return response()->json($response, 200);
     }
-
     /**
      * Get a JWT via given credentials.
      *
@@ -222,7 +219,6 @@ class AuthController extends Controller
             ], 404);
         }
     }
-
     /**
      * Get the authenticated User.
      *
@@ -267,7 +263,6 @@ class AuthController extends Controller
             'message' => config('constants.DATA_UPDATED_SUCCESS')
         ], 200);
     }
-
     /**
      * Log the user out (Invalidate the token).
      *
@@ -282,7 +277,6 @@ class AuthController extends Controller
             'message' =>  'Successfully logged out.'
         ], 200);
     }
-
     /**
      * Refresh a token.
      *
@@ -292,7 +286,6 @@ class AuthController extends Controller
     {
         return $this->respondWithToken(JWTAuth::refresh());
     }
-
     /**
      * Get the token array structure.
      *
@@ -368,7 +361,6 @@ class AuthController extends Controller
         return $data_info;
     }
 
-
     public function get_user($user_id)
     {
         $data_info = $this->get_seller_info(User::find($user_id));
@@ -401,7 +393,6 @@ class AuthController extends Controller
             $jwtToken->save();
         }
     }
-
 
     public function updateUser(Request $request)
     {

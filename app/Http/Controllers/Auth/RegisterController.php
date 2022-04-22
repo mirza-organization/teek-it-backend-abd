@@ -62,18 +62,18 @@ class RegisterController extends Controller
             'phone' => 'required|string|min:10|max:10',
             'company_name' => 'required|string|max:80',
             'company_phone' => 'required|string|min:10|max:10',
-            
-//            'username' => 'required|string|max:255|unique:users',
-//            'address' => 'required|string|max:255',
-//            'city' => 'required|string|max:255',
-//            'postcode' => 'required|string|max:255',
-//            'phone_number' => 'required|string|max:255',
-//            'age' => 'required|string|max:255',
-//            'gender' => 'required|string|max:255',
-//            'driving_lesson_cost' => 'string|max:255',
-//            'approved_driving_instructor' => 'boolean',
-//            'years_of_experience' => 'string',
-//            'role' => 'required|string|max:255',
+            'location_text' => 'required|string',
+
+            //            'username' => 'required|string|max:255|unique:users',
+            //            'city' => 'required|string|max:255',
+            //            'postcode' => 'required|string|max:255',
+            //            'phone_number' => 'required|string|max:255',
+            //            'age' => 'required|string|max:255',
+            //            'gender' => 'required|string|max:255',
+            //            'driving_lesson_cost' => 'string|max:255',
+            //            'approved_driving_instructor' => 'boolean',
+            //            'years_of_experience' => 'string',
+            //            'role' => 'required|string|max:255',
         ]);
     }
 
@@ -87,20 +87,23 @@ class RegisterController extends Controller
     {
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
-            \flash('Email Already Exists Or Incorrect Values In Other Form Fields')->error();
+            \flash('Email Already Exists Or Incorrect Values In Other Form Fields Or Missing Form Fields')->error();
             return Redirect::back()->withInput($request->input())
                 ->withErrors(['name.required', 'Name is required']);
         }
         $data = $request->toArray(); 
-   
         $role = Role::where('name', 'seller')->first();
         $User = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'phone' => '+44' . $data['phone'],
+            'address_1' => $data['location_text'],
             'business_name' => $data['company_name'],
             'business_phone' => '+44' . $data['company_phone'],
+            'business_location' => json_encode($data['Address']),
+            'lat' => $data['Address']['lat'],
+            'lon' => $data['Address']['long'],
             'is_active' => 0,
         ]);
 
@@ -113,7 +116,6 @@ class RegisterController extends Controller
             Hi, ' . $User->name . '<br><br>
 
             Thank you for registering on ' . env('APP_NAME') . '.
-
 <br>
             Here is your account verification link. Click on below link to verify you account. <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
@@ -135,7 +137,6 @@ class RegisterController extends Controller
             Hi, ' . $user->name . '<br><br>
 
             A new store has been register to your site  ' . env('APP_NAME') . '.
-
 <br>
             Please click on below link to activate store. <br><br>
             <a href="' . $store_link . '">Verify</a> OR Copy This in your Browser
@@ -147,11 +148,4 @@ class RegisterController extends Controller
         }
         return Redirect::route('login');
     }
-//    protected function registered(Request $request, $user)
-//    {
-//        Flash::message('You have successfully verified your account.');
-////
-//        return Redirect::route('login');
-//        //
-//    }
 }

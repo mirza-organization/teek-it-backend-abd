@@ -109,6 +109,7 @@ Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespa
 |--------------------------------------------------------------------------
 */
 Route::get('/stores', 'HomeController@admin_stores');
+Route::get('/stores_del', 'HomeController@admin_del_stores')->name('admin.del.stores');
 Route::get('/customers', 'HomeController@admin_customers');
 Route::get('/drivers', 'HomeController@admin_drivers');
 Route::get('/aorders', 'HomeController@admin_orders');

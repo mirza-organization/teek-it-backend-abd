@@ -452,6 +452,49 @@
             jQuery(value).height(max);
         });
         $('.row.mb-2 h1.m-0.text-dark.text-center').text($('.row.mb-2 h1.m-0.text-dark.text-center').text().replace('Admin Dashboard', ''));
+
+        function selectAll() {
+            var checkboxes = document.querySelectorAll('.stores-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = true;
+            }
+        }
+
+        function delStores() {
+            var checkboxes = document.querySelectorAll('.stores-checkbox');
+            var stores = [];
+            var x = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    stores[x] = checkboxes[i].id;
+                    x++;
+                }
+            }
+            if (stores.length != 0) {
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Are you sure you want to delete the selected stores?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{route('admin.del.stores')}}",
+                            type: "get",
+                            data: {
+                                "stores": stores
+                            },
+                            success: function(response) {
+                                if (response == "Stores Deleted Successfully") {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
     </script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

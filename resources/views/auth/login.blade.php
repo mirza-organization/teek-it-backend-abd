@@ -1,14 +1,13 @@
 @extends('layouts.auth.app')
 
 @section('content')
-
 <div class="container">
     <div class="row">
         <div class="col-md-12">
             <h1 class="text-white text-center">{{ __('Sign Up') }}</h1>
             <h1 class="text-white text-center d-none">{{ __('Login') }}</h1>
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" style="margin-bottom: 100px;">
                 @csrf
                 <div class="form-group row">
 
@@ -87,13 +86,27 @@
                         @endif
                     </div>
                 </div>
+
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <div class="form-group" data-toggle="modal" data-target="#map_modal" style="cursor: pointer;">
+                            <i class="fas fa-map-marked-alt text-light fa-2x"></i>
+                            &nbsp;&nbsp;&nbsp;
+                            <span class="text-light" id="user_location">Set Location</span>
+                            <input type="hidden" id="location_text" name="location_text">
+                            <input type="hidden" id="Address[lat]" name="Address[lat]">
+                            <input type="hidden" id="Address[long]" name="Address[long]">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group row mb-0">
                     <div class="col-md-12">
-                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="/* padding: 5px 25px; */display: block;width: 100%;margin-top: 15px!important;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0; ">Sign up</button>
-
+                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="padding: 5px 25px; display: block;width: 100%;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0;">Sign up</button>
                     </div>
                 </div>
             </form>
+
             <form style="display: none" method="POST" action="{{ route('login') }}">
                 @csrf
 
@@ -152,4 +165,57 @@
         </div>
     </div>
 </div>
+<!-- Google Map Modal - Begins -->
+<div class="modal fade" id="map_modal">
+    <div class="modal-dialog modal-lg  modal-dialog-centered">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Add Location</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+                    <div class="card">
+                        <div class="card-body-custom">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-md-12 mt-3 mb-3">
+                                        <div class="form-group" style="height:100%; width:100%">
+                                            <input type="text" class="form-control" name="modal_location_text" id="modal_location_text" />
+                                            <div class="mt-3 mb-3" style="height: 100%; width: 100%; margin: 0px; padding: 0px;min-height: 200px;" id="map-canvas"></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <br>
+                                        <br>
+                                        <br>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="Address">Lat</label>
+                                        <input type="text" name="ad_lat" id="ad_lat" class="form-control">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="Address">Long</label>
+                                        <input type="text" name="ad_long" id="ad_long" class="form-control">
+                                    </div>
+                                    <button type="submit" onclick="submitLocation()" class="d-no mt-3 btn btn-submit btn-block btn-outline-primary">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Google Map Modal - Ends -->
 @endsection

@@ -86,18 +86,18 @@
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label data-toggle="modal" data-target="#myModal">Set Location: &emsp; <i class="fa fa-map-marker text-danger"></i> {{substr($address, 0, 15) . '...'}}</label>
+                                                            <label data-toggle="modal" data-target="#map_modal">Set Location: &emsp; <i class="fa fa-map-marker text-danger"></i> {{substr($address, 0, 15) . '...'}}</label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label data-toggle="modal" data-target="#myModal">Use Current Location: &emsp; <i class="fa fa-map-marked text-primary"></i></label>
+                                                            <label data-toggle="modal" data-target="#map_modal">Use Current Location: &emsp; <i class="fa fa-map-marked text-primary"></i></label>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="">
                                                             <div class="text-center">
-                                                                <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" onclick="document.getElementById('update_location').click();//('#update_location').click();" type="button">Update</button>
+                                                                <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" onclick="document.getElementById('update_location').click();" type="button">Update</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -163,57 +163,9 @@
             <!-- /.row -->
         </div><!-- /.container-fluid -->
 
-        <!-- <div class="container-fluid">
-            <div class="row">
-
-                <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
-                    <h4 class="text-left text-primary">Import Products</h4>
-                    <div class="card">
-                        <div class="card-body-custom">
-                            <div class=" d-block text-right">
-                                <div class="card-text">
-                                    <div class="row">
-                                        <div class="col-md-12">
-
-                                        </div>
-                                        <div class="col-md-12">
-                                            <form action="{{route('importProducts')}}" method="post" enctype="multipart/form-data">
-                                                {{csrf_field()}}
-
-                                                <div class="row form-inline">
-                                                    <div class="col-md-8">
-                                                        <div class="form-group">
-                                                            <label >Browse Data: &emsp;</label>
-                                                            <input required name="file" accept="application/csvm+json" type="file">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="">
-                                                            <div class="text-center">
-                                                                <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" type="submit">Import</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-         -->
         <!-- /.container-fluid -->
         <div class="container-fluid">
             <div class="row">
-
                 <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
                     <h4 class="text-left text-primary">Export Products</h4>
                     <div class="card">
@@ -255,6 +207,7 @@
             <!-- /.row -->
 
         </div><!-- /.container-fluid -->
+        
         <div class="container-fluid">
             <div class="row">
 
@@ -348,14 +301,14 @@
     </div>
     <!-- /.content -->
 </div>
-
-<div class="modal fade " id="myModal">
+<!-- Google Map Modal - Begins -->
+<div class="modal fade" id="map_modal">
     <div class="modal-dialog modal-lg  modal-dialog-centered">
         <div class="modal-content">
 
             <!-- Modal Header -->
             <div class="modal-header">
-                <h4 class="modal-title">Add</h4>
+                <h4 class="modal-title">Add Location</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <!-- Modal body -->
@@ -371,11 +324,8 @@
                                         <div class="col-md-12 mt-3 mb-3">
 
                                             <div class="form-group" style="height:100%; width:100%">
-                                                <input type="text" class="form-control" value="<?php echo $address; ?>" name="location_text" id="location-text-box" />
-                                                <div class="mt-3 mb-3" style="height: 100%;
-  width: 100%;
-  margin: 0px;
-  padding: 0px;    min-height: 200px;" id="map-canvas"></div>
+                                                <input type="text" class="form-control" value="<?php echo $address; ?>" name="location_text" id="location_text" />
+                                                <div class="mt-3 mb-3" style="height: 100%; width: 100%; margin: 0px; padding: 0px;    min-height: 200px;" id="map-canvas"></div>
                                             </div>
                                         </div>
                                         <div class="col-md-12">
@@ -430,8 +380,10 @@
         </div>
     </div>
 </div>
-<script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyBLRlt2ABDpod78NE9X9G5-27tk8NKALdk"></script>
+<!-- Google Map Modal - Ends -->
 
+<!-- Google Map Code - Begins -->
+<script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyDS4Nf8Ict_2h4lih9DCIt_EpkkBnVd85A"></script>
 <script>
     var map;
     var marker;
@@ -487,10 +439,9 @@
 
         }
 
-        // get places auto-complete when user type in location-text-box
+        // get places auto-complete when user type in location_text
         var input = /** @type {HTMLInputElement} */
-            (
-                document.getElementById('location-text-box'));
+            (document.getElementById('location_text'));
 
 
         var autocomplete = new google.maps.places.Autocomplete(input);
@@ -579,4 +530,5 @@
         }
     }
 </script>
+<!-- Google Map Code - Ends -->
 @endsection

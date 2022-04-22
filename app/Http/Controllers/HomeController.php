@@ -932,11 +932,24 @@ class HomeController extends Controller
             if ($request->search) {
                 $users = $users->where('business_name', 'LIKE', $request->search);
             }
-
-            $users = $users->paginate(10);
+            $users = $users->paginate(9);
             return view('admin.stores', compact('users'));
         } else {
             abort(404);
+        }
+    }
+    /**
+     * Delete selected stores
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function admin_del_stores(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            for ($i = 0; $i < count($request->stores); $i++) {
+                DB::table('users')->where('id', '=', $request->stores[$i])->delete();
+            }
+            return response("Stores Deleted Successfully");
         }
     }
     /**
