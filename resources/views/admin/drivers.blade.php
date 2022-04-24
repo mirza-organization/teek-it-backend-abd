@@ -7,6 +7,14 @@
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
                 <a href="/drivers" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Drivers</a>
+                <div class="float-right">
+                    <button type="button" class="btn btn-success" onclick="selectAll()">
+                        <a class="text-white">Select All</a>
+                    </button>
+                    <button type="button" class="btn btn-danger" onclick="delUsers()">
+                        <a class="text-white">Delete</a>
+                    </button>
+                </div>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
@@ -92,8 +100,9 @@
                        bg-success
                     @endif">
                     <div class="card-body">
-                        <a class=" d-block text-right" href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}">
-                            <img class="img-size-16" src="/res/res/img/edit.png" alt="">
+                        <input type="checkbox" class="select-checkbox" title="Select" id="{{$user->id}}">
+                        <a class="d-block text-right float-right" title="Edit" href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}">
+                            <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>
                         <div class="card-text">
                             <div class="col-md-12">

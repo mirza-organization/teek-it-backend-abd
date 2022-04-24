@@ -64,9 +64,13 @@
             <div class="col-lg-4 col-md-6 col-sm-12 pl-4 pr-4 pb-4">
                 <div class="change-height card" style="height: 317px;">
                     <div class="card-body">
-                        <a href="" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class="d-block text-right float-right"><img class="img-size-16" src="/res/res/img/edit.png"></a>
-                        
-                        <a href="{{route('delete_cat',['id'=>$user->id])}}" class="d-block text-right float-right del-icon"><img class="img-size-16" src="/res/res/img/delete.png"></a>
+                        <a href="#" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class="d-block text-right float-right" title="Edit">
+                            <img class="img-size-16" src="/res/res/img/edit.png">
+                        </a>
+
+                        <a href="{{route('delete_cat',['id'=>$user->id])}}" class="d-block text-right float-right del-icon" title="Delete">
+                            <img class="img-size-16" src="/res/res/img/delete.png">
+                        </a>
 
                         <div class="card-text">
                             <div class="col-md-12">

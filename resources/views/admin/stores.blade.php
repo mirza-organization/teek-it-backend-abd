@@ -11,7 +11,7 @@
                     <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="delStores()">
+                    <button type="button" class="btn btn-danger" onclick="delUsers()">
                         <a class="text-white">Delete</a>
                     </button>
                 </div>
@@ -101,7 +101,7 @@
                             bg-success
                             @endif">
                     <div class="card-body">
-                        <input type="checkbox" class="stores-checkbox" title="Select" id="{{$user->id}}">
+                        <input type="checkbox" class="select-checkbox" title="Select" id="{{$user->id}}">
                         <a href="{{route('customer_details',['user_id'=>$user->id])}}" class="d-block text-right float-right" title="Edit" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}">
                             <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>

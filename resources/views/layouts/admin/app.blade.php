@@ -454,39 +454,75 @@
         $('.row.mb-2 h1.m-0.text-dark.text-center').text($('.row.mb-2 h1.m-0.text-dark.text-center').text().replace('Admin Dashboard', ''));
 
         function selectAll() {
-            var checkboxes = document.querySelectorAll('.stores-checkbox');
+            var checkboxes = document.querySelectorAll('.select-checkbox');
             for (var i = 0; i < checkboxes.length; i++) {
                 checkboxes[i].checked = true;
             }
         }
 
-        function delStores() {
-            var checkboxes = document.querySelectorAll('.stores-checkbox');
-            var stores = [];
+        function delUsers() {
+            var checkboxes = document.querySelectorAll('.select-checkbox');
+            var users = [];
             var x = 0;
             for (var i = 0; i < checkboxes.length; i++) {
                 if (checkboxes[i].checked) {
-                    stores[x] = checkboxes[i].id;
+                    users[x] = checkboxes[i].id;
                     x++;
                 }
             }
-            if (stores.length != 0) {
+            if (users.length != 0) {
                 Swal.fire({
                     title: 'Warning!',
-                    text: 'Are you sure you want to delete the selected stores?',
+                    text: 'Are you sure you want to delete the selected users?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Yes'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "{{route('admin.del.stores')}}",
+                            url: "{{route('admin.del.users')}}",
                             type: "get",
                             data: {
-                                "stores": stores
+                                "users": users
                             },
                             success: function(response) {
-                                if (response == "Stores Deleted Successfully") {
+                                if (response == "Users Deleted Successfully") {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function delOrders() {
+            var checkboxes = document.querySelectorAll('.select-checkbox');
+            var orders = [];
+            var x = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    orders[x] = checkboxes[i].id;
+                    x++;
+                }
+            }
+            if (orders.length != 0) {
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Are you sure you want to delete the selected orders?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{route('admin.del.orders')}}",
+                            type: "get",
+                            data: {
+                                "orders": orders
+                            },
+                            success: function(response) {
+                                if (response == "Orders Deleted Successfully") {
                                     window.location.reload();
                                 }
                             }

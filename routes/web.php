@@ -109,10 +109,10 @@ Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespa
 |--------------------------------------------------------------------------
 */
 Route::get('/stores', 'HomeController@admin_stores');
-Route::get('/stores_del', 'HomeController@admin_del_stores')->name('admin.del.stores');
 Route::get('/customers', 'HomeController@admin_customers');
 Route::get('/drivers', 'HomeController@admin_drivers');
 Route::get('/aorders', 'HomeController@admin_orders');
+Route::get('/aorders/delete', 'HomeController@admin_orders_del')->name('admin.del.orders');
 Route::get('/complete-orders', 'HomeController@complete_orders')->name('complete.order');
 Route::get('/mark-complete-order/{id}', 'HomeController@mark_complete_order')->name('mark.complete.order');
 Route::get('/asetting', 'HomeController@asetting');
@@ -125,6 +125,7 @@ Route::get('/customer/{user_id}/details', 'HomeController@admin_customer_details
 Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndRoleController@updateApplicationFee')->name('application_fee');
 Route::post('/update_pages', 'HomeController@update_pages')->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', 'HomeController@change_user_status')->name('change_user_status');
+Route::get('/users_del', 'HomeController@admin_users_del')->name('admin.del.users');
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route

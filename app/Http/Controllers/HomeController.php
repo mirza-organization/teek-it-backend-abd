@@ -897,12 +897,14 @@ class HomeController extends Controller
     /**
      * Delete's a specific category
      * @author Huzaifa Haleem
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function delete_cat(Request $request)
     {
-        DB::table('categories')->where('id', '=', $request->id)->delete();
-        flash('Category Deleted Successfully')->success();
+        if (Auth::user()->hasRole('superadmin')) {
+            DB::table('categories')->where('id', '=', $request->id)->delete();
+            flash('Category Deleted Successfully')->success();
+        }
         return Redirect::back();
     }
 
@@ -939,17 +941,17 @@ class HomeController extends Controller
         }
     }
     /**
-     * Delete selected stores
+     * Delete selected users
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function admin_del_stores(Request $request)
+    public function admin_users_del(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
-            for ($i = 0; $i < count($request->stores); $i++) {
-                DB::table('users')->where('id', '=', $request->stores[$i])->delete();
+            for ($i = 0; $i < count($request->users); $i++) {
+                DB::table('users')->where('id', '=', $request->users[$i])->delete();
             }
-            return response("Stores Deleted Successfully");
+            return response("Users Deleted Successfully");
         }
     }
     /**
@@ -967,8 +969,7 @@ class HomeController extends Controller
             if ($request->search) {
                 $users = $users->where('name', 'LIKE', $request->search);
             }
-
-            $users = $users->paginate(10);
+            $users = $users->paginate(9);
             return view('admin.customers', compact('users'));
         } else {
             abort(404);
@@ -990,14 +991,18 @@ class HomeController extends Controller
                 $users = $users->where('name', 'LIKE', $request->search);
             }
 
-            $users = $users->paginate(10);
+            $users = $users->paginate(9);
 
             return view('admin.drivers', compact('users'));
         } else {
             abort(404);
         }
     }
-
+    /**
+     * Render orders listing view for admin
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function admin_orders(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
@@ -1029,6 +1034,21 @@ class HomeController extends Controller
             return view('admin.orders', compact('orders', 'orders_p'));
         } else {
             abort(404);
+        }
+    }
+    /**
+     * Delete selected orders
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function admin_orders_del(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            for ($i = 0; $i < count($request->orders); $i++) {
+                DB::table('orders')->where('id', '=', $request->orders[$i])->delete();
+                DB::table('order_items')->where('order_id', '=', $request->orders[$i])->delete();
+            }
+            return response("Orders Deleted Successfully");
         }
     }
 
