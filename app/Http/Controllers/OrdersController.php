@@ -143,6 +143,14 @@ class OrdersController extends Controller
                     ->orderByDesc('created_at')->paginate();
                 $pagination = $orders->toArray();
             }
+        } elseif ($request->has('order_status') && $request->order_status == 'complete'){
+            $orders = Orders::query();
+            $orders = $orders->where('type', '=', 'delivery')
+                ->where('order_status', 'complete')
+                ->whereNotNull('delivery_boy_id')
+                ->orderByDesc('created_at')
+                ->paginate();
+            $pagination = $orders->toArray();
         } else {
             $orders = Orders::query();
             $orders = $orders->where('type', '=', 'delivery')
@@ -232,7 +240,6 @@ class OrdersController extends Controller
         }
     }
     /**
-     * Updates an assigned order for the driver only
      * This API is consumed on two occasions 
      * 1) When the driver is "ACCEPTING" the order
      * 2) When the driver is "COMPLETING" the order  
