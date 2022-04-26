@@ -22,8 +22,8 @@ class OrdersController extends Controller
      * @version 1.1.0
      */
     public function index(Request $request)
-    {
-        $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderBy('id', 'desc');
+    { 
+        $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderByDesc('id');
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
         }

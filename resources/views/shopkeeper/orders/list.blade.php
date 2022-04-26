@@ -42,16 +42,16 @@
                                 <a href="{{route('cancel_order',['order_id'=>$order->id])}}" onclick="cancelOrder(event)" class=" d-block btn btn-danger float-right" style="margin-right: 20px">Cancel Order</a>
                                 @else
                                 @if(!empty($order->delivery_boy_id))
-                                <a href="" data-toggle="modal" data-target="#exampleModal{{$order->id}}" class=" btn btn-primary d-block float-right">View Driver Details</a>
+                                <a href="" data-toggle="modal" data-target="#detailsModal{{$order->id}}" class=" btn btn-primary d-block float-right">View Driver Details</a>
                                 <?php
                                 $user = \App\User::find($order->delivery_boy_id);
                                 ?>
                                 @if(!empty($user))
-                                <div class="modal fade" id="exampleModal{{$order->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="detailsModal{{$order->id}}" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="exampleModalLabel">{{$user->name}} {{$user->l_name}}</h5>
+                                                <h5 class="modal-title" id="detailsModalLabel">{{$user->name}} {{$user->l_name}}</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
@@ -60,8 +60,20 @@
                                                 <?php
                                                 $fields = [
                                                     'is_online',
-                                                    'is_active'
-                                                    //'business_name'
+                                                    'is_active',
+                                                    'business_name',
+                                                    'business_location',
+                                                    'business_hours',
+                                                    'bank_details',
+                                                    'settings',
+                                                    'user_img',
+                                                    'remember_token',
+                                                    'created_at',
+                                                    'updated_at',
+                                                    'pending_withdraw',
+                                                    'total_withdraw',
+                                                    'application_fee',
+                                                    'temp_code'
                                                 ];
                                                 ?>
                                                 <div class="row">

@@ -56,7 +56,8 @@
                                 'is_online',
                                 'is_active',
                                 'bank_details',
-                                'user_img', 'business_location'
+                                'user_img', 
+                                'business_location'
                             ];
 
                             ?>
