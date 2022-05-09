@@ -64,16 +64,16 @@ class RegisterController extends Controller
             'company_phone' => 'required|string|min:10|max:10',
             'location_text' => 'required|string',
 
-            //            'username' => 'required|string|max:255|unique:users',
-            //            'city' => 'required|string|max:255',
-            //            'postcode' => 'required|string|max:255',
-            //            'phone_number' => 'required|string|max:255',
-            //            'age' => 'required|string|max:255',
-            //            'gender' => 'required|string|max:255',
-            //            'driving_lesson_cost' => 'string|max:255',
-            //            'approved_driving_instructor' => 'boolean',
-            //            'years_of_experience' => 'string',
-            //            'role' => 'required|string|max:255',
+            //'username' => 'required|string|max:255|unique:users',
+            //'city' => 'required|string|max:255',
+            //'postcode' => 'required|string|max:255',
+            //'phone_number' => 'required|string|max:255',
+            //'age' => 'required|string|max:255',
+            //'gender' => 'required|string|max:255',
+            //'driving_lesson_cost' => 'string|max:255',
+            //'approved_driving_instructor' => 'boolean',
+            //'years_of_experience' => 'string',
+            //'role' => 'required|string|max:255',
         ]);
     }
 
@@ -91,7 +91,47 @@ class RegisterController extends Controller
             return Redirect::back()->withInput($request->input())
                 ->withErrors(['name.required', 'Name is required']);
         }
-        $data = $request->toArray(); 
+        $data = $request->toArray();
+        $business_hours ='{
+            "time": {
+                "Monday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                },
+                "Tuesday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                },
+                "Wednesday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                },
+                "Thursday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                },
+                "Friday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                },
+                "Saturday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                },
+                "Sunday": {
+                    "open": null,
+                    "close": null,
+                    "closed": "on"
+                }
+            },
+            "submitted" : null
+        }';
         $role = Role::where('name', 'seller')->first();
         $User = User::create([
             'name' => $data['name'],
@@ -104,9 +144,10 @@ class RegisterController extends Controller
             'business_location' => json_encode($data['Address']),
             'lat' => $data['Address']['lat'],
             'lon' => $data['Address']['long'],
+            'business_hours' => $business_hours,
+            'settings' => '{"notification_music": 1}',
             'is_active' => 0,
         ]);
-
         $User->roles()->sync($role->id);
         $verification_code = Crypt::encrypt($User->email);
         $FRONTEND_URL = env('FRONTEND_URL');

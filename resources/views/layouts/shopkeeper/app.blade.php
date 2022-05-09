@@ -23,7 +23,6 @@
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
-
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <div class="container">
@@ -52,7 +51,7 @@
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
                         </form>
-                        <a class="" href="{{ route('logout') }}" onclick="event.preventDefault();
+                        <a href="{{ route('logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">Logout</a>
                     </li>
                 </ul>
@@ -157,6 +156,7 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
+
     <audio id="new_order_notification1">
         <source src="{{ asset('audio/TeekItaa.mp4') }}" type="audio/mp4">
     </audio>
@@ -171,7 +171,38 @@
     <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
+
+    <script>
+        $('#business_hours_modal').modal('show');
+
+        function closed(day) {
+            let listOfClasses = document.getElementById("time[" + day + "][open]").className;
+            if (listOfClasses.search("disabled-input-field") < 0) {
+                // To disable the input fields
+                document.getElementById("time[" + day + "][open]").value = null;
+                document.getElementById("time[" + day + "][close]").value = null;
+                // To disable the input fields
+                document.getElementById("time[" + day + "][open]").classList.add('disabled-input-field');
+                document.getElementById("time[" + day + "][close]").classList.add('disabled-input-field');
+                // To remove the required attribute from the input fields 
+                document.getElementById("time[" + day + "][open]").required = false;
+                document.getElementById("time[" + day + "][close]").required = false;
+            } else {
+                // To enable the input fields
+                document.getElementById("time[" + day + "][open]").classList.remove('disabled-input-field');
+                document.getElementById("time[" + day + "][close]").classList.remove('disabled-input-field');
+                // To add the required attribute from the input fields 
+                document.getElementById("time[" + day + "][open]").required = true;
+                document.getElementById("time[" + day + "][close]").required = true;
+            }
+        }
+    </script>
+
     <style>
+        .modal-dialog-custom{
+            max-width: 700px;
+        }
+
         .ratting span {
             color: wj
         }
@@ -270,7 +301,6 @@
             color: #3a4b83;
         }
 
-
         .card-body {
             padding: 5px 5px;
         }
@@ -344,8 +374,8 @@
 
         .ui-timepicker-standard {
             margin-top: -242px !important;
+            z-index: 1100 !important;
         }
-
         /*input.form-control{*/
         /*    border: 0;*/
         /*    border-bottom: 1px solid;*/
@@ -363,7 +393,6 @@
             border-color: #4a7ed6;
             padding-left: 3px;
             background: transparent;
-
             background-color: transparent !important;
         }
 
@@ -375,8 +404,10 @@
         }
     </style>
 
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <!-- Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css  -->
+    <link rel="stylesheet" href="{{ asset('res/dist/css/jquery.timepicker.min.css') }}">
+    <!-- Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js  -->
+    <script src="{{ asset('res/dist/js/jquery.timepicker.min.js') }}"></script>
     <script>
         $('.stimepicker').timepicker({
             timeFormat: 'h:mm p',
@@ -395,8 +426,9 @@
             scrollbar: true
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
         var total_orders = 0;
         /**

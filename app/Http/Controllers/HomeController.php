@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\View;
 use Stripe;
 
 class HomeController extends Controller
@@ -54,10 +55,13 @@ class HomeController extends Controller
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', Auth::id())->sum('order_total');
             $all_orders = Orders::where('seller_id', \auth()->id())
                 ->whereNotNull('order_status')
-                ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
-                 when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
+                ->orderby(\DB::raw('case when is_viewed = 0 then 0 when order_status = "pending" then 1 when order_status = "ready" then 2 when order_status = "assigned" then 3
+                 when order_status = "onTheWay" then 4 when order_status = "delivered" then 5 end'))
                 ->simplePaginate(5);
             return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
+            // return View::composer('shopkeeper.dashboard', function ($view) {
+            //     $view->with('user', $user)->with('pending_orders', 'On GeeksforGeeks')->with('pending_orders', );
+            // });
         } else {
             return $this->admin_home();
         }
@@ -430,7 +434,8 @@ class HomeController extends Controller
             if (!in_array("on", $time[$key]))
                 $time[$key] += ["closed" => null];
         }
-        $data['time'] = $time;
+        $data['time'] = $time; 
+        $data['submitted'] = "yes";
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
         $user->save();
