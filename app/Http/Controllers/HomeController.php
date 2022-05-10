@@ -236,9 +236,7 @@ class HomeController extends Controller
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    // Storage::disk('spaces')->put($filename, File::get($file));
                     Storage::disk('spaces')->put($filename, File::get($file));
-                    // Storage::disk('spaces')->exists($filename)
                     if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
                     } else {

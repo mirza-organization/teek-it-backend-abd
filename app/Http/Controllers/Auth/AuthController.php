@@ -53,11 +53,11 @@ class AuthController extends Controller
             $is_active = 0;
         }
         $User = User::create([
-            'name' => $request->get('name'),
+            'name' => $request->name,
             'l_name' => $request->l_name,
             'phone' => $request->phone,
-            'email' => $request->get('email'),
-            'password' => Hash::make($request->get('password')),
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
             'business_name' => $request->business_name,
             'business_location' => $request->business_location,
             'lat' => json_decode($request->business_location)->lat,
@@ -70,13 +70,11 @@ class AuthController extends Controller
         if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {
-                $file = $request->file('user_img');
-                $filename = $file->getClientOriginalName();
-                $filename = uniqid($User->id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                Storage::disk('user_public')->put($filename, File::get($file));
-                if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                $file = $request->file('user_img'); 
+                $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                Storage::disk('spaces')->put($filename, File::get($file));
+                if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                     info("file is store successfully : " . $filename);
-                    $filename = "/user_imgs/" . $filename;
                 } else {
                     info("file is not found :- " . $filename);
                 }
