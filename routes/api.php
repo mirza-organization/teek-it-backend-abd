@@ -81,6 +81,7 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::post('view/bulk', 'ProductsController@bulkView');
     Route::get('sortbyprice', 'ProductsController@sortByPrice');
     Route::get('sortByLocation', 'ProductsController@sortByLocation');
+    Route::post('recheck_products', 'OrdersController@recheck_products');
 });
 /*
 |--------------------------------------------------------------------------
@@ -116,7 +117,6 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('update', 'OrdersController@updateOrder');
         Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
         Route::get('/get-order-details/{id}', 'Api\v1\OrderController@getOrderDetails');
-        Route::post('recheck_products', 'OrdersController@recheck_products');
     });
 
     Route::group(['prefix' => 'notifications'], function ($router) {
@@ -138,7 +138,6 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
 
     Route::get('keys', 'Auth\AuthController@keys');
 });
-
 // Superadmin Routes
 //Route::group(['middleware' => ['jwt.verify','role:superadmin'],'prefix' => 'sadmin','namespace'=>'Admin'], function($router)
 //{
