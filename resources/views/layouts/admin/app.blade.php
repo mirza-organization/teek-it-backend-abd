@@ -417,8 +417,10 @@
 
         .row.mb-2 h1.m-0.text-dark.text-center {}
     </style>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <!-- Online Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css -->
+    <link rel="stylesheet" href="{{ asset('res/dist/css/jquery.timepicker.min.css') }}">
+    <!-- Online Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js -->
+    <script src="{{ asset('res/dist/js/jquery.timepicker.min.js') }}"></script>
     <script !src="">
         $('.stimepicker').timepicker({
             timeFormat: 'h:mm p',

@@ -749,8 +749,8 @@ class HomeController extends Controller
             $logo = Pages::query()->where('page_type', '=', 'logo')->first();
 
             $pending_orders = Orders::query()->where('order_status', '=', 'ready')->count();
-            $total_products = Orders::query()->where('payment_status', '!=', 'hidden')->count();
-            $total_orders = Products::query()->count();
+            $total_products = Products::query()->count();
+            $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->count();
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->sum('order_total');
             return view('admin.home', compact('terms_page', 'help_page', 'faq_page', 'slogan', 'favicon', 'logo', 'pending_orders', 'total_products', 'total_orders', 'total_sales'));
         } else {
@@ -952,7 +952,12 @@ class HomeController extends Controller
     {
         if (Auth::user()->hasRole('superadmin')) {
             for ($i = 0; $i < count($request->users); $i++) {
+                // $user =  User::find($request->users[$i]);
+                // if($user->hasRole('seller')){
+                //     // Del Products & Orders
+                // }
                 DB::table('users')->where('id', '=', $request->users[$i])->delete();
+                DB::table('role_user')->where('user_id', '=', $request->users[$i])->delete();
             }
             return response("Users Deleted Successfully");
         }
@@ -993,9 +998,8 @@ class HomeController extends Controller
             if ($request->search) {
                 $users = $users->where('name', 'LIKE', $request->search);
             }
-
+           
             $users = $users->paginate(9);
-
             return view('admin.drivers', compact('users'));
         } else {
             abort(404);
