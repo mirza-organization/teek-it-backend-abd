@@ -8,9 +8,9 @@
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
                 <a href="/stores" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Stores</a>
                 <div class="float-right">
-                    <button type="button" class="btn btn-success" onclick="selectAll()">
+                    <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>
-                    </button>
+                    </button> -->
                     <button type="button" class="btn btn-danger" onclick="delUsers()">
                         <a class="text-white">Delete</a>
                     </button>
