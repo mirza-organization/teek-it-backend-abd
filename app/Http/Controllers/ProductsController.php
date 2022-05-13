@@ -119,7 +119,7 @@ class ProductsController extends Controller
         $product->color = $request->color;
         $product->size = $request->size;
         $product->lat = $request->lat;
-        $product->lng = $request->lng;
+        $product->lon = $request->lon;
         $product->price = $request->price;
         $product->qty = $request->qty;
         $product->user_id = $user_id;
@@ -175,7 +175,7 @@ class ProductsController extends Controller
         $product->color = $request->color;
         $product->size = $request->size;
         $product->lat = $request->lat;
-        $product->lng = $request->lng;
+        $product->lon = $request->lon;
         $product->price = $request->price;
         $product->qty = $request->qty;
         $product->user_id = $user_id;
@@ -344,8 +344,8 @@ class ProductsController extends Controller
     public function sortByLocation(Request $request)
     {
         $latitude = $request->get('lat');
-        $longitude = $request->get('lng');
-        $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
+        $longitude = $request->get('lon');
+        $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
         //$products = Products::query()->paginate()->sortBy('price');
         $pagination = $products->toArray();
         if (!empty($products)) {

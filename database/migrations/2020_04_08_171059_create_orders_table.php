@@ -20,7 +20,7 @@ class CreateOrdersTable extends Migration
             $table->string('tax_total')->nullable();
             $table->string('total_items');
             $table->string('lat');
-            $table->string('lng');
+            $table->string('lon');
             $table->string('payment_status');
             $table->timestamps();
         });

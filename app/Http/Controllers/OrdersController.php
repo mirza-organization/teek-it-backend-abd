@@ -58,7 +58,7 @@ class OrdersController extends Controller
     public function seller_orders(Request $request)
     {
         $lat = \auth()->user()->lat;
-        $lng = \auth()->user()->lon;
+        $lon = \auth()->user()->lon;
         $orders = array();
         if ($request->has('order_status') && $request->order_status == 'delivered') {
             $orders = Orders::query();
@@ -74,7 +74,7 @@ class OrdersController extends Controller
                         "users.name",
                         DB::raw("3959 * acos(cos(radians(" . $lat . "))
                             * cos(radians(users.lat))
-                            * cos(radians(users.lon) - radians(" . $lng . "))
+                            * cos(radians(users.lon) - radians(" . $lon . "))
                             + sin(radians(" . $lat . "))
                             * sin(radians(users.lat))) AS distance")
                     )
@@ -113,7 +113,7 @@ class OrdersController extends Controller
                         "orders.id",
                         DB::raw("3959 * acos(cos(radians(" . $assignedOrders->lat . "))
                         * cos(radians(orders.lat))
-                        * cos(radians(orders.lng) - radians(" . $assignedOrders->lng . "))
+                        * cos(radians(orders.lon) - radians(" . $assignedOrders->lon . "))
                         + sin(radians(" . $assignedOrders->lat . "))
                         * sin(radians(orders.lat))) AS distance")
                     )
@@ -400,7 +400,7 @@ class OrdersController extends Controller
             $new_order->order_total = $order_total;
             $new_order->total_items = $total_items;
             $new_order->lat = $customer_lat;
-            $new_order->lng = $customer_lon;
+            $new_order->lon = $customer_lon;
             $new_order->type = $request->type;
             if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
@@ -543,7 +543,7 @@ class OrdersController extends Controller
                 //$this->calculateDriverFair($order, $user);
             }
             $order->lat = $request->lat;
-            $order->lng = $request->lng;
+            $order->lon = $request->lon;
             $order->type = $request->type;
             if ($request->type == 'delivery') {
                 $order->receiver_name = $request->receiver_name;
@@ -551,7 +551,7 @@ class OrdersController extends Controller
                 $order->address = $request->address;
                 $order->house_no = $request->house_no;
                 $order->flat = $request->flat;
-                $order->delivery_charges = $request->delivery_charges[$count];
+                $order->delivery_charges = $request->delivery_charges;
                 $order->service_charges = $request->service_charges;
             }
             $order->description = $request->description;
@@ -726,7 +726,7 @@ class OrdersController extends Controller
     //     $drop_off = 1.10;
     //     $fee = 0.20;
     //     if (is_null($order->parent_id)) {
-    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $store->lat, $store->lon);
+    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lon, $store->lat, $store->lon);
     //         $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
     //         $teekitCharges = $totalFair * $fee;
     //         $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
@@ -736,7 +736,7 @@ class OrdersController extends Controller
     //         $order->save();
     //     } else {
     //         $oldOrder = Orders::find($order->parent_id);
-    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lng, $oldOrder->lat, $oldOrder->lon);
+    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lon, $oldOrder->lat, $oldOrder->lon);
     //         $pickup_val = $oldOrder->seller_id == $order->seller_id ? 0.0 : $pickup;
     //         $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
     //         $teekitCharges = $totalFair * $fee;

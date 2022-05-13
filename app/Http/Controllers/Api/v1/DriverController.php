@@ -29,7 +29,7 @@ class DriverController extends Controller
                 return [
                     'id' => $user->id,
                     'name' => $user->name . ' ' . $user->l_name,
-                    'lat_lng' => $user->business_location,
+                    'lat_lon' => $user->business_location,
                     'phone' => $user->phone
                 ];
             });
@@ -39,12 +39,12 @@ class DriverController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function addLatLng(Request $request)
+    public function addLatLon(Request $request)
     {
         $data = [
-            'business_location' => $request->latlng,
-            'lat' => json_decode($request->latlng)->lat,
-            'lon' => json_decode($request->latlng)->long
+            'business_location' => $request->latlon,
+            'lat' => json_decode($request->latlon)->lat,
+            'lon' => json_decode($request->latlon)->long
         ];
         return User::where('id', auth()->id())
             ->update($data);
