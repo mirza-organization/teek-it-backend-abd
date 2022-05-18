@@ -22,7 +22,7 @@ class OrdersController extends Controller
      * @version 1.1.0
      */
     public function index(Request $request)
-    { 
+    {
         $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderByDesc('id');
         if (!empty($request->order_status)) {
             $orders = $orders->where('order_status', '=', $request->order_status);
@@ -143,7 +143,7 @@ class OrdersController extends Controller
                     ->orderByDesc('created_at')->paginate();
                 $pagination = $orders->toArray();
             }
-        } elseif ($request->has('order_status') && $request->order_status == 'complete'){
+        } elseif ($request->has('order_status') && $request->order_status == 'complete') {
             $orders = Orders::query();
             $orders = $orders->where('type', '=', 'delivery')
                 ->where('order_status', 'complete')
@@ -411,27 +411,6 @@ class OrdersController extends Controller
                 $new_order->driver_charges = $driver_charges;
                 $new_order->delivery_charges = $request->delivery_charges;
                 $new_order->service_charges = $request->service_charges;
-                // For sending SMS notification for "New Order" 
-                $sms = new TwilioSmsService();
-                $verification_code = '';
-                while (strlen($verification_code) < 6) {
-                    $rand_number = rand(0, time());
-                    $verification_code = $verification_code . substr($rand_number, 0, 1);
-                }
-                $message_for_admin = "A new order has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
-                $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
-
-                $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
-                $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
-
-                // To restrict "New Order" SMS notifications only for UK numbers
-                if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
-                    $sms->sendSms($user->business_phone, $message_for_customer);
-                }
-                $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
-                $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number
-                $sms->sendSms('+447817332090', $message_for_admin); //Junaid Number
-                $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number
             }
             $new_order->description = $request->description;
             $new_order->payment_status = $request->payment_status ?? "hidden";
@@ -439,6 +418,29 @@ class OrdersController extends Controller
             $new_order->save();
             $order_id = $new_order->id;
             if ($request->type == 'delivery') {
+                $verification_code = '';
+                while (strlen($verification_code) < 6) {
+                    $rand_number = rand(0, time());
+                    $verification_code = $verification_code . substr($rand_number, 0, 1);
+                }
+                if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
+                    // For sending SMS notification for "New Order" 
+                    $sms = new TwilioSmsService();
+                    $message_for_admin = "A new order #". $order_id ." has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
+                    $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
+
+                    $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
+                    $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
+
+                    // To restrict "New Order" SMS notifications only for UK numbers
+                    if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
+                        $sms->sendSms($user->business_phone, $message_for_customer);
+                    }
+                    $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
+                    $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number
+                    $sms->sendSms('+447817332090', $message_for_admin); //Junaid Number
+                    $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number     
+                }
                 $verification_codes = new VerificationCodes();
                 $verification_codes->order_id = $order_id;
                 $verification_codes->code = '{"code": "' . $verification_code . '", "driver_failed_to_enter_code": "NULL"}';
