@@ -6,7 +6,7 @@
         <div class="row mb-2">
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
-                <a href="#" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Orders</a>
+                <a href="#" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Unverified Orders</a>
                 <div class="float-right">
                     <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>
@@ -63,10 +63,18 @@
                                         Placed on {{$order->created_at}}
                                     </p>
                                 </div>
-                                <div class="col-md-5">
+                                <div class="col-md-3">
                                     <div class="row">
                                         <div class="col-md-12">
                                             Order Status: <span class="text-warning">{{$order->order_status}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <i class="far fa-times-circle text-danger"></i>
+                                            <span class="text-danger">Unverified</span>
                                         </div>
                                     </div>
                                 </div>

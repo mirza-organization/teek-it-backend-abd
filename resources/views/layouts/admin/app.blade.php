@@ -126,6 +126,18 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a href="/aorders/verified" class="nav-link">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Verified Orders</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/aorders/unverified" class="nav-link">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Unverified Orders</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a href="/complete-orders" class="nav-link">
                                         <i class="fas fa-money nav-icon"></i>
                                         <p>Complete Orders</p>

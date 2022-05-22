@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Hash;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -12,7 +13,6 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::get('/', function (Request $request) {
     return 'Working';
 });
@@ -192,6 +192,14 @@ Route::get('payment_intent', function () {
 Route::get('time', function () {
     return response()->json([
         'data' => time(),
+        'status' => true,
+        'message' => ''
+    ], 200);
+});
+
+Route::get('generate_hash', function(){
+    return response()->json([
+        'data' => Hash::make($_REQUEST['password']),
         'status' => true,
         'message' => ''
     ], 200);

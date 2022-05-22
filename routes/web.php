@@ -112,6 +112,8 @@ Route::get('/stores', 'HomeController@admin_stores');
 Route::get('/customers', 'HomeController@admin_customers');
 Route::get('/drivers', 'HomeController@admin_drivers');
 Route::get('/aorders', 'HomeController@admin_orders');
+Route::get('/aorders/verified', 'HomeController@admin_orders_verified');
+Route::get('/aorders/unverified', 'HomeController@admin_orders_unverified');
 Route::get('/aorders/delete', 'HomeController@admin_orders_del')->name('admin.del.orders');
 Route::get('/complete-orders', 'HomeController@complete_orders')->name('complete.order');
 Route::get('/mark-complete-order/{id}', 'HomeController@mark_complete_order')->name('mark.complete.order');

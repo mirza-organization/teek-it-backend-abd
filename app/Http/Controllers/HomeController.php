@@ -254,9 +254,7 @@ class HomeController extends Controller
                     foreach ($images as $image) {
                         $file = $image;
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        // Storage::disk('spaces')->put($filename, File::get($file));
                         Storage::disk('spaces')->put($filename, File::get($file));
-                        // Storage::disk('spaces')->exists($filename)
                         if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                             info("file is store successfully : " . $filename);
                         } else {
@@ -432,7 +430,7 @@ class HomeController extends Controller
             if (!in_array("on", $time[$key]))
                 $time[$key] += ["closed" => null];
         }
-        $data['time'] = $time; 
+        $data['time'] = $time;
         $data['submitted'] = "yes";
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
@@ -723,13 +721,11 @@ class HomeController extends Controller
         $verification_codes = VerificationCodes::query()->select('code->driver_failed_to_enter_code as driver_failed_to_enter_code')
             ->where('order_id', '=', $order_id)
             ->get();
-        if (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "Yes") {
+        if (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "Yes" || json_decode($verification_codes)[0]->driver_failed_to_enter_code == "NULL") {
             Orders::where('id', '=', $order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
             flash('This Order Has Been Marked As Completed')->success();
         } elseif (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "No") {
             flash('This Order Is Already Marked As Completed')->success();
-        } elseif (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "NULL") {
-            flash('This Order Cant Be Marked As Completed Because The Verification Code Has Not Been Provided By The Driver Yet')->success();
         }
         return Redirect::back();
     }
@@ -793,12 +789,15 @@ class HomeController extends Controller
             $user = User::find($user_id);
             if ($user->hasRole('seller')) {
                 $orders = Orders::query()->where('seller_id', '=', $user_id);
+                $role_id = 2;
             }
             if ($user->hasRole('buyer')) {
                 $orders = Orders::query()->where('user_id', '=', $user_id);
+                $role_id = 3;
             }
             if ($user->hasRole('delivery_boy')) {
                 $orders = Orders::query()->where('delivery_boy_id', '=', $user_id);
+                $role_id = 4;
             }
             $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
             $orders = $orders->paginate(10);
@@ -814,11 +813,8 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
-            // $loc = User::where('id', '=', $user_id)
-            // ->update(['business_location->lat' => 64.77]);
-            // dd($loc);
             $orders = $return_arr;
-            return view('admin.customer_details', compact('orders', 'orders_p', 'user'));
+            return view('admin.customer_details', compact('orders', 'orders_p', 'user', 'role_id'));
         } else {
             abort(401);
         }
@@ -998,7 +994,7 @@ class HomeController extends Controller
             if ($request->search) {
                 $users = $users->where('name', 'LIKE', $request->search);
             }
-           
+
             $users = $users->paginate(9);
             return view('admin.drivers', compact('users'));
         } else {
@@ -1039,6 +1035,86 @@ class HomeController extends Controller
             }
             $orders = $return_arr;
             return view('admin.orders', compact('orders', 'orders_p'));
+        } else {
+            abort(404);
+        }
+    }
+    /**
+     * Render verified orders listing view for admin
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function admin_orders_verified(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            $return_arr = [];
+            $orders = Orders::query()->where('payment_status', '!=', 'hidden');
+            $verified_orders = VerificationCodes::query()
+            ->where('code->driver_failed_to_enter_code', '=', 'No')
+            ->orderByDesc('id')
+            ->get();
+            foreach ($verified_orders as $order) {
+                $items = OrderItems::query()->where('order_id', '=', $order->order_id)->get();
+                $item_arr = [];
+                foreach ($items as $item) {
+                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $item['product'] = $product;
+                    $item_arr[] = $item;
+                }
+                $order['items'] = $item_arr;
+                $return_arr[] = $order;
+            }
+            // if ($request->search) {
+            //     $orders = $orders->where('id', '=', $request->search);
+            // }
+            // if ($request->user_id) {
+            //     $orders = $orders->where('user_id', '=', $request->user_id);
+            // }
+            // if ($request->store_id) {
+            //     $orders = $orders->where('seller_id', '=', $request->store_id);
+            // }
+            $orders = $orders->paginate(10);
+            $orders_p = $orders;
+            $orders = $return_arr;
+            return view('admin.verified_orders', compact('orders', 'orders_p'));
+        } else {
+            abort(404);
+        }
+    }
+    /**
+     * Render unverified orders listing view for admin
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function admin_orders_unverified(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            $return_arr = [];
+            $orders = Orders::query()->where('payment_status', '!=', 'hidden')->orderByDesc('id');
+            if ($request->search) {
+                $orders = $orders->where('id', '=', $request->search);
+            }
+            if ($request->user_id) {
+                $orders = $orders->where('user_id', '=', $request->user_id);
+            }
+            if ($request->store_id) {
+                $orders = $orders->where('seller_id', '=', $request->store_id);
+            }
+            $orders = $orders->paginate(10);
+            $orders_p = $orders;
+            foreach ($orders as $order) {
+                $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
+                $item_arr = [];
+                foreach ($items as $item) {
+                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $item['product'] = $product;
+                    $item_arr[] = $item;
+                }
+                $order['items'] = $item_arr;
+                $return_arr[] = $order;
+            }
+            $orders = $return_arr;
+            return view('admin.unverified_orders', compact('orders', 'orders_p'));
         } else {
             abort(404);
         }
