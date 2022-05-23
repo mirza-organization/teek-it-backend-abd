@@ -178,12 +178,16 @@ class DriverController extends Controller
             $given_code = $request->verification_code;
             // If the driver is failed to enter the right verification code
             if ($saved_code != $given_code) {
+                VerificationCodes::where('order_id', '=', $request->order_id)
+                ->update(['code->driver_failed_to_enter_code' => 'Yes']);
                 return response()->json([
                     'data' => [],
                     'status' => false,
                     'message' => config('constants.VERIFICATION_FAILED')
                 ], 200);
             } else {
+                VerificationCodes::where('order_id', '=', $request->order_id)
+                ->update(['code->driver_failed_to_enter_code' => 'No']);
                 Orders::where('id', '=', $request->order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
                 $driver = User::find($request->delivery_boy_id);
                 $order = Orders::find($request->order_id);

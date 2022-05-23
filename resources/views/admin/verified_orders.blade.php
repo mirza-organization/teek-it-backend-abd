@@ -44,8 +44,8 @@
             <div class="col-md-12 p-4 pr-4">
                 <div class="card">
                     <div class="card-body p-2 pl-5 pr-5 pb-5">
-                        <div class="p-2 mb-2">
-                            <input type="checkbox" class="select-checkbox" title="Select" id="{{$order->id}}">
+                        <div class="p-2 mb-2"> 
+                            <input type="checkbox" class="select-checkbox" title="Select" id="{{$order->order_details->id}}">
                             Order #{{$order->order_id}}
                             @if($order->order_status=='pending')
                             <a href="{{route('accept_order',['order_id'=>$order->id])}}" class="d-block btn btn-success float-right">Click Here If Order Is Ready</a>
@@ -60,13 +60,13 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <p>
-                                        Placed on {{$order->created_at}}
+                                        Placed on {{$order->order_details->created_at}}
                                     </p>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            Order Status: <span class="text-warning">{{$order->order_status}}</span>
+                                            Order Status: <span class="text-warning">{{$order->order_details->order_status}}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -88,9 +88,9 @@
                                     <div class="col-md-2">
                                         <span class="img-container">
                                             @if(str_contains($item->product->feature_img, 'https://'))
-                                            <img class="d-block m-auto " src="{{$item->product->feature_img}}" alt="">
+                                            <img class="d-block m-auto " src="{{$item->product->feature_img}}">
                                             @else
-                                            <img class="d-block m-auto " src="{{config('constants.BUCKET') . $item->product->feature_img}}" alt="">
+                                            <img class="d-block m-auto " src="{{config('constants.BUCKET') . $item->product->feature_img}}">
                                             @endif
                                         </span>
                                     </div>
@@ -102,11 +102,11 @@
                                         </h3>
                                     </div>
                                     <div class="col-md-6 mt-5">
-                                        <strong class="text-site-primary"> Receiver Name: </strong> {{$order->receiver_name}} <br>
-                                        <strong class="text-site-primary"> Contact: </strong> {{$order->phone_number}} <br>
-                                        <strong class="text-site-primary"> Address: </strong> {{$order->address}} <br>
-                                        <strong class="text-site-primary"> House#: </strong> {{$order->house_no}} <br>
-                                        <strong class="text-site-primary"> Flat: </strong> {{$order->flat}} <br>
+                                        <strong class="text-site-primary"> Receiver Name: </strong> {{$order->order_details->receiver_name}} <br>
+                                        <strong class="text-site-primary"> Contact: </strong> {{$order->order_details->phone_number}} <br>
+                                        <strong class="text-site-primary"> Address: </strong> {{$order->order_details->address}} <br>
+                                        <strong class="text-site-primary"> House#: </strong> {{$order->order_details->house_no}} <br>
+                                        <strong class="text-site-primary"> Flat: </strong> {{$order->order_details->flat}} <br>
                                         <strong class="text-site-primary"> QTY: </strong> {{$item->product_qty}}
                                     </div>
                                     <div class="col-md-12"><br></div>
