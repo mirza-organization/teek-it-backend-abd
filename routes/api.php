@@ -95,6 +95,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('update/{product_id}', 'ProductsController@update');
         Route::get('delete/{product_id}', 'ProductsController@delete');
         Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@delete_image');
+        Route::get('featured/{store_id}', 'ProductsController@featuredProducts');
         Route::post('ratings/add', 'RattingsController@add');
         Route::post('ratings/update', 'RattingsController@update');
         Route::get('ratings/delete/{ratting_id}', 'RattingsController@delete');

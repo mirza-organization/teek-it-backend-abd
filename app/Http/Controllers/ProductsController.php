@@ -399,17 +399,62 @@ class ProductsController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * It will delete the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function delete($product_id)
     {
         Products::find($product_id)->delete();
         return $this->all();
     }
-
+    /**
+     * It will delete the image of the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function delete_image($image_id, $product_id)
     {
         productImages::find($image_id)->delete();
         return $this->get_product_info($product_id);
+    }
+    /**
+     * It list the featured products 
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
+    public function featuredProducts(Request $request)
+    { 
+        $featured_products = Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })->where('user_id', '=', $request->store_id)
+            ->where('featured', '=', 1)
+            ->where('status', '=', 1)
+            ->orderByDesc('id')
+            ->paginate(10);
+        $pagination = $featured_products->toArray();
+        if (!empty($featured_products)) {
+            $products_data = [];
+            foreach ($featured_products as $product) {
+                $data = $this->get_product_info($product->id);
+                $data->store = User::find($product->user_id);
+                $products_data[] = $data;
+            }
+            unset($pagination['data']);
+            return response()->json([
+                'data' => $products_data,
+                'status' => true,
+                'message' => '',
+                'pagination' => $pagination,
+            ], 200);
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
+        }
     }
     /**
      * It find's the price of the given product
