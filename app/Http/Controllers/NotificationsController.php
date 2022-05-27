@@ -87,22 +87,18 @@ class NotificationsController extends Controller
 ///
 ///
 
-
-
-
     public function get_notifications(){
         $notifications = notifications::query()->where('user_id','=',Auth::id())->get();
-
         $response = array(
+            'data' => $notifications,
             'status' => true,
-            'message' => 'User Notifications',
-            'data' => $notifications
+            'message' => 'User Notifications'
         );
         if ($notifications->count()<=0){
             $response = array(
+                'data' => [],
                 'status' => false,
-                'message' => 'No New Notifications',
-                'data' => null
+                'message' => 'No New Notifications'
             );
         }
         return response()->json($response, 200);
@@ -111,25 +107,29 @@ class NotificationsController extends Controller
     public function delete_notification($notification_id){
         $notification = notifications::find($notification_id);
         $response = array(
+            'data' => [],
             'status' => false,
-            'message' => 'There is No Notification with the given ID or maybe already Deleted',
-            'data' => null
+            'message' => 'There is No Notification with the given ID or maybe already Deleted'
         );
         if (!empty($notification)){
             $notification->delete();
             $response = array(
+                'data' => [],
                 'status' => true,
-                'message' => 'Notification Deleted',
-                'data' => null
+                'message' => 'Notification Deleted'
             );
         }
-
         return response()->json($response, 200);
     }
+    
     public function send_notification(Request $request){
         $validate = notifications::validator($request);
         if ($validate->fails()) {
-            $response = array('status' => false, 'message' => 'Validation error', 'data' => $validate->messages());
+            $response = array(
+                'data' => $validate->messages(),
+                'status' => false,
+                'message' => 'Validation error'
+            );
             return response()->json($response, 400);
         }
         $sender_id=Auth::id();
@@ -141,11 +141,10 @@ class NotificationsController extends Controller
         $notification->other_data = $request->other_data;
         $notification->save();
         $response = array(
+            'data' => [],
             'status' => true,
-            'message' => 'Notification Sent',
-            'data' => null
+            'message' => 'Notification Sent'
         );
         return response()->json($response, 200);
-
     }
 }

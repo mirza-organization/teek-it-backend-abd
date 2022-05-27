@@ -421,7 +421,7 @@ class ProductsController extends Controller
     }
     /**
      * It list the featured products 
-     * @author Huzaifa Haleem
+     * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
     public function featuredProducts(Request $request)
