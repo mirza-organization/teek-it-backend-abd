@@ -60,6 +60,7 @@ Route::get('/inventory/disable/{product_id}', 'HomeController@inventory_disable'
 Route::get('/inventory/enable/{product_id}', 'HomeController@inventory_enable')->name('inventory_enable');
 Route::get('/inventory/enable_all', 'HomeController@inventory_enable_all')->name('enable_all');
 Route::get('/inventory/disable_all', 'HomeController@inventory_disable_all')->name('disable_all');
+Route::get('/inventory/feature/{product_id}', 'HomeController@featureProduct')->name('featureProduct');
 /*
 |--------------------------------------------------------------------------
 | User Settings Routes

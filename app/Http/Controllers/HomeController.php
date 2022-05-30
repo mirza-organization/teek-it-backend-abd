@@ -71,6 +71,8 @@ class HomeController extends Controller
     {
         if (Auth::user()->hasRole('seller')) {
             $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
+            $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+            // dd($featured);
             if ($request->search) {
                 $inventory = $inventory->where('product_name', 'LIKE', $request->search);
             }
@@ -84,7 +86,10 @@ class HomeController extends Controller
             foreach ($inventory as $in) {
                 $inventories[] = Products::get_product_info($in->id);
             }
-            return view('shopkeeper.inventory.list', compact('inventories', 'inventory_p', 'categories'));
+            foreach ($featured as $in) {
+                $featured_products[] = Products::get_product_info($in->id);
+            }
+            return view('shopkeeper.inventory.list', compact('inventories', 'featured_products', 'inventory_p', 'categories'));
         } else {
             abort(404);
         }
@@ -185,6 +190,21 @@ class HomeController extends Controller
             ->where('user_id', Auth::id())
             ->update(['status' => 1]);
         flash('All Products Enabled Successfully')->success();
+        return Redirect::back();
+    }
+    /**
+     * Feature the given product
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function featureProduct(Request $request)
+    {
+        if (Auth::user()->hasRole('seller')) {
+            DB::table('products')
+                ->where('id', $request->product_id)
+                ->update(['featured' => 1]);
+            flash('Marked As Featured, Successfully')->success();
+        }
         return Redirect::back();
     }
     /**
