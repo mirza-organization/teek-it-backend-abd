@@ -197,13 +197,39 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function featureProduct(Request $request)
+    public function markAsFeatured(Request $request)
+    {
+        if (Auth::user()->hasRole('seller')) {
+            $count = DB::table('products')
+                ->select()
+                ->where('user_id', Auth::id())
+                ->where('featured', 1)
+                ->count();
+            if ($count >= 6) {
+                flash('You Can Mark Maximum 6 Products As Featured')->success();
+            } else {
+                DB::table('products')
+                    ->where('id', $request->product_id)
+                    ->update(['featured' => 1]);
+                flash('Marked As Featured, Successfully')->success();
+            }
+            return Redirect::back();
+        }else{
+            abort(404);
+        }
+    }
+    /**
+     * Remove the given product from featured list
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function removeFromFeatured(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             DB::table('products')
                 ->where('id', $request->product_id)
-                ->update(['featured' => 1]);
-            flash('Marked As Featured, Successfully')->success();
+                ->update(['featured' => 0]);
+            flash('Removed From Featured, Successfully')->success();
         }
         return Redirect::back();
     }

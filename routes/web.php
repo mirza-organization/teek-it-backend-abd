@@ -60,7 +60,8 @@ Route::get('/inventory/disable/{product_id}', 'HomeController@inventory_disable'
 Route::get('/inventory/enable/{product_id}', 'HomeController@inventory_enable')->name('inventory_enable');
 Route::get('/inventory/enable_all', 'HomeController@inventory_enable_all')->name('enable_all');
 Route::get('/inventory/disable_all', 'HomeController@inventory_disable_all')->name('disable_all');
-Route::get('/inventory/feature/{product_id}', 'HomeController@featureProduct')->name('featureProduct');
+Route::get('/inventory/feature/add/{product_id}', 'HomeController@markAsFeatured')->name('markAsFeatured');
+Route::get('/inventory/feature/remove/{product_id}', 'HomeController@removeFromFeatured')->name('removeFromFeatured');
 /*
 |--------------------------------------------------------------------------
 | User Settings Routes

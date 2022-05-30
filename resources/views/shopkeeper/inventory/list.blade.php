@@ -82,18 +82,17 @@
                 <div class="col-md-12 col-lg-6 col-xl-4 pb-4">
                     <div class="card change-height">
                         <div class="card-body">
-                            <a href="" class=" d-block text-right">
                                 <div class="card-text">
                                     <div class="row">
-                                        <!-- <div class="col-md-12">
-                                            <a href="{{route('featureProduct',['product_id'=>$inventory->id])}}" title="Mark As Featured" class="d-block text-right float-right"><i class="fas fa-star fa-2x text-warning"></i></a>
+                                        <div class="col-md-12">
+                                            <a href="{{route('removeFromFeatured',['product_id'=>$inventory->id])}}" title="Remove From Featured" class="d-block text-right float-right"><i class="far fa-times-circle fa-2x text-danger"></i></a>
                                             <a href="/inventory/edit/{{$inventory->id}}" title="Edit" class="d-block text-right float-right"><img class="img-size-16" src="{{asset('res/res/img/edit.png')}}"></a>
                                             @if($inventory->status==1)
                                             <a href="/inventory/disable/{{$inventory->id}}" class=" d-block text-right float-right pr-3 text-danger"><span class="font-weight-bold">Disable</span> (Put Inventory 0)</a>
                                             @elseif($inventory->status==0)
                                             <a href="/inventory/enable/{{$inventory->id}}" class=" d-block text-right float-right pr-3 text-primary"><span class="font-weight-bold">Enable</span></a>
                                             @endif
-                                        </div> -->
+                                        </div>
                                         <div class="col-md-9">
                                             <span class="img-container pt-30 pb-30 mb-3">
                                                 @if(str_contains($inventory->feature_img, 'https://'))
@@ -214,12 +213,12 @@
                                 <div class="card-text">
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <a href="{{route('featureProduct',['product_id'=>$inventory->id])}}" title="Mark As Featured" class="d-block text-right float-right"><i class="fas fa-star fa-2x text-warning"></i></a>
+                                            <a href="{{route('markAsFeatured',['product_id'=>$inventory->id])}}" title="Mark As Featured" class="d-block text-right float-right"><i class="fas fa-star fa-2x text-warning"></i></a>
                                             <a href="/inventory/edit/{{$inventory->id}}" title="Edit" class="d-block text-right float-right"><img class="img-size-16" src="{{asset('res/res/img/edit.png')}}"></a>
                                             @if($inventory->status==1)
-                                            <a href="/inventory/disable/{{$inventory->id}}" class=" d-block text-right float-right pr-3 text-danger"><span class="font-weight-bold">Disable</span> (Put Inventory 0)</a>
+                                            <a href="/inventory/disable/{{$inventory->id}}" class="d-block text-right float-right pr-3 text-danger"><span class="font-weight-bold">Disable</span> (Put Inventory 0)</a>
                                             @elseif($inventory->status==0)
-                                            <a href="/inventory/enable/{{$inventory->id}}" class=" d-block text-right float-right pr-3 text-primary"><span class="font-weight-bold">Enable</span></a>
+                                            <a href="/inventory/enable/{{$inventory->id}}" class="d-block text-right float-right pr-3 text-primary"><span class="font-weight-bold">Enable</span></a>
                                             @endif
                                         </div>
                                         <div class="col-md-9">
