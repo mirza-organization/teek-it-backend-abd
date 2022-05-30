@@ -72,7 +72,6 @@ class HomeController extends Controller
         if (Auth::user()->hasRole('seller')) {
             $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
             $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
-            // dd($featured);
             if ($request->search) {
                 $inventory = $inventory->where('product_name', 'LIKE', $request->search);
             }
@@ -83,6 +82,7 @@ class HomeController extends Controller
             $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
             $inventories = [];
+            $featured_products = [];
             foreach ($inventory as $in) {
                 $inventories[] = Products::get_product_info($in->id);
             }

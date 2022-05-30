@@ -64,6 +64,7 @@
             </form>
         </div>
 
+        @if (!empty($featured_products))
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -190,6 +191,7 @@
             <!-- /.row -->
         </div>
         <!-- /.container-featured-products-ends -->
+        @endif
 
         <div class="content-header">
             <div class="container-fluid">
