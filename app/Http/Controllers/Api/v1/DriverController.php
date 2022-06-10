@@ -300,10 +300,10 @@ class DriverController extends Controller
         }
 
         if (!empty($request->driving_licence_number)) {
-            $front_img = $request->file('front_img');
+            $front_img = $request->file('front_img'); 
             $back_img = $request->file('back_img');
-            $front_filename = uniqid($driver_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            $back_filename = uniqid($driver_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+            $front_filename = uniqid($driver_id . '_') . "." . $front_img->getClientOriginalExtension(); //create unique file name...
+            $back_filename = uniqid($driver_id . '_') . "." . $back_img->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($front_filename, File::get($front_img));
             Storage::disk('spaces')->put($back_filename, File::get($back_img));
             if (Storage::disk('spaces')->exists($front_filename) && Storage::disk('spaces')->exists($back_filename)) {  // check file exists in directory or not
@@ -320,35 +320,36 @@ class DriverController extends Controller
             $driving_licence->save();
         }
 
-        // $verification_code = Crypt::encrypt($drivers->email);
-        // $FRONTEND_URL = env('FRONTEND_URL');
-        // $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
+        $verification_code = Crypt::encrypt($drivers->email);
+        $FRONTEND_URL = env('FRONTEND_URL');
+        $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
-        // $html = '<html>
-        //     Hi, ' . $drivers->f_name . '<br><br>
-        //     Thank you for registering on ' . env('APP_NAME') . '.
-        //     <br>
-        //     Here is your account verification link. Click on below link to verify your account. <br><br>
-        //     <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
-        //     ' . $account_verification_link . '
-        //     <br><br><br>
-        //     </html>';
+        $html = '<html>
+            Hi, ' . $drivers->f_name . '<br><br>
+            Thank you for registering on ' . env('APP_NAME') . '.
+            <br>
+            Here is your account verification link. Click on below link to verify your account. <br><br>
+            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+            ' . $account_verification_link . '
+            <br><br><br>
+            </html>';
 
-        // $subject = env('APP_NAME') . ': Account Verification';
-        // Mail::to($drivers->email)
-        //     ->send(new StoreRegisterMail($html, $subject));
+        $subject = env('APP_NAME') . ': Account Verification';
+        Mail::to($drivers->email)
+            ->send(new StoreRegisterMail($html, $subject));
 
         if ($drivers) {
+            // echo "hello"; exit;
             return response()->json([
                 'data' => [],
                 'status' => true,
-                'message' => config('constants.SIGNUP_SUCCESS')
+                'message' => 'You have Signed Up Successfully. We have sent you a verification email please verify.'
             ], 200);
         } else {
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.SIGNUP_ERROR')
+                'message' => 'Error in signing Up.'
             ], 200);
         }
         // $drivers->roles()->sync($role->id);
