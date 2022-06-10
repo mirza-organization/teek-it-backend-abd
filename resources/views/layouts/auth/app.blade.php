@@ -31,7 +31,9 @@
                     <img style=" max-height: 50px;" src="{{ asset('res/res/img/logo.png') }}" alt="TeekIt Logo">
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="fas fa-bars"></span>
+                    <!-- <span class="fas fa-bars"></span> -->
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">

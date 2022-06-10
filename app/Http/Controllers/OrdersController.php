@@ -369,7 +369,7 @@ class OrdersController extends Controller
         $count = 0;
         $order_arr = [];
         foreach ($grouped_seller as $seller_id => $order) {
-            $user_id = Auth()->id();
+            $user_id = Auth::id();
             $total_weight = 0;
             $total_volumn = 0;
             $order_total = 0;

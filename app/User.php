@@ -16,7 +16,6 @@ class User extends Authenticatable implements JWTSubject
     use Notifiable;
     use EntrustUserTrait;
 
-
     /**
      * The attributes that are mass assignable.
      *
@@ -84,7 +83,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return [
             'name' => $this->name,
-            'roles'=>$this->roles
+            'roles' => $this->roles
         ];
     }
 
@@ -92,16 +91,15 @@ class User extends Authenticatable implements JWTSubject
     {
         return Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'l_name'=>'',
-            'postal_code'=>'',
+            'l_name' => '',
+            'postal_code' => '',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|max:50',
             'business_name' => 'string|max:255',
             'business_location' => 'string|max:255',
             'role' => 'required|string|max:255',
-            'address_1'=>'',
-            'address_2'=>'',
-
+            'address_1' => '',
+            'address_2' => '',
         ]);
     }
 
@@ -109,16 +107,15 @@ class User extends Authenticatable implements JWTSubject
     {
         return Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'l_name'=>'',
-            'postal_code'=>'',
+            'l_name' => '',
+            'postal_code' => '',
             'business_name' => '',
             'business_location' => '',
             'user_img' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'address_1'=>'',
-            'address_2'=>''
+            'address_1' => '',
+            'address_2' => ''
         ]);
     }
-
 
     public function roles()
     {
@@ -127,11 +124,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function seller()
     {
-        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name','seller');
+        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'seller');
     }
 
     public function driver()
     {
-        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name','delivery_boy');
+        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
     }
 }

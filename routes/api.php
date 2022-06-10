@@ -127,6 +127,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
     });
 
     Route::group(['prefix' => 'driver'], function () {
+        Route::post('/register', 'Api\v1\DriverController@registerDriver');
         Route::get('/info/{id}', 'Api\v1\DriverController@info');
         Route::post('/add-lat-lon', 'Api\v1\DriverController@addLatLon');
         Route::get('/withdrawable-balance', 'Api\v1\DriverController@getWithdrawalBalance');

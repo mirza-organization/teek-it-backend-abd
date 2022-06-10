@@ -158,7 +158,7 @@ class RegisterController extends Controller
 
             Thank you for registering on ' . env('APP_NAME') . '.
 <br>
-            Here is your account verification link. Click on below link to verify you account. <br><br>
+            Here is your account verification link. Click on below link to verify your account. <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
             ' . $account_verification_link . '
 <br><br><br>

@@ -2,6 +2,9 @@
 
 return [
     'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
+    'SIGNUP_SUCCESS' => 'You have Signed Up Successfully. We have sent you a verification email please verify.',
+
+    'SIGNUP_ERROR' => 'Error in signing Up.',
 
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',

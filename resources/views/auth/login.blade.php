@@ -5,7 +5,6 @@
     <div class="row">
         <div class="col-md-12">
             <h1 class="text-white text-center">{{ __('Sign Up') }}</h1>
-            <h1 class="text-white text-center d-none">{{ __('Login') }}</h1>
 
             <form method="POST" action="{{ route('register') }}" style="margin-bottom: 100px;">
                 @csrf
@@ -107,7 +106,7 @@
                 </div>
             </form>
 
-            <form style="display: none" method="POST" action="{{ route('login') }}">
+            <!-- <form style="display: none" method="POST" action="{{ route('login') }}">
                 @csrf
 
                 <div class="form-group row">
@@ -161,7 +160,7 @@
                         </a>
                     </div>
                 </div>
-            </form>
+            </form> -->
         </div>
     </div>
 </div>
