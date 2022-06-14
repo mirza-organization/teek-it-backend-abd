@@ -29,4 +29,12 @@ class TwilioSmsService
             'from' => $this->fromNumber,
             'body' => $message]);
     }
+
+    public function sendSms2($receiverNumber, $message)
+    {
+        $client = new Client($this->sid, $this->token);
+        $client->messages->create($receiverNumber, [
+            'from' => 'Thokku',
+            'body' => $message]);
+    }
 }

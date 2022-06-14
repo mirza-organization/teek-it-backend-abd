@@ -426,7 +426,7 @@ class OrdersController extends Controller
                 if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
                     // For sending SMS notification for "New Order" 
                     $sms = new TwilioSmsService();
-                    $message_for_admin = "A new order #". $order_id ." has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
+                    $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
                     $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
 
                     $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
@@ -463,6 +463,14 @@ class OrdersController extends Controller
             'message' => 'Order added successfully.'
         ], 200);
     }
+
+    public function sendMsg(Request $request)
+    {
+        $sms = new TwilioSmsService();
+        $sms->sendSms2('+923070004746', 'Mr.Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
+        // $sms->sendSms2('+923170155625', 'Mr.Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
+    }
+
     /**
      * Cancel's a customer order
      * @author Mirza Abdullah Izhar

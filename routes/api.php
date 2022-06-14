@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Hash;
 Route::get('/', function (Request $request) {
     return 'Working';
 });
+
+Route::post('/sendMsg', 'OrdersController@sendMsg');
 /*
 |--------------------------------------------------------------------------
 | Registration, confirmations and verification
