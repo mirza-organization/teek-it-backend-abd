@@ -87,6 +87,14 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('drivers')) ? 'active' : '' }} " href="/notification/home">
+                                <i class="nav-icon fas fa-bell"></i>
+                                <p class="ml-2">
+                                    Notifications
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ (request()->is('stores')) ? 'active' : '' }}  " href="/stores">
                                 <i class="nav-icon fas fa-store-alt"></i>
                                 <p class="ml-2">

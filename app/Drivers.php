@@ -20,6 +20,8 @@ class Drivers extends Model
         'vehicle_type',
         'vehicle_number',
         'area',
+        'lat',
+        'lon',
         'account_holders_name',
         'bank_name',
         'sort_code',

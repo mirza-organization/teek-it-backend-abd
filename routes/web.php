@@ -13,24 +13,24 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('send-message', function () {
-    $receiverNumber = "+923006694349";
-    $message = "This is testing from teek-it";
-    try {
-        $account_sid = config("app.TWILIO_SID");
-        $auth_token = config("app.TWILIO_TOKEN");
-        $twilio_number = config("app.TWILIO_FROM");
+// Route::get('send-message', function () {
+//     $receiverNumber = "+923006694349";
+//     $message = "This is testing from teek-it";
+//     try {
+//         $account_sid = config("app.TWILIO_SID");
+//         $auth_token = config("app.TWILIO_TOKEN");
+//         $twilio_number = config("app.TWILIO_FROM");
 
-        $client = new Client($account_sid, $auth_token);
-        $client->messages->create($receiverNumber, [
-            'from' => $twilio_number,
-            'body' => $message
-        ]);
-        dd('SMS Sent Successfully.');
-    } catch (Exception $e) {
-        dd("Error: " . $e->getMessage());
-    }
-});
+//         $client = new Client($account_sid, $auth_token);
+//         $client->messages->create($receiverNumber, [
+//             'from' => $twilio_number,
+//             'body' => $message
+//         ]);
+//         dd('SMS Sent Successfully.');
+//     } catch (Exception $e) {
+//         dd("Error: " . $e->getMessage());
+//     }
+// });
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +44,10 @@ Auth::routes();
 |--------------------------------------------------------------------------
 */
 Route::get('/', 'HomeController@index')->name('home');
+
+Route::get('/notification/home', 'NotificationsController@homeNotification')->name('homeNotification');
+Route::post('/notification/send', 'NotificationsController@sendNotification')->name('sendNotification');
+
 /*
 |--------------------------------------------------------------------------
 | Inventory Routes

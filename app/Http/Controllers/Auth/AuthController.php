@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Drivers;
 use App\Http\Controllers\ProductsController;
 use App\Products;
 use App\Utils\Constants\AppConst;
@@ -70,7 +71,7 @@ class AuthController extends Controller
         if ($User) {
             $filename = $User->user_img;
             if ($request->hasFile('user_img')) {
-                $file = $request->file('user_img'); 
+                $file = $request->file('user_img');
                 $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                 Storage::disk('spaces')->put($filename, File::get($file));
                 if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
@@ -116,6 +117,14 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
+
+        // // Get some user from somewhere
+        // $user = User::first();
+        // // Get the token
+        // $token = auth()->login($user);
+        // print_r($token);
+        // exit;
+
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['data' => [], 'status' => false, 'message' => config('constants.INVALID_CREDENTIALS')], 401);
         }
@@ -377,7 +386,7 @@ class AuthController extends Controller
         $jwtToken = new JwtToken();
         $jwtToken->user_id = $user->id;
         $jwtToken->token = $token;
-        $jwtToken->browser = $agent->browser();;
+        $jwtToken->browser = $agent->browser();
         $jwtToken->platform = $agent->platform();
         $jwtToken->device = $agent->device();
         $mobileHeader = $request->header('x_platform');

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\v1;
 
 use App\Drivers;
-use App\DrivingLicence;
+use App\DriverDocuments;
 use App\Http\Controllers\Controller;
 use App\Mail\StoreRegisterMail;
 use App\Models\Role;
@@ -20,10 +20,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class DriverController extends Controller
 {
-
     /**
      * @param $id
      * @return mixed
@@ -244,13 +244,17 @@ class DriverController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * Driver signUp
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
     public function registerDriver(Request $request)
     {
         $validatedData = \Validator::make($request->all(), [
             'f_name' => 'required|string|max:80',
             'l_name' => 'required|string|max:80',
-            'email' => 'required|string|email|max:80|unique:users',
+            'email' => 'required|string|email|max:80|unique:drivers',
             'phone' => 'required|string|min:10|max:10',
             'password' => 'required|string|min:8|max:50',
             'vehicle_type' => 'required|int',
@@ -267,91 +271,101 @@ class DriverController extends Controller
                 'message' => $validatedData->errors()
             ], 422);
         }
-        // $role = Role::where('name', 'delivery_boy')->first();
-        $drivers = Drivers::create([
-            'f_name' => $request->f_name,
-            'l_name' => $request->l_name,
-            'email' => $request->email,
-            'phone' => '+44' . $request->phone,
-            'password' => Hash::make($request->password),
-            'vehicle_type' => $request->vehicle_type,
-            'vehicle_number' => $request->vehicle_number,
-            'area' => $request->area,
-            'account_holders_name' => $request->account_holders_name,
-            'bank_name' => $request->bank_name,
-            'sort_code' => $request->sort_code,
-            'account_number' => $request->account_number,
-            'driving_licence_name' => $request->driving_licence_name,
-            'dob' => $request->dob,
-            'driving_licence_number' => $request->driving_licence_number
-        ]);
-        $driver_id = $drivers->id;
-        if ($request->hasFile('profile_img')) {
-            $file = $request->file('profile_img');
-            $filename = uniqid($driver_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('spaces')->put($filename, File::get($file));
-            if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                info("file is store successfully : " . $filename);
-            } else {
-                info("file is not found :- " . $filename);
+        try {
+            // $role = Role::where('name', 'delivery_boy')->first();
+            $drivers = Drivers::create([
+                'f_name' => $request->f_name,
+                'l_name' => $request->l_name,
+                'email' => $request->email,
+                'phone' => '+44' . $request->phone,
+                'password' => Hash::make($request->password),
+                'vehicle_type' => $request->vehicle_type,
+                'vehicle_number' => $request->vehicle_number,
+                'area' => $request->area,
+                'lat' => $request->lat,
+                'lon' => $request->lon,
+                'account_holders_name' => $request->account_holders_name,
+                'bank_name' => $request->bank_name,
+                'sort_code' => $request->sort_code,
+                'account_number' => $request->account_number,
+                'driving_licence_name' => $request->driving_licence_name,
+                'dob' => $request->dob,
+                'driving_licence_number' => $request->driving_licence_number
+            ]);
+            $driver_id = $drivers->id;
+            if ($request->hasFile('profile_img')) {
+                $file = $request->file('profile_img');
+                $filename = uniqid($driver_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                Storage::disk('spaces')->put($filename, File::get($file));
+                if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                    info("file is store successfully : " . $filename);
+                } else {
+                    info("file is not found :- " . $filename);
+                }
+                $drivers->profile_img = $filename;
+                $drivers->save();
             }
-            $drivers->profile_img = $filename;
-            $drivers->save();
-        }
 
-        if (!empty($request->driving_licence_number)) {
-            $front_img = $request->file('front_img'); 
-            $back_img = $request->file('back_img');
-            $front_filename = uniqid($driver_id . '_') . "." . $front_img->getClientOriginalExtension(); //create unique file name...
-            $back_filename = uniqid($driver_id . '_') . "." . $back_img->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('spaces')->put($front_filename, File::get($front_img));
-            Storage::disk('spaces')->put($back_filename, File::get($back_img));
-            if (Storage::disk('spaces')->exists($front_filename) && Storage::disk('spaces')->exists($back_filename)) {  // check file exists in directory or not
-                info("file is store successfully : " . $front_filename);
-                info("file is store successfully : " . $back_filename);
-            } else {
-                info("file is not found :- " . $front_filename);
-                info("file is not found :- " . $back_filename);
+            if (!empty($request->driving_licence_number) || $request->vehicle_type == 1) {
+                $front_img = $request->file('front_img');
+                $back_img = $request->file('back_img');
+                $front_filename = uniqid($driver_id . '_') . "." . $front_img->getClientOriginalExtension(); //create unique file name...
+                $back_filename = uniqid($driver_id . '_') . "." . $back_img->getClientOriginalExtension(); //create unique file name...
+                Storage::disk('spaces')->put($front_filename, File::get($front_img));
+                Storage::disk('spaces')->put($back_filename, File::get($back_img));
+                if (Storage::disk('spaces')->exists($front_filename) && Storage::disk('spaces')->exists($back_filename)) {  // check file exists in directory or not
+                    info("file is store successfully : " . $front_filename);
+                    info("file is store successfully : " . $back_filename);
+                } else {
+                    info("file is not found :- " . $front_filename);
+                    info("file is not found :- " . $back_filename);
+                }
+                $driving_licence = new DriverDocuments();
+                $driving_licence->driver_id = $driver_id;
+                $driving_licence->front_img = $front_filename;
+                $driving_licence->back_img = $back_filename;
+                $driving_licence->save();
             }
-            $driving_licence = new DrivingLicence();
-            $driving_licence->driver_id = $driver_id;
-            $driving_licence->front_img = $front_filename;
-            $driving_licence->back_img = $back_filename;
-            $driving_licence->save();
-        }
 
-        $verification_code = Crypt::encrypt($drivers->email);
-        $FRONTEND_URL = env('FRONTEND_URL');
-        $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
+            $verification_code = Crypt::encrypt($drivers->email);
+            $FRONTEND_URL = env('FRONTEND_URL');
+            $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
-        $html = '<html>
-            Hi, ' . $drivers->f_name . '<br><br>
-            Thank you for registering on ' . env('APP_NAME') . '.
-            <br>
-            Here is your account verification link. Click on below link to verify your account. <br><br>
-            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
-            ' . $account_verification_link . '
-            <br><br><br>
-            </html>';
+            $html = '<html>
+                Hi, ' . $drivers->f_name . '<br><br>
+                Thank you for registering on ' . env('APP_NAME') . '.
+                <br>
+                Here is your account verification link. Click on below link to verify your account. <br><br>
+                <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+                ' . $account_verification_link . '
+                <br><br><br>
+                </html>';
 
-        $subject = env('APP_NAME') . ': Account Verification';
-        Mail::to($drivers->email)
-            ->send(new StoreRegisterMail($html, $subject));
+            $subject = env('APP_NAME') . ': Account Verification';
+            Mail::to($drivers->email)
+                ->send(new StoreRegisterMail($html, $subject));
 
-        if ($drivers) {
-            // echo "hello"; exit;
-            return response()->json([
-                'data' => [],
-                'status' => true,
-                'message' => 'You have Signed Up Successfully. We have sent you a verification email please verify.'
-            ], 200);
-        } else {
+            if ($drivers) {
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => 'You have Signed Up Successfully. We have sent you a verification email please verify.'
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => 'Error in signing Up.'
+                ], 200);
+            }
+            // $drivers->roles()->sync($role->id);
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => 'Error in signing Up.'
+                'message' => $error
             ], 200);
         }
-        // $drivers->roles()->sync($role->id);
     }
 }
