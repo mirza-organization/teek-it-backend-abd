@@ -86,8 +86,16 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::post('recheck_products', 'OrdersController@recheck_products');
     Route::get('featured/{store_id}', 'ProductsController@featuredProducts');
 });
+
 Route::group(['prefix' => 'driver'], function () {
     Route::post('/register', 'Api\v1\DriverController@registerDriver');
+});
+
+Route::group(['prefix' => 'notifications'], function ($router) {
+    Route::get('', 'NotificationsController@get_notifications');
+    Route::post('save_token', 'NotificationsController@saveToken');
+    Route::get('delete/{notification_id}', 'NotificationsController@delete_notification');
+    // Route::post('send', 'NotificationsController@send_notification');
 });
 /*
 |--------------------------------------------------------------------------
@@ -123,12 +131,6 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('update', 'OrdersController@updateOrder');
         Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
         Route::get('/get-order-details/{id}', 'Api\v1\OrderController@getOrderDetails');
-    });
-
-    Route::group(['prefix' => 'notifications'], function ($router) {
-        Route::get('', 'NotificationsController@get_notifications');
-        Route::get('delete/{notification_id}', 'NotificationsController@delete_notification');
-        Route::post('send', 'NotificationsController@send_notification');
     });
 
     Route::group(['prefix' => 'driver'], function () {

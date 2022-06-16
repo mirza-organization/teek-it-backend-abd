@@ -2,22 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\DeviceToken;
 use App\notifications;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class NotificationsController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+    // /**
+    //  * Create a new controller instance.
+    //  *
+    //  * @return void
+    //  */
+    // public function __construct()
+    // {
+    //     $this->middleware('auth');
+    // }
+
     //    /**
     ////     * Display a listing of the resource.
     ////     *
@@ -177,26 +182,76 @@ class NotificationsController extends Controller
      */
     public function sendNotification(Request $request)
     {
-        $validate = notifications::validator($request);
-        if ($validate->fails()) {
-            return response()->json([
-                'data' => $validate->messages(),
-                'status' => false,
-                'message' => 'Validation error'
-            ], 400);
+        if (Auth::user()->hasRole('superadmin')) {
+            $validatedData = notifications::validator($request);
+            if ($validatedData->fails()) {
+                flash('Error in sending notification because a required field is missing or invalid data.')->error();
+                return Redirect::back()->withInput($request->input());
+            }
+
+            $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
+            $SERVER_API_KEY = env('FCM_SERVER_KEY');
+            $data = [
+                "registration_ids" => $firebaseToken,
+                "notification" => [
+                    "title" => $request->title,
+                    "body" => $request->body,
+                ]
+            ];
+            $dataString = json_encode($data);
+            $headers = [
+                'Authorization: key=' . $SERVER_API_KEY,
+                'Content-Type: application/json',
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+            $response = curl_exec($ch);
+
+            return back()->with('success', 'Notification send successfully.');
+        } else {
+            abort(404);
         }
-        $sender_id = Auth::id();
-        $notification = new notifications();
-        $notification->sender_id = $sender_id;
-        $notification->user_id = $request->user_id;
-        $notification->title  = $request->title;
-        $notification->message = $request->message;
-        $notification->other_data = $request->other_data;
-        $notification->save();
-        return response()->json([
-            'data' => [],
-            'status' => true,
-            'message' => 'Notification Sent'
-        ], 200);
+    }
+    /**
+     * It will save device token of every user
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function saveToken(Request $request)
+    {
+        $validatedData = Validator::make($request->all(), [
+            'device_token' => 'required|string'
+        ]);
+        if ($validatedData->fails()) {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $validatedData->errors()
+            ], 422);
+        }
+        try {
+            $device_toke = new DeviceToken();
+            $device_toke->user_id = $request->user_id;
+            $device_toke->device_token = $request->device_token;
+            $device_toke->save();
+            return response()->json([
+                'data' => [],
+                'status' => true,
+                'message' => config('constants.DATA_INSERTION_SUCCESS')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 200);
+        }
     }
 }
