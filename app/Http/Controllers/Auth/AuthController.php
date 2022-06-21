@@ -33,7 +33,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'seller_products', 'search_seller_products']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'sellerProducts', 'searchSellerProducts']]);
     }
     /**
      * Register For Mobile App
@@ -482,7 +482,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function seller_products($seller_id)
+    public function sellerProducts($seller_id)
     {
         $user = User::find($seller_id);
         $data = [];
@@ -522,7 +522,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function search_seller_products($seller_id, $product_name)
+    public function searchSellerProducts($seller_id, $product_name)
     {
         $user = User::find($seller_id);
         $data = [];
@@ -559,7 +559,7 @@ class AuthController extends Controller
         }
     }
 
-    public function delivery_boys()
+    public function deliveryBoys()
     {
         $users = User::query()->where('seller_id', '=', Auth::id())->get();
         $data = [];
@@ -575,7 +575,7 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function get_delivery_boy_info($delivery_boy_info)
+    public function getDeliveryBoyInfo($delivery_boy_info)
     {
         $user = User::find($delivery_boy_info);
         if (!$user) {

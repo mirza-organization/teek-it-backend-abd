@@ -101,7 +101,7 @@ class NotificationsController extends Controller
     ///
     ///
 
-    public function get_notifications()
+    public function getNotifications()
     {
         $notifications = notifications::query()->where('user_id', '=', Auth::id())->get();
         if ($notifications->count() <= 0) {
@@ -119,7 +119,7 @@ class NotificationsController extends Controller
         }
     }
 
-    public function delete_notification($notification_id)
+    public function deleteNotification($notification_id)
     {
         $notification = notifications::find($notification_id);
         if (!empty($notification)) {
@@ -138,30 +138,30 @@ class NotificationsController extends Controller
         }
     }
 
-    public function send_notification(Request $request)
-    {
-        $validate = notifications::validator($request);
-        if ($validate->fails()) {
-            return response()->json([
-                'data' => $validate->messages(),
-                'status' => false,
-                'message' => 'Validation error'
-            ], 400);
-        }
-        $sender_id = Auth::id();
-        $notification = new notifications();
-        $notification->sender_id = $sender_id;
-        $notification->user_id = $request->user_id;
-        $notification->title  = $request->title;
-        $notification->message = $request->message;
-        $notification->other_data = $request->other_data;
-        $notification->save();
-        return response()->json([
-            'data' => [],
-            'status' => true,
-            'message' => 'Notification Sent'
-        ], 200);
-    }
+    // public function send_notification(Request $request)
+    // {
+    //     $validate = notifications::validator($request);
+    //     if ($validate->fails()) {
+    //         return response()->json([
+    //             'data' => $validate->messages(),
+    //             'status' => false,
+    //             'message' => 'Validation error'
+    //         ], 400);
+    //     }
+    //     $sender_id = Auth::id();
+    //     $notification = new notifications();
+    //     $notification->sender_id = $sender_id;
+    //     $notification->user_id = $request->user_id;
+    //     $notification->title  = $request->title;
+    //     $notification->message = $request->message;
+    //     $notification->other_data = $request->other_data;
+    //     $notification->save();
+    //     return response()->json([
+    //         'data' => [],
+    //         'status' => true,
+    //         'message' => 'Notification Sent'
+    //     ], 200);
+    // }
     /**
      * Returns notification form
      * @author Mirza Abdullah Izhar

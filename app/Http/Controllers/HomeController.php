@@ -94,7 +94,7 @@ class HomeController extends Controller
         }
     }
 
-    public function inventory_edit($product_id)
+    public function inventoryEdit($product_id)
     {
         if (Auth::user()->hasRole('seller')) {
             $invent = Products::query()->where('user_id', '=', Auth::id())->where('id', '=', $product_id);
@@ -109,7 +109,7 @@ class HomeController extends Controller
         }
     }
 
-    public function inventory_add(Request $request)
+    public function inventoryAdd(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             $categories = Categories::all();
@@ -120,7 +120,7 @@ class HomeController extends Controller
         }
     }
 
-    public function inventory_add_bulk(Request $request)
+    public function inventoryAddBulk(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             return view('shopkeeper.inventory.add_bulk');
@@ -129,7 +129,7 @@ class HomeController extends Controller
         }
     }
 
-    public function delete_img($image_id)
+    public function deleteImg($image_id)
     {
         if (Auth::user()->hasRole('seller')) {
             productImages::find($image_id)->delete();
@@ -143,7 +143,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function inventory_disable($product_id)
+    public function inventoryDisable($product_id)
     {
         $product = Products::find($product_id);
         $product->status = 0;
@@ -157,7 +157,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function inventory_enable($product_id)
+    public function inventoryEnable($product_id)
     {
         $product = Products::find($product_id);
         $product->status = 1;
@@ -166,29 +166,29 @@ class HomeController extends Controller
         return Redirect::back();
     }
     /**
-     * Disable's all products of logged-in user
-     * @author Mirza Abdullah Izhar
-     * @version 1.1.0
-     */
-    public function inventory_disable_all(Request $request)
-    {
-        DB::table('products')
-            ->where('user_id', Auth::id())
-            ->update(['status' => 0]);
-        flash('All Products Disabled Successfully')->success();
-        return Redirect::back();
-    }
-    /**
      * Enable's all products of logged-in user
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function inventory_enable_all(Request $request)
+    public function inventoryEnableAll(Request $request)
     {
         DB::table('products')
             ->where('user_id', Auth::id())
             ->update(['status' => 1]);
         flash('All Products Enabled Successfully')->success();
+        return Redirect::back();
+    }
+      /**
+     * Disable's all products of logged-in user
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function inventoryDisableAll(Request $request)
+    {
+        DB::table('products')
+            ->where('user_id', Auth::id())
+            ->update(['status' => 0]);
+        flash('All Products Disabled Successfully')->success();
         return Redirect::back();
     }
     /**
@@ -237,7 +237,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function inventory_add_db(Request $request)
+    public function inventoryAddDB(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             $validatedData = Validator::make($request->all(), [
@@ -323,7 +323,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function inventory_update(Request $request, $product_id)
+    public function inventoryUpdate(Request $request, $product_id)
     {
         if (Auth::user()->hasRole('seller')) {
             $validatedData = Validator::make($request->all(), [
@@ -410,7 +410,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function user_img_update(Request $request)
+    public function userImgUpdate(Request $request)
     {
         $user = User::find(\auth()->id());
         $filename = \auth()->user()->name;
@@ -435,7 +435,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function change_settings(Request $request)
+    public function changeSettings(Request $request)
     {
         User::where('id', '=', Auth::id())->update(['settings->' . $request->setting_name => $request->value]);
         return \redirect()->route('home');
@@ -445,7 +445,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function payment_settings()
+    public function paymentSettings()
     {
         $payment_settings = User::find(Auth::id())->bank_details;
         return view('shopkeeper.settings.payment', compact('payment_settings'));
@@ -455,7 +455,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function general_settings()
+    public function generalSettings()
     {
         $user = User::find(Auth::id());
         $business_hours = $user->business_hours;
@@ -468,7 +468,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function time_update(Request $request)
+    public function timeUpdate(Request $request)
     {
         $time = $request->time;
         foreach ($time as $key => $value) {
@@ -488,7 +488,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function location_update(Request $request)
+    public function locationUpdate(Request $request)
     {
         $data = $request->Address;
         $location = $request->location_text;
@@ -506,7 +506,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function password_update(Request $request)
+    public function passwordUpdate(Request $request)
     {
         $validate = Validator::make($request->all(), [
             'old_password' => 'required|string|min:8',
@@ -535,7 +535,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function payment_settings_update(Request $request)
+    public function paymentSettingsUpdate(Request $request)
     {
         $data = $request->all();
         if (empty($data['bank']['two']['bank_name']) || empty($data['bank']['two']['account_number']) || empty($data['bank']['two']['branch'])) {
@@ -733,7 +733,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function change_order_status($order_id)
+    public function changeOrderStatus($order_id)
     {
         Orders::where('id', '=', $order_id)->update(['order_status' => 'ready', 'is_viewed' => 1]);
         $order = Orders::find($order_id);
@@ -749,7 +749,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function mark_as_delivered($order_id)
+    public function markAsDelivered($order_id)
     {
         Orders::where('id', '=', $order_id)->update(['order_status' => 'delivered']);
         flash('This Order Has Been Marked As Delivered')->success();
@@ -761,7 +761,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function mark_as_completed($order_id)
+    public function markAsCompleted($order_id)
     {
         $verification_codes = VerificationCodes::query()->select('code->driver_failed_to_enter_code as driver_failed_to_enter_code')
             ->where('order_id', '=', $order_id)
@@ -803,7 +803,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function asetting()
+    public function aSetting()
     {
         if (Auth::user()->hasRole('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
@@ -827,7 +827,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_customer_details($user_id)
+    public function adminCustomerDetails($user_id)
     {
         $return_arr = [];
         if (Auth::user()->hasRole('superadmin')) {
@@ -869,7 +869,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function all_cat()
+    public function allCat()
     {
         $categories = Categories::paginate();
         return view('admin.categories', compact('categories'));
@@ -879,7 +879,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function add_cat(Request $request)
+    public function addCat(Request $request)
     {
         // $validate = Categories::validator($request);
         // if ($validate->fails()) {
@@ -911,7 +911,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function update_cat(Request $request, $id)
+    public function updateCat(Request $request, $id)
     {
         //$validate = Categories::updateValidator($request);
         // if ($validate->fails()) {
@@ -943,7 +943,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function delete_cat(Request $request)
+    public function deleteCat(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             DB::table('categories')->where('id', '=', $request->id)->delete();
@@ -952,7 +952,7 @@ class HomeController extends Controller
         return Redirect::back();
     }
 
-    public function update_pages(Request $request)
+    public function updatePages(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->update(['page_content' => $request->tos]);
@@ -968,7 +968,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_stores(Request $request)
+    public function adminStores(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
@@ -989,7 +989,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function admin_users_del(Request $request)
+    public function adminUsersDel(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             for ($i = 0; $i < count($request->users); $i++) {
@@ -1008,7 +1008,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_customers(Request $request)
+    public function adminCustomers(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
@@ -1029,7 +1029,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_drivers(Request $request)
+    public function adminDrivers(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
@@ -1051,7 +1051,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_orders(Request $request)
+    public function adminOrders(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $return_arr = [];
@@ -1089,7 +1089,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function admin_orders_verified(Request $request)
+    public function adminOrdersVerified(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $return_arr = [];
@@ -1131,7 +1131,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function admin_orders_unverified(Request $request)
+    public function adminOrdersUnverified(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $return_arr = [];
@@ -1173,7 +1173,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function admin_orders_del(Request $request)
+    public function adminOrdersDel(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             for ($i = 0; $i < count($request->orders); $i++) {
@@ -1215,7 +1215,7 @@ class HomeController extends Controller
         }
     }
 
-    public function withdrawals_request(Request $request)
+    public function withdrawalsRequest(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             if (auth()->user()->pending_withdraw < $request->amount) {
@@ -1254,7 +1254,7 @@ class HomeController extends Controller
         }
     }
 
-    public function change_user_status($user_id, $status)
+    public function changeUserStatus($user_id, $status)
     {
         User::query()->where('id', '=', $user_id)->update(['is_active' => $status]);
         if ($status == 1) {
@@ -1274,7 +1274,7 @@ class HomeController extends Controller
         return Redirect::back();
     }
 
-    public function admin_queries()
+    public function adminQueries()
     {
         if (Auth::user()->hasRole('superadmin')) {
             return view('admin.queries');
@@ -1283,7 +1283,7 @@ class HomeController extends Controller
         }
     }
 
-    public function my_order_count()
+    public function myOrderCount()
     {
         if (Auth::user()->hasRole('seller')) {
             //$pending_orders = Orders::query()->where('order_status','=','ready')->where('seller_id','=',Auth::id())->count();
@@ -1297,7 +1297,7 @@ class HomeController extends Controller
         }
     }
 
-    public function complete_orders()
+    public function completeOrders()
     {
         $orders = Orders::with(['user', 'delivery_boy'])
             ->has('user')
@@ -1313,7 +1313,7 @@ class HomeController extends Controller
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
      */
-    public function mark_complete_order($order_id)
+    public function markCompleteOrder($order_id)
     {
         $order = Orders::with(['user', 'delivery_boy', 'store'])
             ->where('id', $order_id)->first();
@@ -1339,7 +1339,7 @@ class HomeController extends Controller
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
      */
-    public function cancel_order($order_id)
+    public function cancelOrder($order_id)
     {
         $order = Orders::findOrFail($order_id);
         $order->load('user');

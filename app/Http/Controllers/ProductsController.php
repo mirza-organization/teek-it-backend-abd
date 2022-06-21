@@ -69,17 +69,6 @@ class ProductsController extends Controller
     //    }
     //
     //    /**
-    //     * Show the form for editing the specified resource.
-    //     *
-    //     * @param  \App\Products  $products
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function edit(Products $products)
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
     //     * Update the specified resource in storage.
     //     *
     //     * @param  \Illuminate\Http\Request  $request
@@ -414,7 +403,7 @@ class ProductsController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function delete_image($image_id, $product_id)
+    public function deleteImage($image_id, $product_id)
     {
         productImages::find($image_id)->delete();
         return $this->get_product_info($product_id);

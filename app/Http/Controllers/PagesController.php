@@ -83,17 +83,13 @@ class PagesController extends Controller
         //
     }
 
-
-
-    public function get_page(Request $request){
-        $page = Pages::query()->where('page_type','=',$request->page_type)->get();
-        $user_arr= [
-            'data'=>$page,
-            'status'=>true,
-            'message'=>''
-
-        ];
-
-        return response()->json($user_arr, 200);
+    public function getPage(Request $request)
+    {
+        $page = Pages::query()->where('page_type', '=', $request->page_type)->get();
+        return response()->json([
+            'data' => $page,
+            'status' => true,
+            'message' => ''
+        ], 200);
     }
 }

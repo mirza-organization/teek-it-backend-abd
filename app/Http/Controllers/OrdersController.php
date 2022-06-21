@@ -23,29 +23,81 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderByDesc('id');
-        if (!empty($request->order_status)) {
-            $orders = $orders->where('order_status', '=', $request->order_status);
-        }
-        $orders = $orders->paginate(20);
-        $pagination = $orders->toArray();
-        if (!$orders->isEmpty()) {
-            $order_data = [];
-            foreach ($orders as $order) {
-                $order_data[] = $this->get_single_order($order->id);
+        try {
+            $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderByDesc('id');
+            if (!empty($request->order_status)) {
+                $orders = $orders->where('order_status', '=', $request->order_status);
             }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $order_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination
-            ], 200);
-        } else {
+            $orders = $orders->paginate(20);
+            $pagination = $orders->toArray();
+            if (!$orders->isEmpty()) {
+                $order_data = [];
+                foreach ($orders as $order) {
+                    $order_data[] = $this->get_single_order($order->id);
+                }
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $order_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
+                'message' => $error
+            ], 200);
+        }
+    }
+    /**
+     * List 2 products from recent orders of a customer
+     * w.r.t Store & Customer ID
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function recentOrders(Request $request)
+    {
+        try {
+            $recent_orders_prods_ids = DB::table('orders')
+                ->select('orders.id', 'order_items.product_id')
+                ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+                ->where('orders.user_id', '=', Auth::id())
+                ->where('orders.seller_id', '=', $request->store_id)
+                ->orderByDesc('id')
+                ->limit(2)
+                ->get();
+            if (!$recent_orders_prods_ids->isEmpty()) {
+                $recent_orders_prods_data = [];
+                foreach ($recent_orders_prods_ids as $product_id) { 
+                    $recent_orders_prods_data[] = (new ProductsController())->get_product_info($product_id->product_id);
+                }
+                return response()->json([
+                    'data' => $recent_orders_prods_data,
+                    'status' => true,
+                    'message' => ''
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
             ], 200);
         }
     }
@@ -55,7 +107,7 @@ class OrdersController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.1
      */
-    public function seller_orders(Request $request)
+    public function sellerOrders(Request $request)
     {
         $lat = \auth()->user()->lat;
         $lon = \auth()->user()->lon;
@@ -186,7 +238,7 @@ class OrdersController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.1
      */
-    public function delivery_boy_orders(Request $request, $delivery_boy_id)
+    public function deliveryBoyOrders(Request $request, $delivery_boy_id)
     {   //delivery_status:assigned,complete,pending_approval,cancelled
         $orders = Orders::query()->select('id')->where('delivery_boy_id', '=', $delivery_boy_id)
             ->where('delivery_status', '=', $request->delivery_status)
@@ -218,7 +270,7 @@ class OrdersController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function assign_order(Request $request)
+    public function assignOrder(Request $request)
     {
         $order = Orders::find($request->order_id);
         if ($order) {
@@ -246,7 +298,7 @@ class OrdersController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.1
      */
-    public function update_assign(Request $request)
+    public function updateAssign(Request $request)
     {
         $order = Orders::find($request->order_id);
         if ($order) {
@@ -282,7 +334,7 @@ class OrdersController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function cancel_order(Request $request)
+    public function cancelOrder(Request $request)
     {
         $order = Orders::find($request->order_id);
         if ($order) {
@@ -467,8 +519,8 @@ class OrdersController extends Controller
     public function sendMsg(Request $request)
     {
         $sms = new TwilioSmsService();
-        $sms->sendSms2('+923070004746', 'Mr.Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
-        // $sms->sendSms2('+923170155625', 'Mr.Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
+        $sms->sendSms2('+923070004746', 'Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
+        $sms->sendSms2('+923211844171', 'Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
     }
 
     /**
@@ -476,7 +528,7 @@ class OrdersController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function customer_cancel_order(Request $request)
+    public function customerCancelOrder(Request $request)
     {
         $order = Orders::find($request->order_id);
         $product_ids = explode(',', $request->product_ids);
@@ -634,7 +686,7 @@ class OrdersController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function recheck_products(Request $request)
+    public function recheckProducts(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
             'items' => 'required|array',

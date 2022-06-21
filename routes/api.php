@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::get('/', function (Request $request) {
     return 'Working';
 });
@@ -40,8 +41,8 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::post('update', 'Auth\AuthController@updateUser');
     Route::post('updateStatus', 'Auth\AuthController@updateStatus');
     Route::get('me', 'Auth\AuthController@me');
-    Route::get('delivery_boys', 'Auth\AuthController@delivery_boys');
-    Route::get('get_user/{user_id}', 'Auth\AuthController@get_delivery_boy_info');
+    Route::get('delivery_boys', 'Auth\AuthController@deliveryBoys');
+    Route::get('get_user/{user_id}', 'Auth\AuthController@getDeliveryBoyInfo');
 });
 /*
 |--------------------------------------------------------------------------
@@ -49,10 +50,10 @@ Route::group(['prefix' => 'auth'], function ($router) {
 |--------------------------------------------------------------------------
 */
 Route::group(['prefix' => 'category'], function ($router) {
-    //Route::post('add', 'CategoriesController@add');
-    //Route::post('update/{product_id}', 'CategoriesController@update');
+    Route::post('add', 'CategoriesController@add');
+    Route::post('update/{product_id}', 'CategoriesController@update');
     Route::get('all', 'CategoriesController@all');
-    Route::get('view/{category_id}', 'CategoriesController@Products');
+    Route::get('view/{category_id}', 'CategoriesController@products');
     Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');
 });
 /*
@@ -61,7 +62,7 @@ Route::group(['prefix' => 'category'], function ($router) {
 |--------------------------------------------------------------------------
 */
 Route::group(['prefix' => 'page'], function ($router) {
-    Route::get('', 'PagesController@get_page');
+    Route::get('', 'PagesController@getPage');
 });
 /*
 |--------------------------------------------------------------------------
@@ -69,8 +70,8 @@ Route::group(['prefix' => 'page'], function ($router) {
 |--------------------------------------------------------------------------
 */
 Route::get('sellers', 'Auth\AuthController@sellers');
-Route::get('sellers/{seller_id}', 'Auth\AuthController@seller_products');
-Route::get('sellers/{seller_id}/{product_name}', 'Auth\AuthController@search_seller_products');
+Route::get('sellers/{seller_id}', 'Auth\AuthController@sellerProducts');
+Route::get('sellers/{seller_id}/{product_name}', 'Auth\AuthController@searchSellerProducts');
 /*
 |--------------------------------------------------------------------------
 | Products API Routes Without JWT Authentication
@@ -83,7 +84,7 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::post('view/bulk', 'ProductsController@bulkView');
     Route::get('sortbyprice', 'ProductsController@sortByPrice');
     Route::get('sortByLocation', 'ProductsController@sortByLocation');
-    Route::post('recheck_products', 'OrdersController@recheck_products');
+    Route::post('recheck_products', 'OrdersController@recheckProducts');
     Route::get('featured/{store_id}', 'ProductsController@featuredProducts');
 });
 
@@ -92,9 +93,9 @@ Route::group(['prefix' => 'driver'], function () {
 });
 
 Route::group(['prefix' => 'notifications'], function ($router) {
-    Route::get('', 'NotificationsController@get_notifications');
+    Route::get('', 'NotificationsController@getNotifications');
     Route::post('save_token', 'NotificationsController@saveToken');
-    Route::get('delete/{notification_id}', 'NotificationsController@delete_notification');
+    Route::get('delete/{notification_id}', 'NotificationsController@deleteNotification');
     // Route::post('send', 'NotificationsController@send_notification');
 });
 /*
@@ -105,10 +106,9 @@ Route::group(['prefix' => 'notifications'], function ($router) {
 Route::group(['middleware' => ['jwt.verify']], function ($router) {
     Route::group(['prefix' => 'product'], function ($router) {
         Route::post('add', 'ProductsController@add');
-        //Route::get('edit/{id}', 'ProductsController@edit');
         Route::post('update/{product_id}', 'ProductsController@update');
         Route::get('delete/{product_id}', 'ProductsController@delete');
-        Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@delete_image');
+        Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@deleteImage');
         Route::post('ratings/add', 'RattingsController@add');
         Route::post('ratings/update', 'RattingsController@update');
         Route::get('ratings/delete/{ratting_id}', 'RattingsController@delete');
@@ -121,16 +121,17 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
 
     Route::group(['prefix' => 'orders'], function ($router) {
         Route::get('', 'OrdersController@index');
-        Route::get('seller', 'OrdersController@seller_orders');
-        Route::get('delivery_boy_orders/{delivery_boy_id}', 'OrdersController@delivery_boy_orders');
-        Route::get('assign_order', 'OrdersController@assign_order');
-        Route::get('cancel_order', 'OrdersController@cancel_order');
-        Route::get('update_assign', 'OrdersController@update_assign');
         Route::post('new', 'OrdersController@new');
-        Route::post('customer_cancel_order', 'OrdersController@customer_cancel_order');
+        Route::get('seller', 'OrdersController@sellerOrders');
+        Route::get('delivery_boy_orders/{delivery_boy_id}', 'OrdersController@deliveryBoyOrders');
+        Route::get('assign_order', 'OrdersController@assignOrder');
+        Route::get('cancel_order', 'OrdersController@cancelOrder');
+        Route::get('update_assign', 'OrdersController@updateAssign');
+        Route::post('customer_cancel_order', 'OrdersController@customerCancelOrder');
         Route::post('update', 'OrdersController@updateOrder');
         Route::post('/estimated-time/{id}', 'Api\v1\OrderController@storeEstimatedTime');
         Route::get('/get-order-details/{id}', 'Api\v1\OrderController@getOrderDetails');
+        Route::get('/recent_orders/{store_id}', 'OrdersController@recentOrders');
     });
 
     Route::group(['prefix' => 'driver'], function () {
@@ -205,7 +206,7 @@ Route::get('time', function () {
     ], 200);
 });
 
-Route::get('generate_hash', function(){
+Route::get('generate_hash', function () {
     return response()->json([
         'data' => Hash::make($_REQUEST['password']),
         'status' => true,

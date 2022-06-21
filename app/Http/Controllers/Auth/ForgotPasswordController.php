@@ -54,7 +54,6 @@ class ForgotPasswordController extends Controller
                 'message' => trans('passwords.user')
             ], 404);
         }
-        //$token = $this->broker()->createToken($user);
         $digits = 6;
         $token = str_pad(rand(0, pow(10, $digits) - 1), $digits, '0', STR_PAD_LEFT);
 
@@ -73,8 +72,7 @@ class ForgotPasswordController extends Controller
             $message->to($request->email, $user->name)
                 ->subject(env('APP_NAME') . ': Password Reset');
         });
-
-        $response = array('status' => true, 'message' => 'Password reset link sent on your email.');
-        return response()->json($response, 200);
+        
+        return response()->json(['status' => true, 'message' => 'Password reset link sent on your email.'], 200);
     }
 }
