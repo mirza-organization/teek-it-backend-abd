@@ -270,7 +270,7 @@
                 }
             });
         }
-        sendMsg();
+        // sendMsg();
     </script>
 
     <style>
