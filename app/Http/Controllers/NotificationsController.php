@@ -226,6 +226,7 @@ class NotificationsController extends Controller
     public function saveToken(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
+            'device_id' => 'required|string',
             'device_token' => 'required|string'
         ]);
         if ($validatedData->fails()) {
@@ -238,6 +239,7 @@ class NotificationsController extends Controller
         try {
             $device_toke = new DeviceToken();
             $device_toke->user_id = $request->user_id;
+            $device_toke->device_id = $request->device_id;
             $device_toke->device_token = $request->device_token;
             $device_toke->save();
             return response()->json([
