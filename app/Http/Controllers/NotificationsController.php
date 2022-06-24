@@ -182,40 +182,46 @@ class NotificationsController extends Controller
      */
     public function sendNotification(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
-            $validatedData = notifications::validator($request);
-            if ($validatedData->fails()) {
-                flash('Error in sending notification because a required field is missing or invalid data.')->error();
-                return Redirect::back()->withInput($request->input());
+        try {
+            if (Auth::user()->hasRole('superadmin')) {
+                $validatedData = notifications::validator($request);
+                if ($validatedData->fails()) {
+                    flash('Error in sending notification because a required field is missing or invalid data.')->error();
+                    return Redirect::back()->withInput($request->input());
+                }
+
+                $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
+                $SERVER_API_KEY = env('FCM_SERVER_KEY');
+                $data = [
+                    "registration_ids" => $firebaseToken,
+                    "data" => [
+                        "title" => $request->title,
+                        "body" => $request->body,
+                    ],
+                    "priority" => "high"
+                ];
+                $dataString = json_encode($data);
+                $headers = [
+                    'Authorization: key=' . $SERVER_API_KEY,
+                    'Content-Type: application/json',
+                ];
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+                curl_exec($ch);
+
+                return back()->with('success', 'Notification send successfully.');
+            } else {
+                abort(404);
             }
-
-            $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
-            $SERVER_API_KEY = env('FCM_SERVER_KEY');
-            $data = [
-                "registration_ids" => $firebaseToken,
-                "notification" => [
-                    "title" => $request->title,
-                    "body" => $request->body,
-                ]
-            ];
-            $dataString = json_encode($data);
-            $headers = [
-                'Authorization: key=' . $SERVER_API_KEY,
-                'Content-Type: application/json',
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-            $response = curl_exec($ch);
-
-            return back()->with('success', 'Notification send successfully.');
-        } else {
-            abort(404);
+        } catch (Throwable $error) {
+            report($error);
+            return back()->with('error', 'Failed to send notification.');
         }
     }
     /**
