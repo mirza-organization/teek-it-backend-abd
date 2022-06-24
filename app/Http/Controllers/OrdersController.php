@@ -77,7 +77,7 @@ class OrdersController extends Controller
                 ->get();
             if (!$recent_orders_prods_ids->isEmpty()) {
                 $recent_orders_prods_data = [];
-                foreach ($recent_orders_prods_ids as $product_id) { 
+                foreach ($recent_orders_prods_ids as $product_id) {
                     $recent_orders_prods_data[] = (new ProductsController())->get_product_info($product_id->product_id);
                 }
                 return response()->json([
@@ -515,14 +515,6 @@ class OrdersController extends Controller
             'message' => 'Order added successfully.'
         ], 200);
     }
-
-    public function sendMsg(Request $request)
-    {
-        $sms = new TwilioSmsService();
-        $sms->sendSms2('+923070004746', 'Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
-        $sms->sendSms2('+923211844171', 'Ammar, Teri Maa ko agr 4 shot lgany hn to night k kitny charges hain?? ;)');
-    }
-
     /**
      * Cancel's a customer order
      * @author Mirza Abdullah Izhar

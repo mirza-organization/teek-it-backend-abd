@@ -260,16 +260,16 @@
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
 
     <script>
-         function sendMsg() {
-            $.ajax({
-                url: "/api/sendMsg",
-                type: "post",
-                success: function(r) {
-                    setTimeout(sendMsg, 3000);
-                    console.log('sent');
-                }
-            });
-        }
+        //  function sendMsg() {
+        //     $.ajax({
+        //         url: "/api/sendMsg",
+        //         type: "post",
+        //         success: function(r) {
+        //             setTimeout(sendMsg, 3000);
+        //             console.log('sent');
+        //         }
+        //     });
+        // }
         // sendMsg();
     </script>
 

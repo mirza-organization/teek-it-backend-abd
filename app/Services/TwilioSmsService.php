@@ -27,7 +27,8 @@ class TwilioSmsService
         $client = new Client($this->sid, $this->token);
         $client->messages->create($receiverNumber, [
             'from' => $this->fromNumber,
-            'body' => $message]);
+            'body' => $message
+        ]);
     }
 
     public function sendSms2($receiverNumber, $message)
@@ -35,6 +36,7 @@ class TwilioSmsService
         $client = new Client($this->sid, $this->token);
         $client->messages->create($receiverNumber, [
             'from' => 'Thokku',
-            'body' => $message]);
+            'body' => $message
+        ]);
     }
 }
