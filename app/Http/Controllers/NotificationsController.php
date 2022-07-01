@@ -279,7 +279,7 @@ class NotificationsController extends Controller
         }
     }
     /**
-     * It will save device token of every user
+     * It will save/update device token of every user
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
@@ -297,16 +297,27 @@ class NotificationsController extends Controller
             ], 422);
         }
         try {
-            $device_toke = new DeviceToken();
-            $device_toke->user_id = $request->user_id;
-            $device_toke->device_id = $request->device_id;
-            $device_toke->device_token = $request->device_token;
-            $device_toke->save();
-            return response()->json([
-                'data' => [],
-                'status' => true,
-                'message' => config('constants.DATA_INSERTION_SUCCESS')
-            ], 200);
+            $device_token = new DeviceToken();
+            $count = $device_token::select()->where('device_id', $request->device_id)->count();
+            if ($count == 0) {
+                $device_token->user_id = $request->user_id;
+                $device_token->device_id = $request->device_id;
+                $device_token->device_token = $request->device_token;
+                $device_token->save();
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.DATA_INSERTION_SUCCESS')
+                ], 200);
+            } else {
+                $device_token::where('device_id', $request->device_id)
+                    ->update(['user_id' => $request->user_id, 'device_token' => $request->device_token]);
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.DATA_UPDATED_SUCCESS')
+                ], 200);
+            }
         } catch (Throwable $error) {
             report($error);
             return response()->json([
