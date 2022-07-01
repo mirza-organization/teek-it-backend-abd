@@ -191,7 +191,6 @@ class NotificationsController extends Controller
                 }
 
                 $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
-                $SERVER_API_KEY = env('FCM_SERVER_KEY');
                 $data = [
                     "registration_ids" => $firebaseToken,
                     "data" => [
@@ -202,7 +201,7 @@ class NotificationsController extends Controller
                 ];
                 $dataString = json_encode($data);
                 $headers = [
-                    'Authorization: key=' . $SERVER_API_KEY,
+                    'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
                     'Content-Type: application/json',
                 ];
 
@@ -221,7 +220,62 @@ class NotificationsController extends Controller
             }
         } catch (Throwable $error) {
             report($error);
-            return back()->with('error', 'Failed to send notification.');
+            return back()->with('error', 'Failed to send the notification.');
+        }
+    }
+    /**
+     * Test send notifications firebase API
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function sendNotificationTest(Request $request)
+    {
+        try {
+            $validatedData = notifications::validator($request);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => $validatedData->errors(),
+                    'status' => true,
+                    'message' => ""
+                ], 422);
+            }
+
+            $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
+            $data = [
+                "registration_ids" => $firebaseToken,
+                "data" => [
+                    "title" => $request->title,
+                    "body" => $request->body,
+                ],
+                "priority" => "high"
+            ];
+            $dataString = json_encode($data);
+            $headers = [
+                'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
+                'Content-Type: application/json',
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+            $response = curl_exec($ch);
+
+            return response()->json([
+                'data' => $response,
+                'status' => true,
+                'message' => ""
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
     }
     /**

@@ -432,15 +432,15 @@ class OrdersController extends Controller
                 $total_items = $total_items + $order_item['qty'];
                 $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
             }
-            $user = User::find($seller_id);
-            $user_money = $user->pending_withdraw;
-            $user->pending_withdraw = $order_total + $user_money;
-            $user->save();
+            $seller = User::find($seller_id);
+            $seller_money = $seller->pending_withdraw;
+            $seller->pending_withdraw = $order_total + $seller_money;
+            $seller->save();
 
             $customer_lat = $request->lat;
             $customer_lon = $request->lon;
-            $store_lat = $user->lat;
-            $store_lon = $user->lon;
+            $store_lat = $seller->lat;
+            $store_lon = $seller->lon;
             $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
             // print_r($distance); exit;
             // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
@@ -481,12 +481,13 @@ class OrdersController extends Controller
                     $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
                     $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
 
-                    $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
-                    $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
+                    $sms->sendSms($request->phone_number, $message_for_customer);
+                    // $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
+                    // $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
 
                     // To restrict "New Order" SMS notifications only for UK numbers
-                    if (strlen($user->business_phone) == 13 && str_contains($user->business_phone, '+44')) {
-                        $sms->sendSms($user->business_phone, $message_for_customer);
+                    if (strlen($seller->business_phone) == 13 && str_contains($seller->business_phone, '+44')) {
+                        $sms->sendSms($seller->business_phone, $message_for_admin);
                     }
                     $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
                     $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number

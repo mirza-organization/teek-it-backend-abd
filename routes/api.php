@@ -87,16 +87,24 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::post('recheck_products', 'OrdersController@recheckProducts');
     Route::get('featured/{store_id}', 'ProductsController@featuredProducts');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Driver API Routes Without JWT Authentication
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'driver'], function () {
     Route::post('/register', 'Api\v1\DriverController@registerDriver');
 });
-
+/*
+|--------------------------------------------------------------------------
+| Notifications API Routes Without JWT Authentication
+|--------------------------------------------------------------------------
+*/
 Route::group(['prefix' => 'notifications'], function ($router) {
     Route::get('', 'NotificationsController@getNotifications');
     Route::post('save_token', 'NotificationsController@saveToken');
     Route::get('delete/{notification_id}', 'NotificationsController@deleteNotification');
-    // Route::post('send', 'NotificationsController@send_notification');
+    Route::post('send_test', 'NotificationsController@sendNotificationTest');
 });
 /*
 |--------------------------------------------------------------------------
