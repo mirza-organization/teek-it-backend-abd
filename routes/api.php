@@ -94,6 +94,7 @@ Route::group(['prefix' => 'product'], function ($router) {
 */
 Route::group(['prefix' => 'driver'], function () {
     Route::post('/register', 'Api\v1\DriverController@registerDriver');
+    Route::post('/login', 'Api\v1\DriverController@loginDriver');
 });
 /*
 |--------------------------------------------------------------------------

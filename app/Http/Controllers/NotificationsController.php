@@ -195,7 +195,7 @@ class NotificationsController extends Controller
                     "registration_ids" => $firebaseToken,
                     "data" => [
                         "title" => $request->title,
-                        "body" => $request->body,
+                        "message" => $request->message,
                     ],
                     "priority" => "high"
                 ];
@@ -245,7 +245,7 @@ class NotificationsController extends Controller
                 "registration_ids" => $firebaseToken,
                 "data" => [
                     "title" => $request->title,
-                    "body" => $request->body,
+                    "message" => $request->message,
                 ],
                 "priority" => "high"
             ];
@@ -324,7 +324,7 @@ class NotificationsController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 }

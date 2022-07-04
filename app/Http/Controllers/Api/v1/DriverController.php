@@ -6,7 +6,6 @@ use App\Drivers;
 use App\DriverDocuments;
 use App\Http\Controllers\Controller;
 use App\Mail\StoreRegisterMail;
-use App\Models\Role;
 use App\Orders;
 use App\User;
 use App\VerificationCodes;
@@ -18,9 +17,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class DriverController extends Controller
 {
@@ -365,7 +364,53 @@ class DriverController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
+    }
+
+    protected function loginDriver(Request $request)
+    {
+        print_r(JWTAuth::parseToken()->authenticate());
+        // print_r(JWTAuth::refresh()); 
+        exit;
+        // JWTAuth::refresh();
+        $user = JWTAuth::user();
+        $seller_info = [];
+        $seller_info = User::find($user->seller_id);
+
+        $url = URL::to('/');
+        $imagePath = $user['user_img'];
+
+        $data_info = array(
+            'id' => $user->id,
+            'name' => $user->name,
+            'l_name' => $user->l_name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'postal_code' => $user->postal_code,
+            'address_1' => $user->address_1,
+            'address_2' => $user->address_2,
+            'is_online' => $user->is_online,
+            'business_name' => $user->business_name,
+            'business_phone' => $user->business_phone,
+            'business_location' => $user->business_location,
+            'business_hours' => $user->business_hours,
+            'bank_details' => $user->bank_details,
+            'last_login' => $user->last_login,
+            'roles' => $user->roles->pluck('name'),
+            'user_img' => $imagePath,
+            'pending_withdraw' => $user->pending_withdraw,
+            'total_withdraw' => $user->total_withdraw,
+            'vehicle_type' => $user->vehicle_type,
+            'seller_info' => $this->get_seller_info($seller_info),
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60,
+        );
+        return response()->json([
+            'data' => $data_info,
+            'status' => true,
+            'message' =>  config('constants.LOGIN_SUCCESS')
+        ], 200);
     }
 }
