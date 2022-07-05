@@ -367,50 +367,79 @@ class DriverController extends Controller
             ], 500);
         }
     }
-
+    /**
+     * Driver logIn
+     * @version 1.0.0
+     */
     protected function loginDriver(Request $request)
     {
-        print_r(JWTAuth::parseToken()->authenticate());
-        // print_r(JWTAuth::refresh()); 
-        exit;
-        // JWTAuth::refresh();
-        $user = JWTAuth::user();
-        $seller_info = [];
-        $seller_info = User::find($user->seller_id);
-
-        $url = URL::to('/');
-        $imagePath = $user['user_img'];
-
-        $data_info = array(
-            'id' => $user->id,
-            'name' => $user->name,
-            'l_name' => $user->l_name,
-            'email' => $user->email,
-            'phone' => $user->phone,
-            'postal_code' => $user->postal_code,
-            'address_1' => $user->address_1,
-            'address_2' => $user->address_2,
-            'is_online' => $user->is_online,
-            'business_name' => $user->business_name,
-            'business_phone' => $user->business_phone,
-            'business_location' => $user->business_location,
-            'business_hours' => $user->business_hours,
-            'bank_details' => $user->bank_details,
-            'last_login' => $user->last_login,
-            'roles' => $user->roles->pluck('name'),
-            'user_img' => $imagePath,
-            'pending_withdraw' => $user->pending_withdraw,
-            'total_withdraw' => $user->total_withdraw,
-            'vehicle_type' => $user->vehicle_type,
-            'seller_info' => $this->get_seller_info($seller_info),
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60,
-        );
-        return response()->json([
-            'data' => $data_info,
-            'status' => true,
-            'message' =>  config('constants.LOGIN_SUCCESS')
-        ], 200);
+        $validatedData = \Validator::make($request->all(), [
+            'email' => 'required|string|email|max:80',
+            'password' => 'required|string|min:8|max:50'
+        ]);
+        if ($validatedData->fails()) {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $validatedData->errors()
+            ], 422);
+        }
+        try {
+            $credentials = $request->only('email', 'password');
+            $driver_info = [];
+            $driver_info = Drivers::where('email', $credentials['email'])->first();
+            if (Hash::check($credentials['password'], $driver_info->password)) {
+                /**
+                 * In Laravel we can only create JWTAuth token for users table. Therefore, to generate 
+                 * the token we have to use these dummy credentials which are present in the users table
+                 */
+                $dummy_credentials = array(
+                    'email' => 'mirzaabdullahizhar@gmail.com',
+                    'password' => 'Azimraja786'
+                );
+                $token = JWTAuth::attempt($dummy_credentials);
+                $data_info = array(
+                    'id' => $driver_info->id,
+                    'f_name' => $driver_info->f_name,
+                    'l_name' => $driver_info->l_name,
+                    'email' => $driver_info->email,
+                    'phone' => $driver_info->phone,
+                    'profile_img' => $driver_info->profile_img,
+                    'vehicle_type' => $driver_info->vehicle_type,
+                    'vehicle_number' => $driver_info->vehicle_number,
+                    'area' => $driver_info->area,
+                    'lat' => $driver_info->lat,
+                    'lon' => $driver_info->lon,
+                    'account_holders_name' => $driver_info->account_holders_name,
+                    'bank_name' => $driver_info->bank_name,
+                    'sort_code' => $driver_info->sort_code,
+                    'account_number' => $driver_info->account_number,
+                    'driving_licence_name' => $driver_info->driving_licence_name,
+                    'dob' => $driver_info->dob,
+                    'driving_licence_number' => $driver_info->driving_licence_number,
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                );
+                return response()->json([
+                    'data' => $data_info,
+                    'status' => true,
+                    'message' =>  config('constants.LOGIN_SUCCESS')
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' =>  config('constants.INVALID_CREDENTIALS')
+                ], 401);
+            }
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.INVALID_CREDENTIALS')
+            ], 401);
+        }
     }
 }
