@@ -304,28 +304,26 @@ class DriverController extends Controller
                 $drivers->profile_img = $filename;
                 $drivers->save();
             }
-
-            if (!empty($request->driving_licence_number) || $request->vehicle_type == 1) {
-                $front_img = $request->file('front_img');
-                $back_img = $request->file('back_img');
-                $front_filename = uniqid($driver_id . '_') . "." . $front_img->getClientOriginalExtension(); //create unique file name...
-                $back_filename = uniqid($driver_id . '_') . "." . $back_img->getClientOriginalExtension(); //create unique file name...
-                Storage::disk('spaces')->put($front_filename, File::get($front_img));
-                Storage::disk('spaces')->put($back_filename, File::get($back_img));
-                if (Storage::disk('spaces')->exists($front_filename) && Storage::disk('spaces')->exists($back_filename)) {  // check file exists in directory or not
-                    info("file is store successfully : " . $front_filename);
-                    info("file is store successfully : " . $back_filename);
-                } else {
-                    info("file is not found :- " . $front_filename);
-                    info("file is not found :- " . $back_filename);
-                }
-                $driving_licence = new DriverDocuments();
-                $driving_licence->driver_id = $driver_id;
-                $driving_licence->front_img = $front_filename;
-                $driving_licence->back_img = $back_filename;
-                $driving_licence->save();
+            // Upload driver documents
+            $front_img = $request->file('front_img');
+            $back_img = $request->file('back_img');
+            $front_filename = uniqid($driver_id . '_') . "." . $front_img->getClientOriginalExtension(); //create unique file name...
+            $back_filename = uniqid($driver_id . '_') . "." . $back_img->getClientOriginalExtension(); //create unique file name...
+            Storage::disk('spaces')->put($front_filename, File::get($front_img));
+            Storage::disk('spaces')->put($back_filename, File::get($back_img));
+            if (Storage::disk('spaces')->exists($front_filename) && Storage::disk('spaces')->exists($back_filename)) {  // check file exists in directory or not
+                info("file is store successfully : " . $front_filename);
+                info("file is store successfully : " . $back_filename);
+            } else {
+                info("file is not found :- " . $front_filename);
+                info("file is not found :- " . $back_filename);
             }
-
+            $driving_licence = new DriverDocuments();
+            $driving_licence->driver_id = $driver_id;
+            $driving_licence->front_img = $front_filename;
+            $driving_licence->back_img = $back_filename;
+            $driving_licence->save();
+            // Upload driver documents - Ends
             $verification_code = Crypt::encrypt($drivers->email);
             $FRONTEND_URL = env('FRONTEND_URL');
             $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
