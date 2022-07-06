@@ -90,7 +90,7 @@
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->
-    
+
     <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyDS4Nf8Ict_2h4lih9DCIt_EpkkBnVd85A"></script>
     <script>
         // Google Map Code - Begins
@@ -239,15 +239,59 @@
             }
         }
 
-        function submitLocation(){
+        function submitLocation() {
             var user_address = document.getElementById("modal_location_text").value;
             var user_lat = document.getElementById("ad_lat").value;
             var user_lon = document.getElementById("ad_long").value;
             document.getElementById("user_location").innerHTML = user_address;
             document.getElementById("location_text").value = user_address;
             document.getElementById("Address[lat]").value = user_lat;
-            document.getElementById("Address[long]").value = user_lon;
+            document.getElementById("Address[lon]").value = user_lon;
             $('#map_modal').modal('hide');
+        }
+
+        function signUp() {
+            let name = $('#name').val();
+            let email = $('#email').val();
+            let password = $('#password').val();
+            let phone = $('#phone').val();
+            let company_name = $('#company_name').val();
+            let company_phone = $('#company_phone').val();
+            let location_text = $('#location_text').val();
+            let Address = [];
+            let lat = $('input[id="Address[lat]"]').val();
+            let lon = $('input[id="Address[lon]"]').val();
+            $.ajax({
+                url: "{{route('register')}}",
+                type: "post",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    name: name,
+                    email: email,
+                    password: password,
+                    phone: phone,
+                    company_name: company_name,
+                    company_phone: company_phone,
+                    location_text: location_text,
+                    lat: lat,
+                    lon: lon
+                },
+                success: function(response) {
+                    console.log(response);
+                    if (response == "User Created") {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'We have received your store details we will contact you soon to verify your store',
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        });
+                    } else {
+                        console.log(response.errors);
+                        if(response.errors.name)
+                            console.log(response.errors.name[0]);
+                    }
+                }
+            });
         }
     </script>
 
@@ -258,21 +302,9 @@
     <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
-
-    <script>
-        //  function sendMsg() {
-        //     $.ajax({
-        //         url: "/api/sendMsg",
-        //         type: "post",
-        //         success: function(r) {
-        //             setTimeout(sendMsg, 3000);
-        //             console.log('sent');
-        //         }
-        //     });
-        // }
-        // sendMsg();
-    </script>
-
+    <!-- Sweetalerts for Swal -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <style>
         input.form-control {
             border: 0;

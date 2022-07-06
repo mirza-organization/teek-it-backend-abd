@@ -30,4 +30,5 @@ return [
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
+    'ADMIN_EMAIL' => 'admin@teekit.co.uk',
 ];

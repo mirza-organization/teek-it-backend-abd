@@ -5,7 +5,6 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-12">
-                <h2 class="m-0 text-dark text-center">Admin Dashboard</h2>
                 <a class="text-site-primary text-center m-auto d-block" href="/" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Settings</a>
             </div><!-- /.col -->
         </div><!-- /.row -->

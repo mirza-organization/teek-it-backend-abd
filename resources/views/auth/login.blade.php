@@ -6,10 +6,9 @@
         <div class="col-md-12">
             <h1 class="text-white text-center">{{ __('Sign Up') }}</h1>
 
-            <form method="POST" action="{{ route('register') }}" style="margin-bottom: 100px;">
-                @csrf
+            <form id="sign_up_form" style="margin-bottom: 100px;" onsubmit="return false">
+               
                 <div class="form-group row">
-
                     <div class="col-md-12">
                         <input id="name" type="text" placeholder="Name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
 
@@ -20,8 +19,8 @@
                         @endif
                     </div>
                 </div>
-                <div class="form-group row">
 
+                <div class="form-group row">
                     <div class="col-md-12">
                         <input id="email" type="email" placeholder="Email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
 
@@ -34,7 +33,6 @@
                 </div>
 
                 <div class="form-group row">
-
                     <div class="col-md-12">
                         <input id="password" placeholder="Password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" minlength="8" required>
 
@@ -60,6 +58,7 @@
                         @endif
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <div class="col-md-12">
                         <input id="company_name" type="text" placeholder="Company Name" class="form-control{{ $errors->has('company_name') ? ' is-invalid' : '' }}" name="company_name" value="{{ old('company_name') }}" required autofocus>
@@ -71,6 +70,7 @@
                         @endif
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <div class="col-md-12 input-group">
                         <div class="input-group-prepend">
@@ -94,14 +94,14 @@
                             <span class="text-light" id="user_location">Set Location</span>
                             <input type="hidden" id="location_text" name="location_text">
                             <input type="hidden" id="Address[lat]" name="Address[lat]">
-                            <input type="hidden" id="Address[long]" name="Address[long]">
+                            <input type="hidden" id="Address[lon]" name="Address[lon]">
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group row mb-0">
                     <div class="col-md-12">
-                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="padding: 5px 25px; display: block;width: 100%;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0;">Sign up</button>
+                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="padding: 5px 25px; display: block;width: 100%;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0;" onclick="signUp()">Sign up</button>
                     </div>
                 </div>
             </form>

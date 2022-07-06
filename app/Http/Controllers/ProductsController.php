@@ -168,7 +168,6 @@ class ProductsController extends Controller
         $product->price = $request->price;
         $product->qty = $request->qty;
         $product->user_id = $user_id;
-        $data = [];
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             foreach ($images as $image) {
