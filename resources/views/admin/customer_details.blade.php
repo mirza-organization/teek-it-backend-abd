@@ -116,7 +116,7 @@
 
                                         <h4 class="float-right pr-3">Block</h4>
                                         @endif
-                                        <a href="" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right pr-3"><img class="img-size-16" src="/res/res/img/edit.png"></a>
+                                        <!-- <a href="" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right pr-3"><img class="img-size-16" src="/res/res/img/edit.png"></a> -->
                                     </div>
                                 </div>
                                 <div class="col-md-12">

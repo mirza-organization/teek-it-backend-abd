@@ -155,6 +155,7 @@ class RegisterController extends Controller
             'settings' => '{"notification_music": 1}',
             'is_active' => 0,
         ]);
+        if($User) echo "User Created";
         $User->roles()->sync($role->id);
         $verification_code = Crypt::encrypt($User->email);
         $FRONTEND_URL = env('FRONTEND_URL');
@@ -162,13 +163,12 @@ class RegisterController extends Controller
 
         $html = '<html>
             Hi, ' . $User->name . '<br><br>
-
             Thank you for registering on ' . env('APP_NAME') . '.
-<br>
+            <br>
             Here is your account verification link. Click on below link to verify your account. <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
             ' . $account_verification_link . '
-<br><br><br>
+            <br><br><br>
         </html>';
         $subject = env('APP_NAME') . ': Account Verification';
         Mail::to(config('constants.ADMIN_EMAIL'))
@@ -195,6 +195,5 @@ class RegisterController extends Controller
                 ->send(new StoreRegisterMail($adminHtml, $admin_subject));
         }
         // return Redirect::route('login');
-        if($User) echo "User Created";
     }
 }
