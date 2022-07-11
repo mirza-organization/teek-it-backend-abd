@@ -16,14 +16,14 @@
 <div class="content">
     <div class="container-fluid">
         <div class="row">
-            <div class="offset-xl-2 col-lg-12 col-xl-8  pb-4">
+            <div class="offset-xl-2 col-lg-12 col-xl-8 pb-4">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-block text-right">
                             <div class="card-text">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <form action="{{route('sendNotification')}}" method="POST" enctype="multipart/form-data">
+                                        <form action="{{route('admin.notification.send')}}" method="POST" enctype="multipart/form-data">
                                             {{csrf_field()}}
                                             <div class="row">
                                                 <div class="col-md-12">

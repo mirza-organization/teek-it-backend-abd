@@ -79,7 +79,7 @@
                         <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('/')) ? 'active' : '' }}  " href="/">
+                            <a class="nav-link {{ (request()->is('/')) ? 'active' : '' }}" href="/">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p class="ml-2">
                                     Dashboard
@@ -87,7 +87,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('drivers')) ? 'active' : '' }} " href="/notification/home">
+                            <a class="nav-link {{ (request()->is('notification/home')) ? 'active' : '' }}" href="/notification/home">
                                 <i class="nav-icon fas fa-bell"></i>
                                 <p class="ml-2">
                                     Notifications
@@ -95,7 +95,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('stores')) ? 'active' : '' }}  " href="/stores">
+                            <a class="nav-link {{ (request()->is('promocodes/home')) ? 'active' : '' }}" href="/promocodes/home">
+                                <i class="nav-icon fas fa-qrcode"></i>
+                                <p class="ml-2">
+                                    Promo Codes
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('stores')) ? 'active' : '' }}" href="/stores">
                                 <i class="nav-icon fas fa-store-alt"></i>
                                 <p class="ml-2">
                                     Stores
@@ -103,7 +111,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link  {{ (request()->is('customers')) ? 'active' : '' }}  " href="/customers">
+                            <a class="nav-link  {{ (request()->is('customers')) ? 'active' : '' }}" href="/customers">
                                 <i class="nav-icon fas fa-users-cog"></i>
                                 <p class="ml-2">
                                     Customers
@@ -111,7 +119,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('drivers')) ? 'active' : '' }} " href="/drivers">
+                            <a class="nav-link {{ (request()->is('drivers')) ? 'active' : '' }}" href="/drivers">
                                 <i class="nav-icon fas fa-biking"></i>
                                 <p class="ml-2">
                                     Drivers
@@ -177,7 +185,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('acategories')) ? 'active' : '' }} " href="/acategories">
+                            <a class="nav-link {{ (request()->is('acategories')) ? 'active' : '' }}" href="/acategories">
                                 <i class="nav-icon fas fa-clipboard-list"></i>
                                 <p class="ml-2">
                                     Categories
@@ -185,7 +193,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('asetting')) ? 'active' : '' }} " href="/asetting">
+                            <a class="nav-link {{ (request()->is('asetting')) ? 'active' : '' }}" href="/asetting">
                                 <i class="nav-icon fa fa-cog"></i>
                                 <p class="ml-2">
                                     Settings
@@ -193,7 +201,7 @@
                             </a>
                         </li>
                         {{-- <li class="nav-item">--}}
-                        {{-- <a class="nav-link {{ (request()->is('queries')) ? 'active' : '' }} " href="/queries">--}}
+                        {{-- <a class="nav-link {{ (request()->is('queries')) ? 'active' : '' }}" href="/queries">--}}
                         {{-- <i class="nav-icon fas fa-question-circle"></i>--}}
                         {{-- <p class="ml-2">--}}
                         {{-- Queries--}}

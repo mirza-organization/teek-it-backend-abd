@@ -163,11 +163,11 @@ class NotificationsController extends Controller
     //     ], 200);
     // }
     /**
-     * Returns notification form
+     * Returns notification form view
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function homeNotification(Request $request)
+    public function notificationHome(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             return view('admin.notification');
@@ -180,7 +180,7 @@ class NotificationsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function sendNotification(Request $request)
+    public function notificationSend(Request $request)
     {
         try {
             if (Auth::user()->hasRole('superadmin')) {
@@ -220,7 +220,7 @@ class NotificationsController extends Controller
             }
         } catch (Throwable $error) {
             report($error);
-            return back()->with('error', 'Failed to send the notification.');
+            return back()->with('error', 'Failed to send the notification due to some internal error.');
         }
     }
     /**
@@ -228,7 +228,7 @@ class NotificationsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function sendNotificationTest(Request $request)
+    public function notificationSendTest(Request $request)
     {
         try {
             $validatedData = notifications::validator($request);

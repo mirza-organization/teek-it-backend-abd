@@ -25,10 +25,6 @@ Auth::routes();
 |--------------------------------------------------------------------------
 */
 Route::get('/', 'HomeController@index')->name('home');
-
-Route::get('/notification/home', 'NotificationsController@homeNotification')->name('homeNotification');
-Route::post('/notification/send', 'NotificationsController@sendNotification')->name('sendNotification');
-
 /*
 |--------------------------------------------------------------------------
 | Inventory Routes
@@ -95,9 +91,13 @@ Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespa
 | Admin Routes
 |--------------------------------------------------------------------------
 */
+Route::get('/notification/home', 'NotificationsController@notificationHome')->name('admin.notification.home');
+Route::post('/notification/send', 'NotificationsController@notificationSend')->name('admin.notification.send');
 Route::get('/stores', 'HomeController@adminStores');
 Route::get('/customers', 'HomeController@adminCustomers');
-Route::get('/drivers', 'HomeController@adminDrivers');
+Route::get('/drivers', 'HomeController@adminDrivers')->name('admin.drivers');
+Route::get('/promocodes/home', 'PromoCodesController@promocodesHome')->name('admin.promocodes.home');
+Route::post('/promocodes/add', 'PromoCodesController@promocodesAdd')->name('admin.promocodes.add');
 Route::get('/aorders', 'HomeController@adminOrders');
 Route::get('/aorders/verified', 'HomeController@adminOrdersVerified');
 Route::get('/aorders/unverified', 'HomeController@adminOrdersUnverified');
