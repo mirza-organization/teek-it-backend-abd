@@ -153,7 +153,7 @@ class CategoriesController extends Controller
         }
     }
 
-    public function Products($category_id)
+    public function products($category_id)
     {
         $storeId = \request()->store_id;
         $products = Products::query();
@@ -174,8 +174,7 @@ class CategoriesController extends Controller
                 'data' => $products_data,
                 'status' => true,
                 'message' => '',
-                'pagination' => $pagination,
-
+                'pagination' => $pagination
             ];
         } else {
             $products_data = [

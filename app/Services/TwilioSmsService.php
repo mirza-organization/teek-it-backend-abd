@@ -13,7 +13,7 @@ class TwilioSmsService
 
     public function __construct()
     {
-        $this->sid = config("app.TWILIO_SID");;
+        $this->sid = config("app.TWILIO_SID");
         $this->token = config("app.TWILIO_TOKEN");
         $this->fromNumber = config("app.TWILIO_FROM");
     }
@@ -27,6 +27,7 @@ class TwilioSmsService
         $client = new Client($this->sid, $this->token);
         $client->messages->create($receiverNumber, [
             'from' => $this->fromNumber,
-            'body' => $message]);
+            'body' => $message
+        ]);
     }
 }

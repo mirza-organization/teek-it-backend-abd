@@ -86,6 +86,12 @@ input:checked + .slider:before {
 .del-icon {
     margin-right: 5px;
 }
+
+.clipboard-custom {
+    font-size: 30px; 
+    color: #3a4b83;
+}
+
 /* *************************Media Queries************************* */
 @media only screen and (max-width: 425px){  
     .day{

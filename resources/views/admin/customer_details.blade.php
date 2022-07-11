@@ -6,7 +6,17 @@
         <div class="row mb-2">
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
-                <a class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Customer Details</a>
+                <a class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">
+                @if($role_id==2)
+                Store Details
+                @endif
+                @if($role_id==3)
+                Customer Details
+                @endif
+                @if($role_id==4)
+                Driver Details
+                @endif
+            </a>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
@@ -106,15 +116,14 @@
 
                                         <h4 class="float-right pr-3">Block</h4>
                                         @endif
-                                        <a href="" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right pr-3"><img class="img-size-16" src="/res/res/img/edit.png" alt=""></a>
-
+                                        <!-- <a href="" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right pr-3"><img class="img-size-16" src="/res/res/img/edit.png"></a> -->
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-3">
                                             <span class="img-container">
-                                                <img style="height: 250px;" class="d-block m-auto" src=@if($user->user_img)
+                                                <img style="width: 250px;" class="d-block m-auto" src=@if($user->user_img)
                                                 "{{config('constants.BUCKET') . $user->user_img}}"
                                                 @else
                                                 "{{asset('/res/res/img/customer.png')}}"
@@ -133,6 +142,10 @@
                                                 'settings',
                                                 'user_img'
                                             ];
+                                            if($role_id == 3) // Customer
+                                            array_push($fields,  'lat','lon','pending_withdraw','total_withdraw','application_fee');
+                                            if($role_id == 4) // Driver
+                                            array_push($fields,  'application_fee');
                                             ?>
                                             @foreach(json_decode($user) as $key=>$u)
                                             @if(!is_null($u) && !in_array($key,$fields))
@@ -247,11 +260,9 @@
                                 </div>
                             </div>
                             <div class="col-md-12">
-
                                 <hr>
                             </div>
                             <div class="col-md-12">
-
                                 @foreach($order->items as $item)
                                 <div class="row mb-2">
                                     <div class="col-md-2">

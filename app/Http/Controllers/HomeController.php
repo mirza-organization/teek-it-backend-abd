@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
@@ -53,10 +54,13 @@ class HomeController extends Controller
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', Auth::id())->sum('order_total');
             $all_orders = Orders::where('seller_id', \auth()->id())
                 ->whereNotNull('order_status')
-                ->orderby(\DB::raw('case when is_viewed= 0 then 0 when order_status= "pending" then 1 when order_status= "ready" then 2 when order_status= "assigned" then 3
-                 when order_status= "onTheWay" then 4 when order_status= "delivered" then 5 end'))
+                ->orderby(\DB::raw('case when is_viewed = 0 then 0 when order_status = "pending" then 1 when order_status = "ready" then 2 when order_status = "assigned" then 3
+                 when order_status = "onTheWay" then 4 when order_status = "delivered" then 5 end'))
                 ->simplePaginate(5);
             return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
+            // return View::composer('shopkeeper.dashboard', function ($view) {
+            //     $view->with('user', $user)->with('pending_orders', 'On GeeksforGeeks')->with('pending_orders', );
+            // });
         } else {
             return $this->admin_home();
         }
@@ -66,6 +70,7 @@ class HomeController extends Controller
     {
         if (Auth::user()->hasRole('seller')) {
             $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
+            $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
             if ($request->search) {
                 $inventory = $inventory->where('product_name', 'LIKE', $request->search);
             }
@@ -76,16 +81,20 @@ class HomeController extends Controller
             $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
             $inventories = [];
+            $featured_products = [];
             foreach ($inventory as $in) {
                 $inventories[] = Products::get_product_info($in->id);
             }
-            return view('shopkeeper.inventory.list', compact('inventories', 'inventory_p', 'categories'));
+            foreach ($featured as $in) {
+                $featured_products[] = Products::get_product_info($in->id);
+            }
+            return view('shopkeeper.inventory.list', compact('inventories', 'featured_products', 'inventory_p', 'categories'));
         } else {
             abort(404);
         }
     }
 
-    public function inventory_edit($product_id)
+    public function inventoryEdit($product_id)
     {
         if (Auth::user()->hasRole('seller')) {
             $invent = Products::query()->where('user_id', '=', Auth::id())->where('id', '=', $product_id);
@@ -100,7 +109,7 @@ class HomeController extends Controller
         }
     }
 
-    public function inventory_add(Request $request)
+    public function inventoryAdd(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             $categories = Categories::all();
@@ -111,7 +120,7 @@ class HomeController extends Controller
         }
     }
 
-    public function inventory_add_bulk(Request $request)
+    public function inventoryAddBulk(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             return view('shopkeeper.inventory.add_bulk');
@@ -120,7 +129,7 @@ class HomeController extends Controller
         }
     }
 
-    public function delete_img($image_id)
+    public function deleteImg($image_id)
     {
         if (Auth::user()->hasRole('seller')) {
             productImages::find($image_id)->delete();
@@ -134,7 +143,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function inventory_disable($product_id)
+    public function inventoryDisable($product_id)
     {
         $product = Products::find($product_id);
         $product->status = 0;
@@ -148,7 +157,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function inventory_enable($product_id)
+    public function inventoryEnable($product_id)
     {
         $product = Products::find($product_id);
         $product->status = 1;
@@ -157,11 +166,24 @@ class HomeController extends Controller
         return Redirect::back();
     }
     /**
+     * Enable's all products of logged-in user
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function inventoryEnableAll(Request $request)
+    {
+        DB::table('products')
+            ->where('user_id', Auth::id())
+            ->update(['status' => 1]);
+        flash('All Products Enabled Successfully')->success();
+        return Redirect::back();
+    }
+      /**
      * Disable's all products of logged-in user
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function inventory_disable_all(Request $request)
+    public function inventoryDisableAll(Request $request)
     {
         DB::table('products')
             ->where('user_id', Auth::id())
@@ -170,16 +192,44 @@ class HomeController extends Controller
         return Redirect::back();
     }
     /**
-     * Enable's all products of logged-in user
+     * Feature the given product
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function inventory_enable_all(Request $request)
+    public function markAsFeatured(Request $request)
     {
-        DB::table('products')
-            ->where('user_id', Auth::id())
-            ->update(['status' => 1]);
-        flash('All Products Enabled Successfully')->success();
+        if (Auth::user()->hasRole('seller')) {
+            $count = DB::table('products')
+                ->select()
+                ->where('user_id', Auth::id())
+                ->where('featured', 1)
+                ->count();
+            if ($count >= 6) {
+                flash('You Can Mark Maximum 6 Products As Featured')->success();
+            } else {
+                DB::table('products')
+                    ->where('id', $request->product_id)
+                    ->update(['featured' => 1]);
+                flash('Marked As Featured, Successfully')->success();
+            }
+            return Redirect::back();
+        }else{
+            abort(404);
+        }
+    }
+    /**
+     * Remove the given product from featured list
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
+    public function removeFromFeatured(Request $request)
+    {
+        if (Auth::user()->hasRole('seller')) {
+            DB::table('products')
+                ->where('id', $request->product_id)
+                ->update(['featured' => 0]);
+            flash('Removed From Featured, Successfully')->success();
+        }
         return Redirect::back();
     }
     /**
@@ -187,7 +237,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function inventory_add_db(Request $request)
+    public function inventoryAddDB(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             $validatedData = Validator::make($request->all(), [
@@ -231,9 +281,7 @@ class HomeController extends Controller
                 if ($request->hasFile('feature_img')) {
                     $file = $request->file('feature_img');
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    // Storage::disk('spaces')->put($filename, File::get($file));
                     Storage::disk('spaces')->put($filename, File::get($file));
-                    // Storage::disk('spaces')->exists($filename)
                     if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                         info("file is store successfully : " . $filename);
                     } else {
@@ -251,9 +299,7 @@ class HomeController extends Controller
                     foreach ($images as $image) {
                         $file = $image;
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
-                        // Storage::disk('spaces')->put($filename, File::get($file));
                         Storage::disk('spaces')->put($filename, File::get($file));
-                        // Storage::disk('spaces')->exists($filename)
                         if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                             info("file is store successfully : " . $filename);
                         } else {
@@ -277,7 +323,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function inventory_update(Request $request, $product_id)
+    public function inventoryUpdate(Request $request, $product_id)
     {
         if (Auth::user()->hasRole('seller')) {
             $validatedData = Validator::make($request->all(), [
@@ -364,7 +410,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function user_img_update(Request $request)
+    public function userImgUpdate(Request $request)
     {
         $user = User::find(\auth()->id());
         $filename = \auth()->user()->name;
@@ -389,7 +435,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function change_settings(Request $request)
+    public function changeSettings(Request $request)
     {
         User::where('id', '=', Auth::id())->update(['settings->' . $request->setting_name => $request->value]);
         return \redirect()->route('home');
@@ -399,7 +445,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function payment_settings()
+    public function paymentSettings()
     {
         $payment_settings = User::find(Auth::id())->bank_details;
         return view('shopkeeper.settings.payment', compact('payment_settings'));
@@ -409,7 +455,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function general_settings()
+    public function generalSettings()
     {
         $user = User::find(Auth::id());
         $business_hours = $user->business_hours;
@@ -422,14 +468,15 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function time_update(Request $request)
-    {   //dd($request->time);
+    public function timeUpdate(Request $request)
+    {
         $time = $request->time;
         foreach ($time as $key => $value) {
             if (!in_array("on", $time[$key]))
                 $time[$key] += ["closed" => null];
         }
         $data['time'] = $time;
+        $data['submitted'] = "yes";
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
         $user->save();
@@ -441,7 +488,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function location_update(Request $request)
+    public function locationUpdate(Request $request)
     {
         $data = $request->Address;
         $location = $request->location_text;
@@ -455,11 +502,40 @@ class HomeController extends Controller
         return redirect()->back();
     }
     /**
+     * Update's user password
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function passwordUpdate(Request $request)
+    {
+        $validate = Validator::make($request->all(), [
+            'old_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8'
+        ]);
+        if ($validate->fails()) {
+            flash('Password must be 8 characters long.')->error();
+            return Redirect::back();
+        }
+
+        $old_password = $request->old_password;
+        $new_password = $request->new_password;
+
+        $user = User::find(Auth::id());
+        if (Hash::check($old_password, $user->password)) {
+            $user->password = Hash::make($new_password);
+            $user->save();
+            flash('Your password has been updated successfully.')->success();
+        } else {
+            flash('Your old password is incorrect.')->error();
+        }
+        return redirect()->back();
+    }
+    /**
      * Update's payment settings
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function payment_settings_update(Request $request)
+    public function paymentSettingsUpdate(Request $request)
     {
         $data = $request->all();
         if (empty($data['bank']['two']['bank_name']) || empty($data['bank']['two']['account_number']) || empty($data['bank']['two']['branch'])) {
@@ -657,7 +733,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function change_order_status($order_id)
+    public function changeOrderStatus($order_id)
     {
         Orders::where('id', '=', $order_id)->update(['order_status' => 'ready', 'is_viewed' => 1]);
         $order = Orders::find($order_id);
@@ -673,7 +749,7 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function mark_as_delivered($order_id)
+    public function markAsDelivered($order_id)
     {
         Orders::where('id', '=', $order_id)->update(['order_status' => 'delivered']);
         flash('This Order Has Been Marked As Delivered')->success();
@@ -685,18 +761,16 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    public function mark_as_completed($order_id)
+    public function markAsCompleted($order_id)
     {
         $verification_codes = VerificationCodes::query()->select('code->driver_failed_to_enter_code as driver_failed_to_enter_code')
             ->where('order_id', '=', $order_id)
             ->get();
-        if (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "Yes") {
+        if (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "Yes" || json_decode($verification_codes)[0]->driver_failed_to_enter_code == "NULL") {
             Orders::where('id', '=', $order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
             flash('This Order Has Been Marked As Completed')->success();
         } elseif (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "No") {
             flash('This Order Is Already Marked As Completed')->success();
-        } elseif (json_decode($verification_codes)[0]->driver_failed_to_enter_code == "NULL") {
-            flash('This Order Cant Be Marked As Completed Because The Verification Code Has Not Been Provided By The Driver Yet')->success();
         }
         return Redirect::back();
     }
@@ -716,8 +790,8 @@ class HomeController extends Controller
             $logo = Pages::query()->where('page_type', '=', 'logo')->first();
 
             $pending_orders = Orders::query()->where('order_status', '=', 'ready')->count();
-            $total_products = Orders::query()->where('payment_status', '!=', 'hidden')->count();
-            $total_orders = Products::query()->count();
+            $total_products = Products::query()->count();
+            $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->count();
             $total_sales = Orders::query()->where('payment_status', '=', 'paid')->sum('order_total');
             return view('admin.home', compact('terms_page', 'help_page', 'faq_page', 'slogan', 'favicon', 'logo', 'pending_orders', 'total_products', 'total_orders', 'total_sales'));
         } else {
@@ -729,7 +803,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function asetting()
+    public function aSetting()
     {
         if (Auth::user()->hasRole('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
@@ -753,19 +827,22 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_customer_details($user_id)
+    public function adminCustomerDetails($user_id)
     {
         $return_arr = [];
         if (Auth::user()->hasRole('superadmin')) {
             $user = User::find($user_id);
             if ($user->hasRole('seller')) {
                 $orders = Orders::query()->where('seller_id', '=', $user_id);
+                $role_id = 2;
             }
             if ($user->hasRole('buyer')) {
                 $orders = Orders::query()->where('user_id', '=', $user_id);
+                $role_id = 3;
             }
             if ($user->hasRole('delivery_boy')) {
                 $orders = Orders::query()->where('delivery_boy_id', '=', $user_id);
+                $role_id = 4;
             }
             $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
             $orders = $orders->paginate(10);
@@ -781,11 +858,8 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
-            // $loc = User::where('id', '=', $user_id)
-            // ->update(['business_location->lat' => 64.77]);
-            // dd($loc);
             $orders = $return_arr;
-            return view('admin.customer_details', compact('orders', 'orders_p', 'user'));
+            return view('admin.customer_details', compact('orders', 'orders_p', 'user', 'role_id'));
         } else {
             abort(401);
         }
@@ -795,7 +869,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function all_cat()
+    public function allCat()
     {
         $categories = Categories::paginate();
         return view('admin.categories', compact('categories'));
@@ -805,7 +879,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function add_cat(Request $request)
+    public function addCat(Request $request)
     {
         // $validate = Categories::validator($request);
         // if ($validate->fails()) {
@@ -837,7 +911,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function update_cat(Request $request, $id)
+    public function updateCat(Request $request, $id)
     {
         //$validate = Categories::updateValidator($request);
         // if ($validate->fails()) {
@@ -867,16 +941,18 @@ class HomeController extends Controller
     /**
      * Delete's a specific category
      * @author Huzaifa Haleem
-     * @version 1.0.0
+     * @version 1.1.0
      */
-    public function delete_cat(Request $request)
+    public function deleteCat(Request $request)
     {
-        DB::table('categories')->where('id', '=', $request->id)->delete();
-        flash('Category Deleted Successfully')->success();
+        if (Auth::user()->hasRole('superadmin')) {
+            DB::table('categories')->where('id', '=', $request->id)->delete();
+            flash('Category Deleted Successfully')->success();
+        }
         return Redirect::back();
     }
 
-    public function update_pages(Request $request)
+    public function updatePages(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->update(['page_content' => $request->tos]);
@@ -892,7 +968,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_stores(Request $request)
+    public function adminStores(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
@@ -902,11 +978,29 @@ class HomeController extends Controller
             if ($request->search) {
                 $users = $users->where('business_name', 'LIKE', $request->search);
             }
-
-            $users = $users->paginate(10);
+            $users = $users->paginate(9);
             return view('admin.stores', compact('users'));
         } else {
             abort(404);
+        }
+    }
+    /**
+     * Delete selected users
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminUsersDel(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            for ($i = 0; $i < count($request->users); $i++) {
+                // $user =  User::find($request->users[$i]);
+                // if($user->hasRole('seller')){
+                //     // Del Products & Orders
+                // }
+                DB::table('users')->where('id', '=', $request->users[$i])->delete();
+                DB::table('role_user')->where('user_id', '=', $request->users[$i])->delete();
+            }
+            return response("Users Deleted Successfully");
         }
     }
     /**
@@ -914,7 +1008,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_customers(Request $request)
+    public function adminCustomers(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
@@ -924,8 +1018,7 @@ class HomeController extends Controller
             if ($request->search) {
                 $users = $users->where('name', 'LIKE', $request->search);
             }
-
-            $users = $users->paginate(10);
+            $users = $users->paginate(9);
             return view('admin.customers', compact('users'));
         } else {
             abort(404);
@@ -936,7 +1029,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_drivers(Request $request)
+    public function adminDrivers(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
@@ -947,15 +1040,18 @@ class HomeController extends Controller
                 $users = $users->where('name', 'LIKE', $request->search);
             }
 
-            $users = $users->paginate(10);
-
+            $users = $users->paginate(9);
             return view('admin.drivers', compact('users'));
         } else {
             abort(404);
         }
     }
-
-    public function admin_orders(Request $request)
+    /**
+     * Render orders listing view for admin
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
+    public function adminOrders(Request $request)
     {
         if (Auth::user()->hasRole('superadmin')) {
             $return_arr = [];
@@ -986,6 +1082,106 @@ class HomeController extends Controller
             return view('admin.orders', compact('orders', 'orders_p'));
         } else {
             abort(404);
+        }
+    }
+    /**
+     * Render verified orders listing view for admin
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminOrdersVerified(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            $return_arr = [];
+            $verified_orders = VerificationCodes::query()
+                ->where('code->driver_failed_to_enter_code', '=', 'No')
+                ->orderByDesc('id');
+            // if ($request->search) {
+            //     $orders = $orders->where('id', '=', $request->search);
+            // }
+            // if ($request->user_id) {
+            //     $orders = $orders->where('user_id', '=', $request->user_id);
+            // }
+            // if ($request->store_id) {
+            //     $orders = $orders->where('seller_id', '=', $request->store_id);
+            // }
+            $verified_orders = $verified_orders->paginate(10);
+            $orders_p = $verified_orders;
+            foreach ($verified_orders as $order) {
+                $order_details = Orders::query()->where('id', '=', $order->order_id)->first();
+                $items = OrderItems::query()->where('order_id', '=', $order->order_id)->get();
+                $item_arr = [];
+                foreach ($items as $item) {
+                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $item['product'] = $product;
+                    $item_arr[] = $item;
+                }
+                $order['order_details'] = $order_details;
+                $order['items'] = $item_arr;
+                $return_arr[] = $order;
+            }
+            $orders = $return_arr;
+            return view('admin.verified_orders', compact('orders', 'orders_p'));
+        } else {
+            abort(404);
+        }
+    }
+    /**
+     * Render unverified orders listing view for admin
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminOrdersUnverified(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            $return_arr = [];
+            $verified_orders = VerificationCodes::query()
+                ->where('code->driver_failed_to_enter_code', '=', 'Yes')
+                ->orderByDesc('id');
+            // if ($request->search) {
+            //     $orders = $orders->where('id', '=', $request->search);
+            // }
+            // if ($request->user_id) {
+            //     $orders = $orders->where('user_id', '=', $request->user_id);
+            // }
+            // if ($request->store_id) {
+            //     $orders = $orders->where('seller_id', '=', $request->store_id);
+            // }
+            $verified_orders = $verified_orders->paginate(10);
+            $orders_p = $verified_orders;
+            foreach ($verified_orders as $order) {
+                $order_details = Orders::query()->where('id', '=', $order->order_id)->first();
+                $items = OrderItems::query()->where('order_id', '=', $order->order_id)->get();
+                $item_arr = [];
+                foreach ($items as $item) {
+                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $item['product'] = $product;
+                    $item_arr[] = $item;
+                }
+                $order['order_details'] = $order_details;
+                $order['items'] = $item_arr;
+                $return_arr[] = $order;
+            }
+            $orders = $return_arr;
+            return view('admin.unverified_orders', compact('orders', 'orders_p'));
+        } else {
+            abort(404);
+        }
+    }
+    /**
+     * Delete selected orders
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminOrdersDel(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            for ($i = 0; $i < count($request->orders); $i++) {
+                DB::table('orders')->where('id', '=', $request->orders[$i])->delete();
+                DB::table('order_items')->where('order_id', '=', $request->orders[$i])->delete();
+                DB::table('verification_codes')->where('order_id', '=', $request->orders[$i])->delete();
+            }
+            return response("Orders Deleted Successfully");
         }
     }
 
@@ -1019,7 +1215,7 @@ class HomeController extends Controller
         }
     }
 
-    public function withdrawals_request(Request $request)
+    public function withdrawalsRequest(Request $request)
     {
         if (Auth::user()->hasRole('seller')) {
             if (auth()->user()->pending_withdraw < $request->amount) {
@@ -1058,7 +1254,7 @@ class HomeController extends Controller
         }
     }
 
-    public function change_user_status($user_id, $status)
+    public function changeUserStatus($user_id, $status)
     {
         User::query()->where('id', '=', $user_id)->update(['is_active' => $status]);
         if ($status == 1) {
@@ -1078,7 +1274,7 @@ class HomeController extends Controller
         return Redirect::back();
     }
 
-    public function admin_queries()
+    public function adminQueries()
     {
         if (Auth::user()->hasRole('superadmin')) {
             return view('admin.queries');
@@ -1087,7 +1283,7 @@ class HomeController extends Controller
         }
     }
 
-    public function my_order_count()
+    public function myOrderCount()
     {
         if (Auth::user()->hasRole('seller')) {
             //$pending_orders = Orders::query()->where('order_status','=','ready')->where('seller_id','=',Auth::id())->count();
@@ -1101,7 +1297,7 @@ class HomeController extends Controller
         }
     }
 
-    public function complete_orders()
+    public function completeOrders()
     {
         $orders = Orders::with(['user', 'delivery_boy'])
             ->has('user')
@@ -1117,17 +1313,17 @@ class HomeController extends Controller
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
      */
-    public function mark_complete_order($order_id)
+    public function markCompleteOrder($order_id)
     {
         $order = Orders::with(['user', 'delivery_boy', 'store'])
             ->where('id', $order_id)->first();
         $order->delivery_status = 'complete';
         $order->save();
-        (new OrdersController())->calculateDriverFair($order, $order->store);
+        // (new OrdersController())->calculateDriverFair($order, $order->store);
         flash('Order is successfully completed')->success();
         $message = "Thanks for your order " . $order->user->name . ".
             Your order from " . $order->store->name . " has successfully been delivered.
-            If you experienced any issues with your order, please contact us via email at:
+            If you have experienced any issues with your order, please contact us via email at:
             admin@teekit.co.uk";
         $sms = new TwilioSmsService();
         $sms->sendSms($order->user->phone, $message);
@@ -1143,7 +1339,7 @@ class HomeController extends Controller
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
      */
-    public function cancel_order($order_id)
+    public function cancelOrder($order_id)
     {
         $order = Orders::findOrFail($order_id);
         $order->load('user');

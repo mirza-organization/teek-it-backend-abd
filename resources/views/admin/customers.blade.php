@@ -7,6 +7,14 @@
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
                 <a href="/customers" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Customers</a>
+                <div class="float-right">
+                    <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
+                        <a class="text-white">Select All</a>
+                    </button> -->
+                    <button type="button" class="btn btn-danger" onclick="delUsers()">
+                        <a class="text-white">Delete</a>
+                    </button>
+                </div>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
@@ -49,7 +57,7 @@
                             $fields = [
                                 'is_online',
                                 'is_active'
-                                //                                        'business_name'
+                                //'business_name'
                             ];
 
                             ?>
@@ -57,7 +65,6 @@
 
                                 @foreach(json_decode($user) as $key=>$u)
                                 @if(!is_null($u) && !in_array($key,$fields))
-
 
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -97,8 +104,9 @@
                             bg-success
                             @endif">
                     <div class="card-body">
-                        <a href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}" class=" d-block text-right float-right" title="Edit">
-                            <img class="img-size-16" src="/res/res/img/edit.png" alt=""></a>
+                        <input type="checkbox" class="select-checkbox" title="Select" id="{{$user->id}}">
+                        <a href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}" class="d-block text-right float-right" title="Edit">
+                            <img class="img-size-16" src="/res/res/img/edit.png"></a>
                         <a href="/aorders?user_id={{$user->id}}" class="d-block text-right mr-3 float-right mb-3" title="Orders"><i class="fas fa-clipboard-list" style="font-size: 30px; color: #3a4b83;"></i></a>
                         <div class="card-text">
                             <div class="col-md-12">
@@ -107,7 +115,7 @@
                                     "{{config('constants.BUCKET') . $user->user_img}}"
                                     @else
                                     "{{asset('/res/res/img/customer.png')}}"
-                                    @endif alt="">
+                                    @endif>
                                 </span>
                             </div>
                         </div>

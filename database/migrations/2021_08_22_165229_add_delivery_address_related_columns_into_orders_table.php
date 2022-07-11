@@ -14,7 +14,7 @@ class AddDeliveryAddressRelatedColumnsIntoOrdersTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->enum('type', array('delivery', 'self-pickup'))->default('delivery')->after('lng');
+            $table->enum('type', array('delivery', 'self-pickup'))->default('delivery')->after('lon');
             $table->string('receiver_name')->nullable()->after('type');
             $table->string('house_no')->nullable()->after('address');
             $table->string('flat')->nullable()->after('house_no');
@@ -24,7 +24,7 @@ class AddDeliveryAddressRelatedColumnsIntoOrdersTable extends Migration
             DB::statement('ALTER TABLE `orders` MODIFY `address` VARCHAR(191) NULL;');
             DB::statement('ALTER TABLE `orders` MODIFY `phone_number` VARCHAR(191) NULL;');
             DB::statement('ALTER TABLE `orders` MODIFY `lat` VARCHAR(191) NULL;');
-            DB::statement('ALTER TABLE `orders` MODIFY `lng` VARCHAR(191) NULL;');
+            DB::statement('ALTER TABLE `orders` MODIFY `lon` VARCHAR(191) NULL;');
         });
     }
 
@@ -46,7 +46,7 @@ class AddDeliveryAddressRelatedColumnsIntoOrdersTable extends Migration
             DB::statement('ALTER TABLE `orders` MODIFY `address` VARCHAR(191) NOT NULL;');
             DB::statement('ALTER TABLE `orders` MODIFY `phone_number` VARCHAR(191) NOT NULL;');
             DB::statement('ALTER TABLE `orders` MODIFY `lat` VARCHAR(191) NOT NULL;');
-            DB::statement('ALTER TABLE `orders` MODIFY `lng` VARCHAR(191) NOT NULL;');
+            DB::statement('ALTER TABLE `orders` MODIFY `lon` VARCHAR(191) NOT NULL;');
         });
     }
 }

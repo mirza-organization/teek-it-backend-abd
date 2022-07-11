@@ -79,7 +79,7 @@
                         <!-- Add icons to the links using the .nav-icon class
                          with font-awesome or any other icon font library -->
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('/')) ? 'active' : '' }}  " href="/">
+                            <a class="nav-link {{ (request()->is('/')) ? 'active' : '' }}" href="/">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p class="ml-2">
                                     Dashboard
@@ -87,7 +87,23 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('stores')) ? 'active' : '' }}  " href="/stores">
+                            <a class="nav-link {{ (request()->is('notification/home')) ? 'active' : '' }}" href="/notification/home">
+                                <i class="nav-icon fas fa-bell"></i>
+                                <p class="ml-2">
+                                    Notifications
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('promocodes/home')) ? 'active' : '' }}" href="/promocodes/home">
+                                <i class="nav-icon fas fa-qrcode"></i>
+                                <p class="ml-2">
+                                    Promo Codes
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ (request()->is('stores')) ? 'active' : '' }}" href="/stores">
                                 <i class="nav-icon fas fa-store-alt"></i>
                                 <p class="ml-2">
                                     Stores
@@ -95,7 +111,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link  {{ (request()->is('customers')) ? 'active' : '' }}  " href="/customers">
+                            <a class="nav-link  {{ (request()->is('customers')) ? 'active' : '' }}" href="/customers">
                                 <i class="nav-icon fas fa-users-cog"></i>
                                 <p class="ml-2">
                                     Customers
@@ -103,7 +119,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('drivers')) ? 'active' : '' }} " href="/drivers">
+                            <a class="nav-link {{ (request()->is('drivers')) ? 'active' : '' }}" href="/drivers">
                                 <i class="nav-icon fas fa-biking"></i>
                                 <p class="ml-2">
                                     Drivers
@@ -123,6 +139,18 @@
                                     <a href="/aorders" class="nav-link">
                                         <i class="fas fa-gears nav-icon"></i>
                                         <p>Orders</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/aorders/verified" class="nav-link">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Verified Orders</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="/aorders/unverified" class="nav-link">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Unverified Orders</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -157,7 +185,7 @@
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('acategories')) ? 'active' : '' }} " href="/acategories">
+                            <a class="nav-link {{ (request()->is('acategories')) ? 'active' : '' }}" href="/acategories">
                                 <i class="nav-icon fas fa-clipboard-list"></i>
                                 <p class="ml-2">
                                     Categories
@@ -165,7 +193,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ (request()->is('asetting')) ? 'active' : '' }} " href="/asetting">
+                            <a class="nav-link {{ (request()->is('asetting')) ? 'active' : '' }}" href="/asetting">
                                 <i class="nav-icon fa fa-cog"></i>
                                 <p class="ml-2">
                                     Settings
@@ -173,7 +201,7 @@
                             </a>
                         </li>
                         {{-- <li class="nav-item">--}}
-                        {{-- <a class="nav-link {{ (request()->is('queries')) ? 'active' : '' }} " href="/queries">--}}
+                        {{-- <a class="nav-link {{ (request()->is('queries')) ? 'active' : '' }}" href="/queries">--}}
                         {{-- <i class="nav-icon fas fa-question-circle"></i>--}}
                         {{-- <p class="ml-2">--}}
                         {{-- Queries--}}
@@ -417,8 +445,10 @@
 
         .row.mb-2 h1.m-0.text-dark.text-center {}
     </style>
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
+    <!-- Online Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css -->
+    <link rel="stylesheet" href="{{ asset('res/dist/css/jquery.timepicker.min.css') }}">
+    <!-- Online Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js -->
+    <script src="{{ asset('res/dist/js/jquery.timepicker.min.js') }}"></script>
     <script !src="">
         $('.stimepicker').timepicker({
             timeFormat: 'h:mm p',
@@ -452,6 +482,85 @@
             jQuery(value).height(max);
         });
         $('.row.mb-2 h1.m-0.text-dark.text-center').text($('.row.mb-2 h1.m-0.text-dark.text-center').text().replace('Admin Dashboard', ''));
+
+        function selectAll() {
+            var checkboxes = document.querySelectorAll('.select-checkbox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = true;
+            }
+        }
+
+        function delUsers() {
+            var checkboxes = document.querySelectorAll('.select-checkbox');
+            var users = [];
+            var x = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    users[x] = checkboxes[i].id;
+                    x++;
+                }
+            }
+            if (users.length != 0) {
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Are you sure you want to delete the selected users?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{route('admin.del.users')}}",
+                            type: "get",
+                            data: {
+                                "users": users
+                            },
+                            success: function(response) {
+                                if (response == "Users Deleted Successfully") {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        function delOrders() {
+            var checkboxes = document.querySelectorAll('.select-checkbox');
+            var orders = [];
+            var x = 0;
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    orders[x] = checkboxes[i].id;
+                    x++;
+                }
+            }
+            if (orders.length != 0) {
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Are you sure you want to delete the selected orders?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "{{route('admin.del.orders')}}",
+                            type: "get",
+                            data: {
+                                "orders": orders
+                            },
+                            success: function(response) {
+                                if (response == "Orders Deleted Successfully") {
+                                    window.location.reload();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        }
     </script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

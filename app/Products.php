@@ -25,7 +25,7 @@ class Products extends Model
             'color' => 'required|string|max:255',
             'size' => 'required|string|max:255',
             'lat' => 'required|string|max:255',
-            'lng' => 'required|string|max:255',
+            'lon' => 'required|string|max:255',
             'price'=>'required|string|max:255',
             'qty'=>'required|string|max:255'
         ]);
@@ -40,7 +40,7 @@ class Products extends Model
             'color' => 'required|string|max:255',
             'size' => 'required|string|max:255',
             'lat' => 'required|string|max:255',
-            'lng' => 'required|string|max:255',
+            'lon' => 'required|string|max:255',
             'price'=>'required|string|max:255',
             'qty'=>'required|string|max:255'
         ]);

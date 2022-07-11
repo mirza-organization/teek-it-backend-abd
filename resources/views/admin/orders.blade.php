@@ -6,7 +6,15 @@
         <div class="row mb-2">
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
-                <a href="/orders" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Orders</a>
+                <a href="#" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Orders</a>
+                <div class="float-right">
+                    <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
+                        <a class="text-white">Select All</a>
+                    </button> -->
+                    <button type="button" class="btn btn-danger" onclick="delOrders()">
+                        <a class="text-white">Delete</a>
+                    </button>
+                </div>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
@@ -36,7 +44,9 @@
             <div class="col-md-12 p-4 pr-4">
                 <div class="card">
                     <div class="card-body p-2 pl-5 pr-5 pb-5">
-                        <div class="p-2 mb-2">Order #{{$order->id}}
+                        <div class="p-2 mb-2">
+                            <input type="checkbox" class="select-checkbox" title="Select" id="{{$order->id}}">
+                            Order #{{$order->id}}
                             @if($order->order_status=='pending')
                             <a href="{{route('accept_order',['order_id'=>$order->id])}}" class="d-block btn btn-success float-right">Click Here If Order Is Ready</a>
                             <a href="{{route('cancel_order',['order_id'=>$order->id])}}" class="d-block btn btn-danger float-right" onclick="cancelOrder(event)" style="margin-right: 20px">Cancel Order</a>

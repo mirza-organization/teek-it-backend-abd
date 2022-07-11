@@ -69,17 +69,6 @@ class ProductsController extends Controller
     //    }
     //
     //    /**
-    //     * Show the form for editing the specified resource.
-    //     *
-    //     * @param  \App\Products  $products
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function edit(Products $products)
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
     //     * Update the specified resource in storage.
     //     *
     //     * @param  \Illuminate\Http\Request  $request
@@ -119,7 +108,7 @@ class ProductsController extends Controller
         $product->color = $request->color;
         $product->size = $request->size;
         $product->lat = $request->lat;
-        $product->lng = $request->lng;
+        $product->lon = $request->lon;
         $product->price = $request->price;
         $product->qty = $request->qty;
         $product->user_id = $user_id;
@@ -175,11 +164,10 @@ class ProductsController extends Controller
         $product->color = $request->color;
         $product->size = $request->size;
         $product->lat = $request->lat;
-        $product->lng = $request->lng;
+        $product->lon = $request->lon;
         $product->price = $request->price;
         $product->qty = $request->qty;
         $product->user_id = $user_id;
-        $data = [];
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             foreach ($images as $image) {
@@ -344,8 +332,8 @@ class ProductsController extends Controller
     public function sortByLocation(Request $request)
     {
         $latitude = $request->get('lat');
-        $longitude = $request->get('lng');
-        $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lng ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
+        $longitude = $request->get('lon');
+        $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
         //$products = Products::query()->paginate()->sortBy('price');
         $pagination = $products->toArray();
         if (!empty($products)) {
@@ -399,19 +387,68 @@ class ProductsController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * It will delete the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function delete($product_id)
     {
         Products::find($product_id)->delete();
         return $this->all();
     }
-
-    public function delete_image($image_id, $product_id)
+    /**
+     * It will delete the image of the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
+    public function deleteImage($image_id, $product_id)
     {
         productImages::find($image_id)->delete();
         return $this->get_product_info($product_id);
     }
-
+    /**
+     * It list the featured products 
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function featuredProducts(Request $request)
+    { 
+        $featured_products = Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })->where('user_id', '=', $request->store_id)
+            ->where('featured', '=', 1)
+            ->where('status', '=', 1)
+            ->orderByDesc('id')
+            ->paginate(10);
+        $pagination = $featured_products->toArray();
+        if (!empty($featured_products)) {
+            $products_data = [];
+            foreach ($featured_products as $product) {
+                $data = $this->get_product_info($product->id);
+                $data->store = User::find($product->user_id);
+                $products_data[] = $data;
+            }
+            unset($pagination['data']);
+            return response()->json([
+                'data' => $products_data,
+                'status' => true,
+                'message' => '',
+                'pagination' => $pagination,
+            ], 200);
+        } else {
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
+        }
+    }
+    /**
+     * It find's the price of the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function get_product_price($product_id)
     {
         $product = Products::find($product_id);
@@ -420,7 +457,37 @@ class ProductsController extends Controller
         }
         return $product->price * 1.2;
     }
-
+    /**
+     * It find's the volumn of the given product
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function get_product_volumn($product_id)
+    {
+        $product = DB::table('products')
+            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
+            ->where('id', $product_id)
+            ->get();
+        return $product[0]->volumn;
+    }
+    /**
+     * It find's the weight of the given product
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function get_product_weight($product_id)
+    {
+        $product = DB::table('products')
+            ->select('weight')
+            ->where('id', $product_id)
+            ->get();
+        return $product[0]->weight;
+    }
+    /**
+     * It find's the seller_id of the given product
+     * @author Huzaifa Haleem
+     * @version 1.0.0
+     */
     public function get_product_seller_id($product_id)
     {
         return Products::find($product_id)->user_id;
@@ -433,7 +500,7 @@ class ProductsController extends Controller
     public function update_qty($product_id, $qty, $operation)
     {
         if ($operation == 'subtract') {
-            Products::where('id', '=',$product_id)
+            Products::where('id', '=', $product_id)
                 ->decrement('qty', $qty);
         }
         // DB::table('users')->increment('posts', 5);

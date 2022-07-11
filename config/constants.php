@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
+
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',
 
@@ -28,4 +30,5 @@ return [
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
+    'ADMIN_EMAIL' => 'admin@teekit.co.uk',
 ];
