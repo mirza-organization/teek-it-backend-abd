@@ -56,11 +56,8 @@ class HomeController extends Controller
                 ->whereNotNull('order_status')
                 ->orderby(\DB::raw('case when is_viewed = 0 then 0 when order_status = "pending" then 1 when order_status = "ready" then 2 when order_status = "assigned" then 3
                  when order_status = "onTheWay" then 4 when order_status = "delivered" then 5 end'))
-                ->simplePaginate(5);
+                ->paginate(5);
             return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
-            // return View::composer('shopkeeper.dashboard', function ($view) {
-            //     $view->with('user', $user)->with('pending_orders', 'On GeeksforGeeks')->with('pending_orders', );
-            // });
         } else {
             return $this->admin_home();
         }

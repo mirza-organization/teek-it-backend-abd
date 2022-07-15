@@ -68,18 +68,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @foreach($promo_codes as $promo_code)
                                     <tr>
-                                        <td>1</td>
-                                        <td>EID1100</td>
-                                        <td>50%</td>
-                                        <td>1</td>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>{{$promo_code->promo_code}}</td>
+                                        <td>{{$promo_code->discount_percentage}}%</td>
+                                        <td>{{$promo_code->order_number}}</td>
                                         <td>
                                             <a href="#" data-toggle="modal" data-target="#bankModal" class="btn btn-xs btn-warning">View Bank Detail</a>
                                             <a href="#" data-toggle="modal" data-target="#transactionModal" class="btn btn-primary btn-xs">Update Transaction ID</a>
                                         </td>
                                     </tr>
+                                    @endforeach
                                 </tbody>
                             </table>
+                            <div class="d-flex justify-content-center" style="padding-top: 10px;">
+                                {{$promo_codes->links()}}
+                            </div>
                         </div>
                     </div>
                 </div>

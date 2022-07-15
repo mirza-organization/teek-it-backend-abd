@@ -18,7 +18,8 @@ class PromoCodesController extends Controller
     public function promocodesHome()
     {
         if (Auth::user()->hasRole('superadmin')) {
-            return view('admin.promo_codes');
+            $promo_codes = PromoCodes::paginate(10);
+            return view('admin.promo_codes', compact('promo_codes'));
         } else {
             abort(404);
         }
@@ -31,13 +32,13 @@ class PromoCodesController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
-                'promo_code' => 'required|string|unique:promo_codes|max:10',
+                'promo_code' => 'required|string|unique:promo_codes|max:20',
                 'discount_percentage' => 'required|int'
             ]);
             if ($validatedData->fails()) {
                 flash('Error in saving the promo code because a required field is missing or invalid data.')->error();
                 return Redirect::back()->withInput($request->input());
-            } 
+            }
             PromoCodes::create([
                 "promo_code" => $request->promo_code,
                 "discount_percentage" => $request->discount_percentage,
@@ -49,6 +50,47 @@ class PromoCodesController extends Controller
             report($error);
             flash('Failed to save promo code due to some internal error.')->error();
             return back();
+        }
+    }
+    /**
+     * Validates either the given promo code is correct or not
+     * @version 1.0.0
+     */
+    public function promocodesValidate(Request $request)
+    {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'promo_code' => 'required|string|max:20'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validatedData->errors()
+                ], 422);
+            }
+            $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
+            if ($promo_codes == 1) {
+            $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
+                return response()->json([
+                    'data' => $promo_codes,
+                    'status' => true,
+                    'message' => config('constants.VALID_PROMOCODE')
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.INVALID_PROMOCODE')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
     }
     /**

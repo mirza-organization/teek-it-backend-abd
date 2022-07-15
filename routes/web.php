@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 | For Adding Authentication On All Of The Following Routes
 |--------------------------------------------------------------------------
 */
+
 Auth::routes();
 /*
 |--------------------------------------------------------------------------

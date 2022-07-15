@@ -285,18 +285,18 @@ class NotificationsController extends Controller
      */
     public function saveToken(Request $request)
     {
-        $validatedData = Validator::make($request->all(), [
-            'device_id' => 'required|string',
-            'device_token' => 'required|string'
-        ]);
-        if ($validatedData->fails()) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $validatedData->errors()
-            ], 422);
-        }
         try {
+            $validatedData = Validator::make($request->all(), [
+                'device_id' => 'required|string',
+                'device_token' => 'required|string'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validatedData->errors()
+                ], 422);
+            }
             $device_token = new DeviceToken();
             $count = $device_token::select()->where('device_id', $request->device_id)->count();
             if ($count == 0) {

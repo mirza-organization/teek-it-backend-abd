@@ -20,6 +20,9 @@ return [
     'ORDER_UPDATED' => 'Updated.',
     'ORDER_CANCELLED' => 'Cancelled.',
 
+    'VALID_PROMOCODE' => 'You have entered a valid promo code.',
+    'INVALID_PROMOCODE' => 'Invalid promo code.',
+
     'BANK_DETAILS_UPDATED' => 'Bank Account details are successfully updated.',
 
     'MISSING_OR_INVALID_DATA' => 'Required fields missing or invalid data.',

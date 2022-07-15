@@ -141,7 +141,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('/recent_orders/{store_id}', 'OrdersController@recentOrders');
     });
 
-    Route::group(['prefix' => 'driver'], function () {
+    Route::group(['prefix' => 'driver'], function ($router) {
         Route::get('/info/{id}', 'Api\v1\DriverController@info');
         Route::post('/add-lat-lon', 'Api\v1\DriverController@addLatLon');
         Route::get('/withdrawable-balance', 'Api\v1\DriverController@getWithdrawalBalance');
@@ -150,6 +150,10 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('/all-withdrawals', 'Api\v1\DriverController@driverAllWithdrawalRequests');
         Route::post('/check_verification_code/{order_id}', 'Api\v1\DriverController@checkVerificationCode');
         Route::post('/driver_failed_to_enter_code/{order_id}', 'Api\v1\DriverController@driverFailedToEnterCode');
+    });
+
+    Route::group(['prefix' => 'promocodes'], function ($router) {
+        Route::post('/validate', 'PromoCodesController@promocodesValidate');
     });
 
     Route::get('keys', 'Auth\AuthController@keys');
