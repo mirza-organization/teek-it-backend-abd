@@ -22,6 +22,7 @@ use Crypt;
 use Hash;
 use Mail;
 use Carbon\Carbon;
+use Throwable;
 use Validator;
 
 class ProductsController extends Controller
@@ -204,46 +205,55 @@ class ProductsController extends Controller
         return $product;
     }
     /**
-     * Search products
+     * Search products for a specific seller/store
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function search(Request $request)
-    {
-        $validate = Validator::make($request->all(), [
-            'product_name' => 'required'
-        ]);
-        if ($validate->fails()) {
-            return response()->json([
-                'data' => $validate->messages(),
-                'status' => false,
-                'message' => config('constants.VALIDATION_ERROR')
-            ], 400);
-        }
-        $products = Products::query()
-            ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
-            ->paginate();
-        $pagination = $products->toArray();
-        if (!empty($products)) {
-            $products_data = [];
-            foreach ($products as $product) {
-                $products_data[] = $this->get_product_info($product->id);
-            }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination,
-            ], 200);
-        } else {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
-        }
-    }
+    // public function search(Request $request)
+    // {
+    //     try {
+    //         $validate = Validator::make($request->all(), [
+    //             'product_name' => 'required'
+    //         ]);
+    //         if ($validate->fails()) {
+    //             return response()->json([
+    //                 'data' => $validate->messages(),
+    //                 'status' => false,
+    //                 'message' => config('constants.VALIDATION_ERROR')
+    //             ], 400);
+    //         }
+    //         $products = Products::query()
+    //             ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
+    //             ->paginate();
+    //         $pagination = $products->toArray();
+    //         if (!empty($products)) {
+    //             $products_data = [];
+    //             foreach ($products as $product) {
+    //                 $products_data[] = $this->get_product_info($product->id);
+    //             }
+    //             unset($pagination['data']);
+    //             return response()->json([
+    //                 'data' => $products_data,
+    //                 'status' => true,
+    //                 'message' => '',
+    //                 'pagination' => $pagination,
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'data' => [],
+    //                 'status' => false,
+    //                 'message' => config('constants.NO_RECORD')
+    //             ], 200);
+    //         }
+    //     } catch (Throwable $error) {
+    //         report($error);
+    //         return response()->json([
+    //             'data' => [],
+    //             'status' => false,
+    //             'message' => $error
+    //         ], 500);
+    //     }
+    // }
     /**
      * All products listing
      * @author Mirza Abdullah Izhar
@@ -413,7 +423,7 @@ class ProductsController extends Controller
      * @version 1.0.0
      */
     public function featuredProducts(Request $request)
-    { 
+    {
         $featured_products = Products::whereHas('user', function ($query) {
             $query->where('is_active', 1);
         })->where('user_id', '=', $request->store_id)
@@ -592,5 +602,86 @@ class ProductsController extends Controller
         // echo $csvFilePath;
         return response()->download($csvFilePath, null, ['Content-Type' => 'text/csv'])->deleteFileAfterSend();
         //return response()->download($file);
+    }
+    /**
+     * It will search products wrt category id & store id
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function search(Request $request)
+    {
+        try {
+            $validate = Validator::make($request->all(), [
+                'product_name' => 'required|string',
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => $validate->messages(),
+                    'status' => false,
+                    'message' => config('constants.VALIDATION_ERROR')
+                ], 400);
+            }
+            if (isset($request->product_name) && isset($request->category_id) && isset($request->store_id)) {
+                echo 'product name';
+                $products = Products::query()
+                    ->where('product_name', 'Like', "%" . $request->product_name . "%")
+                    ->where('category_id', '=', $request->category_id)
+                    ->where('user_id', '=', $request->store_id)
+                    ->where('status', '=', 1)
+                    ->paginate(10);
+                $pagination = $products->toArray();
+                if (!$products->isEmpty()) {
+                    $products_data = [];
+                    foreach ($products as $product) {
+                        $products_data[] = $this->get_product_info($product->id);
+                    }
+                    unset($pagination['data']);
+                    return response()->json([
+                        'data' => $products_data,
+                        'status' => true,
+                        'message' => '',
+                        'pagination' => $pagination,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
+                }
+            } else {
+                $products = Products::query()
+                    ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
+                    ->where('status', '=', 1)
+                    ->paginate(10);
+                $pagination = $products->toArray();
+                if (!empty($products)) {
+                    $products_data = [];
+                    foreach ($products as $product) {
+                        $products_data[] = $this->get_product_info($product->id);
+                    }
+                    unset($pagination['data']);
+                    return response()->json([
+                        'data' => $products_data,
+                        'status' => true,
+                        'message' => '',
+                        'pagination' => $pagination,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
+                }
+            }
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
     }
 }
