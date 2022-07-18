@@ -681,19 +681,19 @@ class OrdersController extends Controller
      */
     public function recheckProducts(Request $request)
     {
-        $validatedData = Validator::make($request->all(), [
-            'items' => 'required|array',
-            'day' => 'required|string',
-            'time' => 'required|string'
-        ]);
-        if ($validatedData->fails()) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $validatedData->errors()
-            ], 422);
-        }
         try {
+            $validatedData = Validator::make($request->all(), [
+                'items' => 'required|array',
+                'day' => 'required|string',
+                'time' => 'required|string'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validatedData->errors()
+                ], 422);
+            }
             $i = 0;
             foreach ($request->items as $item) {
                 $open_time = User::query()->select('business_hours->time->' . $request->day . '->open as open')

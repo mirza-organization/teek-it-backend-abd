@@ -54,6 +54,8 @@ class PromoCodesController extends Controller
     }
     /**
      * Validates either the given promo code is correct or not
+     * It also checks that either the user is submitting this
+     * Promo code for the right order number or not 
      * @version 1.0.0
      */
     public function promocodesValidate(Request $request)
@@ -69,8 +71,8 @@ class PromoCodesController extends Controller
                     'message' => $validatedData->errors()
                 ], 422);
             }
-            $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
-            if ($promo_codes == 1) {
+            $count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
+            if ($count == 1) {
             $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
                 return response()->json([
                     'data' => $promo_codes,
