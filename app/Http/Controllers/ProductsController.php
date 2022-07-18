@@ -650,6 +650,7 @@ class ProductsController extends Controller
                     ], 200);
                 }
             } else {
+
                 $products = Products::query()
                     ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
                     ->where('status', '=', 1)
