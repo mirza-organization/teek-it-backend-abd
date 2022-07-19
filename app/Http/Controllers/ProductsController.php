@@ -203,47 +203,7 @@ class ProductsController extends Controller
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
-    /**
-     * Search products
-     * @author Mirza Abdullah Izhar
-     * @version 1.2.0
-     */
-    public function search(Request $request)
-    {
-        $validate = Validator::make($request->all(), [
-            'product_name' => 'required'
-        ]);
-        if ($validate->fails()) {
-            return response()->json([
-                'data' => $validate->messages(),
-                'status' => false,
-                'message' => config('constants.VALIDATION_ERROR')
-            ], 400);
-        }
-        $products = Products::query()
-            ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
-            ->paginate();
-        $pagination = $products->toArray();
-        if (!empty($products)) {
-            $products_data = [];
-            foreach ($products as $product) {
-                $products_data[] = $this->get_product_info($product->id);
-            }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination,
-            ], 200);
-        } else {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
-        }
-    }
+   
     /**
      * All products listing
      * @author Mirza Abdullah Izhar
