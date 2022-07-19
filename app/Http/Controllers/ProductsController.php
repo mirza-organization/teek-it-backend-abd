@@ -254,6 +254,7 @@ class ProductsController extends Controller
     //         ], 500);
     //     }
     // }
+   
     /**
      * All products listing
      * @author Mirza Abdullah Izhar
