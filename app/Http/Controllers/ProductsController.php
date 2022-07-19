@@ -604,9 +604,10 @@ class ProductsController extends Controller
         //return response()->download($file);
     }
     /**
-     * It will search products wrt category id & store id
+     * If condition is satisfied it will search products wrt category id & store id product name
+     * Else it will search product by name
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.3.0
      */
     public function search(Request $request)
     {
@@ -622,7 +623,6 @@ class ProductsController extends Controller
                 ], 400);
             }
             if (isset($request->product_name) && isset($request->category_id) && isset($request->store_id)) {
-                echo 'product name';
                 $products = Products::query()
                     ->where('product_name', 'Like', "%" . $request->product_name . "%")
                     ->where('category_id', '=', $request->category_id)
@@ -650,7 +650,6 @@ class ProductsController extends Controller
                     ], 200);
                 }
             } else {
-
                 $products = Products::query()
                     ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
                     ->where('status', '=', 1)
