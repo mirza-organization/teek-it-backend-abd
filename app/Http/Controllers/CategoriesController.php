@@ -14,6 +14,7 @@ use Crypt;
 use Hash;
 use Mail;
 use Psy\Command\WhereamiCommand;
+use Throwable;
 use Validator;
 
 class CategoriesController extends Controller
@@ -101,18 +102,47 @@ class CategoriesController extends Controller
      */
     public function all()
     {
-        $storeId = \request()->store_id;
-        $categories = Categories::query();
-        if (\request()->has('store_id')) {
-            $categories = DB::table('products')
-                ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-                ->where('user_id', $storeId)
-                ->select('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
-                ->groupBy('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
-                ->get();
+        try {
+            $storeId = \request()->store_id;
+            $categories = Categories::query();
+            if (\request()->has('store_id')) {
+                $categories = DB::table('products')
+                    ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+                    ->where('user_id', $storeId)
+                    ->select('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
+                    ->groupBy('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
+                    ->get();
+                if (!$categories->isEmpty()) {
+                    return response()->json([
+                        'data' => $categories,
+                        'status' => true,
+                        'message' => ''
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
+                }
+            }
+            $categories = $categories->get();
             if (!$categories->isEmpty()) {
+                $categories_data = [];
+                foreach ($categories as $category) {
+                    //    $products = Products::query()->where('category_id', '=', $category->id)->get();
+                    //    if (!empty($products)) {
+                    //        $products_data = [];
+                    //        foreach ($products as $product) {
+                    //            $products_data[] = (new ProductsController())->get_product_info($product->id);
+                    //        }
+                    //        $category['products'] = $products_data;
+                    //
+                    //    }
+                    $categories_data[] = $category;
+                }
                 return response()->json([
-                    'data' => $categories,
+                    'data' => $categories_data,
                     'status' => true,
                     'message' => ''
                 ], 200);
@@ -123,84 +153,81 @@ class CategoriesController extends Controller
                     'message' => config('constants.NO_RECORD')
                 ], 200);
             }
-        }
-        $categories = $categories->get();
-        if (!$categories->isEmpty()) {
-            $categories_data = [];
-            foreach ($categories as $category) {
-                //    $products = Products::query()->where('category_id', '=', $category->id)->get();
-                //    if (!empty($products)) {
-                //        $products_data = [];
-                //        foreach ($products as $product) {
-                //            $products_data[] = (new ProductsController())->get_product_info($product->id);
-                //        }
-                //        $category['products'] = $products_data;
-                //
-                //    }
-                $categories_data[] = $category;
-            }
-            return response()->json([
-                'data' => $categories_data,
-                'status' => true,
-                'message' => ''
-            ], 200);
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
+                'message' => $error
             ], 200);
         }
     }
 
     public function products($category_id)
     {
-        $storeId = \request()->store_id;
-        $products = Products::query();
-        $products = $products->whereHas('user', function ($query) {
-            $query->where('is_active', 1);
-        })->where('category_id', '=', $category_id)
-            ->where('status', 1);
-        if (\request()->has('store_id')) $products->where('user_id', $storeId);
-        $products = $products->paginate();
-        $pagination = $products->toArray();
-        if (!empty($products)) {
-            $products_data = [];
-            foreach ($products as $product) {
-                $products_data[] = (new ProductsController())->get_product_info($product->id);
+        try {
+            $storeId = \request()->store_id;
+            $products = Products::query();
+            $products = $products->whereHas('user', function ($query) {
+                $query->where('is_active', 1);
+            })->where('category_id', '=', $category_id)
+                ->where('status', 1);
+            if (\request()->has('store_id')) $products->where('user_id', $storeId);
+            $products = $products->paginate();
+            $pagination = $products->toArray();
+            if (!$products->isEmpty()) {
+                $products_data = [];
+                foreach ($products as $product) {
+                    $products_data[] = (new ProductsController())->get_product_info($product->id);
+                }
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $products_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD'),
+                ], 200);
             }
-            unset($pagination['data']);
-            $products_data = [
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination
-            ];
-        } else {
-            $products_data = [
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => 'No Record Found'
-            ];
+                'message' => $error
+            ], 200);
         }
-        return response()->json($products_data);
     }
 
     public function stores($category_id): \Illuminate\Http\JsonResponse
     {
-        if (!Categories::where('id', $category_id)->exists()) {
-            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.NO_RECORD')], 422);
+        try {
+            if (!Categories::where('id', $category_id)->exists()) {
+                return response()->json(['data' => [], 'status' => false, 'message' => config('constants.NO_RECORD')], 422);
+            }
+            $ids = DB::table('categories')
+                ->select(DB::raw('distinct(user_id) as store_id'))
+                ->join('products', 'categories.id', '=', 'products.category_id')
+                ->join('users', 'products.user_id', '=', 'users.id')
+                ->where('qty', '>', 0)
+                ->where('status', '=', 1)
+                ->where('is_active', '=', 1)
+                ->where('categories.id', '=', $category_id)
+                ->get()->pluck('store_id');
+            $stores = User::whereIn('id', $ids)->get()->toArray();
+            return response()->json(['stores' => $stores], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 200);
         }
-        $ids = DB::table('categories')
-            ->select(DB::raw('distinct(user_id) as store_id'))
-            ->join('products', 'categories.id', '=', 'products.category_id')
-            ->join('users', 'products.user_id', '=', 'users.id')
-            ->where('qty', '>', 0)
-            ->where('status', '=', 1)
-            ->where('is_active', '=', 1)
-            ->where('categories.id', '=', $category_id)
-            ->get()->pluck('store_id');
-        $stores = User::whereIn('id', $ids)->get()->toArray();
-        return response()->json(['stores' => $stores], 200);
     }
 }

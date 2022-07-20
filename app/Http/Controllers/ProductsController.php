@@ -262,29 +262,38 @@ class ProductsController extends Controller
      */
     public function all()
     {
-        $products = Products::whereHas('user', function ($query) {
-            $query->where('is_active', 1);
-        })->where('status', 1)->paginate();
-        $pagination = $products->toArray();
-        if (!empty($products)) {
-            $products_data = [];
-            foreach ($products as $product) {
-                $data = $this->get_product_info($product->id);
-                $data->store = User::find($product->user_id);
-                $products_data[] = $data;
+        try {
+            $products = Products::whereHas('user', function ($query) {
+                $query->where('is_active', 1);
+            })->where('status', 1)->paginate();
+            $pagination = $products->toArray();
+            if (!empty($products)) {
+                $products_data = [];
+                foreach ($products as $product) {
+                    $data = $this->get_product_info($product->id);
+                    $data->store = User::find($product->user_id);
+                    $products_data[] = $data;
+                }
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $products_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination,
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
             }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination,
-            ], 200);
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
+                'message' => $error
             ], 200);
         }
     }
@@ -317,26 +326,35 @@ class ProductsController extends Controller
 
     public function sortByPrice()
     {
-        $products = Products::query()->paginate()->sortBy('price');
-        $pagination = $products->toArray();
-        if (!empty($products)) {
-            $products_data = [];
-            foreach ($products as $product) {
-                $products_data[] = $this->get_product_info($product->id);
+        try {
+            $products = Products::query()->paginate()->sortBy('price');
+            $pagination = $products->toArray();
+            if (!$products->isEmpty()) {
+                $products_data = [];
+                foreach ($products as $product) {
+                    $products_data[] = $this->get_product_info($product->id);
+                }
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $products_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination,
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
             }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination,
-            ], 200);
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
+                'message' => $error
+            ], 500);
         }
     }
 
@@ -425,33 +443,42 @@ class ProductsController extends Controller
      */
     public function featuredProducts(Request $request)
     {
-        $featured_products = Products::whereHas('user', function ($query) {
-            $query->where('is_active', 1);
-        })->where('user_id', '=', $request->store_id)
-            ->where('featured', '=', 1)
-            ->where('status', '=', 1)
-            ->orderByDesc('id')
-            ->paginate(10);
-        $pagination = $featured_products->toArray();
-        if (!empty($featured_products)) {
-            $products_data = [];
-            foreach ($featured_products as $product) {
-                $data = $this->get_product_info($product->id);
-                $data->store = User::find($product->user_id);
-                $products_data[] = $data;
+        try {
+            $featured_products = Products::whereHas('user', function ($query) {
+                $query->where('is_active', 1);
+            })->where('user_id', '=', $request->store_id)
+                ->where('featured', '=', 1)
+                ->where('status', '=', 1)
+                ->orderByDesc('id')
+                ->paginate(10);
+            $pagination = $featured_products->toArray();
+            if (!$featured_products->isEmpty()) {
+                $products_data = [];
+                foreach ($featured_products as $product) {
+                    $data = $this->get_product_info($product->id);
+                    $data->store = User::find($product->user_id);
+                    $products_data[] = $data;
+                }
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $products_data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination,
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
             }
-            unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination,
-            ], 200);
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
+                'message' => $error
             ], 200);
         }
     }

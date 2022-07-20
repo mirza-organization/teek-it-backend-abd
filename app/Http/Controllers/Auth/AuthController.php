@@ -22,6 +22,7 @@ use Crypt;
 use Hash;
 use Mail;
 use Carbon\Carbon;
+use Throwable;
 use Validator;
 
 class AuthController extends Controller
@@ -455,20 +456,29 @@ class AuthController extends Controller
      */
     public function sellers()
     {
-        $users = User::with('seller')
-            ->where('is_active', '=', 1)->get();
-        $data = [];
-        foreach ($users as $user) {
-            if ($user->hasRole('seller')) {
-                $user->where('is_active', 1);
-                $data[] = $this->get_seller_info($user);
+        try {
+            $users = User::with('seller')
+                ->where('is_active', '=', 1)->get();
+            $data = [];
+            foreach ($users as $user) {
+                if ($user->hasRole('seller')) {
+                    $user->where('is_active', 1);
+                    $data[] = $this->get_seller_info($user);
+                }
             }
+            return response()->json([
+                'data' => $data,
+                'status' => true,
+                'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 200);
         }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => ''
-        ], 200);
     }
     /**
      * Listing of all products w.r.t Seller/Store 'id'
@@ -477,36 +487,45 @@ class AuthController extends Controller
      */
     public function sellerProducts($seller_id)
     {
-        $user = User::find($seller_id);
-        $data = [];
-        if ($user->hasRole('seller')) {
-            // $info = $this->get_seller_info($user); 
-            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
-            $pagination = $products->toArray();
-            if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->get_product_info($product->id);
+        try {
+            $user = User::find($seller_id);
+            $data = [];
+            if ($user->hasRole('seller')) {
+                // $info = $this->get_seller_info($user); 
+                $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
+                $pagination = $products->toArray();
+                if (!$products->isEmpty()) {
+                    foreach ($products as $product) {
+                        $data[] = (new ProductsController())->get_product_info($product->id);
+                    }
+                    // $info['products'] = $products_data;
+                    unset($pagination['data']);
+                    return response()->json([
+                        'data' => $data,
+                        'status' => true,
+                        'message' => '',
+                        'pagination' => $pagination
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
                 }
-                // $info['products'] = $products_data;
-                unset($pagination['data']);
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
             } else {
                 return response()->json([
                     'data' => [],
                     'status' => false,
-                    'message' => config('constants.NO_RECORD')
+                    'message' => config('constants.NO_SELLER')
                 ], 200);
             }
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_SELLER')
+                'message' => $error
             ], 200);
         }
     }
@@ -517,37 +536,46 @@ class AuthController extends Controller
      */
     public function searchSellerProducts($seller_id, $product_name)
     {
-        $user = User::find($seller_id);
-        $data = [];
-        if ($user->hasRole('seller')) {
-            $products = Products::query()
-                ->where('user_id', '=', $user->id)
-                ->where('status', '=', 1)
-                ->where('product_name', 'LIKE', '%' . $product_name . '%')->paginate();
-            $pagination = $products->toArray();
-            if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->get_product_info($product->id);
+        try {
+            $user = User::find($seller_id);
+            $data = [];
+            if ($user->hasRole('seller')) {
+                $products = Products::query()
+                    ->where('user_id', '=', $user->id)
+                    ->where('status', '=', 1)
+                    ->where('product_name', 'LIKE', '%' . $product_name . '%')->paginate();
+                $pagination = $products->toArray();
+                if (!$products->isEmpty()) {
+                    foreach ($products as $product) {
+                        $data[] = (new ProductsController())->get_product_info($product->id);
+                    }
+                    unset($pagination['data']);
+                    return response()->json([
+                        'data' => $data,
+                        'status' => true,
+                        'message' => '',
+                        'pagination' => $pagination
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
                 }
-                unset($pagination['data']);
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
             } else {
                 return response()->json([
                     'data' => [],
                     'status' => false,
-                    'message' => config('constants.NO_RECORD')
+                    'message' => config('constants.NO_SELLER')
                 ], 200);
             }
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_SELLER')
+                'message' => $error
             ], 200);
         }
     }
@@ -604,11 +632,20 @@ class AuthController extends Controller
      */
     public function keys()
     {
-        $keys = Keys::all();
-        return response()->json([
-            'data' => $keys,
-            'status' => true,
-            'message' => ''
-        ], 200);
+        try {
+            $keys = Keys::all();
+            return response()->json([
+                'data' => $keys,
+                'status' => true,
+                'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 200);
+        }
     }
 }
