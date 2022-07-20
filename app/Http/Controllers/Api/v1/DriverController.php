@@ -220,7 +220,7 @@ class DriverController extends Controller
     public function driverFailedToEnterCode(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'order_id' => 'required'
+            'order_id' => 'required|int'
         ]);
         if ($validator->fails()) {
             return response()->json([

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Orders;
 use App\PromoCodes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,6 +63,7 @@ class PromoCodesController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
+                'user_id' => 'required|int',
                 'promo_code' => 'required|string|max:20'
             ]);
             if ($validatedData->fails()) {
@@ -71,14 +73,28 @@ class PromoCodesController extends Controller
                     'message' => $validatedData->errors()
                 ], 422);
             }
-            $count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
-            if ($count == 1) {
-            $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-                return response()->json([
-                    'data' => $promo_codes,
-                    'status' => true,
-                    'message' => config('constants.VALID_PROMOCODE')
-                ], 200);
+            $promocodes_count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
+            if ($promocodes_count == 1) {
+                $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
+                // print_r($promo_codes[0]->order_number);
+                // exit;
+                $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
+                // print_r($orders_count);
+                // exit;
+
+                if ($promo_codes[0]->order_number == $orders_count) {
+                    return response()->json([
+                        'data' => $promo_codes,
+                        'status' => true,
+                        'message' => config('constants.VALID_PROMOCODE')
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => true,
+                        'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
+                    ], 200);
+                }
             } else {
                 return response()->json([
                     'data' => [],
