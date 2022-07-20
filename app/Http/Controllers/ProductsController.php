@@ -254,7 +254,7 @@ class ProductsController extends Controller
     //         ], 500);
     //     }
     // }
-   
+
     /**
      * All products listing
      * @author Mirza Abdullah Izhar
@@ -645,9 +645,9 @@ class ProductsController extends Controller
             ]);
             if ($validate->fails()) {
                 return response()->json([
-                    'data' => $validate->messages(),
+                    'data' => [],
                     'status' => false,
-                    'message' => config('constants.VALIDATION_ERROR')
+                    'message' =>  $validate->messages()
                 ], 400);
             }
             if (isset($request->product_name) && isset($request->category_id) && isset($request->store_id)) {
