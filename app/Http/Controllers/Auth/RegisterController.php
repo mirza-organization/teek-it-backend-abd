@@ -162,18 +162,20 @@ class RegisterController extends Controller
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
         $html = '<html>
-            Hi, Team Teek IT.<br><br>
-           A new store signed up today.
-            <br>
-           Please verify their details and take your decision to allow or disallow the store on our platform.<br><br>
-           '  .  $User->name   .  '<br>
-           '  .  $User->email  .  '<br>
-           '  .  $User->phone  .  '
-           <br><br>
-            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
-            ' . $account_verification_link . '
-            <br><br><br>
-        </html>';
+        Hi, Team Teek IT.<br><br>
+       A new store signed up today.
+        <br>
+       Please verify their details and take your decision to allow or disallow the store on our platform.<br><br>
+     <strong> Store Name: </strong> '  .  $User->business_name   .  '<br>
+     <strong>  Owner Name:</strong> '  .  $User->name   .            '<br>
+     <strong>  Email:     </strong>     '  .  $User->email  .       '<br>
+     <strong>  Contact:   </strong>   '  .  $User->phone  .          '<br>
+     <strong>  address:   </strong>   '  .  $User->address_1  .  '
+       <br><br>
+        <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+        ' . $account_verification_link . '
+        <br><br><br>
+    </html>';
         $subject = env('APP_NAME') . ': Account Verification';
         Mail::to(config('constants.ADMIN_EMAIL'))
             ->send(new StoreRegisterMail($html, $subject));

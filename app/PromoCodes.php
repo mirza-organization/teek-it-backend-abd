@@ -9,6 +9,7 @@ class PromoCodes extends Model
     protected $fillable = [
         'promo_code',
         'discount_percentage',
-        'order_number'
+        'order_number',
+        'expiry_dt'
     ];
 }

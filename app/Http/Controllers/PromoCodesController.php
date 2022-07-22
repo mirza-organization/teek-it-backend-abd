@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Orders;
 use App\PromoCodes;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -31,11 +32,14 @@ class PromoCodesController extends Controller
      */
     public function promocodesAdd(Request $request)
     {
+        // dd($request->all());
         try {
             $validatedData = Validator::make($request->all(), [
                 'promo_code' => 'required|string|unique:promo_codes|max:20',
-                'discount_percentage' => 'required|int'
+                'discount_percentage' => 'required|int',
+                // 'expiry_dt' => 'required'
             ]);
+
             if ($validatedData->fails()) {
                 flash('Error in saving the promo code because a required field is missing or invalid data.')->error();
                 return Redirect::back()->withInput($request->input());
@@ -44,6 +48,7 @@ class PromoCodesController extends Controller
                 "promo_code" => $request->promo_code,
                 "discount_percentage" => $request->discount_percentage,
                 "order_number" => $request->order_number,
+                "expiry_dt" => $request->expiry_dt,
             ]);
             flash('Promo code saved successfully.')->success();
             return back();
@@ -75,20 +80,31 @@ class PromoCodesController extends Controller
             }
             $promocodes_count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
             if ($promocodes_count == 1) {
-                $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-                $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
-                if ($promo_codes[0]->order_number == $orders_count) {
-                    return response()->json([
-                        'data' => $promo_codes,
-                        'status' => true,
-                        'message' => config('constants.VALID_PROMOCODE')
-                    ], 200);
-                } else {
+                $expiry = PromoCodes::where('promo_code', '=', $request->promo_code)->pluck('expiry_dt')->first();
+                $testdate = '2022-07-23';
+                $current_date = date('Y-m-d');
+                if ($expiry < $current_date) {
                     return response()->json([
                         'data' => [],
                         'status' => true,
-                        'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
+                        'message' => 'expired'
                     ], 200);
+                } else {
+                    $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
+                    $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
+                    if ($promo_codes[0]->order_number == $orders_count) {
+                        return response()->json([
+                            'data' => $promo_codes,
+                            'status' => true,
+                            'message' => config('constants.VALID_PROMOCODE')
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'data' => [],
+                            'status' => true,
+                            'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
+                        ], 200);
+                    }
                 }
             } else {
                 return response()->json([
@@ -104,6 +120,15 @@ class PromoCodesController extends Controller
                 'status' => false,
                 'message' => $error
             ], 500);
+        }
+    }
+    public function promoCodesDel(Request $request)
+    {
+        if (Auth::user()->hasRole('superadmin')) {
+            for ($i = 0; $i < count($request->promocodes); $i++) {
+                PromoCodes::where('id', '=', $request->promocodes[$i])->delete();
+            }
+            return response("Promocodes Deleted Successfully");
         }
     }
     /**
