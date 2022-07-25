@@ -5,7 +5,9 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-12">
-                <a class="text-site-primary text-center m-auto d-block" href="/notification/home" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Send Notification</a>
+                <a class="text-site-primary text-center m-auto d-block"
+                    style="width: fit-content;font-size: 3.0em; line-height: 1;">Send
+                    Notification</a>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->
@@ -23,21 +25,26 @@
                             <div class="card-text">
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <form action="{{route('admin.notification.send')}}" method="POST" enctype="multipart/form-data">
+                                        <form action="{{route('admin.notification.send')}}" method="POST"
+                                            enctype="multipart/form-data">
                                             {{csrf_field()}}
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <input type="text" class="form-control" name="title" placeholder="Title*" required>
+                                                        <input type="text" class="form-control" name="title"
+                                                            placeholder="Title*" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <textarea class="form-control" name="message" cols="30" rows="10"></textarea>
+                                                        <textarea class="form-control" name="message" cols="30"
+                                                            rows="10"></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6 offset-md-3 text-center">
-                                                    <button style="background: #ffcf42;color:black;font-weight: 600" class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill" type="submit">Send</button>
+                                                    <button style="background: #ffcf42;color:black;font-weight: 600"
+                                                        class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
+                                                        type="submit">Send</button>
                                                 </div>
                                             </div>
                                         </form>

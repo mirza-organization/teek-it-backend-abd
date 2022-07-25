@@ -105,10 +105,8 @@
                                         <td>{{$promo_code->order_number}}</td>
                                         <td>{{$promo_code->expiry_dt}}</td>
                                         <td>
-                                            <a href="#" data-toggle="modal" data-target="#bankModal"
-                                                class="btn btn-xs btn-warning">View Bank Detail</a>
                                             <a href="#" data-toggle="modal" data-target="#transactionModal"
-                                                class="btn btn-primary btn-xs">Update Transaction ID</a>
+                                                class="btn btn-primary btn-xs">Edit Transaction ID</a>
                                         </td>
                                     </tr>
                                     @endforeach

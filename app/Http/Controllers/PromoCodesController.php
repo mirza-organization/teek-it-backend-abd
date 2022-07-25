@@ -80,14 +80,13 @@ class PromoCodesController extends Controller
             }
             $promocodes_count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
             if ($promocodes_count == 1) {
-                $expiry = PromoCodes::where('promo_code', '=', $request->promo_code)->pluck('expiry_dt')->first();
-                $testdate = '2022-07-23';
+                $expiry_dt = PromoCodes::where('promo_code', '=', $request->promo_code)->pluck('expiry_dt')->first();
                 $current_date = date('Y-m-d');
-                if ($expiry < $current_date) {
+                if ($expiry_dt < $current_date) {
                     return response()->json([
                         'data' => [],
                         'status' => true,
-                        'message' => 'expired'
+                        'message' =>  config('constants.EXPIRED_PROMOCODE')
                     ], 200);
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();

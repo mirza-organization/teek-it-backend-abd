@@ -22,6 +22,7 @@ return [
 
     'VALID_PROMOCODE' => 'You have entered a valid promo code.',
     'INVALID_PROMOCODE' => 'Invalid promo code.',
+    'EXPIRED_PROMOCODE' => 'This promo code has been expired.',
 
     'BANK_DETAILS_UPDATED' => 'Bank Account details are successfully updated.',
 
@@ -30,7 +31,7 @@ return [
     'VERIFICATION_SUCCESS' => 'Verification Successful.',
     'VERIFICATION_FAILED' => 'You have entered a invalid verification code.',
 
-    'ITEM_DELETED' => 'Data Deleted Successfully.',
+    'ITEM_DELETED' => 'Data deleted successfully.',
 
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
