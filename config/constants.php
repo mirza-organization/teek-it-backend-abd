@@ -30,6 +30,8 @@ return [
     'VERIFICATION_SUCCESS' => 'Verification Successful.',
     'VERIFICATION_FAILED' => 'You have entered a invalid verification code.',
 
+    'ITEM_DELETED' => 'Data Deleted Successfully.',
+
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',

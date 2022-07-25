@@ -121,19 +121,28 @@ class NotificationsController extends Controller
 
     public function deleteNotification($notification_id)
     {
-        $notification = notifications::find($notification_id);
-        if (!empty($notification)) {
-            $notification->delete();
+        try {
+            $notification = notifications::find($notification_id);
+            if (!empty($notification)) {
+                $notification->delete();
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.ITEM_DELETED'),
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
-                'status' => true,
-                'message' => 'Notification Deleted'
-            ], 200);
-        } else {
-            return response()->json([
-                'data' => [],
-                'status' => true,
-                'message' => 'There is No Notification with the given ID or maybe already Deleted'
+                'status' => false,
+                'message' => $error
             ], 200);
         }
     }
