@@ -51,7 +51,7 @@
                                                     <div class="col-md-3">
                                                         <div class="form-group">
                                                             <input type="date" class="form-control" name="expiry_dt"
-                                                                id="expiry_dt" placeholder="expiry date*">
+                                                                id="expiry_dt">
                                                         </div>
                                                     </div>
 
