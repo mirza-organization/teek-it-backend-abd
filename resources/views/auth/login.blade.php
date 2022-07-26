@@ -4,7 +4,6 @@
 <div class="container">
     <div class="row">
         <form id="sign_up_form" style="margin-bottom: 100px;" onsubmit="return false">
-
             <div class="form-group row">
                 <div class="col-md-12">
                     <input id="name" type="text" placeholder="Name" class="form-control" name="name"

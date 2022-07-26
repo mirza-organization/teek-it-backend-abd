@@ -32,14 +32,12 @@ class PromoCodesController extends Controller
      */
     public function promocodesAdd(Request $request)
     {
-        // dd($request->all());
         try {
             $validatedData = Validator::make($request->all(), [
                 'promo_code' => 'required|string|unique:promo_codes|max:20',
                 'discount_percentage' => 'required|int',
-                // 'expiry_dt' => 'required'
+                'expiry_dt' => 'required'
             ]);
-
             if ($validatedData->fails()) {
                 flash('Error in saving the promo code because a required field is missing or invalid data.')->error();
                 return Redirect::back()->withInput($request->input());
@@ -50,7 +48,8 @@ class PromoCodesController extends Controller
                 "order_number" => $request->order_number,
                 "expiry_dt" => $request->expiry_dt,
             ]);
-            flash('Promo code saved successfully.')->success();
+            return redirect()->back()->with('message', 'Promo code updated successfully.');
+
             return back();
         } catch (Throwable $error) {
             report($error);
@@ -121,13 +120,50 @@ class PromoCodesController extends Controller
             ], 500);
         }
     }
+    /**
+     * Deletes the specific promo code via ajax call
+     */
     public function promoCodesDel(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
-            for ($i = 0; $i < count($request->promocodes); $i++) {
-                PromoCodes::where('id', '=', $request->promocodes[$i])->delete();
+        try {
+            if (Auth::user()->hasRole('superadmin')) {
+                for ($i = 0; $i < count($request->promocodes); $i++) {
+                    PromoCodes::where('id', '=', $request->promocodes[$i])->delete();
+                }
+                return response("Promocodes Deleted Successfully");
             }
-            return response("Promocodes Deleted Successfully");
+        } catch (Throwable $error) {
+            report($error);
+            flash('Failed to delete promo code due to some internal error.')->error();
+            return back();
+        }
+    }
+    /**
+     * Updates the specific promo code via popup modal
+     */
+    public function promoCodesUpdate(Request $request, $id)
+    {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'promo_code' => 'required|string|max:20',
+                'discount_percentage' => 'required|int',
+                'expiry_dt' => 'required'
+            ]);
+            if ($validatedData->fails()) {
+                flash('Error in saving the promo code because a required field is missing or invalid data.')->error();
+                return Redirect::back()->withInput($request->input());
+            }
+            $promo_code = PromoCodes::find($id);
+            $promo_code->promo_code = $request->promo_code;
+            $promo_code->discount_percentage = $request->discount_percentage;
+            $promo_code->order_number = $request->order_number;
+            $promo_code->expiry_dt = $request->expiry_dt;
+            $promo_code->save();
+            return redirect()->back()->with('message', 'Promo code updated successfully.');
+        } catch (Throwable $error) {
+            report($error);
+            flash('Failed to edit promo code due to some internal error.')->error();
+            return back();
         }
     }
     /**

@@ -100,6 +100,7 @@ Route::get('/drivers', 'HomeController@adminDrivers')->name('admin.drivers');
 Route::get('/promocodes/home', 'PromoCodesController@promocodesHome')->name('admin.promocodes.home');
 Route::post('/promocodes/add', 'PromoCodesController@promocodesAdd')->name('admin.promocodes.add');
 Route::get('/promocodes/delete', 'PromoCodesController@promoCodesDel')->name('admin.promocodes.del');
+Route::post('/promocodes/{id}/update', 'PromoCodesController@promoCodesUpdate')->name('admin.promocodes.update');
 Route::get('/aorders', 'HomeController@adminOrders');
 Route::get('/aorders/verified', 'HomeController@adminOrdersVerified');
 Route::get('/aorders/unverified', 'HomeController@adminOrdersUnverified');

@@ -342,6 +342,7 @@
 
     input.form-control::placeholder {
         color: white;
+        font-size: 15px;
     }
 
     .form-control:focus {
