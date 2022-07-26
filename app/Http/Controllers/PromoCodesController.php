@@ -83,12 +83,11 @@ class PromoCodesController extends Controller
                 if ($expiry_dt < $current_date) {
                     return response()->json([
                         'data' => [],
-                        'status' => true,
+                        'status' => false,
                         'message' =>  config('constants.EXPIRED_PROMOCODE')
                     ], 200);
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-
                     if (!empty($promo_codes[0]->order_number)) {
                         $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $orders_count) {
@@ -100,7 +99,7 @@ class PromoCodesController extends Controller
                         } else {
                             return response()->json([
                                 'data' => [],
-                                'status' => true,
+                                'status' => false,
                                 'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
                             ], 200);
                         }
@@ -114,7 +113,7 @@ class PromoCodesController extends Controller
             } else {
                 return response()->json([
                     'data' => [],
-                    'status' => true,
+                    'status' => false,
                     'message' => config('constants.INVALID_PROMOCODE')
                 ], 200);
             }
