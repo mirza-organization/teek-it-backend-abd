@@ -3,11 +3,6 @@
 <div class="content">
     <!-- Content Header (Page header) -->
     <div class="content-header">
-        @if(session()->has('message'))
-        <div class="alert alert-success">
-            <div class="rmv_msg"> {{ session()->get('message') }}</div>
-        </div>
-        @endif
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-12">
@@ -17,7 +12,6 @@
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
-
     <!-- Main content -->
     <div class="content">
         <div class="container-fluid">

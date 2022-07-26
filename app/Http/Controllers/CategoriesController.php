@@ -159,7 +159,7 @@ class CategoriesController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 
@@ -200,7 +200,7 @@ class CategoriesController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 
@@ -227,7 +227,7 @@ class CategoriesController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 }

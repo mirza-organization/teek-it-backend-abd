@@ -291,7 +291,7 @@
                 lon: lon
             },
             success: function(response) {
-                $('#signup').text('sign up');
+                $('#signup').text('Sign up');
                 if (response == "User Created") {
                     Swal.fire({
                         title: 'Success!',
@@ -302,16 +302,31 @@
                         location.reload();
                     });
                 } else {
-                    console.log(response.errors);
-                    if (response.errors.name)
-                        console.log(response.errors.name[0]);
-                    $('.name').html(response.errors.name[0]);
-                    $('.email').html(response.errors.email[0]);
-                    $('.password').html(response.errors.password[0]);
-                    $('.phone').html(response.errors.phone[0]);
-                    $('.company_name').html(response.errors.company_name[0]);
-                    $('.company_phone').html(response.errors.company_phone[0]);
-                    $('.location').html(response.errors.location_text[0]);
+                    $('.error').html('');
+                    if (response.errors.name) {
+                        // console.log(response.errors.name[0]);
+                        $('.name').html('');
+                        $('.name').html(response.errors.name[0]);
+                    }
+                    if (response.errors.email) {
+                        $('.email').html(response.errors.email[0]);
+                    }
+                    if (response.errors.password) {
+                        $('.password').html(response.errors.password[0]);
+                    }
+                    if (response.errors.phone) {
+                        $('.phone').html(response.errors.phone[0]);
+                    }
+                    if (response.errors.company_name) {
+                        $('.company_name').html(response.errors.company_name[0]);
+                    }
+                    if (response.errors.company_phone) {
+                        $('.company_phone').html(response.errors.company_phone[0]);
+                    }
+                    if (response.errors.location_text) {
+                        $('.location').html(response.errors.location_text[0]);
+                    }
+
                 }
             }
         });
@@ -342,7 +357,6 @@
 
     input.form-control::placeholder {
         color: white;
-        font-size: 15px;
     }
 
     .form-control:focus {

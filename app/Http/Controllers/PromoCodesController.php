@@ -48,8 +48,7 @@ class PromoCodesController extends Controller
                 "order_number" => $request->order_number,
                 "expiry_dt" => $request->expiry_dt,
             ]);
-            return redirect()->back()->with('message', 'Promo code updated successfully.');
-
+            flash('Promo code saved successfully.')->success();
             return back();
         } catch (Throwable $error) {
             report($error);
@@ -89,20 +88,28 @@ class PromoCodesController extends Controller
                     ], 200);
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-                    $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
-                    if ($promo_codes[0]->order_number == $orders_count) {
-                        return response()->json([
-                            'data' => $promo_codes,
-                            'status' => true,
-                            'message' => config('constants.VALID_PROMOCODE')
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'data' => [],
-                            'status' => true,
-                            'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
-                        ], 200);
+
+                    if (!empty($promo_codes[0]->order_number)) {
+                        $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
+                        if ($promo_codes[0]->order_number == $orders_count) {
+                            return response()->json([
+                                'data' => $promo_codes,
+                                'status' => true,
+                                'message' => config('constants.VALID_PROMOCODE')
+                            ], 200);
+                        } else {
+                            return response()->json([
+                                'data' => [],
+                                'status' => true,
+                                'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
+                            ], 200);
+                        }
                     }
+                    return response()->json([
+                        'data' => $promo_codes,
+                        'status' => true,
+                        'message' => config('constants.VALID_PROMOCODE')
+                    ], 200);
                 }
             } else {
                 return response()->json([
@@ -143,28 +150,23 @@ class PromoCodesController extends Controller
      */
     public function promoCodesUpdate(Request $request, $id)
     {
-        try {
-            $validatedData = Validator::make($request->all(), [
-                'promo_code' => 'required|string|max:20',
-                'discount_percentage' => 'required|int',
-                'expiry_dt' => 'required'
-            ]);
-            if ($validatedData->fails()) {
-                flash('Error in saving the promo code because a required field is missing or invalid data.')->error();
-                return Redirect::back()->withInput($request->input());
-            }
-            $promo_code = PromoCodes::find($id);
-            $promo_code->promo_code = $request->promo_code;
-            $promo_code->discount_percentage = $request->discount_percentage;
-            $promo_code->order_number = $request->order_number;
-            $promo_code->expiry_dt = $request->expiry_dt;
-            $promo_code->save();
-            return redirect()->back()->with('message', 'Promo code updated successfully.');
-        } catch (Throwable $error) {
-            report($error);
-            flash('Failed to edit promo code due to some internal error.')->error();
-            return back();
+        $validatedData = Validator::make($request->all(), [
+            'promo_code' => 'required|string|max:20',
+            'discount_percentage' => 'required|int',
+            'expiry_dt' => 'required'
+        ]);
+        if ($validatedData->fails()) {
+            flash('Error in saving the promo code because a required field is missing or invalid data.')->error();
+            return Redirect::back()->withInput($request->input());
         }
+        $promo_code = PromoCodes::find($id);
+        $promo_code->promo_code = $request->promo_code;
+        $promo_code->discount_percentage = $request->discount_percentage;
+        $promo_code->order_number = $request->order_number;
+        $promo_code->expiry_dt = $request->expiry_dt;
+        $promo_code->save();
+        flash('Promo code updated successfully.')->success();
+        return back();
     }
     /**
      * Display the specified resource.

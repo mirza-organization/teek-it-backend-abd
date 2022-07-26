@@ -477,11 +477,6 @@
     });
     </script>
     <script>
-    setTimeout(function() {
-        $('.alert-success').removeClass('alert alert-success');
-        $('.alert-success').html('');
-        $('.rmv_msg').hide();
-    }, 2000);
     gpt_box = jQuery('.change-height');
     // console.log(gpt_box);
     max = jQuery(gpt_box[0]).height();

@@ -156,12 +156,11 @@ class RegisterController extends Controller
             'settings' => '{"notification_music": 1}',
             'is_active' => 0,
         ]);
-        // if ($User) {
-        //     // echo "User Created";
-
-        // }
+        if ($User) {
+            echo "User Created";
+        }
         $User->roles()->sync($role->id);
-        return response("User Created");
+
         $verification_code = Crypt::encrypt($User->email);
         $FRONTEND_URL = env('FRONTEND_URL');
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;

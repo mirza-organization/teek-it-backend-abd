@@ -486,7 +486,7 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
     /**
@@ -585,7 +585,7 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 
@@ -654,7 +654,7 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 }
