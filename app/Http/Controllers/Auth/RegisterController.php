@@ -172,7 +172,7 @@ class RegisterController extends Controller
            <strong>Store Name:</strong> '  .  $User->business_name   .  '<br>
            <strong>Owner Name:</strong> '  .  $User->name   .  '<br>
            <strong>Email:</strong> '  .  $User->email  .  '<br>
-           <strong>Contact:</strong> '  .  $User->business_phone  .  '
+           <strong>Contact:</strong> '  .  $User->business_phone  .  '<br>
            <strong>Address:</strong> '  .  $User->address_1  .  '
            <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser

@@ -90,7 +90,7 @@ class PromoCodesController extends Controller
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
                     if (!empty($promo_codes[0]->order_number)) {
                         $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
-                        if ($promo_codes[0]->order_number == $orders_count) {
+                        if ($promo_codes[0]->order_number == $orders_count + 1) {
                             return response()->json([
                                 'data' => $promo_codes,
                                 'status' => true,

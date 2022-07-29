@@ -127,7 +127,7 @@
                     <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="return delPromoCodes()">
+                    <button type="button" class="btn btn-danger" onclick="delPromoCodes()">
                         <a class="text-white">Delete</a>
                     </button>
                 </div>
