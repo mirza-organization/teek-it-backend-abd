@@ -83,30 +83,67 @@
                                             <form action="{{route('admin.promocodes.add')}}" method="POST">
                                                 {{csrf_field()}}
                                                 <div class="row">
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <input type="text" class="form-control" name="promo_code"
                                                                 id="promo_code" placeholder="Promo Code*" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <select name="discount_type" class="form-control" required>
+                                                                <option disabled selected>Select type</option>
+                                                                <option value="percentage">Percentage</option>
+                                                                <option value="fixed_amount">Fixed amount</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <input type="number" class="form-control"
                                                                 name="discount_percentage" id="discount_percentage"
-                                                                placeholder="Discount %*" required>
+                                                                placeholder="Discount*" required>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <input type="number" class="form-control"
                                                                 name="order_number" id="order_number"
                                                                 placeholder="Order#">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-4">
                                                         <div class="form-group">
                                                             <input type="date" class="form-control" name="expiry_dt"
                                                                 id="expiry_dt" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control" name="order_count"
+                                                                id="order_count" placeholder="Usage limit">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control"
+                                                                name="min_discount" id="min_discount"
+                                                                placeholder="Min discount">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <input type="number" class="form-control"
+                                                                name="max_discount" id="max_discount"
+                                                                placeholder="Max discount">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <select name="discount_type" class="form-control" required>
+                                                                <option disabled selected>Select store</option>
+                                                                <option value="percentage">store</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6 offset-md-3 text-center">

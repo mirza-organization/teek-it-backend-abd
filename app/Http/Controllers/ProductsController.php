@@ -720,6 +720,17 @@ class ProductsController extends Controller
     public function updatePrice(Request $request)
     {
         try {
+            $validator = \Validator::make($request->all(), [
+                'file' => 'required',
+                'store_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'data' => $validator->errors(),
+                    'status' => false,
+                    'message' => ""
+                ], 422);
+            }
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
                 // File Details
