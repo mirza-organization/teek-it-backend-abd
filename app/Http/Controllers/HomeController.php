@@ -175,7 +175,7 @@ class HomeController extends Controller
         flash('All Products Enabled Successfully')->success();
         return Redirect::back();
     }
-      /**
+    /**
      * Disable's all products of logged-in user
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
@@ -210,7 +210,7 @@ class HomeController extends Controller
                 flash('Marked As Featured, Successfully')->success();
             }
             return Redirect::back();
-        }else{
+        } else {
             abort(404);
         }
     }
@@ -1358,5 +1358,69 @@ class HomeController extends Controller
             ->send(new OrderIsCanceledMail($order));
         flash('Order is successfully canceled')->success();
         return back();
+    }
+
+    /**
+     * it will update the store image via popup modal
+     */
+    public function updateStoreImage(Request $request, $id)
+    {
+        $validatedData = Validator::make($request->all(), [
+            'store_image' => 'required',
+        ]);
+        if ($validatedData->fails()) {
+            flash('Error in updating the image because a required field is missing or invalid data.')->error();
+            return Redirect::back()->withInput($request->input());
+        }
+        $store_image = User::find($id);
+        if ($request->hasFile('store_image')) {
+            $file = $request->file('store_image');
+            $filename = uniqid($store_image->id . '_' . $store_image->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+            Storage::disk('user_public')->put($filename, File::get($file));
+            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+                info("file is stored successfully : " . $filename);
+                // $filename = "/user_imgs/" . $filename;
+            } else {
+                info("file is not found :- " . $filename);
+            }
+        }
+        $store_image->user_img = $filename;
+        $store_image->save();
+        flash('Store Image Successfully Updated')->success();
+        return Redirect::back();
+    }
+    /**
+     * it will update the user info via popup modal
+     */
+    public function userInfoUpdate(Request $request, $id)
+    {
+        $validatedData = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'business_name' => 'required|string',
+            'phone' => 'required|string',
+            'business_phone' => 'required|string',
+        ]);
+        if ($validatedData->fails()) {
+            flash('Error in updating the image because a required field is missing or invalid data.')->error();
+            return Redirect::back()->withInput($request->input());
+        }
+        $phone = substr($request->phone, 0, 3);
+        $business_phone = substr($request->business_phone, 0, 3);
+        $user_info = User::find($id);
+        $user_info->name = $request->name;
+        $user_info->business_name = $request->business_name;
+        if ($phone == '+44') {
+            $user_info->phone = $request->phone;
+        } else {
+            $user_info->phone = '+44' . $request->phone;
+        }
+        if ($business_phone == '+44') {
+            $user_info->business_phone = $request->business_phone;
+        } else {
+            $user_info->business_phone = '+44' . $request->business_phone;
+        }
+        $user_info->save();
+        flash('Data Successfully Updated')->success();
+        return Redirect::back();
     }
 }

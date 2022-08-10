@@ -33,6 +33,8 @@ return [
 
     'ITEM_DELETED' => 'Data deleted successfully.',
 
+    'MAX_LIMIT' => 'Promo code usage has reached its maximum limit.',
+
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',

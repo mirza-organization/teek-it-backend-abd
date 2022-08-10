@@ -49,6 +49,7 @@ Route::get('/inventory/feature/remove/{product_id}', 'HomeController@removeFromF
 | User Settings Routes
 |--------------------------------------------------------------------------
 */
+Route::post('/user_info/{id}/update', 'HomeController@userInfoUpdate')->name('admin.userinfo.update');
 Route::get('/settings/general', 'HomeController@generalSettings');
 Route::get('/settings/payment', 'HomeController@paymentSettings');
 Route::post('/settings/payment/update', 'HomeController@paymentSettingsUpdate')->name('payment_settings_update');
@@ -118,6 +119,7 @@ Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndR
 Route::post('/update_pages', 'HomeController@updatePages')->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', 'HomeController@changeUserStatus')->name('change_user_status');
 Route::get('/users_del', 'HomeController@adminUsersDel')->name('admin.del.users');
+Route::post('/store_image/{id}/update', 'HomeController@updateStoreImage')->name('admin.image.update');
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route

@@ -717,7 +717,7 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * 
      */
-    public function updatePrice(Request $request)
+    public function updatePriceBulk(Request $request)
     {
         try {
             $validator = \Validator::make($request->all(), [

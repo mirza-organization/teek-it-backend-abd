@@ -33,32 +33,79 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="row">
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="">Promo code</label>
                                                 <input type="text" name="promo_code" class="form-control"
                                                     value="{{$promo_code->promo_code}}" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="">Discount</label>
-                                                <input type="number" name="discount_percentage" class="form-control"
-                                                    value="{{$promo_code->discount_percentage}}" required>
+                                                <label for="">Discount type</label>
+                                                <select name="discount_type" class="form-control" required>
+                                                    <option disabled value="{{$promo_code->discount_type}}" selected>
+                                                        {{$promo_code->discount_type}}
+                                                    </option>
+                                                    <option value="percentage">Percentage
+                                                    </option>
+                                                    <option value="fixed amount">Fixed amount
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+
+                                                <input type="text" name="discount_type" class="form-control"
+                                                    value="{{$promo_code->discount_type}}" required>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="">Discount</label>
+                                                <input type="number" name="discount" class="form-control"
+                                                    value="{{$promo_code->discount}}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="">Order</label>
                                                 <input type="number" name="order_number" class="form-control"
                                                     value="{{$promo_code->order_number}}">
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="">Usage limit</label>
+                                                <input type="number" name="usage_limit" class="form-control"
+                                                    value="{{$promo_code->usage_limit}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="">Min discount</label>
+                                                <input type="number" name="min_discount" class="form-control"
+                                                    value="{{$promo_code->min_discount}}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="">Max discount</label>
+                                                <input type="number" name="max_discount" class="form-control"
+                                                    value="{{$promo_code->max_discount}}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="">Expiry date</label>
                                                 <input type="date" name="expiry_dt" class="form-control"
                                                     value="{{$promo_code->expiry_dt}}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="">Store</label>
+                                                <input type="text" name="store" class="form-control"
+                                                    value="{{$promo_code->store}}">
                                             </div>
                                         </div>
                                     </div>
@@ -73,100 +120,118 @@
                 </div>
                 @endforeach
                 <!-- modal end -->
-                <div class="offset-xl-2 col-lg-12 col-xl-8 pb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="d-block text-right">
-                                <div class="card-text">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <form action="{{route('admin.promocodes.add')}}" method="POST">
-                                                {{csrf_field()}}
-                                                <div class="row">
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <input type="text" class="form-control" name="promo_code"
-                                                                id="promo_code" placeholder="Promo Code*" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <select name="discount_type" class="form-control" required>
-                                                                <option disabled selected>Select type</option>
-                                                                <option value="percentage">Percentage</option>
-                                                                <option value="fixed_amount">Fixed amount</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <input type="number" class="form-control"
-                                                                name="discount_percentage" id="discount_percentage"
-                                                                placeholder="Discount*" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <input type="number" class="form-control"
-                                                                name="order_number" id="order_number"
-                                                                placeholder="Order#">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <input type="date" class="form-control" name="expiry_dt"
-                                                                id="expiry_dt" required>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="form-group">
-                                                            <input type="number" class="form-control" name="order_count"
-                                                                id="order_count" placeholder="Usage limit">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <input type="number" class="form-control"
-                                                                name="min_discount" id="min_discount"
-                                                                placeholder="Min discount">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <input type="number" class="form-control"
-                                                                name="max_discount" id="max_discount"
-                                                                placeholder="Max discount">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="form-group">
-                                                            <select name="discount_type" class="form-control" required>
-                                                                <option disabled selected>Select store</option>
-                                                                <option value="percentage">store</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6 offset-md-3 text-center">
-                                                        <button style="background: #ffcf42;color:black;font-weight: 600"
-                                                            class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
-                                                            type="submit">Add</button>
-                                                    </div>
-                                                </div>
-                                            </form>
+                <!-- Add form modal starts -->
+                <div class="modal fade" id="add_promocodeModal" tabindex="-1" role="dialog"
+                    aria-labelledby="add_promocodeModalLabel" style="display: none;" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <form action="{{route('admin.promocodes.add')}}" method="POST">
+                                        {{csrf_field()}}
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Add Promo Code</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
                                         </div>
-                                    </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" name="promo_code"
+                                                        id="promo_code" placeholder="Promo Code*" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <select name="discount_type" class="form-control" required>
+                                                        <option disabled selected>Select type
+                                                        </option>
+                                                        <option value="0">Percentage
+                                                        </option>
+                                                        <option value="1">Fixed amount
+                                                        </option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" name="discount"
+                                                        id="discount" placeholder="Discount*" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" name="order_number"
+                                                        id="order_number" placeholder="Valid for order# (optional)">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" name="usage_limit"
+                                                        id="usage_limit" placeholder="Usage limit (optional)">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="date" class="form-control" name="expiry_dt"
+                                                        id="expiry_dt" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" name="min_discount"
+                                                        id="min_discount" placeholder="Min discount*" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <input type="number" class="form-control" name="max_discount"
+                                                        id="max_discount" placeholder="Max discount*" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <select name="store_id" class="form-control" required>
+
+                                                        <option disabled selected>Select store
+                                                        </option>
+                                                        @foreach($stores as $store)
+                                                        <option value="{{$store->id}}">
+                                                            {{$store->business_name}}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer hidden ">
+                                                <button type="button"
+                                                    class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
+                                                    data-dismiss="modal">Close</button>
+                                                <button style="background: #ffcf42;color:black;font-weight: 600"
+                                                    class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
+                                                    type="submit">Add</button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="float-left">
-                    <button type="button" class="btn btn-success" onclick="selectAll()">
+                <!-- Add form modal ends -->
+                <div class="container">
+                    <button type="button" class="mx-1 d-block text-right float-right btn btn-success"
+                        onclick="selectAll()">
                         <a class="text-white">Select All</a>
                     </button>
-                    <button type="button" class="btn btn-danger" onclick="delPromoCodes()">
+                    <button type="button" class="mx-1 d-block text-right float-right btn btn-danger"
+                        onclick="delPromoCodes()">
                         <a class="text-white">Delete</a>
                     </button>
+                    <a href="" data-toggle="modal" data-target="#add_promocodeModal"
+                        class="mx-1 d-block text-right float-right btn btn-primary">Add Promo
+                        Code</a>
                 </div>
                 <div class="col-md-12">
                     <div class="row">
@@ -192,7 +257,11 @@
                                                 id="{{$promo_code->id}}">
                                         </td>
                                         <td>{{$promo_code->promo_code}}</td>
-                                        <td>{{$promo_code->discount_percentage}}%</td>
+                                        @if($promo_code->discount_type=='0')
+                                        <td>{{$promo_code->discount}}%</td>
+                                        @else
+                                        <td>£{{$promo_code->discount}}</td>
+                                        @endif
                                         <td>{{$promo_code->order_number}}</td>
                                         <td>{{$promo_code->expiry_dt}}</td>
                                         <td>

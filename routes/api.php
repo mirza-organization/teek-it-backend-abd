@@ -77,7 +77,6 @@ Route::get('sellers/{seller_id}/{product_name}', 'Auth\AuthController@searchSell
 */
 Route::group(['prefix' => 'product'], function ($router) {
     Route::post('search', 'ProductsController@search');
-    Route::post('update_price', 'ProductsController@updatePrice');
     Route::get('all', 'ProductsController@all');
     Route::get('view/{product_id}', 'ProductsController@view');
     Route::post('view/bulk', 'ProductsController@bulkView');
@@ -115,6 +114,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
     Route::group(['prefix' => 'product'], function ($router) {
         Route::post('add', 'ProductsController@add');
         Route::post('update/{product_id}', 'ProductsController@update');
+        Route::post('update_price/bulk', 'ProductsController@updatePriceBulk');
         Route::get('delete/{product_id}', 'ProductsController@delete');
         Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@deleteImage');
         Route::post('ratings/add', 'RattingsController@add');
