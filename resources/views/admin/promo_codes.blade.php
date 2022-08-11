@@ -44,20 +44,16 @@
                                             <div class="form-group">
                                                 <label for="">Discount type</label>
                                                 <select name="discount_type" class="form-control" required>
-                                                    <option disabled value="{{$promo_code->discount_type}}" selected>
-                                                        {{$promo_code->discount_type}}
+                                                    <option value="{{$promo_code->discount_type}}" selected>
+                                                        {{$promo_code->discount_type==0 ? 'percentage' : 'fixed amount'}}
                                                     </option>
-                                                    <option value="percentage">Percentage
+                                                    <option value="0">Percentage
                                                     </option>
-                                                    <option value="fixed amount">Fixed amount
+                                                    <option value="1">Fixed amount
                                                     </option>
                                                 </select>
                                             </div>
-                                            <div class="form-group">
 
-                                                <input type="text" name="discount_type" class="form-control"
-                                                    value="{{$promo_code->discount_type}}" required>
-                                            </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
@@ -83,15 +79,15 @@
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="">Min discount</label>
-                                                <input type="number" name="min_discount" class="form-control"
-                                                    value="{{$promo_code->min_discount}}" required>
+                                                <input type="number" name="min_amnt_for_discount" class="form-control"
+                                                    value="{{$promo_code->min_amnt_for_discount}}" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label for="">Max discount</label>
-                                                <input type="number" name="max_discount" class="form-control"
-                                                    value="{{$promo_code->max_discount}}" required>
+                                                <input type="number" name="max_amnt_for_discount" class="form-control"
+                                                    value="{{$promo_code->max_amnt_for_discount}}" required>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -103,9 +99,16 @@
                                         </div>
                                         <div class="col-md-12">
                                             <div class="form-group">
-                                                <label for="">Store</label>
-                                                <input type="text" name="store" class="form-control"
-                                                    value="{{$promo_code->store}}">
+                                                <select name="store_id" class="form-control">
+                                                    <option selected value="{{$promo_code->store_id}}">Select
+                                                        store
+                                                    </option>
+                                                    @foreach($stores as $store)
+                                                    <option value="{{$store->id}}">
+                                                        {{$store->business_name}}
+                                                    </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -180,19 +183,21 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <input type="number" class="form-control" name="min_discount"
-                                                        id="min_discount" placeholder="Min discount*" required>
+                                                    <input type="number" class="form-control"
+                                                        name="min_amnt_for_discount" id="min_amnt_for_discount"
+                                                        placeholder="Min amount for discount*" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <input type="number" class="form-control" name="max_discount"
-                                                        id="max_discount" placeholder="Max discount*" required>
+                                                    <input type="number" class="form-control"
+                                                        name="max_amnt_for_discount" id="max_amnt_for_discount"
+                                                        placeholder="Max amount for discount*" required>
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <div class="form-group">
-                                                    <select name="store_id" class="form-control" required>
+                                                    <select name="store_id" class="form-control">
 
                                                         <option disabled selected>Select store
                                                         </option>

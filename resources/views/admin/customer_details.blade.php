@@ -57,7 +57,7 @@
                                                         <div class="row">
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
-                                                                    <label for="">Change Store Image</label>
+                                                                    <label for="">Change Image</label>
                                                                     <input type="file" name="store_image"
                                                                         class="form-control" value="" required
                                                                         accept="image/x-png,image/jpeg,image/jpg">

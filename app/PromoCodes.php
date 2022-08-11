@@ -12,8 +12,8 @@ class PromoCodes extends Model
         'discount',
         'order_number',
         'usage_limit',
-        'min_discount',
-        'max_discount',
+        'min_amnt_for_discount',
+        'max_amnt_for_discount',
         'store_id',
         'expiry_dt'
     ];

@@ -41,6 +41,7 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('me', 'Auth\AuthController@me');
     Route::get('delivery_boys', 'Auth\AuthController@deliveryBoys');
     Route::get('get_user/{user_id}', 'Auth\AuthController@getDeliveryBoyInfo');
+    Route::get('userinfo/delete/{user_id}', 'Auth\AuthController@userInfoDelete');
 });
 /*
 |--------------------------------------------------------------------------
@@ -120,6 +121,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('ratings/add', 'RattingsController@add');
         Route::post('ratings/update', 'RattingsController@update');
         Route::get('ratings/delete/{ratting_id}', 'RattingsController@delete');
+        Route::get('userinfo/delete/{user_id}', 'HomeController@userInfoDelete');
     });
 
     Route::group(['prefix' => 'withdrawal'], function ($router) {
@@ -219,11 +221,20 @@ Route::get('time', function () {
 });
 
 Route::get('generate_hash', function () {
-    return response()->json([
-        'data' => Hash::make($_REQUEST['password']),
-        'status' => true,
-        'message' => ''
-    ], 200);
+    try {
+        return response()->json([
+            'data' => Hash::make($_REQUEST['password']),
+            'status' => true,
+            'message' => ''
+        ], 200);
+    } catch (Throwable $error) {
+        report($error);
+        return response()->json([
+            'data' => [],
+            'status' => false,
+            'message' => $error
+        ], 500);
+    }
 });
 
 Route::fallback(function () {

@@ -166,10 +166,12 @@
                                 <div class="col-md-5">
                                     <h3 class="card-title"><strong>User Info</strong></h3>
                                 </div>
-                                <div>
-                                    <a href="" data-toggle="modal" data-target="#editUserModal{{$user[0]->id}}"
-                                        class="   float-left pr-3"><img class="img-size-16"
-                                            src="/res/res/img/edit.png"></a>
+                                <div class="col-md-7">
+                                    <label class=" float-right">
+                                        <a href="" data-toggle="modal" data-target="#editUserModal{{$user[0]->id}}"
+                                            class="   float-left pr-3"><img class="img-size-16"
+                                                src="/res/res/img/edit.png"></a>
+                                    </label>
                                 </div>
                             </div>
                         </div>

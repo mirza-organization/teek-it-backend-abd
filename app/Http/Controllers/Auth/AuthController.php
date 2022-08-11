@@ -22,6 +22,7 @@ use Crypt;
 use Hash;
 use Mail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Throwable;
 use Validator;
 
@@ -138,7 +139,7 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 
@@ -535,7 +536,7 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
     /**
@@ -591,18 +592,27 @@ class AuthController extends Controller
 
     public function deliveryBoys()
     {
-        $users = User::query()->where('seller_id', '=', Auth::id())->get();
-        $data = [];
-        foreach ($users as $user) {
-            if ($user->hasRole('delivery_boy')) {
-                $data[] = $this->get_seller_info($user);
+        try {
+            $users = User::query()->where('seller_id', '=', Auth::id())->get();
+            $data = [];
+            foreach ($users as $user) {
+                if ($user->hasRole('delivery_boy')) {
+                    $data[] = $this->get_seller_info($user);
+                }
             }
+            return response()->json([
+                'data' => $data,
+                'status' => true,
+                'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => ''
-        ], 200);
     }
 
     public function getDeliveryBoyInfo($delivery_boy_info)
@@ -636,7 +646,6 @@ class AuthController extends Controller
     }
     /**
      * Listing of all SECRET KEYS
-     * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
     public function keys()
@@ -647,6 +656,41 @@ class AuthController extends Controller
                 'data' => $keys,
                 'status' => true,
                 'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+     * It will delete user from users table
+     * It will insert the deleted user data into 'Deleted_users' table
+     * @version 1.0.0
+     */
+    public function userInfoDelete($user_id)
+    {
+        try {
+            $user = User::find($user_id);
+            if (!empty($user)) {
+                DB::table('deleted_users')->insert([
+                    'user_id' =>  $user->id,
+                    'postcode' =>  $user->postcode,
+                ]);
+                $user->delete();
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.ITEM_DELETED'),
+                ], 200);
+            }
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
             ], 200);
         } catch (Throwable $error) {
             report($error);

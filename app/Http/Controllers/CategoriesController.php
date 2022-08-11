@@ -116,7 +116,7 @@ class CategoriesController extends Controller
                     return response()->json([
                         'data' => $categories,
                         'status' => true,
-                        'message' => ''
+                        'message' => '',
                     ], 200);
                 } else {
                     return response()->json([
@@ -220,7 +220,10 @@ class CategoriesController extends Controller
                 ->where('categories.id', '=', $category_id)
                 ->get()->pluck('store_id');
             $stores = User::whereIn('id', $ids)->get()->toArray();
-            return response()->json(['stores' => $stores], 200);
+            return response()->json([
+                'stores' => $stores,
+                'status' => true,
+            ], 200);
         } catch (Throwable $error) {
             report($error);
             return response()->json([

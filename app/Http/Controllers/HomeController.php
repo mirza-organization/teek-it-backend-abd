@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Stripe;
+use Throwable;
 
 class HomeController extends Controller
 {
@@ -1362,9 +1363,12 @@ class HomeController extends Controller
 
     /**
      * it will update the store image via popup modal
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
      */
     public function updateStoreImage(Request $request, $id)
     {
+        // try {
         $validatedData = Validator::make($request->all(), [
             'store_image' => 'required',
         ]);
@@ -1376,8 +1380,8 @@ class HomeController extends Controller
         if ($request->hasFile('store_image')) {
             $file = $request->file('store_image');
             $filename = uniqid($store_image->id . '_' . $store_image->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+            Storage::disk('spaces')->put($filename, File::get($file));
+            if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
                 info("file is stored successfully : " . $filename);
                 // $filename = "/user_imgs/" . $filename;
             } else {
@@ -1388,39 +1392,52 @@ class HomeController extends Controller
         $store_image->save();
         flash('Store Image Successfully Updated')->success();
         return Redirect::back();
+        // } catch (Throwable $error) {
+        //     report($error);
+        //     flash('Failed to update store image due to some internal error.')->error();
+        //     return back();
+        // }
     }
     /**
      * it will update the user info via popup modal
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
      */
     public function userInfoUpdate(Request $request, $id)
     {
-        $validatedData = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'business_name' => 'required|string',
-            'phone' => 'required|string',
-            'business_phone' => 'required|string',
-        ]);
-        if ($validatedData->fails()) {
-            flash('Error in updating the image because a required field is missing or invalid data.')->error();
-            return Redirect::back()->withInput($request->input());
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'name' => 'required|string',
+                'business_name' => 'required|string',
+                'phone' => 'required|string|max:13',
+                'business_phone' => 'required|string',
+            ]);
+            if ($validatedData->fails()) {
+                flash('Error in updating the user info because a required field is missing or invalid data.')->error();
+                return Redirect::back()->withInput($request->input());
+            }
+            $phone = substr($request->phone, 0, 3);
+            $business_phone = substr($request->business_phone, 0, 3);
+            $user_info = User::find($id);
+            $user_info->name = $request->name;
+            $user_info->business_name = $request->business_name;
+            if ($phone == '+44') {
+                $user_info->phone = $request->phone;
+            } else {
+                $user_info->phone = '+44' . $request->phone;
+            }
+            if ($business_phone == '+44') {
+                $user_info->business_phone = $request->business_phone;
+            } else {
+                $user_info->business_phone = '+44' . $request->business_phone;
+            }
+            $user_info->save();
+            flash('Data Successfully Updated')->success();
+            return Redirect::back();
+        } catch (Throwable $error) {
+            report($error);
+            flash('Failed to update user info due to some internal error.')->error();
+            return back();
         }
-        $phone = substr($request->phone, 0, 3);
-        $business_phone = substr($request->business_phone, 0, 3);
-        $user_info = User::find($id);
-        $user_info->name = $request->name;
-        $user_info->business_name = $request->business_name;
-        if ($phone == '+44') {
-            $user_info->phone = $request->phone;
-        } else {
-            $user_info->phone = '+44' . $request->phone;
-        }
-        if ($business_phone == '+44') {
-            $user_info->business_phone = $request->business_phone;
-        } else {
-            $user_info->business_phone = '+44' . $request->business_phone;
-        }
-        $user_info->save();
-        flash('Data Successfully Updated')->success();
-        return Redirect::back();
     }
 }

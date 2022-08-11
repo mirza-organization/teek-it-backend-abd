@@ -728,8 +728,8 @@ class OrdersController extends Controller
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
+                'message' => $error
+            ], 500);
         }
     }
     /**
