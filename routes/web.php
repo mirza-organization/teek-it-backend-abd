@@ -49,7 +49,7 @@ Route::get('/inventory/feature/remove/{product_id}', 'HomeController@removeFromF
 | User Settings Routes
 |--------------------------------------------------------------------------
 */
-Route::post('/user_info/{id}/update', 'HomeController@userInfoUpdate')->name('admin.userinfo.update');
+Route::post('/user_info/update', 'HomeController@userInfoUpdate')->name('admin.userinfo.update');
 Route::get('/settings/general', 'HomeController@generalSettings');
 Route::get('/settings/payment', 'HomeController@paymentSettings');
 Route::post('/settings/payment/update', 'HomeController@paymentSettingsUpdate')->name('payment_settings_update');

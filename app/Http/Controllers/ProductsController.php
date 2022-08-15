@@ -717,7 +717,7 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * 
      */
-    public function updatePriceBulk(Request $request)
+    public function updatePriceBulk(Request $request, $delimiter = ',', $filename = '')
     {
         try {
             $validator = \Validator::make($request->all(), [
@@ -735,51 +735,29 @@ class ProductsController extends Controller
                 $file = $request->file('file');
                 // File Details
                 $filename = $file->getClientOriginalName();
-                $extension = $file->getClientOriginalExtension();
-                $tempPath = $file->getRealPath();
-                $fileSize = $file->getSize();
-                $mimeType = $file->getMimeType();
-                $valid_extension = array("csv");
-                $maxFileSize = 2097152;
-                if (in_array(strtolower($extension), $valid_extension)) {
-                    if ($fileSize <= $maxFileSize) {
-                        $location = public_path('upload/csv');
-                        $file->move($location, $filename);
-                        $filepath = $location . "/" . $filename;
-                        // Reading file
-                        $file = fopen($filepath, "r");
-                        $i = 0;
-                        while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
-                            $num = count($filedata);
-                            if ($i == 0) {
-                                $i++;
-                                continue;
-                            };
-                            DB::table('products')->where('user_id', $request->store_id)
-                                ->where('category_id', $filedata[0])
-                                ->where('sku', $filedata[1])
-                                ->update(['price' => $filedata[2]]);
-                        }
-                        fclose($file);
-                        return response()->json([
-                            'data' => [],
-                            'status' => true,
-                            'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'data' => [],
-                            'status' => false,
-                            'message' =>  config('constants.FILE_TOO_LARGE'),
-                        ], 200);
-                    }
-                } else {
-                    return response()->json([
-                        'data' => [],
-                        'status' => false,
-                        'message' =>  config('constants.INVALID_FILE'),
-                    ], 200);
+                $location = public_path('upload/csv');
+                $file->move($location, $filename);
+                $filepath = $location . "/" . $filename;
+                // Reading file
+                $file = fopen($filepath, "r");
+                $i = 0;
+                while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
+                    // $num = count($filedata);
+                    if ($i == 0) {
+                        $i++;
+                        continue;
+                    };
+                    DB::statement('CREATE Temporary TABLE temp_products LIKE products');
+                    $db = DB::statement('INSERT INTO `temp_products`( `user_id`, `category_id`,`product_name`, `sku`, `qty`, `price`, `featured`, `discount_percentage`, `contact`)VALUES (1,' . $filedata[0] . ',' . $filedata[0] . ',' . $filedata[1] . ',3, ' . $filedata[2] . ',1,20,02083541500 )');
+                    DB::statement('UPDATE products,temp_products SET products.price = temp_products.price WHERE  products.category_id = temp_products.category_id AND products.sku = temp_products.sku');
+                    DB::statement('DROP Temporary TABLE temp_products');
                 }
+                fclose($file);
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
+                ], 200);
             }
         } catch (Throwable $error) {
             report($error);
@@ -790,4 +768,101 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+    /**
+     * Update product price from csv file w.r.t their SKU and store_id 
+     * @author Mirza Abdullah Izhar
+     * 
+     */
+    // public function updatePriceBulk(Request $request)
+    // {
+    // try {
+    //     $validator = \Validator::make($request->all(), [
+    //         'file' => 'required',
+    //         'store_id' => 'required',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'data' => $validator->errors(),
+    //             'status' => false,
+    //             'message' => ""
+    //         ], 422);
+    //     }
+    // if ($request->hasFile('file')) {
+    //     $file = $request->file('file');
+    //     // File Details
+    //     $filename = $file->getClientOriginalName();
+    // $extension = $file->getClientOriginalExtension();
+    // $tempPath = $file->getRealPath();
+    // $fileSize = $file->getSize();
+    // $mimeType = $file->getMimeType();
+    //$valid_extension = array("csv");
+    // $maxFileSize = 2097152;
+    // if (in_array(strtolower($extension), $valid_extension)) {
+    // if ($fileSize <= $maxFileSize) {
+    // $location = public_path('upload/csv');
+    // $file->move($location, $filename);
+    // $filepath = $location . "/" . $filename;
+    // // Reading file
+    // $file = fopen($filepath, "r");
+    // $i = 0;
+    // while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+    //     $num = count($filedata);
+    //     if ($i == 0) {
+    //         $i++;
+    //         continue;
+    //     };
+    //     for ($c = 0; $c < $num; $c++) {
+    //         $importData_arr[$i][] = $filedata[$c];
+    //     }
+    //     $i++;
+    //     Products::where('user_id', $request->store_id)
+    //         ->where('category_id', $filedata[0])
+    //         ->where('sku', $filedata[1])
+    //         ->chunk(100, function ($users) {
+    //             foreach ($users as $user) {
+    //                 $user->update(['price' => $filedata[]]);
+    //             }
+    //         });
+    // DB::table('products')->where('user_id', $request->store_id)
+    // ->where('category_id', $filedata[0])
+    // ->where('sku', $filedata[1])
+    // ->update(['price' => $filedata[2]]);
+    //}
+    // fclose($file);
+    // // Insert to MySQL database
+    // foreach ($importData_arr as $importData) {
+
+    //     DB::table('products')->where('user_id', $request->store_id)
+    //         ->where('category_id', $importData[0])
+    //         ->where('sku', $importData[1])
+    //         ->update(['price' => $importData[2]]);
+    // }
+    // return response()->json([
+    //     'data' => [],
+    //     'status' => true,
+    //     'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
+    // ], 200);
+    // } else {
+    //     return response()->json([
+    //         'data' => [],
+    //         'status' => false,
+    //         'message' =>  config('constants.FILE_TOO_LARGE'),
+    //     ], 200);
+    // }
+    // } else {
+    //     return response()->json([
+    //         'data' => [],
+    //         'status' => false,
+    //         'message' =>  config('constants.INVALID_FILE'),
+    //     ], 200);
+    // }
+    //  }
+    //     } catch (Throwable $error) {
+    //         report($error);
+    //         return response()->json([
+    //             'data' => [],
+    //             'status' => false,
+    //             'message' => $error
+    //         ], 500);
+    //     }
 }

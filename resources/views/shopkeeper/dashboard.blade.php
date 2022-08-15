@@ -210,12 +210,12 @@
         </div><!-- /.container-fluid -->
     </div>
     <!-- /.content -->
+    <!-- action="{{route('admin.userinfo.update',['id'=>$user[0]->id])}}" -->
     <div class="modal fade" id="editUserModal{{$user[0]->id}}" tabindex="-1" role="dialog"
         aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form method="post" action="{{route('admin.userinfo.update',['id'=>$user[0]->id])}}"
-                    enctype="multipart/form-data">
+                <form id="user_info" onsubmit="return false" enctype="multipart/form-data">
                     {{csrf_field()}}
                     <div class="modal-header">
                         <h5 class="modal-title display-center" id="exampleModalLabel">
@@ -228,18 +228,29 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <div class="form-group">
+
+                            <input type="hidden" id="id" class="form-control" value="{{$user[0]->id}}">
+                        </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Name</label>
-                                    <input type="text" name="name" class="form-control" value="{{$user[0]->name}}"
-                                        required>
+                                    <input type="text" name="name" id="name"
+                                        class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                                        value="{{$user[0]->name}}">
+                                    @if ($errors->has('name'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('name') }}</strong>
+                                    </span>
+                                    @endif
+                                    <p id="name" class="text-danger name error"></p>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="">Business Name</label>
-                                    <input type="text" name="business_name" class="form-control"
+                                    <input type="text" name="business_name" id="business_name" class="form-control"
                                         value="{{$user[0]->business_name}}" required>
                                 </div>
                             </div>
@@ -271,7 +282,8 @@
                     </div>
                     <div class="modal-footer hidden ">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save
+                        <button type="submit" id="user_info_update" onclick="userInfoUpdate()"
+                            class="btn btn-primary">Save
                             changes</button>
                     </div>
                 </form>
@@ -364,5 +376,60 @@
 </div>
 <!-- Set Store Hours Modal - Ends -->
 <?php } ?>
+<script>
+function userInfoUpdate() {
+    let name = $('#name').val();
+    let id = $('#id').val();
+    let business_name = $('#business_name').val();
+    let phone = $('#phone').val();
+    let business_phone = $('#business_phone').val();
 
+    $.ajax({
+        url: "{{route('admin.userinfo.update')}}",
+        type: "post",
+        data: {
+            _token: "{{ csrf_token() }}",
+            name: name,
+            id: id,
+            business_name: business_name,
+            phone: phone,
+            phone: phone,
+            business_phone: business_phone,
+
+        },
+        success: function(response) {
+            if (response == "Data Sent") {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'We have received your modification request,our team will respond back soon after varifying',
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                }).then(function() {
+                    location.reload();
+                });
+            } else {
+                $('.error').html('');
+                if (response.errors.name) {
+                    // console.log(response.errors.name[0]);
+                    $('.name').html('');
+                    $('.name').html(response.errors.name[0]);
+                }
+                if (response.errors.business_name) {
+                    $('.business_name').html(response.errors.business_name[0]);
+                }
+                if (response.errors.phone) {
+                    $('.phone').html(response.errors.phone[0]);
+                }
+                if (response.errors.business_phone) {
+                    $('.business_phone').html(response.errors.business_phone[0]);
+                }
+
+            }
+        }
+    });
+}
+</script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+@yield('scripts')
 @endsection

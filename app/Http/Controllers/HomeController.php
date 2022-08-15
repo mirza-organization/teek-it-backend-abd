@@ -1403,41 +1403,40 @@ class HomeController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function userInfoUpdate(Request $request, $id)
+    public function userInfoUpdate(Request $request)
     {
-        try {
-            $validatedData = Validator::make($request->all(), [
-                'name' => 'required|string',
-                'business_name' => 'required|string',
-                'phone' => 'required|string|max:13',
-                'business_phone' => 'required|string',
-            ]);
-            if ($validatedData->fails()) {
-                flash('Error in updating the user info because a required field is missing or invalid data.')->error();
-                return Redirect::back()->withInput($request->input());
-            }
-            $phone = substr($request->phone, 0, 3);
-            $business_phone = substr($request->business_phone, 0, 3);
-            $user_info = User::find($id);
-            $user_info->name = $request->name;
-            $user_info->business_name = $request->business_name;
-            if ($phone == '+44') {
-                $user_info->phone = $request->phone;
-            } else {
-                $user_info->phone = '+44' . $request->phone;
-            }
-            if ($business_phone == '+44') {
-                $user_info->business_phone = $request->business_phone;
-            } else {
-                $user_info->business_phone = '+44' . $request->business_phone;
-            }
-            $user_info->save();
-            flash('Data Successfully Updated')->success();
-            return Redirect::back();
-        } catch (Throwable $error) {
-            report($error);
-            flash('Failed to update user info due to some internal error.')->error();
-            return back();
+        $is_valid = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'business_name' => 'required|string',
+            'phone' => 'required|string|max:13',
+            'business_phone' => 'required|string',
+        ]);
+        // $is_valid = $this->validator($request->all());
+        if ($is_valid->fails()) {
+            return response()->json([
+                'errors' => $is_valid->errors()
+            ], 200);
+            exit;
         }
+        $html = '<html>
+        Hi, Team Teek IT.<br><br>
+       Store name has demanded to update their business information as following:-<br><br>
+       <strong> Name:</strong> '  .  $request->name   .  '<br>
+       <strong>Business Name:</strong> '  .  $request->business_name   .  '<br>
+       <strong>Phone:</strong> '  .  $request->phone  .  '<br>
+       <strong>Business Phone:</strong> '  .  $request->business_phone  .  '<br>
+       <br><br>
+       Please verify this information & take your desision about modifying their business information.
+       <br><br>
+       From,
+       <br>
+       Teek it
+       </html>';
+        if ($request->all()) {
+            echo "Data Sent";
+        }
+        // $subject = env('APP_NAME') . ': User Info Update';
+        // Mail::to(config('constants.ADMIN_EMAIL'))
+        //     ->send(new StoreRegisterMail($html, $subject));
     }
 }
