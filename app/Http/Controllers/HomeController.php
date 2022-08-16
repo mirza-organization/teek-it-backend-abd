@@ -1408,8 +1408,8 @@ class HomeController extends Controller
         $is_valid = Validator::make($request->all(), [
             'name' => 'required|string',
             'business_name' => 'required|string',
-            'phone' => 'required|string|max:13',
-            'business_phone' => 'required|string',
+            'phone' => 'required|string|min:13|max:13',
+            'business_phone' => 'required|string|min:13|max:13',
         ]);
         // $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
@@ -1418,9 +1418,13 @@ class HomeController extends Controller
             ], 200);
             exit;
         }
+        $store_name = User::find($request->id);
+        if ($request->all()) {
+            echo "Data Sent";
+        }
         $html = '<html>
         Hi, Team Teek IT.<br><br>
-       Store name has demanded to update their business information as following:-<br><br>
+        '  .  $store_name->business_name   .  ' has demanded to update their business information as following:-<br><br>
        <strong> Name:</strong> '  .  $request->name   .  '<br>
        <strong>Business Name:</strong> '  .  $request->business_name   .  '<br>
        <strong>Phone:</strong> '  .  $request->phone  .  '<br>
@@ -1432,11 +1436,8 @@ class HomeController extends Controller
        <br>
        Teek it
        </html>';
-        if ($request->all()) {
-            echo "Data Sent";
-        }
-        // $subject = env('APP_NAME') . ': User Info Update';
-        // Mail::to(config('constants.ADMIN_EMAIL'))
-        //     ->send(new StoreRegisterMail($html, $subject));
+        $subject = env('APP_NAME') . ': User Info Update';
+        Mail::to(config('constants.ADMIN_EMAIL'))
+            ->send(new StoreRegisterMail($html, $subject));
     }
 }

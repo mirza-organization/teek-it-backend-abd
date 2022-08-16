@@ -251,7 +251,8 @@
                                 <div class="form-group">
                                     <label for="">Business Name</label>
                                     <input type="text" name="business_name" id="business_name" class="form-control"
-                                        value="{{$user[0]->business_name}}" required>
+                                        value="{{$user[0]->business_name}}">
+                                    <p id="business_name" class="text-danger business_name error"></p>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -260,8 +261,10 @@
                                     <div class="row ">
                                         <span class="input-group-text">+44</span>
                                         <div class="col-md-8">
-                                            <input type="tel" class="form-control" maxlength="10" id="phone"
-                                                name="phone" value="{{$user[0]->phone}}" required>
+                                            <input type="tel" class="form-control" id="phone" name="phone"
+                                                value="{{$user[0]->phone}}">
+                                            <p id="phone" class="text-danger phone error"></p>
+
                                         </div>
                                     </div>
                                 </div>
@@ -272,10 +275,12 @@
                                     <div class="row ">
                                         <span class="input-group-text">+44</span>
                                         <div class="col-md-8">
-                                            <input type="text" class="form-control" maxlength="10" id="business_phone"
-                                                name="business_phone" value="{{$user[0]->business_phone}}" required>
+                                            <input type="text" class="form-control" id="business_phone"
+                                                name="business_phone" value="{{$user[0]->business_phone}}">
                                         </div>
                                     </div>
+                                    <p id="business_phone" class="text-danger business_phone error"></p>
+
                                 </div>
                             </div>
                         </div>
@@ -376,59 +381,6 @@
 </div>
 <!-- Set Store Hours Modal - Ends -->
 <?php } ?>
-<script>
-function userInfoUpdate() {
-    let name = $('#name').val();
-    let id = $('#id').val();
-    let business_name = $('#business_name').val();
-    let phone = $('#phone').val();
-    let business_phone = $('#business_phone').val();
-
-    $.ajax({
-        url: "{{route('admin.userinfo.update')}}",
-        type: "post",
-        data: {
-            _token: "{{ csrf_token() }}",
-            name: name,
-            id: id,
-            business_name: business_name,
-            phone: phone,
-            phone: phone,
-            business_phone: business_phone,
-
-        },
-        success: function(response) {
-            if (response == "Data Sent") {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'We have received your modification request,our team will respond back soon after varifying',
-                    icon: 'success',
-                    confirmButtonText: 'Ok'
-                }).then(function() {
-                    location.reload();
-                });
-            } else {
-                $('.error').html('');
-                if (response.errors.name) {
-                    // console.log(response.errors.name[0]);
-                    $('.name').html('');
-                    $('.name').html(response.errors.name[0]);
-                }
-                if (response.errors.business_name) {
-                    $('.business_name').html(response.errors.business_name[0]);
-                }
-                if (response.errors.phone) {
-                    $('.phone').html(response.errors.phone[0]);
-                }
-                if (response.errors.business_phone) {
-                    $('.business_phone').html(response.errors.business_phone[0]);
-                }
-
-            }
-        }
-    });
-}
-</script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 @yield('scripts')
