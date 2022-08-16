@@ -12,17 +12,17 @@ use App\Keys;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Crypt;
 use JWTAuth;
 use Jenssegers\Agent\Agent;
 use App\Models\JwtToken;
 use Illuminate\Http\Request;
 use App\User;
 use App\Models\Role;
-use Crypt;
-use Hash;
-use Mail;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 use Validator;
 
@@ -44,72 +44,80 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validate = User::validator($request);
-        if ($validate->fails()) {
-            $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
-            return response()->json($response, 400);
-        }
-        $role = Role::where('name', $request->get('role'))->first();
-        if ($request->get('role') == 'buyer') {
-            $is_active = 1;
-        } else {
-            $is_active = 0;
-        }
-        $User = User::create([
-            'name' => $request->name,
-            'l_name' => $request->l_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'business_name' => $request->business_name,
-            'business_location' => $request->business_location,
-            'lat' => json_decode($request->business_location)->lat,
-            'lon' => json_decode($request->business_location)->long,
-            'seller_id' => $request->seller_id,
-            'postal_code' => $request->postal_code,
-            'is_active' => $is_active,
-            'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
-        ]);
-        if ($User) {
-            $filename = $User->user_img;
-            if ($request->hasFile('user_img')) {
-                $file = $request->file('user_img');
-                $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                Storage::disk('spaces')->put($filename, File::get($file));
-                if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                    info("file is store successfully : " . $filename);
-                } else {
-                    info("file is not found :- " . $filename);
+        try {
+            $validate = User::validator($request);
+            if ($validate->fails()) {
+                $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
+                return response()->json($response, 400);
+            }
+            $role = Role::where('name', $request->get('role'))->first();
+            if ($request->get('role') == 'buyer') {
+                $is_active = 1;
+            } else {
+                $is_active = 0;
+            }
+            $User = User::create([
+                'name' => $request->name,
+                'l_name' => $request->l_name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'business_name' => $request->business_name,
+                'business_location' => $request->business_location,
+                'lat' => json_decode($request->business_location)->lat,
+                'lon' => json_decode($request->business_location)->long,
+                'seller_id' => $request->seller_id,
+                'postcode' => $request->postal_code,
+                'is_active' => $is_active,
+                'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
+            ]);
+            if ($User) {
+                if ($request->hasFile('user_img')) {
+                    $file = $request->file('user_img');
+                    $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                    Storage::disk('spaces')->put($filename, File::get($file));
+                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                        info("file is store successfully : " . $filename);
+                    } else {
+                        info("file is not found :- " . $filename);
+                    }
+                    $User->user_img = $filename;
+                    $User->save();
                 }
             }
+
+            $User->roles()->sync($role->id);
+            $verification_code = Crypt::encrypt($User->email);
+
+            $FRONTEND_URL = env('FRONTEND_URL');
+            $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
+
+            $html = '<html>
+            Congratulations ' . $User->name . '!<br><br>
+            You have successfully registered on ' . env('APP_NAME') . '.
+            <br>
+            There is just one more step to go. Click on the link below to verify your account so you can start purchasing products on TeekIT today!  <br><br>
+                <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+                ' . $account_verification_link . '
+            <br><br><br>
+            For more information please visit https://teekit.co.uk/ 
+            If you have any further inquiries please email admin@teekit.co.uk
+            </html>';
+
+            Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $User) {
+                $message->to($request->email, $User->name)
+                    ->subject(env('APP_NAME') . ': Account Verification');
+            });
+            $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
+            return response()->json($response, 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
-        $User->user_img = $filename;
-        $User->save();
-
-        $User->roles()->sync($role->id);
-        $verification_code = Crypt::encrypt($User->email);
-
-        $FRONTEND_URL = env('FRONTEND_URL');
-        $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
-
-        $html = '<html>
-        Congratulations ' . $User->name . '!<br><br>
-        You have successfully registered on ' . env('APP_NAME') . '.
-        <br>
-        There is just one more step to go. Click on the link below to verify your account so you can start purchasing products on TeekIT today!  <br><br>
-            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
-            ' . $account_verification_link . '
-        <br><br><br>
-        For more information please visit https://teekit.co.uk/ 
-        If you have any further inquiries please email admin@teekit.co.uk
-        </html>';
-
-        Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $User) {
-            $message->to($request->email, $User->name)
-                ->subject(env('APP_NAME') . ': Account Verification');
-        });
-        $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
-        return response()->json($response, 200);
     }
     /**
      * Get a JWT via given credentials.

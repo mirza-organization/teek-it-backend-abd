@@ -746,10 +746,10 @@ class ProductsController extends Controller
                     if ($i == 0) {
                         $i++;
                         continue;
-                    };
+                    }; 
                     DB::statement('CREATE Temporary TABLE temp_products LIKE products');
                     $db = DB::statement('INSERT INTO `temp_products`( `user_id`, `category_id`,`product_name`, `sku`, `qty`, `price`, `featured`, `discount_percentage`, `contact`)VALUES (' . $request->store_id . ',' . $filedata[0] . ',' . $filedata[0] . ',' . $filedata[1] . ',3, ' . $filedata[2] . ',1,20,02083541500 )');
-                    DB::statement('UPDATE products,temp_products SET products.price = temp_products.price WHERE products.user_id=temp_products.user_id AND products.category_id = temp_products.category_id AND products.sku = temp_products.sku ');
+                    DB::statement('UPDATE products,temp_products SET products.price = temp_products.price WHERE products.user_id = temp_products.user_id AND products.category_id = temp_products.category_id AND products.sku = temp_products.sku');
                     DB::statement('DROP Temporary TABLE temp_products');
                 }
                 fclose($file);
