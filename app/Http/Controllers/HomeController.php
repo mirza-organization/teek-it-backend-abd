@@ -1411,7 +1411,6 @@ class HomeController extends Controller
             'phone' => 'required|string|min:13|max:13',
             'business_phone' => 'required|string|min:13|max:13',
         ]);
-        // $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
             return response()->json([
                 'errors' => $is_valid->errors()

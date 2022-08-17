@@ -675,7 +675,7 @@ class AuthController extends Controller
         }
     }
     /**
-     * It will delete user from users table
+     * It will delete user from users table by id
      * It will insert the deleted user data into 'Deleted_users' table
      * @version 1.0.0
      */
@@ -687,6 +687,8 @@ class AuthController extends Controller
                 DB::table('deleted_users')->insert([
                     'user_id' =>  $user->id,
                     'postcode' =>  $user->postcode,
+                    'created_at' =>   Carbon::now(),
+                    'updated_at' =>   Carbon::now(),
                 ]);
                 $user->delete();
                 return response()->json([
