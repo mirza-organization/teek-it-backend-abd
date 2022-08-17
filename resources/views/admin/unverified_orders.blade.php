@@ -46,7 +46,7 @@
                 <div class="card">
                     <div class="card-body p-2 pl-5 pr-5 pb-5">
                         <div class="p-2 mb-2">
-                            <input type="checkbox" class="select-checkbox" title="Select" id="{{$order->id}}">
+                            <input type="checkbox" class="select-checkbox" title="Select" id="{{$order->order_id}}">
                             Order #{{$order->order_id}}
                             @if($order->order_status=='pending')
                             <a href="{{route('accept_order',['order_id'=>$order->id])}}"
@@ -76,7 +76,7 @@
                                                 class="text-warning">{{$order->order_details->order_status}}</span>
                                         </div>
                                     </div>
-                                </div>
+                                </div> 
                                 <div class="col-md-2">
                                     <div class="row">
                                         <div class="col-md-12">
