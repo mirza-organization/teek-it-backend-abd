@@ -670,13 +670,14 @@ class HomeController extends Controller
                 $product->contact = $importData[10];
                 $product->colors = ($importData[11] == "null") ? NULL : $importData[11];
                 $product->bike = $importData[12];
-                $product->van = $importData[13];
+                $product->car = $importData[13];
+                $product->van = $importData[14];
                 $product->feature_img = $importData[18];
-                $product->height = $importData[14];
-                $product->width = $importData[15];
-                $product->length = $importData[16];
+                $product->height = $importData[15];
+                $product->width = $importData[16];
+                $product->length = $importData[17];
                 $product->save();
-
+                print_r($importData[18]); exit;
                 $product_images = new productImages();
                 $product_images->product_id = (int)$product->id;
                 $product_images->product_image = $importData[18];

@@ -216,7 +216,6 @@ class PromoCodesController extends Controller
                                     'data' => [
                                         $promo_codes,
                                         'store' => ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA'),
-
                                     ],
                                     'status' => true,
                                     'message' => config('constants.VALID_PROMOCODE')

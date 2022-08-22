@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\DeletedUsers;
 use App\Drivers;
 use App\Http\Controllers\ProductsController;
 use App\Products;
@@ -679,16 +680,16 @@ class AuthController extends Controller
      * It will insert the deleted user data into 'Deleted_users' table
      * @version 1.0.0
      */
-    public function userInfoDelete($user_id)
+    public function deleteUser($user_id)
     {
         try {
-            $user = User::find($user_id);
+            $user = User::find($user_id); 
             if (!empty($user)) {
                 DB::table('deleted_users')->insert([
                     'user_id' =>  $user->id,
                     'postcode' =>  $user->postcode,
                     'created_at' =>   Carbon::now(),
-                    'updated_at' =>   Carbon::now(),
+                    'updated_at' =>   Carbon::now()
                 ]);
                 $user->delete();
                 return response()->json([
