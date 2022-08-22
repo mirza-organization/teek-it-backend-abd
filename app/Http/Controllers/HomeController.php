@@ -621,9 +621,9 @@ class HomeController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
-            $extension = $file->getClientOriginalExtension(); //Get extension of uploaded file
-            $tempPath = $file->getRealPath();
-            $fileSize = $file->getSize(); //Get size of uploaded file in bytes
+            // $extension = $file->getClientOriginalExtension(); //Get extension of uploaded file
+            // $tempPath = $file->getRealPath();
+            // $fileSize = $file->getSize(); //Get size of uploaded file in bytes
 
             //Check for file extension and size
             // $this->checkUploadedFileProperties($extension, $fileSize);
@@ -677,7 +677,7 @@ class HomeController extends Controller
                 $product->width = $importData[16];
                 $product->length = $importData[17];
                 $product->save();
-                print_r($importData[18]); exit;
+
                 $product_images = new productImages();
                 $product_images->product_id = (int)$product->id;
                 $product_images->product_image = $importData[18];

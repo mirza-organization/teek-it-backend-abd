@@ -114,6 +114,10 @@ Route::group(['prefix' => 'notifications'], function ($router) {
 Route::group(['middleware' => ['jwt.verify']], function ($router) {
     Route::group(['prefix' => 'product'], function ($router) {
         Route::post('add', 'ProductsController@add');
+        // Route::post('add/bulk', function(){
+        //     return "hello";
+        // });
+        Route::post('add/bulk', 'ProductsController@importProductsAPI');
         Route::post('update/{product_id}', 'ProductsController@update');
         Route::post('update_price/bulk', 'ProductsController@updatePriceBulk');
         Route::get('delete/{product_id}', 'ProductsController@delete');
@@ -121,7 +125,6 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('ratings/add', 'RattingsController@add');
         Route::post('ratings/update', 'RattingsController@update');
         Route::get('ratings/delete/{ratting_id}', 'RattingsController@delete');
-        Route::get('userinfo/delete/{user_id}', 'HomeController@userInfoDelete');
     });
 
     Route::group(['prefix' => 'withdrawal'], function ($router) {

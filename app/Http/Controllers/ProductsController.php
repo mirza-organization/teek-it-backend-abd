@@ -22,75 +22,11 @@ use Crypt;
 use Hash;
 use Mail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
-use Validator;
 
 class ProductsController extends Controller
 {
-    //    /**
-    //     * Display a listing of the resource.
-    //     *
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function index()
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
-    //     * Show the form for creating a new resource.
-    //     *
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function create()
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
-    //     * Store a newly created resource in storage.
-    //     *
-    //     * @param  \Illuminate\Http\Request  $request
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function store(Request $request)
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
-    //     * Display the specified resource.
-    //     *
-    //     * @param  \App\Products  $products
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function show(Products $products)
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
-    //     * Update the specified resource in storage.
-    //     *
-    //     * @param  \Illuminate\Http\Request  $request
-    //     * @param  \App\Products  $products
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function update(Request $request, Products $products)
-    //    {
-    //        //
-    //    }
-    //
-    //    /**
-    //     * Remove the specified resource from storage.
-    //     *
-    //     * @param  \App\Products  $products
-    //     * @return \Illuminate\Http\Response
-    //     */
-    //    public function destroy(Products $products)
-    //    {
-    //        //
-    //    }
     public function add(Request $request)
     {
         $validate = Products::validator($request);
@@ -138,6 +74,107 @@ class ProductsController extends Controller
             'status' => true,
             'message' => config('constants.DATA_INSERTION_SUCCESS')
         ], 200);
+    }
+    /**
+     * Upload's bulk products
+     * This function belongs to import products API
+     * This is the replice of import products WEB URL
+     * @version 1.0.0
+     */
+    public function importProductsAPI(Request $request)
+    {
+        try {
+            $validatedData = Validator::make($request->all(), [
+                'file' => 'required|file',
+                'store_id' => 'required|integer'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' =>  $validatedData->errors()
+                ], 422);
+            }
+            $user_id = $request->store_id; 
+            $file = $request->file('file');
+            $filename = $file->getClientOriginalName();
+            // $extension = $file->getClientOriginalExtension(); //Get extension of uploaded file
+            // $tempPath = $file->getRealPath();
+            // $fileSize = $file->getSize(); //Get size of uploaded file in bytes
+
+            //Check for file extension and size
+            // $this->checkUploadedFileProperties($extension, $fileSize);
+
+            //Where uploaded file will be stored on the server 
+            $location = public_path('upload/csv');
+            // Upload file
+            $file->move($location, $filename);
+            // In case the uploaded file path is to be stored in the database 
+            $filepath = $location . "/" . $filename;
+            // Reading file
+            $file = fopen($filepath, "r");
+            // Read through the file and store the contents as an array
+            $importData_arr = array();
+            $i = 0;
+            //Read the contents of the uploaded file 
+            while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
+                $num = count($filedata);
+                // Skip first row (Remove below comment if you want to skip the first row)
+                if ($i == 0) {
+                    $i++;
+                    continue;
+                }
+                for ($c = 0; $c < $num; $c++) {
+                    $importData_arr[$i][] = $filedata[$c];
+                }
+                $i++;
+            }
+            fclose($file); //Close after reading
+            $j = 0;
+            foreach ($importData_arr as $importData) {
+                $product = new Products();
+                $product->user_id = $user_id;
+                $product->category_id = $importData[0];
+                $product->product_name = $importData[1];
+                $product->sku = $importData[2];
+                $product->qty = ($importData[3] == "") ? 0 : $importData[3];
+                $product->price = str_replace(',', '', $importData[4]);
+                $product->discount_percentage = ($importData[5] == "") ? 0 : $importData[5];
+                $product->weight = $importData[6];
+                $product->brand = $importData[7];
+                $product->size = ($importData[8] == "null") ? NULL : $importData[8];
+                $product->status = $importData[9];
+                $product->contact = $importData[10];
+                $product->colors = ($importData[11] == "null") ? NULL : $importData[11];
+                $product->bike = $importData[12];
+                $product->car = $importData[13];
+                $product->van = $importData[14];
+                $product->feature_img = $importData[18];
+                $product->height = $importData[15];
+                $product->width = $importData[16];
+                $product->length = $importData[17];
+                $product->save();
+
+                $product_images = new productImages();
+                $product_images->product_id = (int)$product->id;
+                $product_images->product_image = $importData[18];
+                $product_images->save();
+
+                $j++;
+            }
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' =>  config('constants.DATA_INSERTION_SUCCESS')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
