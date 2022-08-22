@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class RattingsController extends Controller
 {
@@ -127,11 +128,32 @@ class RattingsController extends Controller
 
     public function delete($ratting_id)
     {
-        Rattings::find($ratting_id)->delete();
-        return (new ProductsController)->all();
+        try {
+            $delete_rating =  Rattings::find($ratting_id);
+            if ($delete_rating) {
+                $delete_rating->delete();
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.ITEM_DELETED'),
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+            // return (new ProductsController)->all();
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
     }
-
-
 
 
 

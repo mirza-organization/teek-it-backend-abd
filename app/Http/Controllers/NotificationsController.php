@@ -133,7 +133,7 @@ class NotificationsController extends Controller
             } else {
                 return response()->json([
                     'data' => [],
-                    'status' => true,
+                    'status' => false,
                     'message' => config('constants.NO_RECORD')
                 ], 200);
             }
@@ -143,7 +143,7 @@ class NotificationsController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
 

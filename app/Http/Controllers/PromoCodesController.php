@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Orders;
 use App\PromoCodes;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -208,11 +209,15 @@ class PromoCodesController extends Controller
                     if (!empty($promo_codes[0]->order_number)) {
                         $orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $orders_count + 1) {
-                            $usage_limit = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->pluck('usage_limit');
-                            if ($usage_limit[0] >= 1) {
-                                PromoCodes::where('promo_code', '=', $request->promo_code)->update(['usage_limit' => DB::raw('GREATEST(usage_limit - 1, 0)')]);
+                            //below query will pass required data to two of our helper functions down below validate function
+                            $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
+                            if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
                                 return response()->json([
-                                    'data' => $promo_codes,
+                                    'data' => [
+                                        $promo_codes,
+                                        'store' => ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA'),
+
+                                    ],
                                     'status' => true,
                                     'message' => config('constants.VALID_PROMOCODE')
                                 ], 200);
@@ -251,6 +256,47 @@ class PromoCodesController extends Controller
                 'status' => false,
                 'message' => $error
             ], 500);
+        }
+    }
+    /**
+     * function will return boolean values i.e 1 = true, 0 = false
+     */
+    public function promoCodeUsageLimit($promo_code_data)
+    {
+        $status = 1;
+        $stores = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::user()->id)->first();
+        if (empty($stores)) {
+            DB::table('promo_codes_usage_limit')->insert([
+                'user_id' => Auth::user()->id,
+                'promo_code_id' =>  $promo_code_data->id,
+                'total_used' => 1,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+            $status = 1;
+        } else {
+            if ($stores->total_used < $promo_code_data->usage_limit) {
+                DB::table('promo_codes_usage_limit')->where('promo_code_id', '=', $promo_code_data->id)->increment('total_used', 1);
+                $status = 1;
+            } else {
+                $status = 0;
+            }
+        }
+        return $status;
+    }
+    /**
+     * function will check if promo code belongs to a specific store
+     */
+    public function ifPromoCodeBelongsToStore($promo_code_data)
+    {
+        $store = User::where('id', $promo_code_data->store_id)->first();
+        if (empty($store)) {
+        } else {
+            return  $data = [
+                'id' => $store->id,
+                'name' => $store->business_name,
+                'discount' => $promo_code_data->discount,
+            ];
         }
     }
 }
