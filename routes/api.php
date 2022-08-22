@@ -114,9 +114,6 @@ Route::group(['prefix' => 'notifications'], function ($router) {
 Route::group(['middleware' => ['jwt.verify']], function ($router) {
     Route::group(['prefix' => 'product'], function ($router) {
         Route::post('add', 'ProductsController@add');
-        // Route::post('add/bulk', function(){
-        //     return "hello";
-        // });
         Route::post('add/bulk', 'ProductsController@importProductsAPI');
         Route::post('update/{product_id}', 'ProductsController@update');
         Route::post('update_price/bulk', 'ProductsController@updatePriceBulk');
