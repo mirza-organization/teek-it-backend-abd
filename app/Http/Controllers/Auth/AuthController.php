@@ -713,7 +713,8 @@ class AuthController extends Controller
         }
     }
     /**
-     * Social Login
+     * Google register
+     * @version 1.0.0
      */
     public function registerGoogle(Request $request)
     {
@@ -721,7 +722,9 @@ class AuthController extends Controller
             $validator = \Validator::make($request->all(), [
                 'name' => 'required|string',
                 'l_name' => 'required|string',
-                'email' => 'required|email',
+                'email' => 'required|string|email|max:255|unique:users',
+                'role' => 'required|string|max:255',
+
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -740,12 +743,40 @@ class AuthController extends Controller
                 'postcode' => $request->postcode,
                 'contact' => $request->contact,
             ]);
+            $user->roles()->sync(3);
             $user = User::where('email', '=', $user->email)->first();
+            $seller_info = [];
+            $seller_info = User::find($user->seller_id);
+            $data_info = array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'l_name' => $user->l_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'address_1' => $user->address_1,
+                'address_2' => $user->address_2,
+                'postal_code' => $user->postal_code,
+                'business_name' => $user->business_name,
+                'business_phone' => $user->business_phone,
+                'business_location' => $user->business_location,
+                'business_hours' => $user->business_hours,
+                'bank_details' => $user->bank_details,
+                'user_img' => $user->user_img,
+                'pending_withdraw' => $user->pending_withdraw,
+                'total_withdraw' => $user->total_withdraw,
+                'is_online' => $user->is_online,
+                'last_login' => $user->last_login,
+                'seller_info' => $this->get_seller_info($seller_info),
+                'roles' => $user->roles->pluck('name'),
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            );
             $token = JWTAuth::fromUser($user);
             return response()->json([
                 'data' => [
-                    'user' => $user,
-                    'token' => $token,
+                    'user' => $data_info,
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
                 ],
                 'status' => true,
                 'message' => config('constants.REGISTER_SUCCESS'),
@@ -759,11 +790,15 @@ class AuthController extends Controller
             ], 500);
         }
     }
+    /**
+     * Google login via email
+     * @version 1.0.0
+     */
     public function loginGoogle(Request $request)
     {
         try {
             $validator = \Validator::make($request->all(), [
-                'email' => 'required|email',
+                'email' => 'required|string|email|max:255',
             ]);
             if ($validator->fails()) {
                 return response()->json([
@@ -773,6 +808,31 @@ class AuthController extends Controller
                 ], 422);
             }
             $user = User::where('email', '=', $request->email)->first();
+            $seller_info = [];
+            $seller_info = User::find($user->seller_id);
+            $data_info = array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'l_name' => $user->l_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'address_1' => $user->address_1,
+                'address_2' => $user->address_2,
+                'postal_code' => $user->postal_code,
+                'business_name' => $user->business_name,
+                'business_phone' => $user->business_phone,
+                'business_location' => $user->business_location,
+                'business_hours' => $user->business_hours,
+                'bank_details' => $user->bank_details,
+                'user_img' => $user->user_img,
+                'pending_withdraw' => $user->pending_withdraw,
+                'total_withdraw' => $user->total_withdraw,
+                'is_online' => $user->is_online,
+                'last_login' => $user->last_login,
+                'seller_info' => $this->get_seller_info($seller_info),
+                'roles' => $user->roles->pluck('name'),
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            );
             if (!$user) {
                 return response()->json([
                     'data' => [],
@@ -783,8 +843,10 @@ class AuthController extends Controller
             $token = JWTAuth::fromUser($user);
             return response()->json([
                 'data' => [
-                    'user_id' => $user->id,
-                    'token' => $token,
+                    'user_id' => $data_info,
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
                 ],
                 'status' => true,
                 'message' =>   config('constants.LOGIN_SUCCESS'),
