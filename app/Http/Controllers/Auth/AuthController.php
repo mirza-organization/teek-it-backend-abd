@@ -36,7 +36,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'sellerProducts', 'searchSellerProducts']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'sellerProducts', 'searchSellerProducts', 'loginGoogle', 'registerGoogle']]);
     }
     /**
      * Register For Mobile App
@@ -683,7 +683,7 @@ class AuthController extends Controller
     public function deleteUser($user_id)
     {
         try {
-            $user = User::find($user_id); 
+            $user = User::find($user_id);
             if (!empty($user)) {
                 DB::table('deleted_users')->insert([
                     'user_id' =>  $user->id,
@@ -702,6 +702,92 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => config('constants.NO_RECORD')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+     * Social Login
+     */
+    public function registerGoogle(Request $request)
+    {
+        try {
+            $validator = \Validator::make($request->all(), [
+                'name' => 'required|string',
+                'l_name' => 'required|string',
+                'email' => 'required|email',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'data' => $validator->errors(),
+                    'status' => false,
+                    'message' => ""
+                ], 422);
+            }
+            $user = User::create([
+                'name' => $request->name,
+                'l_name' => $request->l_name,
+                'email' => $request->email,
+                'address_1' => $request->address_1,
+                'lat' => $request->lat,
+                'lon' => $request->lon,
+                'postcode' => $request->postcode,
+                'contact' => $request->contact,
+            ]);
+            $user = User::where('email', '=', $user->email)->first();
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'data' => [
+                    'user' => $user,
+                    'token' => $token,
+                ],
+                'status' => true,
+                'message' => config('constants.REGISTER_SUCCESS'),
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    public function loginGoogle(Request $request)
+    {
+        try {
+            $validator = \Validator::make($request->all(), [
+                'email' => 'required|email',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'data' => $validator->errors(),
+                    'status' => false,
+                    'message' => ""
+                ], 422);
+            }
+            $user = User::where('email', '=', $request->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' =>  config('constants.INVALID_CREDENTIALS')
+                ], 401);
+            }
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'data' => [
+                    'user_id' => $user->id,
+                    'token' => $token,
+                ],
+                'status' => true,
+                'message' =>   config('constants.LOGIN_SUCCESS'),
             ], 200);
         } catch (Throwable $error) {
             report($error);

@@ -2,6 +2,7 @@
 
 return [
     'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
+    'REGISTER_SUCCESS' => 'You have Registered  Successfully.',
 
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',

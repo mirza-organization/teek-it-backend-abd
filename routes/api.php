@@ -26,6 +26,8 @@ Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');
 Route::get('auth/verify', 'Auth\AuthController@verify');
+Route::post('auth/register_google', 'Auth\AuthController@registerGoogle');
+Route::post('auth/login_google', 'Auth\AuthController@loginGoogle');
 /*
 |--------------------------------------------------------------------------
 | Authentication API Routes
