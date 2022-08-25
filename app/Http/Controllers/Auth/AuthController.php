@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
-use Validator;
 
 class AuthController extends Controller
 {
@@ -558,6 +558,7 @@ class AuthController extends Controller
         try {
             $user = User::find($seller_id);
             $data = [];
+            // sabretooth
             if ($user->hasRole('seller')) {
                 $products = Products::query()
                     ->where('user_id', '=', $user->id)
@@ -680,10 +681,20 @@ class AuthController extends Controller
      * It will insert the deleted user data into 'Deleted_users' table
      * @version 1.0.0
      */
-    public function deleteUser($user_id)
+    public function deleteUser(Request $request)
     {
         try {
-            $user = User::find($user_id);
+            $validatedData = Validator::make($request->all(), [
+                'user_id' => 'required|integer'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validatedData->errors()
+                ], 422);
+            }
+            $user = User::find($request->user_id);
             if (!empty($user)) {
                 DB::table('deleted_users')->insert([
                     'user_id' =>  $user->id,
@@ -808,6 +819,13 @@ class AuthController extends Controller
                 ], 422);
             }
             $user = User::where('email', '=', $request->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' =>  config('constants.INVALID_CREDENTIALS')
+                ], 401);
+            }
             $seller_info = [];
             $seller_info = User::find($user->seller_id);
             $data_info = array(
@@ -833,13 +851,6 @@ class AuthController extends Controller
                 'roles' => $user->roles->pluck('name'),
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
             );
-            if (!$user) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' =>  config('constants.INVALID_CREDENTIALS')
-                ], 401);
-            }
             $token = JWTAuth::fromUser($user);
             return response()->json([
                 'data' => [

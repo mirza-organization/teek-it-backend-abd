@@ -43,7 +43,7 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('me', 'Auth\AuthController@me');
     Route::get('delivery_boys', 'Auth\AuthController@deliveryBoys');
     Route::get('get_user/{user_id}', 'Auth\AuthController@getDeliveryBoyInfo');
-    Route::get('user/delete/{user_id}', 'Auth\AuthController@deleteUser');
+    Route::post('user/delete', 'Auth\AuthController@deleteUser');
 });
 /*
 |--------------------------------------------------------------------------
