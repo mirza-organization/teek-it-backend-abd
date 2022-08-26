@@ -551,19 +551,22 @@ class AuthController extends Controller
     /**
      * Search products w.r.t Seller/Store 'id' & Product Name
      * @author Mirza Abdullah Izhar
-     * @version 1.2.0
+     * @version 1.3.0
      */
     public function searchSellerProducts($seller_id, $product_name)
     {
         try {
             $user = User::find($seller_id);
             $data = [];
-            // sabretooth
             if ($user->hasRole('seller')) {
-                $products = Products::query()
-                    ->where('user_id', '=', $user->id)
-                    ->where('status', '=', 1)
-                    ->where('product_name', 'LIKE', '%' . $product_name . '%')->paginate();
+                $keywords = explode(" ", $product_name);
+                $article = Products::query();
+                foreach ($keywords as $word) {
+                    $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $product_name . '%');
+                }
+                $article->Where('user_id', '=', $user->id);
+                $article->Where('status', '=', 1);
+                $products = $article->paginate(30);
                 $pagination = $products->toArray();
                 if (!$products->isEmpty()) {
                     foreach ($products as $product) {
