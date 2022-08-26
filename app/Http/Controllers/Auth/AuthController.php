@@ -562,11 +562,11 @@ class AuthController extends Controller
                 $keywords = explode(" ", $product_name);
                 $article = Products::query();
                 foreach ($keywords as $word) {
-                    $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $product_name . '%');
+                    $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $product_name . '%')
+                    ->where('user_id', '=', $user->id)
+                    ->where('status', '=', 1);
                 }
-                $article->Where('user_id', '=', $user->id);
-                $article->Where('status', '=', 1);
-                $products = $article->paginate(30);
+                $products = $article->paginate(20);
                 $pagination = $products->toArray();
                 if (!$products->isEmpty()) {
                     foreach ($products as $product) {
