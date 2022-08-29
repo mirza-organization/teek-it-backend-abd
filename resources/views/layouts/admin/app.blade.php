@@ -610,6 +610,62 @@
             });
         }
     }
+
+    function updateStoreInfo() {
+
+        let name = $('#name').val();
+        let id = $('#id').val();
+        let business_name = $('#business_name').val();
+        let phone = $('#phone').val();
+        let business_phone = $('#business_phone').val();
+        let store_image = $('#store_image').val();
+
+
+        $.ajax({
+            url: "{{route('admin.image.update')}}",
+            type: "post",
+
+            data: {
+                _token: "{{ csrf_token() }}",
+                name: name,
+                id: id,
+                phone: phone,
+                business_name: business_name,
+                business_phone: business_phone,
+                store_image: store_image,
+            },
+            success: function(response) {
+                if (response == "Data Saved") {
+                    Swal.fire({
+                            title: 'Success!',
+                            text: 'Data has been updated successfully',
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        })
+                        .then(function() {
+                            location.reload();
+                        });
+                } else {
+                    $('.error').html('');
+                    if (response.errors.name) {
+                        $('.name').html(response.errors.name[0]);
+                    }
+                    if (response.errors.business_name) {
+                        $('.business_name').html(response.errors.business_name[0]);
+                    }
+                    if (response.errors.phone) {
+                        $('.phone').html(response.errors.phone[0]);
+                    }
+                    if (response.errors.business_phone) {
+                        $('.business_phone').html(response.errors.business_phone[0]);
+                    }
+                    if (response.errors.store_image) {
+                        $('.store_image').html(response.errors.store_image[0]);
+                    }
+                }
+            }
+        });
+    }
     </script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>

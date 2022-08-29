@@ -25,6 +25,7 @@
 <!-- /.content-header -->
 
 <!-- Main content -->
+<!-- {{route('admin.image.update',['id'=>$user->id])}} -->
 <div class="content">
     <div class="container-fluid">
         <div class="row">
@@ -38,8 +39,7 @@
                                         aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
-                                                <form method="post"
-                                                    action="{{route('admin.image.update',['id'=>$user->id])}}"
+                                                <form id="user_info" onsubmit="return false"
                                                     enctype="multipart/form-data">
                                                     {{csrf_field()}}
                                                     <div class="modal-header">
@@ -54,21 +54,93 @@
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
+                                                        <div class="form-group">
+
+                                                            <input type="hidden" id="id" class="form-control"
+                                                                value="{{$user->id}}">
+                                                        </div>
                                                         <div class="row">
-                                                            <div class="col-md-12">
+                                                            <div class="col-md-6">
                                                                 <div class="form-group">
-                                                                    <label for="">Change Image</label>
-                                                                    <input type="file" name="store_image"
-                                                                        class="form-control" value="" required
-                                                                        accept="image/x-png,image/jpeg,image/jpg">
+                                                                    <label for="">Name</label>
+                                                                    <input type="text" name="name" id="name"
+                                                                        class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                                                                        value="{{$user->name}}">
+                                                                    @if ($errors->has('name'))
+                                                                    <span class="invalid-feedback" role="alert">
+                                                                        <strong>{{ $errors->first('name') }}</strong>
+                                                                    </span>
+                                                                    @endif
+                                                                    <p id="name" class="text-danger name error"></p>
                                                                 </div>
                                                             </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="">Business Name</label>
+                                                                    <input type="tel" name="business_name"
+                                                                        id="business_name" class="form-control"
+                                                                        value="{{$user->business_name}}" required>
+                                                                    <p id="business_name"
+                                                                        class="text-danger business_name error"></p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="">Phone</label>
+                                                                    <div class="row ">
+                                                                        <span class="input-group-text">+44</span>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" class="form-control"
+                                                                                id="phone" name="phone"
+                                                                                value="{{$user->phone}}">
+
+
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <p id="phone" class="text-danger phone error">
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="">Business Phone</label>
+                                                                    <div class="row ">
+                                                                        <span class="input-group-text">+44</span>
+                                                                        <div class="col-md-8">
+                                                                            <input type="text" class="form-control"
+                                                                                id="business_phone"
+                                                                                name="business_phone"
+                                                                                value="{{$user->business_phone}}">
+                                                                        </div>
+                                                                    </div>
+                                                                    <p id="business_phone"
+                                                                        class="text-danger business_phone error"></p>
+
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label for="">Image</label>
+                                                                    <input type="file" name="store_image"
+                                                                        id="store_image" class="form-control" value=""
+                                                                        accept="image/x-png,image/jpeg,image/jpg">
+
+                                                                </div>
+                                                                <p id="store_image"
+                                                                    class="text-danger store_image error">
+                                                                </p>
+                                                            </div>
+
+
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer hidden ">
                                                         <button type="button" class="btn btn-secondary"
                                                             data-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-primary">Save
+                                                        <button type="submit" id="user_info_update"
+                                                            onclick="updateStoreInfo()" class="btn btn-primary">Save
                                                             changes</button>
                                                     </div>
                                                 </form>

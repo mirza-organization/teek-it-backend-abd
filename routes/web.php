@@ -119,7 +119,7 @@ Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndR
 Route::post('/update_pages', 'HomeController@updatePages')->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', 'HomeController@changeUserStatus')->name('change_user_status');
 Route::get('/users_del', 'HomeController@adminUsersDel')->name('admin.del.users');
-Route::post('/store_image/{id}/update', 'HomeController@updateStoreImage')->name('admin.image.update');
+Route::post('/store_info/update', 'HomeController@updateStoreInfo')->name('admin.image.update');
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route

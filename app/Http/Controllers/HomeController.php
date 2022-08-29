@@ -1363,36 +1363,63 @@ class HomeController extends Controller
     }
 
     /**
-     * it will update the store image via popup modal
+     * it will update the store info via popup modal
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.2.0
      */
-    public function updateStoreImage(Request $request, $id)
+    public function updateStoreInfo(Request $request)
     {
         // try {
+
         $validatedData = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'business_name' => 'required|string',
+            'phone' => 'required|max:13',
+            'business_phone' => 'required|max:13',
             'store_image' => 'required',
         ]);
+
         if ($validatedData->fails()) {
-            flash('Error in updating the image because a required field is missing or invalid data.')->error();
-            return Redirect::back()->withInput($request->input());
+            return response()->json([
+                'errors' => $validatedData->errors()
+            ], 200);
+            exit;
         }
-        $store_image = User::find($id);
+        $data = $request->all();
+        $phone = substr($request->phone, 0, 3);
+        $business_phone = substr($request->business_phone, 0, 3);
+        $store_info = User::find($request->id);
+        $filename = '';
         if ($request->hasFile('store_image')) {
             $file = $request->file('store_image');
-            $filename = uniqid($store_image->id . '_' . $store_image->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+            $filename = uniqid($store_info->id . "_" . $store_info->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($filename, File::get($file));
             if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                info("file is stored successfully : " . $filename);
-                // $filename = "/user_imgs/" . $filename;
-            } else {
-                info("file is not found :- " . $filename);
+                if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                    info("file is store successfully : " . $filename);
+                } else {
+                    info("file is not found :- " . $filename);
+                }
             }
         }
-        $store_image->user_img = $filename;
-        $store_image->save();
-        flash('Store Image Successfully Updated')->success();
-        return Redirect::back();
+        // $filename = $data['store_image'];
+        if ($phone == '+44') {
+            $store_info->phone = $request->phone;
+        } else {
+            $store_info->phone = '+44' . $request->phone;
+        }
+        if ($business_phone == '+44') {
+            $store_info->business_phone = $request->business_phone;
+        } else {
+            $store_info->business_phone = '+44' . $request->business_phone;
+        }
+        $store_info->name = $request->name;
+        $store_info->business_name = $request->business_name;
+        $store_info->user_img = $filename;
+        $store_info->save();
+        if ($store_info) {
+            echo 'Data Saved';
+        }
         // } catch (Throwable $error) {
         //     report($error);
         //     flash('Failed to update store image due to some internal error.')->error();
