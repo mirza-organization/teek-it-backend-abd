@@ -39,7 +39,6 @@ class PromoCodesController extends Controller
      */
     public function promocodesAdd(Request $request)
     {
-
         try {
             $validatedData = Validator::make($request->all(), [
                 'promo_code' => 'required|string|unique:promo_codes|max:20',
