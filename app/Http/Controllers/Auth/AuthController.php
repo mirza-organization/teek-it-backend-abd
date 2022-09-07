@@ -163,8 +163,8 @@ class AuthController extends Controller
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => $validate->messages()
-            ], 400);
+                'message' => $validate->errors()
+            ], 422);
         }
 
         $token = $request->token;
@@ -218,8 +218,8 @@ class AuthController extends Controller
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' =>  $validate->messages()
-            ], 400);
+                'message' =>  $validate->errors()
+            ], 422);
         }
 
         $User = JWTAuth::user();
@@ -742,9 +742,9 @@ class AuthController extends Controller
             ]);
             if ($validator->fails()) {
                 return response()->json([
-                    'data' => $validator->errors(),
+                    'data' => [],
                     'status' => false,
-                    'message' => ""
+                    'message' => $validator->errors()
                 ], 422);
             }
             $user = User::create([
@@ -816,9 +816,9 @@ class AuthController extends Controller
             ]);
             if ($validator->fails()) {
                 return response()->json([
-                    'data' => $validator->errors(),
+                    'data' => [],
                     'status' => false,
-                    'message' => ""
+                    'message' => $validator->errors()
                 ], 422);
             }
             $user = User::where('email', '=', $request->email)->first();
