@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\OrdersController;
 use App\Categories;
+use App\Http\Controllers\Api\v1\OrderController;
 use App\productImages;
 use App\Products;
 use App\Rattings;
@@ -23,6 +25,7 @@ use Hash;
 use Mail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
+use Stripe\Product;
 use Throwable;
 
 class ProductsController extends Controller
@@ -620,7 +623,7 @@ class ProductsController extends Controller
     /**
      * It searches all products with w.r.t all given filters
      * @author Mirza Abdullah Izhar
-     * @version 1.4.0
+     * @version 1.5.0
      */
     public function search(Request $request)
     {
@@ -635,20 +638,27 @@ class ProductsController extends Controller
                     'message' =>  $validate->errors()
                 ], 422);
             }
+            $user_lat = $request->lat;
+            $user_lon = $request->lon;
+            $miles = $request->miles;
+            if (isset($miles)) {
+                $store_ids =  $this->searchWrtNearByStores($user_lat, $user_lon,  $miles);
+            }
             $keywords = explode(" ", $request->product_name);
             $article = Products::query();
             foreach ($keywords as $word) {
                 $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
                     ->where('status', '=', 1);
-                if(isset($request->store_id)) $article->where('user_id', '=', $request->store_id);
-                if(isset($request->category_id)) $article->where('category_id', '=', $request->category_id);
-                if(isset($request->min_price) && !isset($request->max_price)) $article->where('price', '>=', $request->min_price);
-                if(!isset($request->min_price) && isset($request->max_price)) $article->where('price', '<=', $request->max_price);
-                if(isset($request->min_price) && isset($request->max_price)) $article->whereBetween('price', [$request->min_price, $request->max_price]);
-                if(isset($request->weight)) $article->where('weight', '=', $request->weight);
-                if(isset($request->brand)) $article->where('brand', '=', $request->brand);
+                if (isset($ids)) $article->whereIn('user_id', $store_ids);
+                if (isset($request->category_id)) $article->where('category_id', '=', $request->category_id);
+                if (isset($request->store_id)) $article->where('user_id', '=', $request->store_id);
+                if (isset($request->min_price) && !isset($request->max_price)) $article->where('price', '>=', $request->min_price);
+                if (!isset($request->min_price) && isset($request->max_price)) $article->where('price', '<=', $request->max_price);
+                if (isset($request->min_price) && isset($request->max_price)) $article->whereBetween('price', [$request->min_price, $request->max_price]);
+                if (isset($request->weight)) $article->where('weight', '=', $request->weight);
+                if (isset($request->brand)) $article->where('brand', '=', $request->brand);
             }
-            $products = $article->paginate(10);
+            $products = $article->paginate(100);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 $products_data = [];
@@ -678,7 +688,30 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-
+    /**
+     * It takes lat,lon  from user and store,converts them into distaance
+     * and gives all store ids within given miles
+     */
+    public function searchWrtNearByStores($user_lat, $user_lon, $miles)
+    {
+        $radius =  3958.8;
+        $store_data = DB::table('users AS user')->selectRaw("*,
+            (  3961 * acos( cos( radians(" . $user_lat . ") ) *
+            cos( radians(user.lat) ) *
+            cos( radians(user.lon) - radians(" . $user_lon . ") ) + 
+            sin( radians(" . $user_lat . ") ) *
+            sin( radians(user.lat) ) ) ) 
+            AS distance")
+            ->having("distance", "<", $radius)
+            ->orderBy("distance")
+            ->get();
+        foreach ($store_data as $data) {
+            if ($data->distance <= $miles) {
+                $store_ids[] = $data->id;
+            }
+        }
+        return ($store_ids);
+    }
     // public function search(Request $request)
     // {
     //     try {

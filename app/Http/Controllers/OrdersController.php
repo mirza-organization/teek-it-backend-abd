@@ -656,6 +656,7 @@ class OrdersController extends Controller
 
     public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
+
         $address1 = $latitude1 . ',' . $longitude1;
         $address2 = $latitude2 . ',' . $longitude2;
 
@@ -670,6 +671,7 @@ class OrdersController extends Controller
 
         $miles = (int)$distanceString[0] * 0.621371;
         // return $miles > 1 ? $miles : 1;
+
         return $miles;
     }
     /**
