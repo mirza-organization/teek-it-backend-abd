@@ -649,7 +649,7 @@ class ProductsController extends Controller
             foreach ($keywords as $word) {
                 $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
                     ->where('status', '=', 1);
-                if (isset($ids)) $article->whereIn('user_id', $store_ids);
+                if (isset($store_ids)) $article->whereIn('user_id', $store_ids);
                 if (isset($request->category_id)) $article->where('category_id', '=', $request->category_id);
                 if (isset($request->store_id)) $article->where('user_id', '=', $request->store_id);
                 if (isset($request->min_price) && !isset($request->max_price)) $article->where('price', '>=', $request->min_price);
