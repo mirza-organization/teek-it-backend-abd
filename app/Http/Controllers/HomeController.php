@@ -1467,4 +1467,16 @@ class HomeController extends Controller
         Mail::to(config('constants.ADMIN_EMAIL'))
             ->send(new StoreRegisterMail($html, $subject));
     }
+    /**
+     * it will update the unverified orders to verified
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function clickToVerify($order_id)
+    {
+        VerificationCodes::where('order_id', $order_id)
+            ->update(['code->driver_failed_to_enter_code' => 'No']);
+        flash('Order Verified Successfully')->success();
+        return Redirect::back();
+    }
 }

@@ -64,7 +64,7 @@
                         </div>
                         <div class="card-text">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <p>
                                         Placed on {{$order->order_details->created_at}}
                                     </p>
@@ -76,13 +76,21 @@
                                                 class="text-warning">{{$order->order_details->order_status}}</span>
                                         </div>
                                     </div>
-                                </div> 
+                                </div>
                                 <div class="col-md-2">
                                     <div class="row">
                                         <div class="col-md-12">
                                             <i class="far fa-times-circle text-danger"></i>
                                             <span class="text-danger">Unverified</span>
                                         </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="row">
+                                        <a href="{{route('verify_order',['order_id'=>$order->order_id])}}"
+                                            class="d-block btn btn-success float-right" onclick="clickToVerify(event)"
+                                            style="margin-right: 20px">Click To
+                                            Verify</a>
                                     </div>
                                 </div>
                             </div>
@@ -152,10 +160,28 @@
 function cancelOrder(ev) {
     ev.preventDefault();
     var urlToRedirect = ev.currentTarget.getAttribute(
-    'href'); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
+        'href'
+    ); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
     Swal.fire({
         title: 'Warning!',
         text: 'Are you sure want to cancel this order?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes'
+    }).then((result) => {
+        if (result.isConfirmed)
+            window.location.href = urlToRedirect
+    });
+}
+
+function clickToVerify(ev) {
+    ev.preventDefault();
+    var urlToRedirect = ev.currentTarget.getAttribute(
+        'href'
+    ); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
+    Swal.fire({
+        title: 'Warning!',
+        text: 'Are you sure want to verify this order?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes'
