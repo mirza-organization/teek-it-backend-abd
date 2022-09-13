@@ -638,9 +638,12 @@ class ProductsController extends Controller
                     'message' =>  $validate->errors()
                 ], 422);
             }
+
             $user_lat = $request->lat;
             $user_lon = $request->lon;
             $miles = $request->miles;
+
+            // Use other controller's method in this controller's method
             if (isset($miles)) {
                 $store_ids =  $this->searchWrtNearByStores($user_lat, $user_lon,  $miles);
             }
@@ -703,13 +706,14 @@ class ProductsController extends Controller
             sin( radians(user.lat) ) ) ) 
             AS distance")
             ->having("distance", "<", $radius)
-            ->orderBy("distance")
+            ->orderBy("distance", "ASC")
             ->get();
         foreach ($store_data as $data) {
             if ($data->distance <= $miles) {
-                $store_ids[] = $data->id;
+                $store_ids[] = $data->distance;
             }
         }
+
         return ($store_ids);
     }
     // public function search(Request $request)

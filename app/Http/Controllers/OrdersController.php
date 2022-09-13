@@ -668,10 +668,8 @@ class OrdersController extends Controller
         $query = file_get_contents($url);
         $results = json_decode($query, true);
         $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
-
         $miles = (int)$distanceString[0] * 0.621371;
         // return $miles > 1 ? $miles : 1;
-
         return $miles;
     }
     /**

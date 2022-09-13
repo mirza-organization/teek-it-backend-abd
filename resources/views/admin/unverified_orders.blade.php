@@ -164,7 +164,7 @@ function cancelOrder(ev) {
     ); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
     Swal.fire({
         title: 'Warning!',
-        text: 'Are you sure want to cancel this order?',
+        text: 'Are you sure you want to cancel this order?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes'
@@ -181,7 +181,7 @@ function clickToVerify(ev) {
     ); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
     Swal.fire({
         title: 'Warning!',
-        text: 'Are you sure want to verify this order?',
+        text: 'Are you sure you want to verify this order?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes'
