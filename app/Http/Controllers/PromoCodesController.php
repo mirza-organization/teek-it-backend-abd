@@ -236,7 +236,7 @@ class PromoCodesController extends Controller
                         }
                     }
                     return response()->json([
-                        'data' => $promo_codes,
+                        'data' => $promo_codes[0],
                         'status' => true,
                         'message' => config('constants.VALID_PROMOCODE')
                     ], 200);

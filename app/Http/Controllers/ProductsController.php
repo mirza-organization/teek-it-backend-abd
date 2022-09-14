@@ -646,6 +646,7 @@ class ProductsController extends Controller
             // Use other controller's method in this controller's method
             if (isset($miles)) {
                 $store_ids =  $this->searchWrtNearByStores($user_lat, $user_lon,  $miles);
+                //dd($store_ids);
             }
             $keywords = explode(" ", $request->product_name);
             $article = Products::query();
@@ -697,6 +698,7 @@ class ProductsController extends Controller
      */
     public function searchWrtNearByStores($user_lat, $user_lon, $miles)
     {
+
         $radius =  3958.8;
         $store_data = DB::table('users AS user')->selectRaw("*,
             (  3961 * acos( cos( radians(" . $user_lat . ") ) *
@@ -710,11 +712,35 @@ class ProductsController extends Controller
             ->get();
         foreach ($store_data as $data) {
             if ($data->distance <= $miles) {
-                $store_ids[] = $data->distance;
+                $store_ids[] = $data->id;
+                $latitude2[] = $data->lat;
+                $longitude2[] = $data->lon;
             }
         }
-
-        return ($store_ids);
+        $pm = $this->getDistanceBetweenPointsNew($user_lat, $user_lon, $latitude2, $longitude2);
+        return [
+            'ids' => $store_ids,
+        ];
+    }
+    public function getDurationBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
+    {
+        $count = count($longitude2);
+        for ($i = 0; $i < $count; $i++) {
+            $address2 = $latitude2[$i] . ',' . $longitude2[$i];
+            $address1 = $latitude1 . ',' . $longitude1;
+            //  $address2 = $latitude2 . ',' . $longitude2;
+            $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+            $query = file_get_contents($url);
+            $results = json_decode($query, true);
+            $distanceString[] = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+            $durationString = explode(' ', $results['routes'][0]['legs'][0]['duration']['text']);
+            $miles[] = (int)$distanceString[0] * 0.621371;
+            $duration[] = implode(",", $durationString);
+        }
+        // Google Distance Matrix
+        // $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=".$latitude1.",".$longitude1."&destinations=".$latitude2.",".$longitude2."&mode=driving&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+        // return $miles > 1 ? $miles : 1;
+        return  $duration;
     }
     // public function search(Request $request)
     // {

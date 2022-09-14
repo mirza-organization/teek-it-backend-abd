@@ -653,10 +653,8 @@ class OrdersController extends Controller
         // $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
-
     public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
-
         $address1 = $latitude1 . ',' . $longitude1;
         $address2 = $latitude2 . ',' . $longitude2;
 
@@ -668,10 +666,12 @@ class OrdersController extends Controller
         $query = file_get_contents($url);
         $results = json_decode($query, true);
         $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+
         $miles = (int)$distanceString[0] * 0.621371;
         // return $miles > 1 ? $miles : 1;
         return $miles;
     }
+
     /**
      * This function will return back store open/close & product qty status
      * Along with this information it will also send store_id & product_id
