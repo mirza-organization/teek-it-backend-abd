@@ -642,18 +642,17 @@ class ProductsController extends Controller
             $user_lat = $request->lat;
             $user_lon = $request->lon;
             $miles = $request->miles;
-
-            // Use other controller's method in this controller's method
             if (isset($miles)) {
                 $store_ids =  $this->searchWrtNearByStores($user_lat, $user_lon,  $miles);
-                //dd($store_ids);
+                //dd($store_ids['time']);
             }
             $keywords = explode(" ", $request->product_name);
             $article = Products::query();
+
             foreach ($keywords as $word) {
                 $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
                     ->where('status', '=', 1);
-                if (isset($store_ids)) $article->whereIn('user_id', $store_ids);
+                if (isset($store_ids)) $article->whereIn('user_id', $store_ids['ids']);
                 if (isset($request->category_id)) $article->where('category_id', '=', $request->category_id);
                 if (isset($request->store_id)) $article->where('user_id', '=', $request->store_id);
                 if (isset($request->min_price) && !isset($request->max_price)) $article->where('price', '>=', $request->min_price);
@@ -662,7 +661,9 @@ class ProductsController extends Controller
                 if (isset($request->weight)) $article->where('weight', '=', $request->weight);
                 if (isset($request->brand)) $article->where('brand', '=', $request->brand);
             }
-            $products = $article->paginate(100);
+
+            $products = $article->paginate(10);
+
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 $products_data = [];
@@ -717,9 +718,10 @@ class ProductsController extends Controller
                 $longitude2[] = $data->lon;
             }
         }
-        $pm = $this->getDistanceBetweenPointsNew($user_lat, $user_lon, $latitude2, $longitude2);
+        $pm = $this->getDurationBetweenPointsNew($user_lat, $user_lon, $latitude2, $longitude2);
         return [
             'ids' => $store_ids,
+            'time' => $pm,
         ];
     }
     public function getDurationBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)

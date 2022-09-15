@@ -177,7 +177,7 @@ class PromoCodesController extends Controller
      * Validates either the given promo code is correct or not
      * It also checks that either the user is submitting this
      * Promo code for the right order number or not 
-     * @version 1.1.0
+     * @version 1.2.0
      */
     public function promocodesValidate(Request $request)
     {
@@ -211,7 +211,7 @@ class PromoCodesController extends Controller
                             //below query will pass required data to two of our helper functions down below validate function
                             $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
                             if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
-
+                                if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = 'NA');
                                 return response()->json([
                                     'data' => [
                                         'promo_code' => $promo_codes[0],
