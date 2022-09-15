@@ -687,17 +687,18 @@ class AuthController extends Controller
     public function deleteUser(Request $request)
     {
         try {
-            $validatedData = Validator::make($request->all(), [
-                'user_id' => 'required|integer'
-            ]);
-            if ($validatedData->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validatedData->errors()
-                ], 422);
-            }
-            $user = User::find($request->user_id);
+            // $validatedData = Validator::make($request->all(), [
+            //     'user_id' => 'required|integer'
+            // ]);
+            // if ($validatedData->fails()) {
+            //     return response()->json([
+            //         'data' => [],
+            //         'status' => false,
+            //         'message' => $validatedData->errors()
+            //     ], 422);
+            // } 
+            // $user = User::find($request->user_id);
+            $user = User::find(Auth::id());
             if (!empty($user)) {
                 DB::table('deleted_users')->insert([
                     'user_id' =>  $user->id,

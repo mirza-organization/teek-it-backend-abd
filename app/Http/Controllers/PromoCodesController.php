@@ -272,7 +272,7 @@ class PromoCodesController extends Controller
         $usage_limit = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::id())->first();
         if (empty($usage_limit)) {
             DB::table('promo_codes_usage_limit')->insert([
-                'user_id' => Auth::user()->id,
+                'user_id' => Auth::id(),
                 'promo_code_id' =>  $promo_code_data->id,
                 'total_used' => 1,
                 'created_at' => Carbon::now(),
