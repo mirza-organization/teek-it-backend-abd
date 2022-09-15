@@ -638,7 +638,6 @@ class ProductsController extends Controller
                     'message' =>  $validate->errors()
                 ], 422);
             }
-
             $user_lat = $request->lat;
             $user_lon = $request->lon;
             $miles = $request->miles;
@@ -648,7 +647,6 @@ class ProductsController extends Controller
             }
             $keywords = explode(" ", $request->product_name);
             $article = Products::query();
-
             foreach ($keywords as $word) {
                 $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
                     ->where('status', '=', 1);
@@ -661,15 +659,16 @@ class ProductsController extends Controller
                 if (isset($request->weight)) $article->where('weight', '=', $request->weight);
                 if (isset($request->brand)) $article->where('brand', '=', $request->brand);
             }
-
             $products = $article->paginate(10);
-
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 $products_data = [];
+
                 foreach ($products as $product) {
                     $products_data[] = $this->get_product_info($product->id);
                 }
+
+                dd($products_data);
                 unset($pagination['data']);
                 return response()->json([
                     'data' => $products_data,
