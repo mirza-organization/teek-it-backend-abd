@@ -210,9 +210,10 @@ class PromoCodesController extends Controller
                         if ($promo_codes[0]->order_number == $orders_count + 1) {
                             //below query will pass required data to two of our helper functions down below validate function
                             $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
+                            if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = 'NA');
                             if (!empty($promo_code_data->usage_limit)) {
                                 if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
-                                    if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = 'NA');
+
                                     return response()->json([
                                         'data' => [
                                             'promo_code' => $promo_codes[0],
@@ -238,7 +239,10 @@ class PromoCodesController extends Controller
                         }
                     }
                     return response()->json([
-                        'data' => $promo_codes[0],
+                        'data' => [
+                            'promo_code' => $promo_codes[0],
+                            'store' => ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA'),
+                        ],
                         'status' => true,
                         'message' => config('constants.VALID_PROMOCODE')
                     ], 200);
