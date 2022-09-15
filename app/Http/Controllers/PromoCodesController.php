@@ -206,8 +206,8 @@ class PromoCodesController extends Controller
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
                     if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = 'NA');
-                     //below query will pass required data to our helper functions down below to validate
-                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
+                    //below query will pass required data to our helper functions down below to validate
+                    $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
                     if (!empty($promo_codes[0]->order_number)) {
                         $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
@@ -237,6 +237,7 @@ class PromoCodesController extends Controller
                             ], 200);
                         }
                     }
+                    $this->promoCodeUsageLimit($promo_code_data);
                     return response()->json([
                         'data' => [
                             'promo_code' => $promo_codes[0],
