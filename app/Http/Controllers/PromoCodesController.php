@@ -263,8 +263,8 @@ class PromoCodesController extends Controller
     public function promoCodeUsageLimit($promo_code_data)
     {
         $status = 1;
-        $stores = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::user()->id)->first();
-        if (empty($stores)) {
+        $usage_limit = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::id())->first();
+        if (empty($usage_limit)) {
             DB::table('promo_codes_usage_limit')->insert([
                 'user_id' => Auth::user()->id,
                 'promo_code_id' =>  $promo_code_data->id,
@@ -274,8 +274,11 @@ class PromoCodesController extends Controller
             ]);
             $status = 1;
         } else {
-            if ($stores->total_used < $promo_code_data->usage_limit) {
-                DB::table('promo_codes_usage_limit')->where('promo_code_id', '=', $promo_code_data->id)->increment('total_used', 1);
+            if ($usage_limit->total_used < $promo_code_data->usage_limit) {
+                DB::table('promo_codes_usage_limit')
+                ->where('promo_code_id', '=', $promo_code_data->id)
+                ->where('user_id', '=', Auth::id())
+                ->increment('total_used', 1);
                 $status = 1;
             } else {
                 $status = 0;
