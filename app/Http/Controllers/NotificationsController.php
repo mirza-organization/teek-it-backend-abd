@@ -222,7 +222,24 @@ class NotificationsController extends Controller
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
                 curl_exec($ch);
-
+                $curl = curl_init();
+                curl_setopt($curl, CURLOPT_HTTP09_ALLOWED, true);
+                curl_setopt_array($curl, array(
+                    CURLOPT_PORT => "443",
+                    CURLOPT_URL => "https://api.push.apple.com:443/3/device/" . $firebaseToken . "",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0,
+                    CURLOPT_CUSTOMREQUEST => "POST",
+                    CURLOPT_POSTFIELDS => $dataString,
+                    CURLOPT_HTTPHEADER => array(
+                        "apns-topic: bundleid", // put it here your aplication bundle id
+                        "authorization: bearer " . $firebaseToken . "",
+                    ),
+                ));
+                curl_close($curl);
                 return back()->with('success', 'Notification send successfully.');
             } else {
                 abort(404);
