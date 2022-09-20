@@ -269,7 +269,8 @@ class PromoCodesController extends Controller
     public function promoCodeUsageLimit($promo_code_data)
     {
         $status = 1;
-        $usage_limit = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::id())->first();
+        $usage_limit = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::id())
+            ->where('promo_code_id', $promo_code_data->id)->first();
         if (empty($usage_limit)) {
             DB::table('promo_codes_usage_limit')->insert([
                 'user_id' => Auth::id(),
