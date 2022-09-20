@@ -208,16 +208,19 @@ class PromoCodesController extends Controller
                     if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = 'NA');
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
+                    /**
+                     * This condition will only work if the  
+                     * Promo code is only valid for a specific order#
+                     */
                     if (!empty($promo_codes[0]->order_number)) {
                         $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
                             if (!empty($promo_code_data->usage_limit)) {
                                 if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
+                                    $data[0]['promo_code'] = $promo_codes[0];
+                                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA');
                                     return response()->json([
-                                        'data' => [
-                                            'promo_code' => $promo_codes[0],
-                                            'store' => ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA'),
-                                        ],
+                                        'data' => $data,
                                         'status' => true,
                                         'message' => config('constants.VALID_PROMOCODE')
                                     ], 200);
@@ -238,11 +241,10 @@ class PromoCodesController extends Controller
                         }
                     }
                     $this->promoCodeUsageLimit($promo_code_data);
+                    $data[0]['promo_code'] = $promo_codes[0];
+                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA');
                     return response()->json([
-                        'data' => [
-                            'promo_code' => $promo_codes[0],
-                            'store' => ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA'),
-                        ],
+                        'data' => $data,
                         'status' => true,
                         'message' => config('constants.VALID_PROMOCODE')
                     ], 200);
