@@ -187,7 +187,7 @@ class NotificationsController extends Controller
     /**
      * It will send notifications
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function notificationSend(Request $request)
     {
@@ -213,7 +213,9 @@ class NotificationsController extends Controller
                     'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
                     'Content-Type: application/json',
                 ];
-
+                /**
+                 * For Android devices
+                 */
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
                 curl_setopt($ch, CURLOPT_POST, true);
@@ -222,6 +224,9 @@ class NotificationsController extends Controller
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
                 curl_exec($ch);
+                /**
+                 * For iOS devices
+                 */
                 $curl = curl_init();
                 curl_setopt($curl, CURLOPT_HTTP09_ALLOWED, true);
                 curl_setopt_array($curl, array(
@@ -239,6 +244,7 @@ class NotificationsController extends Controller
                         "authorization: bearer " . $firebaseToken . "",
                     ),
                 ));
+                curl_close($ch);
                 curl_close($curl);
                 return back()->with('success', 'Notification send successfully.');
             } else {
