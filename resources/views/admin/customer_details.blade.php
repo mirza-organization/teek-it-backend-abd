@@ -39,7 +39,7 @@
                                         aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
-                                                <form id="user_info" onsubmit="return false"
+                                                <form id="user_info" name="user_form" onsubmit="return false"
                                                     enctype="multipart/form-data">
                                                     {{csrf_field()}}
                                                     <div class="modal-header">
@@ -56,7 +56,7 @@
                                                     <div class="modal-body">
                                                         <div class="form-group">
 
-                                                            <input type="hidden" id="id" class="form-control"
+                                                            <input type="hidden" id="id" name="id" class="form-control"
                                                                 value="{{$user->id}}">
                                                         </div>
                                                         <div class="row">
@@ -124,9 +124,10 @@
                                                                 <div class="form-group">
                                                                     <label for="">Image</label>
                                                                     <input type="file" name="store_image"
-                                                                        id="store_image" class="form-control" value=""
-                                                                        accept="image/x-png,image/jpeg,image/jpg">
-
+                                                                        accept="image/*" id="store_image"
+                                                                        class="form-control" value="$user->user_img">
+                                                                    <img src="{{config('constants.BUCKET') . $user->user_img}}"
+                                                                        alt="" width="50px" height="50px">
                                                                 </div>
                                                                 <p id="store_image"
                                                                     class="text-danger store_image error">

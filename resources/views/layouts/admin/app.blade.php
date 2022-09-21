@@ -612,28 +612,14 @@
     }
 
     function updateStoreInfo() {
-
-        let name = $('#name').val();
-        let id = $('#id').val();
-        let business_name = $('#business_name').val();
-        let phone = $('#phone').val();
-        let business_phone = $('#business_phone').val();
-        let store_image = $('#store_image').val();
-
-
+        var form = document.forms.namedItem("user_form");
+        var formdata = new FormData(form);
         $.ajax({
             url: "{{route('admin.image.update')}}",
             type: "post",
-
-            data: {
-                _token: "{{ csrf_token() }}",
-                name: name,
-                id: id,
-                phone: phone,
-                business_name: business_name,
-                business_phone: business_phone,
-                store_image: store_image,
-            },
+            contentType: false,
+            data: formdata,
+            processData: false,
             success: function(response) {
                 if (response == "Data Saved") {
                     Swal.fire({

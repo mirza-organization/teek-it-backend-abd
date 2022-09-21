@@ -1365,44 +1365,36 @@ class HomeController extends Controller
     /**
      * it will update the store info via popup modal
      * @author Mirza Abdullah Izhar
-     * @version 1.2.0
+     * @version 1.3.0
      */
     public function updateStoreInfo(Request $request)
     {
-        // try {
-
         $validatedData = Validator::make($request->all(), [
             'name' => 'required|string',
             'business_name' => 'required|string',
             'phone' => 'required|max:13',
             'business_phone' => 'required|max:13',
-            'store_image' => 'required',
         ]);
-
         if ($validatedData->fails()) {
             return response()->json([
                 'errors' => $validatedData->errors()
             ], 200);
             exit;
         }
-        $data = $request->all();
         $phone = substr($request->phone, 0, 3);
         $business_phone = substr($request->business_phone, 0, 3);
         $store_info = User::find($request->id);
-        $filename = '';
         if ($request->hasFile('store_image')) {
             $file = $request->file('store_image');
-            $filename = uniqid($store_info->id . "_" . $store_info->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
+            $filename = uniqid($store_info->id . "_" . $store_info->name . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($filename, File::get($file));
             if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                    info("file is store successfully : " . $filename);
-                } else {
-                    info("file is not found :- " . $filename);
-                }
+                info("file is store successfully : " . $filename);
+            } else {
+                info("file is not found :- " . $filename);
             }
         }
-        // $filename = $data['store_image'];
+        $filename = $store_info->user_img;
         if ($phone == '+44') {
             $store_info->phone = $request->phone;
         } else {
@@ -1420,11 +1412,6 @@ class HomeController extends Controller
         if ($store_info) {
             echo 'Data Saved';
         }
-        // } catch (Throwable $error) {
-        //     report($error);
-        //     flash('Failed to update store image due to some internal error.')->error();
-        //     return back();
-        // }
     }
     /**
      * it will update the user info via popup modal
