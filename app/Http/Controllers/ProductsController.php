@@ -643,7 +643,6 @@ class ProductsController extends Controller
             $miles = $request->miles;
             if (isset($miles)) {
                 $store_ids =  $this->searchWrtNearByStores($user_lat, $user_lon,  $miles);
-                //dd($store_ids['time']);
             }
             $keywords = explode(" ", $request->product_name);
             $article = Products::query();
@@ -663,12 +662,9 @@ class ProductsController extends Controller
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 $products_data = [];
-
                 foreach ($products as $product) {
                     $products_data[] = $this->get_product_info($product->id);
                 }
-
-                dd($products_data);
                 unset($pagination['data']);
                 return response()->json([
                     'data' => $products_data,
@@ -698,7 +694,6 @@ class ProductsController extends Controller
      */
     public function searchWrtNearByStores($user_lat, $user_lon, $miles)
     {
-
         $radius =  3958.8;
         $store_data = DB::table('users AS user')->selectRaw("*,
             (  3961 * acos( cos( radians(" . $user_lat . ") ) *
