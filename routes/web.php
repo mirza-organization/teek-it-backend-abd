@@ -1,6 +1,4 @@
 <?php
-
-use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -127,22 +125,3 @@ Route::post('/store_info/update', 'HomeController@updateStoreInfo')->name('admin
 |--------------------------------------------------------------------------
 */
 Route::get('/my_order_count', 'HomeController@myOrderCount')->name('my_order_count');
-
-// Route::get('send-message', function () {
-//     $receiverNumber = "+923006694349";
-//     $message = "This is testing from teek-it";
-//     try {
-//         $account_sid = config("app.TWILIO_SID");
-//         $auth_token = config("app.TWILIO_TOKEN");
-//         $twilio_number = config("app.TWILIO_FROM");
-
-//         $client = new Client($account_sid, $auth_token);
-//         $client->messages->create($receiverNumber, [
-//             'from' => $twilio_number,
-//             'body' => $message
-//         ]);
-//         dd('SMS Sent Successfully.');
-//     } catch (Exception $e) {
-//         dd("Error: " . $e->getMessage());
-//     }
-// });

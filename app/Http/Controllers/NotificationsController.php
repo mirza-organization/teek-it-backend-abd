@@ -240,7 +240,7 @@ class NotificationsController extends Controller
                     CURLOPT_CUSTOMREQUEST => "POST",
                     CURLOPT_POSTFIELDS => $dataString,
                     CURLOPT_HTTPHEADER => array(
-                        "apns-topic: bundleid", // put it here your aplication bundle id
+                        "apns-topic: com.teekit.customer", // put it here your aplication bundle id
                         "authorization: bearer " . $firebaseToken . "",
                     ),
                 ));
