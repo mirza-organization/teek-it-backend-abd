@@ -652,10 +652,19 @@ class ProductsController extends Controller
                 if (isset($store_ids)) $article->whereIn('user_id', $store_ids['ids']);
                 if (isset($request->category_id)) $article->where('category_id', '=', $request->category_id);
                 if (isset($request->store_id)) $article->where('user_id', '=', $request->store_id);
+                /**
+                 * For price range
+                 */
                 if (isset($request->min_price) && !isset($request->max_price)) $article->where('price', '>=', $request->min_price);
                 if (!isset($request->min_price) && isset($request->max_price)) $article->where('price', '<=', $request->max_price);
                 if (isset($request->min_price) && isset($request->max_price)) $article->whereBetween('price', [$request->min_price, $request->max_price]);
-                if (isset($request->weight)) $article->where('weight', '=', $request->weight);
+                /**
+                 * For weight range
+                 */
+                if (isset($request->min_weight) && !isset($request->max_weight)) $article->where('weight', '>=', $request->min_weight);
+                if (!isset($request->min_weight) && isset($request->max_weight)) $article->where('weight', '<=', $request->max_weight);
+                if (isset($request->min_weight) && isset($request->max_weight)) $article->whereBetween('weight', [$request->min_weight, $request->max_weight]);
+
                 if (isset($request->brand)) $article->where('brand', '=', $request->brand);
             }
             $products = $article->paginate(10);
@@ -738,90 +747,6 @@ class ProductsController extends Controller
         // return $miles > 1 ? $miles : 1;
         return  $duration;
     }
-    // public function search(Request $request)
-    // {
-    //     try {
-    //         $validate = Validator::make($request->all(), [
-    //             'product_name' => 'required|string',
-    //         ]);
-    //         if ($validate->fails()) {
-    //             return response()->json([
-    //                 'data' => [],
-    //                 'status' => false,
-    //                 'message' =>  $validate->errors()
-    //             ], 422);
-    //         }
-    //         // $keywords = explode(" ", $request->product_name);
-    //         // $article = Products::query();
-    //         // foreach ($keywords as $word) {
-    //         //     $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
-    //         //         ->where('user_id', '=', $request->store_id)
-    //         //         ->where('status', '=', 1);
-    //         // }
-
-    //         if (isset($request->product_name) && isset($request->category_id) && isset($request->store_id)) {
-    //             $products = Products::query()
-    //                 ->where('product_name', 'Like', "%" . $request->product_name . "%")
-    //                 ->where('category_id', '=', $request->category_id)
-    //                 ->where('user_id', '=', $request->store_id)
-    //                 ->where('status', '=', 1)
-    //                 ->paginate(10);
-    //             $pagination = $products->toArray();
-    //             if (!$products->isEmpty()) {
-    //                 $products_data = [];
-    //                 foreach ($products as $product) {
-    //                     $products_data[] = $this->get_product_info($product->id);
-    //                 }
-    //                 unset($pagination['data']);
-    //                 return response()->json([
-    //                     'data' => $products_data,
-    //                     'status' => true,
-    //                     'message' => '',
-    //                     'pagination' => $pagination,
-    //                 ], 200);
-    //             } else {
-    //                 return response()->json([
-    //                     'data' => [],
-    //                     'status' => false,
-    //                     'message' => config('constants.NO_RECORD')
-    //                 ], 200);
-    //             }
-    //         } else {
-    //             $products = Products::query()
-    //                 ->where('product_name', 'Like', "%" . $request->get('product_name') . "%")
-    //                 ->where('status', '=', 1)
-    //                 ->paginate(10);
-    //             $pagination = $products->toArray();
-    //             if (!empty($products)) {
-    //                 $products_data = [];
-    //                 foreach ($products as $product) {
-    //                     $products_data[] = $this->get_product_info($product->id);
-    //                 }
-    //                 unset($pagination['data']);
-    //                 return response()->json([
-    //                     'data' => $products_data,
-    //                     'status' => true,
-    //                     'message' => '',
-    //                     'pagination' => $pagination,
-    //                 ], 200);
-    //             } else {
-    //                 return response()->json([
-    //                     'data' => [],
-    //                     'status' => false,
-    //                     'message' => config('constants.NO_RECORD')
-    //                 ], 200);
-    //             }
-    //         }
-    //     } catch (Throwable $error) {
-    //         report($error);
-    //         return response()->json([
-    //             'data' => [],
-    //             'status' => false,
-    //             'message' => $error
-    //         ], 500);
-    //     }
-    // }
-
     /**
      * Update product price from csv file w.r.t their SKU and store_id 
      * @author Mirza Abdullah Izhar
