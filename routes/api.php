@@ -106,7 +106,7 @@ Route::group(['prefix' => 'notifications'], function ($router) {
     Route::get('', 'NotificationsController@getNotifications');
     Route::post('save_token', 'NotificationsController@saveToken');
     Route::get('delete/{notification_id}', 'NotificationsController@deleteNotification');
-    Route::post('send_test', 'NotificationsController@sendNotificationTest');
+    Route::post('send_test', 'NotificationsController@notificationSendTest');
 });
 /*
 |--------------------------------------------------------------------------
