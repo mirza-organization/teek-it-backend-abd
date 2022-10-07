@@ -12,7 +12,7 @@ class notifications extends Model
     {
         return Validator::make($request->all(), [
             'title' => 'required|string',
-            'message' => 'required|string'
+            'body' => 'required|string'
         ]);
     }
 }
