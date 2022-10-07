@@ -221,13 +221,13 @@ class CategoriesController extends Controller
                 ->get()->pluck('store_id');
             $stores = User::whereIn('id', $ids)->get()->toArray();
             return response()->json([
-                'data' => $stores,
+                'stores' => $stores,
                 'status' => true,
             ], 200);
         } catch (Throwable $error) {
             report($error);
             return response()->json([
-                'data' => [],
+                'stores' => [],
                 'status' => false,
                 'message' => $error
             ], 500);
