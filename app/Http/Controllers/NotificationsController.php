@@ -289,82 +289,90 @@ class NotificationsController extends Controller
             }
 
             $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
-            // $data = [
-            //     "registration_ids" => $firebaseToken,
-            //     "data" => [
-            //         "title" => $request->title,
-            //         "message" => $request->message,
-            //     ],
-            //     "priority" => "high"
-            // ];
-            // $dataString = json_encode($data);
-            // $headers = [
-            //     'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
-            //     'Content-Type: application/json',
-            // ];
-
-            // /**
-            //  * For Android devices
-            //  */
-            // $ch = curl_init();
-            // curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
-            // curl_setopt($ch, CURLOPT_POST, true);
-            // curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            // curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-            // curl_exec($ch);
-            /**
-             * For iOS devices
-             */
-            // print_r( $firebaseToken); exit;
-            $dataForiOS = [
+            $data = [
                 "registration_ids" => $firebaseToken,
                 "notification" => [
                     "title" => $request->title,
                     "message" => $request->message,
                 ],
-                "priority" => 10
+                "priority" => "high"
             ];
-            $dataString = json_encode($dataForiOS);
+
+            // "data" => [
+            //     "title" => $request->title,
+            //     "message" => $request->message,
+            // ],
+
+            $dataString = json_encode($data);
             $headers = [
                 'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
                 'Content-Type: application/json',
             ];
-            // print_r($firebaseToken[0]); exit;
-            $curl = curl_init();
-            curl_setopt($curl, CURLOPT_HTTP09_ALLOWED, true);
-            curl_setopt_array($curl, array(
-                CURLOPT_PORT => "443",
-                CURLOPT_URL => "https://api.push.apple.com:443/3/device/$firebaseToken[0]",
-                // CURLOPT_URL => "https://fcm.googleapis.com/fcm/send",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => "",
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0,
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => $dataString,
-                CURLOPT_SSLCERT =>"apns.pem",
-                CURLOPT_HTTPHEADER => array(
-                    "apns-topic: com.teekit.customer", // put it here your aplication bundle id
-                    "apns-push-type: alert",
-                    "Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A",
-                    "Content-Type: application/json"
-                )
-            ));
+
+            /**
+             * For Android devices
+             */
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+            curl_exec($ch);
+
+            /**
+             * For iOS devices
+             */
+            // print_r( $firebaseToken); exit;
+            // $dataForiOS = [
+            //     "registration_ids" => $firebaseToken,
+            //     "notification" => [
+            //         "title" => $request->title,
+            //         "message" => $request->message,
+            //     ],
+            //     "priority" => 10
+            // ];
+            // $dataString = json_encode($dataForiOS);
+            // $headers = [
+            //     'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
+            //     'Content-Type: application/json',
+            // ];
+            // // print_r($firebaseToken[0]); exit;
+            // $curl = curl_init();
+            // curl_setopt($curl, CURLOPT_HTTP09_ALLOWED, true);
+            // curl_setopt_array($curl, array(
+            //     CURLOPT_PORT => "443",
+            //     // CURLOPT_URL => "https://api.push.apple.com:443/3/device/$firebaseToken[0]",
+            //     CURLOPT_URL => "https://fcm.googleapis.com/fcm/send",
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => "",
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 30,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0,
+            //     CURLOPT_CUSTOMREQUEST => "POST",
+            //     CURLOPT_POSTFIELDS => $dataString,
+            //     CURLOPT_SSLCERT =>"apns.pem",
+            //     CURLOPT_HTTPHEADER => array(
+            //         "apns-topic: com.teekit.customer", // put it here your aplication bundle id
+            //         "apns-push-type: alert",
+            //         "Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A",
+            //         "Content-Type: application/json"
+            //     )
+            // ));
             // CURLOPT_HTTPHEADER => array(
             //     "apns-topic: com.teekit.customer", // put it here your aplication bundle id
             //     "authorization: bearer " . $firebaseToken . "",
             // )
-            $response = curl_exec($curl);
-            // print_r($curl);
-            // exit;
-            // curl_close($ch);
-            curl_close($curl);
-
+            // $response = curl_exec($curl);
+            // // print_r($curl);
+            // // exit;
+            $response = $ch;
+            curl_close($ch);
+            // curl_close($curl);
+                print_r($response); exit;
             return response()->json([
-                'data' => json_decode($response),
+                'data' => $response,
                 'status' => true,
                 'message' => ""
             ], 200);
