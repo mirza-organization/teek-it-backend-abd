@@ -1304,7 +1304,7 @@ class HomeController extends Controller
             ->where('type', 'delivery')
             ->where('delivery_status', '=', 'pending_approval')
             //            ->where('order_status', 'delivered')
-            ->get();
+            ->paginate(10);
         return view('admin.complete-orders', compact('orders'));
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Validation\ValidationException;
 use Laracasts\Flash\Flash;
 
 class LoginController extends Controller
@@ -90,6 +91,18 @@ class LoginController extends Controller
         $this->incrementLoginAttempts($request);
         //return $this->sendFailedLoginResponse($request);
         return $this->invalidCreds($request);
+    }
+    /**
+     * It is a helper method being called in login method
+     * it will throw a flash message on incorrect/invalid credentials
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    protected function invalidCreds(Request $request)
+    {
+        throw ValidationException::withMessages([
+            flash('Login failed! Incorrect email or password.')->error(),
+        ]);
     }
     //    public function sendFailedLoginResponse(Request $request)
     //    {

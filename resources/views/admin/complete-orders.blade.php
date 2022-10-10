@@ -21,35 +21,46 @@
 <!-- /.content-header -->
 
 <!-- Main content -->
-<table id="complete-orders-table" class="table">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Order Id</th>
-            <th>Total Items</th>
-            <th>Delivery Boy Name</th>
-            <th>Receiver Name</th>
-            <th>Receiver Phone No</th>
-            <th>Receiver Complete Address</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12">
+            <table id="" class="table text-center table-hover table-responsive-sm border-bottom">
+                <thead>
+                    <tr class="bg-primary text-white">
+                        <th>#</th>
+                        <th scope="col">Order Id</th>
+                        <th>Total Items</th>
+                        <th>Delivery Boy Name</th>
+                        <th>Receiver Name</th>
+                        <th>Receiver Phone No</th>
+                        <th>Receiver Complete Address</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
 
-    <tbody>
-        @foreach($orders as $key=> $order)
-        <tr>
-            <td>{{$key+1}}</td>
-            <td>{{$order->id}}</td>
-            <td>{{$order->total_items}}</td>
-            <td>{{$order->delivery_boy->name .' '. $order->delivery_boy->l_name}}</td>
-            <td>{{$order->user->name .' '. $order->user->l_name}}</td>
-            <td>{{$order->phone_number}}</td>
-            <td>{{ \Illuminate\Support\Str::limit($order->house_no .' '. $order->address, 50, $end='...') }}</td>
-            <td><a href="{{route('mark.complete.order',$order->id)}}" class="btn btn-primary">Mark as complete</a></td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
+                <tbody>
+                    @foreach($orders as $key=> $order)
+                    <tr>
+                        <td>{{$key+1}}</td>
+                        <td>{{$order->id}}</td>
+                        <td>{{$order->total_items}}</td>
+                        <td>{{$order->delivery_boy->name .' '. $order->delivery_boy->l_name}}</td>
+                        <td>{{$order->user->name .' '. $order->user->l_name}}</td>
+                        <td>{{$order->phone_number}}</td>
+                        <td>{{ \Illuminate\Support\Str::limit($order->house_no .' '. $order->address, 50, $end='...') }}
+                        </td>
+                        <td><a href="{{route('mark.complete.order',$order->id)}}" class="btn btn-primary">Mark as
+                                complete</a></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="d-flex justify-content-center" style="padding-top: 10px;">
+                {{$orders->links()}}
+            </div>
+        </div>
+    </div>
+</div>
 <!-- /.content -->
 @endsection
 
