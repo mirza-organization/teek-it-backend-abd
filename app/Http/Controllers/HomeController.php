@@ -1303,11 +1303,10 @@ class HomeController extends Controller
             ->has('delivery_boy')
             ->where('type', 'delivery')
             ->where('delivery_status', '=', 'pending_approval')
-            //            ->where('order_status', 'delivered')
+            //->where('order_status', 'delivered')
             ->paginate(10);
         return view('admin.complete-orders', compact('orders'));
     }
-
     /**
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
