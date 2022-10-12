@@ -1298,12 +1298,12 @@ class HomeController extends Controller
 
     public function completeOrders()
     {
-        $orders = Orders::with(['user', 'delivery_boy'])
-            ->has('user')
-            ->has('delivery_boy')
-            ->where('type', 'delivery')
-            ->where('delivery_status', '=', 'pending_approval')
-            //->where('order_status', 'delivered')
+        $orders = DB::table('orders')
+            ->leftJoin('users', 'orders.user_id', '=', 'users.id')
+            ->LeftJoin('drivers', 'orders.delivery_boy_id', '=', 'drivers.id')
+            ->where('delivery_status', '=', 'complete')
+            ->where('order_status', '=', 'complete')
+            ->select('drivers.f_name', 'drivers.l_name', 'orders.id', 'orders.total_items', 'orders.phone_number', 'orders.house_no', 'orders.address',  'orders.type', 'users.name')
             ->paginate(10);
         return view('admin.complete-orders', compact('orders'));
     }

@@ -31,6 +31,7 @@
                         <th scope="col">Order Id</th>
                         <th>Total Items</th>
                         <th>Delivery Boy Name</th>
+                        <th>Delivery Type</th>
                         <th>Receiver Name</th>
                         <th>Receiver Phone No</th>
                         <th>Receiver Complete Address</th>
@@ -44,13 +45,13 @@
                         <td>{{$key+1}}</td>
                         <td>{{$order->id}}</td>
                         <td>{{$order->total_items}}</td>
-                        <td>{{$order->delivery_boy->name .' '. $order->delivery_boy->l_name}}</td>
-                        <td>{{$order->user->name .' '. $order->user->l_name}}</td>
+                        <td>{{$order->f_name .' '. $order->l_name}}</td>
+                        <td>{{$order->type}}</td>
+                        <td>{{$order->name .' '. $order->l_name}}</td>
                         <td>{{$order->phone_number}}</td>
                         <td>{{ \Illuminate\Support\Str::limit($order->house_no .' '. $order->address, 50, $end='...') }}
                         </td>
-                        <td><a href="{{route('mark.complete.order',$order->id)}}" class="btn btn-primary">Mark as
-                                complete</a></td>
+                        <td><a href="#" class="btn btn-danger"> Delete </a></td>
                     </tr>
                     @endforeach
                 </tbody>
