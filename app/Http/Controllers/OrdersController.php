@@ -442,17 +442,15 @@ class OrdersController extends Controller
                 $store_lat = $seller->lat;
                 $store_lon = $seller->lon;
                 $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
-                // print_r($distance); exit;
                 // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
-                // print_r($distance); exit;
                 $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
             }
             $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
-            $new_order->total_items = $total_items;
-            $request->type == 'delivery' ?  $new_order->lat = $customer_lat : '';
-            $request->type == 'delivery' ?  $new_order->lon = $customer_lon : '';
+            $new_order->total_items = $total_items; 
+            $new_order->lat = ($request->type == 'delivery') ? $customer_lat : NULL;
+            $new_order->lon = ($request->type == 'delivery') ? $customer_lon : NULL;
             $new_order->type = $request->type;
             if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
