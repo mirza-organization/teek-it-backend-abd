@@ -13,6 +13,57 @@
 </div>
 <!-- /.content-header -->
 
+<div class="container-fluid content">
+    <div class="row">
+        <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
+            <h4 class="text-left text-primary">Update Password</h4>
+            <div class="card">
+                <div class="card-body-custom">
+                    <div class=" d-block text-right">
+                        <div class="card-text">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <form action="{{route('password_update')}}" method="POST">
+                                        {{csrf_field()}}
+                                        <div class="row form-inline">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <input type="password" class="form-control " name="old_password"
+                                                        placeholder="Old Password" required id="old_password"
+                                                        minlength="8">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <input type="password" class="form-control" name="new_password"
+                                                        placeholder="New Password" required id="new_password"
+                                                        minlength="8">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="">
+                                                    <div class="text-center">
+                                                        <button style="background: #ffcf42;color:black;font-weight: 600"
+                                                            class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
+                                                            type="submit">Update</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- /.row -->
+</div><!-- /.container-fluid -->
 <!-- Main content -->
 <form method="post" action="{{route('update_pages')}}" enctype="multipart/form-data">
     {{csrf_field()}}
