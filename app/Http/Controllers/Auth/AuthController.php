@@ -362,8 +362,7 @@ class AuthController extends Controller
     private function get_seller_info($seller_info)
     {
         $user = $seller_info;
-        if (!$user)
-            return null;
+        if (!$user) return null;
         $data_info = array(
             'id' => $user->id,
             'name' => $user->name,
@@ -475,16 +474,11 @@ class AuthController extends Controller
      */
     public function sellers()
     {
-        try {
+        try { 
             $users = User::with('seller')
                 ->where('is_active', '=', 1)->get();
             $data = [];
-            foreach ($users as $user) {
-                if ($user->hasRole('seller')) {
-                    $user->where('is_active', 1);
-                    $data[] = $this->get_seller_info($user);
-                }
-            }
+            foreach ($users as $user) $data[] = $this->get_seller_info($user);
             return response()->json([
                 'data' => $data,
                 'status' => true,
@@ -517,7 +511,6 @@ class AuthController extends Controller
                     foreach ($products as $product) {
                         $data[] = (new ProductsController())->get_product_info($product->id);
                     }
-                    // $info['products'] = $products_data;
                     unset($pagination['data']);
                     return response()->json([
                         'data' => $data,
