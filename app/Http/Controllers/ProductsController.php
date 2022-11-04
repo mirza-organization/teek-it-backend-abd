@@ -387,22 +387,41 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function view($product_id)
-    {
-        $product = $this->get_product_info($product_id);
-        if (!empty($product)) {
-            $product->store = User::find($product->user_id);
-            return response()->json([
-                'data' => $product,
-                'status' => true,
-                'message' => '',
-            ], 200);
-        } else {
+    public function view(Request $request)
+    { 
+        try {
+            $validate = Validator::make($request->route()->parameters(), [
+                'product_id' => 'required|integer'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validate->errors()
+                ], 422);
+            }
+            $product = $this->get_product_info($request->product_id);
+            if (!empty($product)) {
+                $product->store = User::find($product->user_id);
+                return response()->json([
+                    'data' => $product,
+                    'status' => true,
+                    'message' => "",
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
+                'message' => $error
+            ], 500);
         }
     }
     /**
