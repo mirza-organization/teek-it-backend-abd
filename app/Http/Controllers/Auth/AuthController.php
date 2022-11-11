@@ -273,7 +273,7 @@ class AuthController extends Controller
             'total_withdraw' => $user->total_withdraw,
             'is_online' => $user->is_online,
             'last_login' => $user->last_login,
-            'seller_info' => $this->get_seller_info($seller_info),
+            'seller_info' => $this->getSellerInfo($seller_info),
             'roles' => $user->roles->pluck('name'),
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         );
@@ -343,7 +343,7 @@ class AuthController extends Controller
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'vehicle_type' => $user->vehicle_type,
-            'seller_info' => $this->get_seller_info($seller_info),
+            'seller_info' => $this->getSellerInfo($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
@@ -359,7 +359,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    private function get_seller_info($seller_info)
+    private function getSellerInfo($seller_info)
     {
         $user = $seller_info;
         if (!$user) return null;
@@ -382,7 +382,7 @@ class AuthController extends Controller
 
     public function get_user($user_id)
     {
-        $data_info = $this->get_seller_info(User::find($user_id));
+        $data_info = $this->getSellerInfo(User::find($user_id));
         return $data_info;
     }
 
@@ -474,11 +474,14 @@ class AuthController extends Controller
      */
     public function sellers()
     {
-        try { 
-            $users = User::with('seller')
-                ->where('is_active', '=', 1)->get();
+        try {
+            $users = User::where('is_active', '=', 1)->get();
             $data = [];
-            foreach ($users as $user) $data[] = $this->get_seller_info($user);
+            foreach ($users as $user) {
+                if (!$user->seller->isEmpty()) {
+                    if ($user->seller[0]->name == 'seller') $data[] = $this->getSellerInfo($user);
+                }
+            }
             return response()->json([
                 'data' => $data,
                 'status' => true,
@@ -504,7 +507,7 @@ class AuthController extends Controller
             $user = User::find($seller_id);
             $data = [];
             if ($user->hasRole('seller')) {
-                // $info = $this->get_seller_info($user); 
+                // $info = $this->getSellerInfo($user); 
                 $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
                 $pagination = $products->toArray();
                 if (!$products->isEmpty()) {
@@ -603,7 +606,7 @@ class AuthController extends Controller
             $data = [];
             foreach ($users as $user) {
                 if ($user->hasRole('delivery_boy')) {
-                    $data[] = $this->get_seller_info($user);
+                    $data[] = $this->getSellerInfo($user);
                 }
             }
             return response()->json([
@@ -774,7 +777,7 @@ class AuthController extends Controller
                 'total_withdraw' => $user->total_withdraw,
                 'is_online' => $user->is_online,
                 'last_login' => $user->last_login,
-                'seller_info' => $this->get_seller_info($seller_info),
+                'seller_info' => $this->getSellerInfo($seller_info),
                 'roles' => $user->roles->pluck('name'),
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
             );
@@ -844,7 +847,7 @@ class AuthController extends Controller
                 'total_withdraw' => $user->total_withdraw,
                 'is_online' => $user->is_online,
                 'last_login' => $user->last_login,
-                'seller_info' => $this->get_seller_info($seller_info),
+                'seller_info' => $this->getSellerInfo($seller_info),
                 'roles' => $user->roles->pluck('name'),
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
             );

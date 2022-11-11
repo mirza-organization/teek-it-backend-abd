@@ -51,7 +51,8 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token'
     ];
 
     /**
@@ -116,19 +117,24 @@ class User extends Authenticatable implements JWTSubject
             'address_2' => ''
         ]);
     }
-
+    // Many-to-many relationship
     public function roles()
     {
         return $this->belongsToMany('App\Models\Role', 'role_user');
     }
-
+    // Many-to-many relationship
     public function seller()
     {
-        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'seller');
+        return $this->belongsToMany('App\Models\Role', 'role_user')->wherePivot('role_id', 2);
     }
-
+    // Many-to-many relationship
     public function driver()
     {
         return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
+    }
+    // One-to-many relationship
+    public function orders()
+    {
+        return $this->hasMany('App\Orders');
     }
 }
