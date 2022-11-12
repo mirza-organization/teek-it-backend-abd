@@ -51,11 +51,11 @@ Route::group(['prefix' => 'auth'], function ($router) {
 |--------------------------------------------------------------------------
 */
 Route::group(['prefix' => 'qty'], function ($router) {
-    Route::get('all', 'QtyTestController@all');
-    Route::get('product/{store_id}', 'QtyTestController@getByStoreId');
-    Route::get('product/{store_id}/{prod_id}', 'QtyTestController@getById');
-    Route::post('update/{prod_id}', 'QtyTestController@updateById');
-    Route::get('multi-curl', 'QtyTestController@multiCURL');
+    Route::get('all', 'QtyController@all');
+    Route::get('product/{store_id}', 'QtyController@getByStoreId');
+    Route::get('product/{store_id}/{prod_id}', 'QtyController@getById');
+    Route::post('update/{prod_id}', 'QtyController@updateById');
+    Route::get('multi-curl', 'QtyController@multiCURL');
 });
 /*
 |--------------------------------------------------------------------------
