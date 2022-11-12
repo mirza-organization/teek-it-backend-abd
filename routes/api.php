@@ -47,6 +47,18 @@ Route::group(['prefix' => 'auth'], function ($router) {
 });
 /*
 |--------------------------------------------------------------------------
+| Qty API Routes
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'qty'], function ($router) {
+    Route::get('all', 'QtyTestController@all');
+    Route::get('product/{store_id}', 'QtyTestController@getByStoreId');
+    Route::get('product/{store_id}/{prod_id}', 'QtyTestController@getById');
+    Route::post('update/{prod_id}', 'QtyTestController@updateById');
+    Route::get('multi-curl', 'QtyTestController@multiCURL');
+});
+/*
+|--------------------------------------------------------------------------
 | Category API Routes
 |--------------------------------------------------------------------------
 */
