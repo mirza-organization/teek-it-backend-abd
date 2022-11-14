@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVerificationCodesTable extends Migration
+class CreateQtyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreateVerificationCodesTable extends Migration
      */
     public function up()
     {
-        Schema::create('verification_codes', function (Blueprint $table) {
+        Schema::create('qty', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('order_id')->unique();
-            $table->json('code');
+            $table->unsignedBigInteger('users_id');            
+            $table->foreign('users_id')->references('id')->on('users');
+            $table->unsignedBigInteger('products_id');
+            $table->foreign('products_id')->references('id')->on('products');
+            $table->integer('qty');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ class CreateVerificationCodesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('verification_codes');
+        Schema::dropIfExists('qty');
     }
 }
