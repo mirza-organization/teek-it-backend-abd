@@ -66,7 +66,7 @@ class AuthController extends Controller
                 'business_name' => $request->business_name,
                 'business_location' => $request->business_location,
                 'lat' => json_decode($request->business_location)->lat,
-                'lon' => json_decode($request->business_location)->long,
+                'lon' => json_decode($request->business_location)->lon,
                 'seller_id' => $request->seller_id,
                 'postcode' => $request->postal_code,
                 'is_active' => $is_active,
