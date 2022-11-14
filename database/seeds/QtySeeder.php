@@ -14,14 +14,12 @@ class QtySeeder extends Seeder
     public function run()
     {
         $faker = Faker::create();
-        foreach(range(1, 1000000) as $index) {
+        foreach (range(1, 1000000) as $index) {
             Qty::create([
-                 'users_id' => $faker->numberBetween(1,5000000),
-                 'products_id' => $faker->numberBetween(1,1000000),
-                 'qty' => $faker->randomDigit(),
+                'users_id' => $faker->numberBetween(1, 5000000),
+                'products_id' => $faker->numberBetween(1, 1000000),
+                'qty' => $faker->randomDigit(),
             ]);
         }
     }
 }
-
-
