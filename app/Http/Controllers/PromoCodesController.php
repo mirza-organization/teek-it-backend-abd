@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Orders;
 use App\PromoCodes;
 use App\User;
@@ -22,12 +23,14 @@ class PromoCodesController extends Controller
     public function promocodesHome()
     {
         if (Auth::user()->hasRole('superadmin')) {
+            //Get stores names for select dropdown
+            $stores = Role::find(2)->users;
+            // dd($stores);
             $promo_codes = PromoCodes::paginate(10);
-            //get stores names for select dropdown
-            $stores = \DB::select('SELECT *
-            FROM users A
-             LEFT JOIN role_user B
-            ON A.id= B.user_id WHERE B.role_id=2');
+            // $stores = \DB::select('SELECT *
+            // FROM users A
+            //  LEFT JOIN role_user B
+            // ON A.id= B.user_id WHERE B.role_id=2');
             return view('admin.promo_codes', compact('promo_codes', 'stores'));
         } else {
             abort(404);

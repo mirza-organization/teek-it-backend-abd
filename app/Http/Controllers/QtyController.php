@@ -172,41 +172,42 @@ class QtyController extends Controller
     public function multiCURL()
     {
         try {
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                // CURLOPT_URL => 'http://127.0.0.1:8000/api/category/all',
-                // CURLOPT_URL => 'http://127.0.0.1:8000/api/qty/all',
-                CURLOPT_URL => 'https://app.teekit.co.uk/api/category/all',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-            ));
+            // $curl = curl_init();
+            // curl_setopt_array($curl, array(
+            //     // CURLOPT_URL => 'http://127.0.0.1:8000/api/category/all',
+            //     // CURLOPT_URL => 'http://127.0.0.1:8000/api/qty/all',
+            //     // CURLOPT_URL => 'https://app.teekit.co.uk/api/category/all',
+            //     CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'GET',
+            // ));
     
-            $response = curl_exec($curl);
+            // $response = curl_exec($curl);
             
-            curl_close($curl);
-            echo $response;
-            exit;
+            // curl_close($curl);
+            // echo $response;
+            // exit;
 
             // *************Multi CURL
-            // for ($times = 0; $times < 1; $times++) {
-            //     // create both cURL resources
-            //     $ch[$times] = curl_init();
-            //     curl_setopt_array($ch[$times], array(
-            //         CURLOPT_URL => 'http://127.0.0.1:8000/api/qty/all',
-            //         CURLOPT_RETURNTRANSFER => true,
-            //         CURLOPT_ENCODING => '',
-            //         CURLOPT_MAXREDIRS => 10,
-            //         CURLOPT_TIMEOUT => 0,
-            //         CURLOPT_FOLLOWLOCATION => true,
-            //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //         CURLOPT_CUSTOMREQUEST => 'GET',
-            //     ));
-            // } 
+            for ($times = 0; $times < 1; $times++) {
+                // create both cURL resources
+                $ch[$times] = curl_init();
+                curl_setopt_array($ch[$times], array(
+                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
+            } 
 
             //create the multiple cURL handle
             $mh = curl_multi_init();
@@ -225,7 +226,8 @@ class QtyController extends Controller
             for ($a = 0; $a < count($ch); $a++)
                 curl_multi_remove_handle($mh, $ch[$a]);
             curl_multi_close($mh);
-            // 
+            print_r($mh);
+            exit; 
             return response()->json([
                 'data' => $mh,
                 'status' => true,

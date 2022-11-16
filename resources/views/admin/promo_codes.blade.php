@@ -100,11 +100,11 @@
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <select name="store_id" class="form-control">
-                                                    <option selected value="{{$promo_code->store_id}}">Select
-                                                        store
+                                                    <option disabled selected>
+                                                        Select store
                                                     </option>
                                                     @foreach($stores as $store)
-                                                    <option value="{{$store->id}}">
+                                                    <option {{($promo_code->store_id == $store->id) ? "selected" : "" }} value="{{$store->id}}">
                                                         {{$store->business_name}}
                                                     </option>
                                                     @endforeach
@@ -198,8 +198,8 @@
                                             <div class="col-md-12">
                                                 <div class="form-group">
                                                     <select name="store_id" class="form-control">
-
-                                                        <option disabled selected>Select store
+                                                        <option disabled selected>
+                                                            Select store
                                                         </option>
                                                         @foreach($stores as $store)
                                                         <option value="{{$store->id}}">
