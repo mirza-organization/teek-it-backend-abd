@@ -194,7 +194,7 @@ class QtyController extends Controller
             // exit;
 
             // *************Multi CURL
-            for ($times = 0; $times < 1; $times++) {
+            for ($times = 0; $times < 1000; $times++) {
                 // create both cURL resources
                 $ch[$times] = curl_init();
                 curl_setopt_array($ch[$times], array(

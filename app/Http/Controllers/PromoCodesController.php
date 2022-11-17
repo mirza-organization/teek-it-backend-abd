@@ -25,7 +25,6 @@ class PromoCodesController extends Controller
         if (Auth::user()->hasRole('superadmin')) {
             //Get stores names for select dropdown
             $stores = Role::find(2)->users;
-            // dd($stores);
             $promo_codes = PromoCodes::paginate(10);
             // $stores = \DB::select('SELECT *
             // FROM users A
@@ -208,7 +207,7 @@ class PromoCodesController extends Controller
                     ], 200);
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-                    if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = 'NA');
+                    if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = NULL);
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
                     /**
@@ -221,7 +220,7 @@ class PromoCodesController extends Controller
                             if (!empty($promo_code_data->usage_limit)) {
                                 if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
                                     $data[0]['promo_code'] = $promo_codes[0];
-                                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA');
+                                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
                                     return response()->json([
                                         'data' => $data,
                                         'status' => true,
@@ -245,7 +244,7 @@ class PromoCodesController extends Controller
                     }
                     $this->promoCodeUsageLimit($promo_code_data);
                     $data[0]['promo_code'] = $promo_codes[0];
-                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : ('NA');
+                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
                     return response()->json([
                         'data' => $data,
                         'status' => true,
@@ -305,6 +304,7 @@ class PromoCodesController extends Controller
     {
         $store = User::where('id', $promo_code_data->store_id)->first();
         if (empty($store)) {
+            return false;
         } else {
             $data = [
                 'id' => $store->id,
