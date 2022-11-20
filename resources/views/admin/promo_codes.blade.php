@@ -80,6 +80,13 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
+                                                        <label for="">Expiry date</label>
+                                                        <input type="date" name="expiry_dt" class="form-control"
+                                                            value="{{ $promo_code->expiry_dt }}" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
                                                         <label for="">Min discount</label>
                                                         <input type="number" name="min_amnt_for_discount"
                                                             class="form-control"
@@ -92,13 +99,6 @@
                                                         <input type="number" name="max_amnt_for_discount"
                                                             class="form-control"
                                                             value="{{ $promo_code->max_amnt_for_discount }}" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label for="">Expiry date</label>
-                                                        <input type="date" name="expiry_dt" class="form-control"
-                                                            value="{{ $promo_code->expiry_dt }}" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
