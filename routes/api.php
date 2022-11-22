@@ -56,6 +56,8 @@ Route::group(['prefix' => 'qty'], function ($router) {
     Route::get('product/{store_id}/{prod_id}', 'QtyController@getById');
     Route::post('update/{prod_id}', 'QtyController@updateById');
     Route::get('multi-curl', 'QtyController@multiCURL');
+    // 
+    Route::get('all-big-tbl/{store_id}/{branch_col_name}', 'QtyController@allBigTbl');
 });
 /*
 |--------------------------------------------------------------------------

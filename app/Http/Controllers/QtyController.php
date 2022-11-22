@@ -168,7 +168,11 @@ class QtyController extends Controller
             ], 500);
         }
     }
-
+    /**
+     * It is used to test API's respose time
+     * By sending them bulk requests in a single attempt
+     * @version 1.9.0
+     */
     public function multiCURL()
     {
         try {
@@ -186,9 +190,9 @@ class QtyController extends Controller
             //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             //     CURLOPT_CUSTOMREQUEST => 'GET',
             // ));
-    
+
             // $response = curl_exec($curl);
-            
+
             // curl_close($curl);
             // echo $response;
             // exit;
@@ -198,7 +202,7 @@ class QtyController extends Controller
                 // create both cURL resources
                 $ch[$times] = curl_init();
                 curl_setopt_array($ch[$times], array(
-                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',
+                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all-big-tbl/33/branch100',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
@@ -207,7 +211,7 @@ class QtyController extends Controller
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
                 ));
-            } 
+            }
 
             //create the multiple cURL handle
             $mh = curl_multi_init();
@@ -227,11 +231,46 @@ class QtyController extends Controller
                 curl_multi_remove_handle($mh, $ch[$a]);
             curl_multi_close($mh);
             print_r($mh);
-            exit; 
+            exit;
             return response()->json([
                 'data' => $mh,
                 'status' => true,
                 'message' => config('constants.DATA_UPDATED_SUCCESS')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+    * It fetches products qty
+    * From the big table with 102 cols
+    * @version 1.0.0
+    */
+    public function allBigTbl(Request $request){
+        try {
+            $validate = Validator::make($request->route()->parameters(), [
+                'store_id' => 'required|integer',
+                'branch_col_name' => 'required|string'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validate->errors()
+                ], 422);
+            }
+            $branch_tbl_info = DB::table('big_branch_table')->where('store_id', $request->store_id)->get();
+            // dd($branch_tbl_info[0]->tbl_name);
+            $qty = DB::table($branch_tbl_info[0]->tbl_name)->select('id','prod_id',$request->branch_col_name)->simplePaginate(10);
+            return response()->json([
+                'data' => $qty,
+                'status' => true,
+                'message' => '',
             ], 200);
         } catch (Throwable $error) {
             report($error);
