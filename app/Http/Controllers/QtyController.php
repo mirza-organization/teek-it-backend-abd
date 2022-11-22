@@ -18,7 +18,7 @@ class QtyController extends Controller
     {
         // ini_set('memory_limit', '1024M'); 
         try {
-            $qty = Qty::simplePaginate(15);
+            $qty = Qty::simplePaginate(10);
             // Is Null Kaam Nahi Kr Raha
             if (!is_null($qty)) {
                 return response()->json([
@@ -198,11 +198,12 @@ class QtyController extends Controller
             // exit;
 
             // *************Multi CURL
-            for ($times = 0; $times < 1000; $times++) {
+            for ($times = 0; $times < 100; $times++) {
                 // create both cURL resources
                 $ch[$times] = curl_init();
                 curl_setopt_array($ch[$times], array(
-                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all-big-tbl/33/branch100',
+                    // CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all-big-tbl/33/branch100',
+                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',    
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
@@ -265,8 +266,7 @@ class QtyController extends Controller
                 ], 422);
             }
             $branch_tbl_info = DB::table('big_branch_table')->where('store_id', $request->store_id)->get();
-            // dd($branch_tbl_info[0]->tbl_name);
-            $qty = DB::table($branch_tbl_info[0]->tbl_name)->select('id','prod_id',$request->branch_col_name)->simplePaginate(10);
+            $qty = DB::table($branch_tbl_info[0]->tbl_name)->select('id','prod_id',$request->branch_col_name)->paginate(10);
             return response()->json([
                 'data' => $qty,
                 'status' => true,
