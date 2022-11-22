@@ -2,13 +2,20 @@
 @section('content')
 <!-- Content Header (Page header) -->
 <div class="content-header">
+    @if(session()->has('message'))
+    <div class="alert alert-success">
+        <div class="rmv_msg"> {{ session()->get('message') }}</div>
+    </div>
+    @endif
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
-                <a href="/categories" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Categories</a>
+                <a class="text-site-primary text-center m-auto d-block"
+                    style="width: fit-content; font-size: 3.0em; line-height: 1;">Categories</a>
                 <div class="container">
-                    <a href="" data-toggle="modal" data-target="#exampleModal" class=" d-block text-right float-right btn btn-primary">Add Category</a>
+                    <a href="" data-toggle="modal" data-target="#exampleModal"
+                        class=" d-block text-right float-right btn btn-primary">Add Category</a>
                 </div>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -23,11 +30,13 @@
 
         <div class="row">
             @foreach($categories as $user)
-            <div class="modal fade" id="exampleModal{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+            <div class="modal fade" id="exampleModal{{$user->id}}" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
                 <div class="modal-dialog" role="document">
 
                     <div class="modal-content">
-                        <form method="post" action="{{route('update_cat',['id'=>$user->id])}}" enctype="multipart/form-data">
+                        <form method="post" action="{{route('update_cat',['id'=>$user->id])}}"
+                            enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="modal-header">
                                 <h5 class="modal-title" id="exampleModalLabel">{{$user->category_name}}</h5>
@@ -41,13 +50,15 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="">Name</label>
-                                            <input type="text" name="category_name" class="form-control" value="{{$user->category_name}}">
+                                            <input type="text" name="category_name" class="form-control"
+                                                value="{{$user->category_name}}">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="">Category Image</label>
-                                            <input type="file" name="category_image" class="form-control" value="{{$user->category_name}}">
+                                            <input type="file" name="category_image" class="form-control"
+                                                value="{{$user->category_name}}">
                                         </div>
                                     </div>
 
@@ -64,18 +75,21 @@
             <div class="col-lg-4 col-md-6 col-sm-12 pl-4 pr-4 pb-4">
                 <div class="change-height card" style="height: 317px;">
                     <div class="card-body">
-                        <a href="#" data-toggle="modal" data-target="#exampleModal{{$user->id}}" class="d-block text-right float-right" title="Edit">
+                        <a href="#" data-toggle="modal" data-target="#exampleModal{{$user->id}}"
+                            class="d-block text-right float-right" title="Edit">
                             <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>
 
-                        <a href="{{route('delete_cat',['id'=>$user->id])}}" class="d-block text-right float-right del-icon" title="Delete">
+                        <a href="{{route('delete_cat',['id'=>$user->id])}}"
+                            class="d-block text-right float-right del-icon" title="Delete">
                             <img class="img-size-16" src="/res/res/img/delete.png">
                         </a>
 
                         <div class="card-text">
                             <div class="col-md-12">
                                 <span class="img-container">
-                                    <img class="d-block m-auto" src="{{config('constants.BUCKET') . $user->category_image}}">
+                                    <img class="d-block m-auto"
+                                        src="{{config('constants.BUCKET') . $user->category_image}}">
                                 </span>
                             </div>
                         </div>
@@ -98,7 +112,8 @@
 </div>
 <!-- /.content -->
 
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
 
         <div class="modal-content">
@@ -137,14 +152,14 @@
     </div>
 </div>
 <style>
-    body .img-container img {
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        height: auto;
-        height: 160px;
-        object-fit: scale-down;
-    }
+body .img-container img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    height: auto;
+    height: 160px;
+    object-fit: scale-down;
+}
 </style>
 
 @endsection

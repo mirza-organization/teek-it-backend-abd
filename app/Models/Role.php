@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Models;
 
@@ -10,14 +10,14 @@ use Validator;
 
 class Role extends EntrustRole
 {
-	protected $fillable = [
-    	'name', 'display_name','description'
-	];
+    protected $fillable = [
+        'name', 'display_name', 'description'
+    ];
 
 
-	public static function validator(Request $request)
+    public static function validator(Request $request)
     {
-    	return Validator::make($request->toArray(), [
+        return Validator::make($request->toArray(), [
             'name' => 'required|unique:roles|max:255',
             'display_name' => 'required',
             'description' => 'required',
@@ -35,6 +35,6 @@ class Role extends EntrustRole
 
     public function users()
     {
-        return $this->belongsToMany('App\User','role_user');
+        return $this->belongsToMany('App\User', 'role_user');
     }
-}   
+}

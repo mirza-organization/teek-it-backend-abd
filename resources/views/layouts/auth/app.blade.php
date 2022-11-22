@@ -91,7 +91,8 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyDS4Nf8Ict_2h4lih9DCIt_EpkkBnVd85A"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyDS4Nf8Ict_2h4lih9DCIt_EpkkBnVd85A">
+    </script>
     <script>
         // Google Map Code - Begins
         var map;
@@ -208,7 +209,9 @@
                 var address = '';
                 if (place.address_components) {
                     address = [
-                        (place.address_components[0] && place.address_components[0].short_name || ''), (place.address_components[1] && place.address_components[1].short_name || ''), (place.address_components[2] && place.address_components[2].short_name || '')
+                        (place.address_components[0] && place.address_components[0].short_name || ''), (place
+                            .address_components[1] && place.address_components[1].short_name || ''), (place
+                            .address_components[2] && place.address_components[2].short_name || '')
                     ].join(' ');
                 }
 
@@ -251,6 +254,8 @@
         }
 
         function signUp() {
+            var spinner =
+                '<div  class="d-flex justify-content-center text-white"><div class="spinner-border myspinner"role="status"><span class="sr-only">Loading...</span></div></div>';
             let name = $('#name').val();
             let email = $('#email').val();
             let password = $('#password').val();
@@ -261,6 +266,7 @@
             let Address = [];
             let lat = $('input[id="Address[lat]"]').val();
             let lon = $('input[id="Address[lon]"]').val();
+            $('#signup').html(spinner);
             $.ajax({
                 url: "{{route('register')}}",
                 type: "post",
@@ -277,18 +283,42 @@
                     lon: lon
                 },
                 success: function(response) {
-                    console.log(response);
+                    $('#signup').text('Sign up');
                     if (response == "User Created") {
                         Swal.fire({
                             title: 'Success!',
                             text: 'We have received your store details we will contact you soon to verify your store',
                             icon: 'success',
                             confirmButtonText: 'Ok'
+                        }).then(function() {
+                            location.reload();
                         });
                     } else {
-                        console.log(response.errors);
-                        if(response.errors.name)
-                            console.log(response.errors.name[0]);
+                        $('.error').html('');
+                        if (response.errors.name) {
+                            // console.log(response.errors.name[0]);
+                            $('.name').html('');
+                            $('.name').html(response.errors.name[0]);
+                        }
+                        if (response.errors.email) {
+                            $('.email').html(response.errors.email[0]);
+                        }
+                        if (response.errors.password) {
+                            $('.password').html(response.errors.password[0]);
+                        }
+                        if (response.errors.phone) {
+                            $('.phone').html(response.errors.phone[0]);
+                        }
+                        if (response.errors.company_name) {
+                            $('.company_name').html(response.errors.company_name[0]);
+                        }
+                        if (response.errors.company_phone) {
+                            $('.company_phone').html(response.errors.company_phone[0]);
+                        }
+                        if (response.errors.location_text) {
+                            $('.location').html(response.errors.location_text[0]);
+                        }
+
                     }
                 }
             });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\DeletedUsers;
 use App\Drivers;
 use App\Http\Controllers\ProductsController;
 use App\Products;
@@ -12,17 +13,19 @@ use App\Keys;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Crypt;
 use JWTAuth;
 use Jenssegers\Agent\Agent;
 use App\Models\JwtToken;
 use Illuminate\Http\Request;
 use App\User;
 use App\Models\Role;
-use Crypt;
-use Hash;
-use Mail;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
-use Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -33,7 +36,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'sellerProducts', 'searchSellerProducts']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'sellerProducts', 'searchSellerProducts', 'loginGoogle', 'registerGoogle']]);
     }
     /**
      * Register For Mobile App
@@ -42,72 +45,80 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        $validate = User::validator($request);
-        if ($validate->fails()) {
-            $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
-            return response()->json($response, 400);
-        }
-        $role = Role::where('name', $request->get('role'))->first();
-        if ($request->get('role') == 'buyer') {
-            $is_active = 1;
-        } else {
-            $is_active = 0;
-        }
-        $User = User::create([
-            'name' => $request->name,
-            'l_name' => $request->l_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'business_name' => $request->business_name,
-            'business_location' => $request->business_location,
-            'lat' => json_decode($request->business_location)->lat,
-            'lon' => json_decode($request->business_location)->long,
-            'seller_id' => $request->seller_id,
-            'postal_code' => $request->postal_code,
-            'is_active' => $is_active,
-            'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
-        ]);
-        if ($User) {
-            $filename = $User->user_img;
-            if ($request->hasFile('user_img')) {
-                $file = $request->file('user_img');
-                $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                Storage::disk('spaces')->put($filename, File::get($file));
-                if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                    info("file is store successfully : " . $filename);
-                } else {
-                    info("file is not found :- " . $filename);
+        try {
+            $validate = User::validator($request);
+            if ($validate->fails()) {
+                $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
+                return response()->json($response, 400);
+            }
+            $role = Role::where('name', $request->get('role'))->first();
+            if ($request->get('role') == 'buyer') {
+                $is_active = 1;
+            } else {
+                $is_active = 0;
+            }
+            $User = User::create([
+                'name' => $request->name,
+                'l_name' => $request->l_name,
+                'phone' => $request->phone,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'business_name' => $request->business_name,
+                'business_location' => $request->business_location,
+                'lat' => json_decode($request->business_location)->lat,
+                'lon' => json_decode($request->business_location)->lon,
+                'seller_id' => $request->seller_id,
+                'postcode' => $request->postal_code,
+                'is_active' => $is_active,
+                'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
+            ]);
+            if ($User) {
+                if ($request->hasFile('user_img')) {
+                    $file = $request->file('user_img');
+                    $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+                    Storage::disk('spaces')->put($filename, File::get($file));
+                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                        info("file is store successfully : " . $filename);
+                    } else {
+                        info("file is not found :- " . $filename);
+                    }
+                    $User->user_img = $filename;
+                    $User->save();
                 }
             }
+
+            $User->roles()->sync($role->id);
+            $verification_code = Crypt::encrypt($User->email);
+
+            $FRONTEND_URL = env('FRONTEND_URL');
+            $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
+
+            $html = '<html>
+            Congratulations ' . $User->name . '!<br><br>
+            You have successfully registered on ' . env('APP_NAME') . '.
+            <br>
+            There is just one more step to go. Click on the link below to verify your account so you can start purchasing products on TeekIT today!  <br><br>
+                <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+                ' . $account_verification_link . '
+            <br><br><br>
+            For more information please visit https://teekit.co.uk/ 
+            If you have any further inquiries please email admin@teekit.co.uk
+            </html>';
+
+            Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $User) {
+                $message->to($request->email, $User->name)
+                    ->subject(env('APP_NAME') . ': Account Verification');
+            });
+            $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
+            return response()->json($response, 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
-        $User->user_img = $filename;
-        $User->save();
-
-        $User->roles()->sync($role->id);
-        $verification_code = Crypt::encrypt($User->email);
-
-        $FRONTEND_URL = env('FRONTEND_URL');
-        $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
-
-        $html = '<html>
-        Congratulations ' . $User->name . '!<br><br>
-        You have successfully registered on ' . env('APP_NAME') . '.
-        <br>
-        There is just one more step to go. Click on the link below to verify your account so you can start purchasing products on TeekIT today!  <br><br>
-            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
-            ' . $account_verification_link . '
-        <br><br><br>
-        For more information please visit https://teekit.co.uk/ 
-        If you have any further inquiries please email admin@teekit.co.uk
-        </html>';
-
-        Mail::send('emails.general', ["html" => $html], function ($message) use ($request, $User) {
-            $message->to($request->email, $User->name)
-                ->subject(env('APP_NAME') . ': Account Verification');
-        });
-        $response = array('status' => true, 'role' => $request->role, 'message' => 'You have registered succesfully! We have sent a verification link to your email address. Please click on the link to activate your account.');
-        return response()->json($response, 200);
     }
     /**
      * Get a JWT via given credentials.
@@ -116,20 +127,29 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        try {
+            $credentials = $request->only('email', 'password');
 
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.INVALID_CREDENTIALS')], 401);
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['data' => [], 'status' => false, 'message' => config('constants.INVALID_CREDENTIALS')], 401);
+            }
+            $user = JWTAuth::user();
+            if ($user->email_verified_at == null) {
+                return response()->json(['data' => [], 'status' => false, 'message' => config('constants.EMAIL_NOT_VERIFIED')], 401);
+            }
+            if ($user->is_active == 0) {
+                return response()->json(['data' => [], 'status' => false, 'message' => config('constants.ACCOUNT_DEACTIVATED')], 401);
+            }
+            $this->authenticated($request, $user, $token);
+            return $this->respondWithToken($token);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
-        $user = JWTAuth::user();
-        if ($user->email_verified_at == null) {
-            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.EMAIL_NOT_VERIFIED')], 401);
-        }
-        if ($user->is_active == 0) {
-            return response()->json(['data' => [], 'status' => false, 'message' => config('constants.ACCOUNT_DEACTIVATED')], 401);
-        }
-        $this->authenticated($request, $user, $token);
-        return $this->respondWithToken($token);
     }
 
     public function verify(Request $request)
@@ -143,8 +163,8 @@ class AuthController extends Controller
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => $validate->messages()
-            ], 400);
+                'message' => $validate->errors()
+            ], 422);
         }
 
         $token = $request->token;
@@ -198,8 +218,8 @@ class AuthController extends Controller
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' =>  $validate->messages()
-            ], 400);
+                'message' =>  $validate->errors()
+            ], 422);
         }
 
         $User = JWTAuth::user();
@@ -253,7 +273,7 @@ class AuthController extends Controller
             'total_withdraw' => $user->total_withdraw,
             'is_online' => $user->is_online,
             'last_login' => $user->last_login,
-            'seller_info' => $this->get_seller_info($seller_info),
+            'seller_info' => $this->getSellerInfo($seller_info),
             'roles' => $user->roles->pluck('name'),
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         );
@@ -323,7 +343,7 @@ class AuthController extends Controller
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'vehicle_type' => $user->vehicle_type,
-            'seller_info' => $this->get_seller_info($seller_info),
+            'seller_info' => $this->getSellerInfo($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
@@ -339,11 +359,10 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    private function get_seller_info($seller_info)
+    private function getSellerInfo($seller_info)
     {
         $user = $seller_info;
-        if (!$user)
-            return null;
+        if (!$user) return null;
         $data_info = array(
             'id' => $user->id,
             'name' => $user->name,
@@ -363,7 +382,7 @@ class AuthController extends Controller
 
     public function get_user($user_id)
     {
-        $data_info = $this->get_seller_info(User::find($user_id));
+        $data_info = $this->getSellerInfo(User::find($user_id));
         return $data_info;
     }
 
@@ -455,20 +474,27 @@ class AuthController extends Controller
      */
     public function sellers()
     {
-        $users = User::with('seller')
-            ->where('is_active', '=', 1)->get();
-        $data = [];
-        foreach ($users as $user) {
-            if ($user->hasRole('seller')) {
-                $user->where('is_active', 1);
-                $data[] = $this->get_seller_info($user);
+        try {
+            $users = User::where('is_active', '=', 1)->get();
+            $data = [];
+            foreach ($users as $user) {
+                if (!$user->seller->isEmpty()) {
+                    if ($user->seller[0]->name == 'seller') $data[] = $this->getSellerInfo($user);
+                }
             }
+            return response()->json([
+                'data' => $data,
+                'status' => true,
+                'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => ''
-        ], 200);
     }
     /**
      * Listing of all products w.r.t Seller/Store 'id'
@@ -477,95 +503,125 @@ class AuthController extends Controller
      */
     public function sellerProducts($seller_id)
     {
-        $user = User::find($seller_id);
-        $data = [];
-        if ($user->hasRole('seller')) {
-            // $info = $this->get_seller_info($user); 
-            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
-            $pagination = $products->toArray();
-            if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->get_product_info($product->id);
+        try {
+            $user = User::find($seller_id);
+            $data = [];
+            if ($user->hasRole('seller')) {
+                // $info = $this->getSellerInfo($user); 
+                $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
+                $pagination = $products->toArray();
+                if (!$products->isEmpty()) {
+                    foreach ($products as $product) {
+                        $data[] = (new ProductsController())->get_product_info($product->id);
+                    }
+                    unset($pagination['data']);
+                    return response()->json([
+                        'data' => $data,
+                        'status' => true,
+                        'message' => '',
+                        'pagination' => $pagination
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
                 }
-                // $info['products'] = $products_data;
-                unset($pagination['data']);
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
             } else {
                 return response()->json([
                     'data' => [],
                     'status' => false,
-                    'message' => config('constants.NO_RECORD')
+                    'message' => config('constants.NO_SELLER')
                 ], 200);
             }
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_SELLER')
-            ], 200);
+                'message' => $error
+            ], 500);
         }
     }
     /**
      * Search products w.r.t Seller/Store 'id' & Product Name
      * @author Mirza Abdullah Izhar
-     * @version 1.2.0
+     * @version 1.3.0
      */
     public function searchSellerProducts($seller_id, $product_name)
     {
-        $user = User::find($seller_id);
-        $data = [];
-        if ($user->hasRole('seller')) {
-            $products = Products::query()
-                ->where('user_id', '=', $user->id)
-                ->where('status', '=', 1)
-                ->where('product_name', 'LIKE', '%' . $product_name . '%')->paginate();
-            $pagination = $products->toArray();
-            if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->get_product_info($product->id);
+        try {
+            $user = User::find($seller_id);
+            $data = [];
+            if ($user->hasRole('seller')) {
+                $keywords = explode(" ", $product_name);
+                $article = Products::query();
+                foreach ($keywords as $word) {
+                    $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $product_name . '%')
+                        ->where('user_id', '=', $user->id)
+                        ->where('status', '=', 1);
                 }
-                unset($pagination['data']);
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
+                $products = $article->paginate(20);
+                $pagination = $products->toArray();
+                if (!$products->isEmpty()) {
+                    foreach ($products as $product) {
+                        $data[] = (new ProductsController())->get_product_info($product->id);
+                    }
+                    unset($pagination['data']);
+                    return response()->json([
+                        'data' => $data,
+                        'status' => true,
+                        'message' => '',
+                        'pagination' => $pagination
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'data' => [],
+                        'status' => false,
+                        'message' => config('constants.NO_RECORD')
+                    ], 200);
+                }
             } else {
                 return response()->json([
                     'data' => [],
                     'status' => false,
-                    'message' => config('constants.NO_RECORD')
+                    'message' => config('constants.NO_SELLER')
                 ], 200);
             }
-        } else {
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_SELLER')
-            ], 200);
+                'message' => $error
+            ], 500);
         }
     }
 
     public function deliveryBoys()
     {
-        $users = User::query()->where('seller_id', '=', Auth::id())->get();
-        $data = [];
-        foreach ($users as $user) {
-            if ($user->hasRole('delivery_boy')) {
-                $data[] = $this->get_seller_info($user);
+        try {
+            $users = User::query()->where('seller_id', '=', Auth::id())->get();
+            $data = [];
+            foreach ($users as $user) {
+                if ($user->hasRole('delivery_boy')) {
+                    $data[] = $this->getSellerInfo($user);
+                }
             }
+            return response()->json([
+                'data' => $data,
+                'status' => true,
+                'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
-        return response()->json([
-            'data' => $data,
-            'status' => true,
-            'message' => ''
-        ], 200);
     }
 
     public function getDeliveryBoyInfo($delivery_boy_info)
@@ -599,16 +655,220 @@ class AuthController extends Controller
     }
     /**
      * Listing of all SECRET KEYS
-     * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
     public function keys()
     {
-        $keys = Keys::all();
-        return response()->json([
-            'data' => $keys,
-            'status' => true,
-            'message' => ''
-        ], 200);
+        try {
+            $keys = Keys::all();
+            return response()->json([
+                'data' => $keys,
+                'status' => true,
+                'message' => ''
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+     * It will delete user from users table by id
+     * It will insert the deleted user data into 'Deleted_users' table
+     * @version 1.0.0
+     */
+    public function deleteUser(Request $request)
+    {
+        try {
+            // $validatedData = Validator::make($request->all(), [
+            //     'user_id' => 'required|integer'
+            // ]);
+            // if ($validatedData->fails()) {
+            //     return response()->json([
+            //         'data' => [],
+            //         'status' => false,
+            //         'message' => $validatedData->errors()
+            //     ], 422);
+            // } 
+            // $user = User::find($request->user_id);
+            $user = User::find(Auth::id());
+            if (!empty($user)) {
+                DB::table('deleted_users')->insert([
+                    'user_id' =>  $user->id,
+                    'postcode' =>  $user->postcode,
+                    'created_at' =>   Carbon::now(),
+                    'updated_at' =>   Carbon::now()
+                ]);
+                $user->delete();
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.ITEM_DELETED'),
+                ], 200);
+            }
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => config('constants.NO_RECORD')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+     * Google register
+     * @version 1.0.0
+     */
+    public function registerGoogle(Request $request)
+    {
+        try {
+            $validator = \Validator::make($request->all(), [
+                'name' => 'required|string',
+                'l_name' => 'required|string',
+                'email' => 'required|string|email|max:255|unique:users',
+                'role' => 'required|string|max:255',
+
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validator->errors()
+                ], 422);
+            }
+            $user = User::create([
+                'name' => $request->name,
+                'l_name' => $request->l_name,
+                'email' => $request->email,
+                'address_1' => $request->address_1,
+                'lat' => $request->lat,
+                'lon' => $request->lon,
+                'postcode' => $request->postcode,
+                'contact' => $request->contact,
+            ]);
+            $user->roles()->sync(3);
+            $user = User::where('email', '=', $user->email)->first();
+            $seller_info = [];
+            $seller_info = User::find($user->seller_id);
+            $data_info = array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'l_name' => $user->l_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'address_1' => $user->address_1,
+                'address_2' => $user->address_2,
+                'postal_code' => $user->postal_code,
+                'business_name' => $user->business_name,
+                'business_phone' => $user->business_phone,
+                'business_location' => $user->business_location,
+                'business_hours' => $user->business_hours,
+                'bank_details' => $user->bank_details,
+                'user_img' => $user->user_img,
+                'pending_withdraw' => $user->pending_withdraw,
+                'total_withdraw' => $user->total_withdraw,
+                'is_online' => $user->is_online,
+                'last_login' => $user->last_login,
+                'seller_info' => $this->getSellerInfo($seller_info),
+                'roles' => $user->roles->pluck('name'),
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            );
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'data' => [
+                    'user' => $data_info,
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
+                'status' => true,
+                'message' => config('constants.REGISTER_SUCCESS'),
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+     * Google login via email
+     * @version 1.0.0
+     */
+    public function loginGoogle(Request $request)
+    {
+        try {
+            $validator = \Validator::make($request->all(), [
+                'email' => 'required|string|email|max:255',
+            ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validator->errors()
+                ], 422);
+            }
+            $user = User::where('email', '=', $request->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' =>  config('constants.INVALID_CREDENTIALS')
+                ], 401);
+            }
+            $seller_info = [];
+            $seller_info = User::find($user->seller_id);
+            $data_info = array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'l_name' => $user->l_name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'address_1' => $user->address_1,
+                'address_2' => $user->address_2,
+                'postal_code' => $user->postal_code,
+                'business_name' => $user->business_name,
+                'business_phone' => $user->business_phone,
+                'business_location' => $user->business_location,
+                'business_hours' => $user->business_hours,
+                'bank_details' => $user->bank_details,
+                'user_img' => $user->user_img,
+                'pending_withdraw' => $user->pending_withdraw,
+                'total_withdraw' => $user->total_withdraw,
+                'is_online' => $user->is_online,
+                'last_login' => $user->last_login,
+                'seller_info' => $this->getSellerInfo($seller_info),
+                'roles' => $user->roles->pluck('name'),
+                'expires_in' => JWTAuth::factory()->getTTL() * 60,
+            );
+            $token = JWTAuth::fromUser($user);
+            return response()->json([
+                'data' => [
+                    'user_id' => $data_info,
+                    'access_token' => $token,
+                    'token_type' => 'bearer',
+                    'expires_in' => JWTAuth::factory()->getTTL() * 60,
+                ],
+                'status' => true,
+                'message' =>   config('constants.LOGIN_SUCCESS'),
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
     }
 }

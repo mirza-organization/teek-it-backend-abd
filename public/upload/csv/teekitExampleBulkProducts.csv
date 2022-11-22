@@ -1,5 +1,0 @@
-category_id,product_name,sku,qty,price,discount_percentage,weight,brand,size,status,contact,colors,bike,van,height,width,length
-1, Hammer, 1144, 50,25,20,200,TS,medium,1,03009148007,"blue,green",1,0,25,22,23
-2, Nut Bold, 1145, 51,26,21,201,TS,mediumm,2,03009148007,"blue,yellow",0,1,26,23,24
-3, Copper Wire, 1146, 52,27,22,202,TS,small,3,03009148007,"blue,yellow",0,1,26,23,24
-4, Screw Guage, 1147, 53,28,23,203,TS,large,4,03009148007,"blue,black",1,0,26,23,24

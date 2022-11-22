@@ -45,6 +45,11 @@ return [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
+        'rider' => [
+            'driver' => 'jwt',
+            'provider' => 'riders',
+        ],
+
     ],
 
     /*
@@ -69,6 +74,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\User::class,
             'table' => 'users',
+        ],
+        'riders' => [
+            'driver' => 'eloquent',
+            'model' => App\Drivers::class,
+            // 'table' => 'drivers',
         ],
 
         // 'users' => [
@@ -97,6 +107,12 @@ return [
             'provider' => 'users',
             'table' => 'password_resets',
             'expire' => 60,
+        ],
+        'riders' => [
+            'provider' => 'riders',
+            'table' => 'password_resets',
+            'expire' => 60,
+            'throttle' => 60,
         ],
     ],
 

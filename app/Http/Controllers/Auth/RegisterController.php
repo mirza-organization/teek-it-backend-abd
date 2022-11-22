@@ -85,6 +85,7 @@ class RegisterController extends Controller
      */
     protected function register(Request $request)
     {
+
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
             return response()->json([
@@ -155,17 +156,25 @@ class RegisterController extends Controller
             'settings' => '{"notification_music": 1}',
             'is_active' => 0,
         ]);
-        if($User) echo "User Created";
+        if ($User) {
+            echo "User Created";
+        }
         $User->roles()->sync($role->id);
+
         $verification_code = Crypt::encrypt($User->email);
         $FRONTEND_URL = env('FRONTEND_URL');
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
-
         $html = '<html>
-            Hi, ' . $User->name . '<br><br>
-            Thank you for registering on ' . env('APP_NAME') . '.
+            Hi, Team Teek IT.<br><br>
+           A new store signed up today.
             <br>
-            Here is your account verification link. Click on below link to verify your account. <br><br>
+           Please verify their details and take your decision to allow or disallow the store on our platform.<br><br>
+           <strong>Store Name:</strong> '  .  $User->business_name   .  '<br>
+           <strong>Owner Name:</strong> '  .  $User->name   .  '<br>
+           <strong>Email:</strong> '  .  $User->email  .  '<br>
+           <strong>Contact:</strong> '  .  $User->business_phone  .  '<br>
+           <strong>Address:</strong> '  .  $User->address_1  .  '
+           <br><br>
             <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
             ' . $account_verification_link . '
             <br><br><br>
@@ -194,6 +203,7 @@ class RegisterController extends Controller
             if (!empty($adminHtml)) Mail::to($user->email)
                 ->send(new StoreRegisterMail($adminHtml, $admin_subject));
         }
+
         // return Redirect::route('login');
     }
 }

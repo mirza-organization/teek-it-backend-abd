@@ -17,6 +17,7 @@
         "laracasts/flash": "^3.1",
         "laravel/framework": "^6.0",
         "laravel/tinker": "^1.0",
+        "lcobucci/jwt": "3.3.1",
         "league/flysystem-aws-s3-v3": "~1.0",
         "stripe/stripe-php": "7.3",
         "twilio/sdk": "^6.28",

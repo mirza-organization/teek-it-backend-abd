@@ -6,7 +6,8 @@
         <div class="row mb-2">
             <div class="col-sm-12">
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
-                <a href="/drivers" class="text-site-primary text-center m-auto d-block" style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Drivers</a>
+                <a class="text-site-primary text-center m-auto d-block"
+                    style="width: fit-content; font-size: 3.0em; line-height: 1;">Drivers</a>
                 <div class="float-right">
                     <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>
@@ -42,7 +43,8 @@
         <div class="row">
             @foreach($users as $user)
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal{{$user->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="exampleModal{{$user->id}}" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -76,9 +78,13 @@
                                         <label for="" class="mt-5">
 
                                             @if($user->is_active==0)
-                                            <a href="{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}"> <span class="text-success">Click here to Enable Account</span></a>
+                                            <a
+                                                href="{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}">
+                                                <span class="text-success">Click here to Enable Account</span></a>
                                             @else
-                                            <a href="{{route('change_user_status',['user_id'=>$user->id,'status'=>0])}}"> <span class="text-danger">Click here to Disable Account </span></a>
+                                            <a
+                                                href="{{route('change_user_status',['user_id'=>$user->id,'status'=>0])}}">
+                                                <span class="text-danger">Click here to Disable Account </span></a>
                                             @endif
                                         </label>
                                     </div>
@@ -101,7 +107,9 @@
                     @endif">
                     <div class="card-body">
                         <input type="checkbox" class="select-checkbox" title="Select" id="{{$user->id}}">
-                        <a class="d-block text-right float-right" title="Edit" href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal" pdata-target="#exampleModal{{$user->id}}">
+                        <a class="d-block text-right float-right" title="Edit"
+                            href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal"
+                            pdata-target="#exampleModal{{$user->id}}">
                             <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>
                         <div class="card-text">
@@ -135,14 +143,14 @@
 
 
 <style>
-    body .img-container img {
-        width: auto;
-        height: auto;
-        max-width: 100%;
-        height: auto;
-        height: 160px;
-        object-fit: scale-down;
-    }
+body .img-container img {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    height: auto;
+    height: 160px;
+    object-fit: scale-down;
+}
 </style>
 <!-- /.content -->
 @endsection

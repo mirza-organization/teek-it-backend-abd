@@ -26,6 +26,8 @@ Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
 Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 Route::post('auth/register', 'Auth\AuthController@register');
 Route::get('auth/verify', 'Auth\AuthController@verify');
+Route::post('auth/register_google', 'Auth\AuthController@registerGoogle');
+Route::post('auth/login_google', 'Auth\AuthController@loginGoogle');
 /*
 |--------------------------------------------------------------------------
 | Authentication API Routes
@@ -41,6 +43,21 @@ Route::group(['prefix' => 'auth'], function ($router) {
     Route::get('me', 'Auth\AuthController@me');
     Route::get('delivery_boys', 'Auth\AuthController@deliveryBoys');
     Route::get('get_user/{user_id}', 'Auth\AuthController@getDeliveryBoyInfo');
+    Route::post('user/delete', 'Auth\AuthController@deleteUser');
+});
+/*
+|--------------------------------------------------------------------------
+| Qty API Routes
+|--------------------------------------------------------------------------
+*/
+Route::group(['prefix' => 'qty'], function ($router) {
+    Route::get('all', 'QtyController@all');
+    Route::get('product/{store_id}', 'QtyController@getByStoreId');
+    Route::get('product/{store_id}/{prod_id}', 'QtyController@getById');
+    Route::post('update/{prod_id}', 'QtyController@updateById');
+    Route::get('multi-curl', 'QtyController@multiCURL');
+    // 
+    Route::get('all-big-tbl/{store_id}/{branch_col_name}', 'QtyController@allBigTbl');
 });
 /*
 |--------------------------------------------------------------------------
@@ -103,7 +120,7 @@ Route::group(['prefix' => 'notifications'], function ($router) {
     Route::get('', 'NotificationsController@getNotifications');
     Route::post('save_token', 'NotificationsController@saveToken');
     Route::get('delete/{notification_id}', 'NotificationsController@deleteNotification');
-    Route::post('send_test', 'NotificationsController@sendNotificationTest');
+    Route::post('send_test', 'NotificationsController@notificationSendTest');
 });
 /*
 |--------------------------------------------------------------------------
@@ -113,7 +130,9 @@ Route::group(['prefix' => 'notifications'], function ($router) {
 Route::group(['middleware' => ['jwt.verify']], function ($router) {
     Route::group(['prefix' => 'product'], function ($router) {
         Route::post('add', 'ProductsController@add');
+        Route::post('add/bulk', 'ProductsController@importProductsAPI');
         Route::post('update/{product_id}', 'ProductsController@update');
+        Route::post('update_price/bulk', 'ProductsController@updatePriceBulk');
         Route::get('delete/{product_id}', 'ProductsController@delete');
         Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@deleteImage');
         Route::post('ratings/add', 'RattingsController@add');
@@ -141,7 +160,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('/recent_orders/{store_id}', 'OrdersController@recentOrders');
     });
 
-    Route::group(['prefix' => 'driver'], function () {
+    Route::group(['prefix' => 'driver'], function ($router) {
         Route::get('/info/{id}', 'Api\v1\DriverController@info');
         Route::post('/add-lat-lon', 'Api\v1\DriverController@addLatLon');
         Route::get('/withdrawable-balance', 'Api\v1\DriverController@getWithdrawalBalance');
@@ -150,6 +169,10 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::get('/all-withdrawals', 'Api\v1\DriverController@driverAllWithdrawalRequests');
         Route::post('/check_verification_code/{order_id}', 'Api\v1\DriverController@checkVerificationCode');
         Route::post('/driver_failed_to_enter_code/{order_id}', 'Api\v1\DriverController@driverFailedToEnterCode');
+    });
+
+    Route::group(['prefix' => 'promocodes'], function ($router) {
+        Route::post('/validate', 'PromoCodesController@promocodesValidate');
     });
 
     Route::get('keys', 'Auth\AuthController@keys');
@@ -214,11 +237,20 @@ Route::get('time', function () {
 });
 
 Route::get('generate_hash', function () {
-    return response()->json([
-        'data' => Hash::make($_REQUEST['password']),
-        'status' => true,
-        'message' => ''
-    ], 200);
+    try {
+        return response()->json([
+            'data' => Hash::make($_REQUEST['password']),
+            'status' => true,
+            'message' => ''
+        ], 200);
+    } catch (Throwable $error) {
+        report($error);
+        return response()->json([
+            'data' => [],
+            'status' => false,
+            'message' => $error
+        ], 500);
+    }
 });
 
 Route::fallback(function () {

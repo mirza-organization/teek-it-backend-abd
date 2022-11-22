@@ -7,10 +7,12 @@
             <h1 class="text-white text-center">{{ __('Sign Up') }}</h1>
 
             <form id="sign_up_form" style="margin-bottom: 100px;" onsubmit="return false">
-               
+
                 <div class="form-group row">
                     <div class="col-md-12">
-                        <input id="name" type="text" placeholder="Name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required autofocus>
+                        <input id="name" type="text" placeholder="Name"
+                            class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name"
+                            value="{{ old('name') }}" autofocus>
 
                         @if ($errors->has('name'))
                         <span class="invalid-feedback" role="alert">
@@ -18,74 +20,83 @@
                         </span>
                         @endif
                     </div>
+                    <p id="name" class="text-danger name error"></p>
                 </div>
-
                 <div class="form-group row">
                     <div class="col-md-12">
-                        <input id="email" type="email" placeholder="Email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
-
+                        <input id="email" type="email" placeholder="Email"
+                            class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email"
+                            value="{{ old('email') }}" autofocus>
                         @if ($errors->has('email'))
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $errors->first('email') }}</strong>
                         </span>
                         @endif
                     </div>
+                    <p id="email" class="text-danger email error"></p>
                 </div>
-
                 <div class="form-group row">
                     <div class="col-md-12">
-                        <input id="password" placeholder="Password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" minlength="8" required>
-
+                        <input id="password" placeholder="Password" type="password"
+                            class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password"
+                            minlength="8">
                         @if ($errors->has('password'))
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $errors->first('password') }}</strong>
                         </span>
                         @endif
                     </div>
+                    <p id="password" class="text-danger password error"></p>
                 </div>
-
                 <div class="form-group row">
                     <div class="col-md-12 input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">+44</span>
                         </div>
-                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" placeholder="Phone Number" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" id="phone" name="phone" value="{{ old('phone') }}" required autofocus>
-
+                        <input type="text"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                            maxlength="10" placeholder="Phone Number"
+                            class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" id="phone" name="phone"
+                            value="{{ old('phone') }}" autofocus>
                         @if ($errors->has('phone'))
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $errors->first('phone') }}</strong>
                         </span>
                         @endif
                     </div>
+                    <p id="phone" class="text-danger phone error"></p>
                 </div>
-
                 <div class="form-group row">
                     <div class="col-md-12">
-                        <input id="company_name" type="text" placeholder="Company Name" class="form-control{{ $errors->has('company_name') ? ' is-invalid' : '' }}" name="company_name" value="{{ old('company_name') }}" required autofocus>
-
+                        <input id="company_name" type="text" placeholder="Company Name"
+                            class="form-control{{ $errors->has('company_name') ? ' is-invalid' : '' }}"
+                            name="company_name" value="{{ old('company_name') }}" autofocus>
                         @if ($errors->has('company_name'))
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $errors->first('company_name') }}</strong>
                         </span>
                         @endif
                     </div>
+                    <p id="company_name" class="text-danger company_name error"></p>
                 </div>
-
                 <div class="form-group row">
                     <div class="col-md-12 input-group">
                         <div class="input-group-prepend">
                             <span class="input-group-text">+44</span>
                         </div>
-                        <input type="text" oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" maxlength="10" placeholder="Company Phone" class="form-control{{ $errors->has('company_phone') ? ' is-invalid' : '' }}" id="company_phone" name="company_phone" value="{{ old('company_phone') }}" required autofocus>
-
+                        <input type="text"
+                            oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+                            maxlength="10" placeholder="Company Phone"
+                            class="form-control{{ $errors->has('company_phone') ? ' is-invalid' : '' }}"
+                            id="company_phone" name="company_phone" value="{{ old('company_phone') }}" autofocus>
                         @if ($errors->has('company_phone'))
                         <span class="invalid-feedback" role="alert">
                             <strong>{{ $errors->first('company_phone') }}</strong>
                         </span>
                         @endif
                     </div>
+                    <p id="company_phone" class="text-danger company_phone error"></p>
                 </div>
-
                 <div class="form-group row">
                     <div class="col-md-12">
                         <div class="form-group" data-toggle="modal" data-target="#map_modal" style="cursor: pointer;">
@@ -97,15 +108,16 @@
                             <input type="hidden" id="Address[lon]" name="Address[lon]">
                         </div>
                     </div>
+                    <p id="company_phone" class="text-danger location error"></p>
                 </div>
-
                 <div class="form-group row mb-0">
                     <div class="col-md-12">
-                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="padding: 5px 25px; display: block;width: 100%;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0;" onclick="signUp()">Sign up</button>
+                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"
+                            style="padding: 5px 25px; display: block;width: 100%;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0;"
+                            id="signup" onclick="signUp()">Sign up</button>
                     </div>
                 </div>
             </form>
-
             <!-- <form style="display: none" method="POST" action="{{ route('login') }}">
                 @csrf
 
@@ -182,8 +194,11 @@
                                 <div class="row">
                                     <div class="col-md-12 mt-3 mb-3">
                                         <div class="form-group" style="height:100%; width:100%">
-                                            <input type="text" class="form-control" name="modal_location_text" id="modal_location_text" />
-                                            <div class="mt-3 mb-3" style="height: 100%; width: 100%; margin: 0px; padding: 0px;min-height: 200px;" id="map-canvas"></div>
+                                            <input type="text" class="form-control" name="modal_location_text"
+                                                id="modal_location_text" />
+                                            <div class="mt-3 mb-3"
+                                                style="height: 100%; width: 100%; margin: 0px; padding: 0px;min-height: 200px;"
+                                                id="map-canvas"></div>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
@@ -199,7 +214,8 @@
                                         <label for="Address">Long</label>
                                         <input type="text" name="ad_long" id="ad_long" class="form-control">
                                     </div>
-                                    <button type="submit" onclick="submitLocation()" class="d-no mt-3 btn btn-submit btn-block btn-outline-primary">Submit</button>
+                                    <button type="submit" onclick="submitLocation()"
+                                        class="d-no mt-3 btn btn-submit btn-block btn-outline-primary">Submit</button>
                                 </div>
                             </div>
                         </div>

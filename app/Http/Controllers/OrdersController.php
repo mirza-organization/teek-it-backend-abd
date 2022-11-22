@@ -358,7 +358,7 @@ class OrdersController extends Controller
     /**
      * Inserts a newly arrived order
      * @author Mirza Abdullah Izhar
-     * @version 1.2.0
+     * @version 1.3.0
      */
     public function new(Request $request)
     {
@@ -436,23 +436,21 @@ class OrdersController extends Controller
             $seller_money = $seller->pending_withdraw;
             $seller->pending_withdraw = $order_total + $seller_money;
             $seller->save();
-
-            $customer_lat = $request->lat;
-            $customer_lon = $request->lon;
-            $store_lat = $seller->lat;
-            $store_lon = $seller->lon;
-            $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
-            // print_r($distance); exit;
-            // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
-            // print_r($distance); exit;
-            $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
-
+            if ($request->type == 'delivery') {
+                $customer_lat = $request->lat;
+                $customer_lon = $request->lon;
+                $store_lat = $seller->lat;
+                $store_lon = $seller->lon;
+                $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
+                // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
+                $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
+            }
             $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
-            $new_order->total_items = $total_items;
-            $new_order->lat = $customer_lat;
-            $new_order->lon = $customer_lon;
+            $new_order->total_items = $total_items; 
+            $new_order->lat = ($request->type == 'delivery') ? $customer_lat : NULL;
+            $new_order->lon = ($request->type == 'delivery') ? $customer_lon : NULL;
             $new_order->type = $request->type;
             if ($request->type == 'delivery') {
                 $new_order->receiver_name = $request->receiver_name;
@@ -653,7 +651,6 @@ class OrdersController extends Controller
         // $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
-
     public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
         $address1 = $latitude1 . ',' . $longitude1;
@@ -672,6 +669,7 @@ class OrdersController extends Controller
         // return $miles > 1 ? $miles : 1;
         return $miles;
     }
+
     /**
      * This function will return back store open/close & product qty status
      * Along with this information it will also send store_id & product_id
@@ -681,19 +679,19 @@ class OrdersController extends Controller
      */
     public function recheckProducts(Request $request)
     {
-        $validatedData = Validator::make($request->all(), [
-            'items' => 'required|array',
-            'day' => 'required|string',
-            'time' => 'required|string'
-        ]);
-        if ($validatedData->fails()) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $validatedData->errors()
-            ], 422);
-        }
         try {
+            $validatedData = Validator::make($request->all(), [
+                'items' => 'required|array',
+                'day' => 'required|string',
+                'time' => 'required|string'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validatedData->errors()
+                ], 422);
+            }
             $i = 0;
             foreach ($request->items as $item) {
                 $open_time = User::query()->select('business_hours->time->' . $request->day . '->open as open')
@@ -728,8 +726,8 @@ class OrdersController extends Controller
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
+                'message' => $error
+            ], 500);
         }
     }
     /**

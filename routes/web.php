@@ -1,6 +1,4 @@
 <?php
-
-use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 | For Adding Authentication On All Of The Following Routes
 |--------------------------------------------------------------------------
 */
+
 Auth::routes();
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +47,7 @@ Route::get('/inventory/feature/remove/{product_id}', 'HomeController@removeFromF
 | User Settings Routes
 |--------------------------------------------------------------------------
 */
+Route::post('/user_info/update', 'HomeController@userInfoUpdate')->name('admin.userinfo.update');
 Route::get('/settings/general', 'HomeController@generalSettings');
 Route::get('/settings/payment', 'HomeController@paymentSettings');
 Route::post('/settings/payment/update', 'HomeController@paymentSettingsUpdate')->name('payment_settings_update');
@@ -73,6 +73,7 @@ Route::get('/orders/ready_state/{order_id}', 'HomeController@changeOrderStatus')
 Route::get('/orders/mark_as_delivered/{order_id}', 'HomeController@markAsDelivered')->name('mark_as_delivered');
 Route::get('/orders/mark_as_completed/{order_id}', 'HomeController@markAsCompleted')->name('mark_as_completed');
 Route::get('/orders/cancel/{order_id}', 'HomeController@cancelOrder')->name('cancel_order');
+Route::get('/orders/verify/{order_id}', 'HomeController@clickToVerify')->name('verify_order');
 /*
 |--------------------------------------------------------------------------
 | Withdrawal Routes
@@ -98,6 +99,8 @@ Route::get('/customers', 'HomeController@adminCustomers');
 Route::get('/drivers', 'HomeController@adminDrivers')->name('admin.drivers');
 Route::get('/promocodes/home', 'PromoCodesController@promocodesHome')->name('admin.promocodes.home');
 Route::post('/promocodes/add', 'PromoCodesController@promocodesAdd')->name('admin.promocodes.add');
+Route::get('/promocodes/delete', 'PromoCodesController@promoCodesDel')->name('admin.promocodes.del');
+Route::post('/promocodes/{id}/update', 'PromoCodesController@promoCodesUpdate')->name('admin.promocodes.update');
 Route::get('/aorders', 'HomeController@adminOrders');
 Route::get('/aorders/verified', 'HomeController@adminOrdersVerified');
 Route::get('/aorders/unverified', 'HomeController@adminOrdersUnverified');
@@ -115,28 +118,10 @@ Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndR
 Route::post('/update_pages', 'HomeController@updatePages')->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', 'HomeController@changeUserStatus')->name('change_user_status');
 Route::get('/users_del', 'HomeController@adminUsersDel')->name('admin.del.users');
+Route::post('/store_info/update', 'HomeController@updateStoreInfo')->name('admin.image.update');
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route
 |--------------------------------------------------------------------------
 */
 Route::get('/my_order_count', 'HomeController@myOrderCount')->name('my_order_count');
-
-// Route::get('send-message', function () {
-//     $receiverNumber = "+923006694349";
-//     $message = "This is testing from teek-it";
-//     try {
-//         $account_sid = config("app.TWILIO_SID");
-//         $auth_token = config("app.TWILIO_TOKEN");
-//         $twilio_number = config("app.TWILIO_FROM");
-
-//         $client = new Client($account_sid, $auth_token);
-//         $client->messages->create($receiverNumber, [
-//             'from' => $twilio_number,
-//             'body' => $message
-//         ]);
-//         dd('SMS Sent Successfully.');
-//     } catch (Exception $e) {
-//         dd("Error: " . $e->getMessage());
-//     }
-// });

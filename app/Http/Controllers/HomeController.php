@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Stripe;
+use Throwable;
 
 class HomeController extends Controller
 {
@@ -56,11 +57,8 @@ class HomeController extends Controller
                 ->whereNotNull('order_status')
                 ->orderby(\DB::raw('case when is_viewed = 0 then 0 when order_status = "pending" then 1 when order_status = "ready" then 2 when order_status = "assigned" then 3
                  when order_status = "onTheWay" then 4 when order_status = "delivered" then 5 end'))
-                ->simplePaginate(5);
+                ->paginate(5);
             return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
-            // return View::composer('shopkeeper.dashboard', function ($view) {
-            //     $view->with('user', $user)->with('pending_orders', 'On GeeksforGeeks')->with('pending_orders', );
-            // });
         } else {
             return $this->admin_home();
         }
@@ -178,7 +176,7 @@ class HomeController extends Controller
         flash('All Products Enabled Successfully')->success();
         return Redirect::back();
     }
-      /**
+    /**
      * Disable's all products of logged-in user
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
@@ -213,7 +211,7 @@ class HomeController extends Controller
                 flash('Marked As Featured, Successfully')->success();
             }
             return Redirect::back();
-        }else{
+        } else {
             abort(404);
         }
     }
@@ -623,9 +621,9 @@ class HomeController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
-            $extension = $file->getClientOriginalExtension(); //Get extension of uploaded file
-            $tempPath = $file->getRealPath();
-            $fileSize = $file->getSize(); //Get size of uploaded file in bytes
+            // $extension = $file->getClientOriginalExtension(); //Get extension of uploaded file
+            // $tempPath = $file->getRealPath();
+            // $fileSize = $file->getSize(); //Get size of uploaded file in bytes
 
             //Check for file extension and size
             // $this->checkUploadedFileProperties($extension, $fileSize);
@@ -672,11 +670,12 @@ class HomeController extends Controller
                 $product->contact = $importData[10];
                 $product->colors = ($importData[11] == "null") ? NULL : $importData[11];
                 $product->bike = $importData[12];
-                $product->van = $importData[13];
+                $product->car = $importData[13];
+                $product->van = $importData[14];
                 $product->feature_img = $importData[18];
-                $product->height = $importData[14];
-                $product->width = $importData[15];
-                $product->length = $importData[16];
+                $product->height = $importData[15];
+                $product->width = $importData[16];
+                $product->length = $importData[17];
                 $product->save();
 
                 $product_images = new productImages();
@@ -1299,16 +1298,15 @@ class HomeController extends Controller
 
     public function completeOrders()
     {
-        $orders = Orders::with(['user', 'delivery_boy'])
-            ->has('user')
-            ->has('delivery_boy')
-            ->where('type', 'delivery')
-            ->where('delivery_status', '=', 'pending_approval')
-            //            ->where('order_status', 'delivered')
-            ->get();
+        $orders = DB::table('orders')
+            ->leftJoin('users', 'orders.user_id', '=', 'users.id')
+            ->LeftJoin('drivers', 'orders.delivery_boy_id', '=', 'drivers.id')
+            ->where('delivery_status', '=', 'complete')
+            ->where('order_status', '=', 'complete')
+            ->select('drivers.f_name', 'drivers.l_name', 'orders.id', 'orders.total_items', 'orders.phone_number', 'orders.house_no', 'orders.address',  'orders.type', 'users.name')
+            ->paginate(10);
         return view('admin.complete-orders', compact('orders'));
     }
-
     /**
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
@@ -1361,5 +1359,110 @@ class HomeController extends Controller
             ->send(new OrderIsCanceledMail($order));
         flash('Order is successfully canceled')->success();
         return back();
+    }
+
+    /**
+     * it will update the store info via popup modal
+     * @author Mirza Abdullah Izhar
+     * @version 1.3.0
+     */
+    public function updateStoreInfo(Request $request)
+    {
+        $validatedData = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'business_name' => 'required|string',
+            'phone' => 'required|max:13',
+            'business_phone' => 'required|max:13',
+        ]);
+        if ($validatedData->fails()) {
+            return response()->json([
+                'errors' => $validatedData->errors()
+            ], 200);
+            exit;
+        }
+        $phone = substr($request->phone, 0, 3);
+        $business_phone = substr($request->business_phone, 0, 3);
+        $store_info = User::find($request->id);
+        if ($request->hasFile('store_image')) {
+            $file = $request->file('store_image');
+            $filename = uniqid($store_info->id . "_" . $store_info->name . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
+            Storage::disk('spaces')->put($filename, File::get($file));
+            if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+                info("file is store successfully : " . $filename);
+            } else {
+                info("file is not found :- " . $filename);
+            }
+        }
+        $filename = $store_info->user_img;
+        if ($phone == '+44') {
+            $store_info->phone = $request->phone;
+        } else {
+            $store_info->phone = '+44' . $request->phone;
+        }
+        if ($business_phone == '+44') {
+            $store_info->business_phone = $request->business_phone;
+        } else {
+            $store_info->business_phone = '+44' . $request->business_phone;
+        }
+        $store_info->name = $request->name;
+        $store_info->business_name = $request->business_name;
+        $store_info->user_img = $filename;
+        $store_info->save();
+        if ($store_info) {
+            echo 'Data Saved';
+        }
+    }
+    /**
+     * it will update the user info via popup modal
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function userInfoUpdate(Request $request)
+    {
+        $is_valid = Validator::make($request->all(), [
+            'name' => 'required|string',
+            'business_name' => 'required|string',
+            'phone' => 'required|string|min:13|max:13',
+            'business_phone' => 'required|string|min:13|max:13',
+        ]);
+        if ($is_valid->fails()) {
+            return response()->json([
+                'errors' => $is_valid->errors()
+            ], 200);
+            exit;
+        }
+        $store_name = User::find($request->id);
+        if ($request->all()) {
+            echo "Data Sent";
+        }
+        $html = '<html>
+        Hi, Team Teek IT.<br><br>
+        '  .  $store_name->business_name   .  ' has demanded to update their business information as following:-<br><br>
+       <strong> Name:</strong> '  .  $request->name   .  '<br>
+       <strong>Business Name:</strong> '  .  $request->business_name   .  '<br>
+       <strong>Phone:</strong> '  .  $request->phone  .  '<br>
+       <strong>Business Phone:</strong> '  .  $request->business_phone  .  '<br>
+       <br><br>
+       Please verify this information & take your desision about modifying their business information.
+       <br><br>
+       From,
+       <br>
+       Teek it
+       </html>';
+        $subject = env('APP_NAME') . ': User Info Update';
+        Mail::to(config('constants.ADMIN_EMAIL'))
+            ->send(new StoreRegisterMail($html, $subject));
+    }
+    /**
+     * it will update the unverified orders to verified
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function clickToVerify($order_id)
+    {
+        VerificationCodes::where('order_id', $order_id)
+            ->update(['code->driver_failed_to_enter_code' => 'No']);
+        flash('Order Verified Successfully')->success();
+        return Redirect::back();
     }
 }

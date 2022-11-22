@@ -98,3 +98,8 @@ input:checked + .slider:before {
         font-size: 12px;
     }
 }
+.spinner-border{
+    color: black;
+    width: 19px;
+    height:19px;
+}

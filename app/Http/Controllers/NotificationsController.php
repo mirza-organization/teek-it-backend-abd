@@ -121,20 +121,29 @@ class NotificationsController extends Controller
 
     public function deleteNotification($notification_id)
     {
-        $notification = notifications::find($notification_id);
-        if (!empty($notification)) {
-            $notification->delete();
+        try {
+            $notification = notifications::find($notification_id);
+            if (!empty($notification)) {
+                $notification->delete();
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.ITEM_DELETED'),
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
-                'status' => true,
-                'message' => 'Notification Deleted'
-            ], 200);
-        } else {
-            return response()->json([
-                'data' => [],
-                'status' => true,
-                'message' => 'There is No Notification with the given ID or maybe already Deleted'
-            ], 200);
+                'status' => false,
+                'message' => $error
+            ], 500);
         }
     }
 
@@ -178,7 +187,7 @@ class NotificationsController extends Controller
     /**
      * It will send notifications
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function notificationSend(Request $request)
     {
@@ -189,13 +198,12 @@ class NotificationsController extends Controller
                     flash('Error in sending notification because a required field is missing or invalid data.')->error();
                     return Redirect::back()->withInput($request->input());
                 }
-
                 $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
                 $data = [
                     "registration_ids" => $firebaseToken,
-                    "data" => [
+                    "notification" => [
                         "title" => $request->title,
-                        "message" => $request->message,
+                        "body" => $request->body,
                     ],
                     "priority" => "high"
                 ];
@@ -204,7 +212,6 @@ class NotificationsController extends Controller
                     'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
                     'Content-Type: application/json',
                 ];
-
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
                 curl_setopt($ch, CURLOPT_POST, true);
@@ -213,7 +220,7 @@ class NotificationsController extends Controller
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
                 curl_exec($ch);
-
+                curl_close($ch);
                 return back()->with('success', 'Notification send successfully.');
             } else {
                 abort(404);
@@ -243,12 +250,18 @@ class NotificationsController extends Controller
             $firebaseToken = DeviceToken::whereNotNull('device_token')->pluck('device_token')->all();
             $data = [
                 "registration_ids" => $firebaseToken,
-                "data" => [
+                "notification" => [
                     "title" => $request->title,
-                    "message" => $request->message,
+                    "body" => $request->body,
                 ],
                 "priority" => "high"
             ];
+
+            // "data" => [
+            //     "title" => $request->title,
+            //     "message" => $request->message,
+            // ],
+
             $dataString = json_encode($data);
             $headers = [
                 'Authorization: key=AAAAQ4iVuPM:APA91bGUp791v4RmZlEm3Dge71Yoj_dKq-XIytfnHtvCnHdmiH-BTZGlaCHGydnWvd976Mm5bSU6OFUNZqSf9YdamZifR3HMUl4m57RE21vSzrgGpfHmvYS47RQxDHV4WIN4zPFfNO-A',
@@ -262,8 +275,12 @@ class NotificationsController extends Controller
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
-            $response = curl_exec($ch);
+            curl_exec($ch);
+            $response = $ch;
+            curl_close($ch);
 
+            print_r($response);
+            exit;
             return response()->json([
                 'data' => $response,
                 'status' => true,
@@ -285,18 +302,18 @@ class NotificationsController extends Controller
      */
     public function saveToken(Request $request)
     {
-        $validatedData = Validator::make($request->all(), [
-            'device_id' => 'required|string',
-            'device_token' => 'required|string'
-        ]);
-        if ($validatedData->fails()) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $validatedData->errors()
-            ], 422);
-        }
         try {
+            $validatedData = Validator::make($request->all(), [
+                'device_id' => 'required|string',
+                'device_token' => 'required|string'
+            ]);
+            if ($validatedData->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validatedData->errors()
+                ], 422);
+            }
             $device_token = new DeviceToken();
             $count = $device_token::select()->where('device_id', $request->device_id)->count();
             if ($count == 0) {

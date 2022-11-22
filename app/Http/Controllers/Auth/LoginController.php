@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Validation\ValidationException;
 use Laracasts\Flash\Flash;
 
 class LoginController extends Controller
@@ -39,7 +40,8 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function login(\Illuminate\Http\Request $request) {
+    public function login(\Illuminate\Http\Request $request)
+    {
         $this->validateLogin($request);
         // If the class is using the ThrottlesLogins trait, we can automatically throttle
         // the login attempts for this application. We'll key this by the username and
@@ -48,17 +50,15 @@ class LoginController extends Controller
             $this->fireLockoutEvent($request);
             return $this->sendLockoutResponse($request);
         }
-
         // This section is the only change
         if ($this->guard()->validate($this->credentials($request))) {
             $user = $this->guard()->getLastAttempted();
-            
             // Make sure the user is active
             if ($user->is_active && $this->attemptLogin($request) && $user->email_verified_at != null) {
                 // Send the normal successful login response
-                if ($user->hasRole('seller') || $user->hasRole('superadmin')){
+                if ($user->hasRole('seller') || $user->hasRole('superadmin')) {
                     return $this->sendLoginResponse($request);
-                }else{
+                } else {
                     return redirect()
                         ->route('login')
                         ->withInput($request->only($this->username(), 'remember'))
@@ -70,7 +70,7 @@ class LoginController extends Controller
                 $this->incrementLoginAttempts($request);
                 if ($user->email_verified_at == null) {
                     Flash::message('Email not verified, verify your email first.');
-                }else{
+                } else {
                     Flash::message('You are not Activated, kindly contact admin.');
                 }
 
@@ -80,17 +80,27 @@ class LoginController extends Controller
                     ->withErrors(['active' => 'You must be active to login.']);
             }
         }
-
         // If the login attempt was unsuccessful we will increment the number of attempts
         // to login and redirect the user back to the login form. Of course, when this
         // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
-
-        return $this->sendFailedLoginResponse($request);
+        //return $this->sendFailedLoginResponse($request);
+        return $this->invalidCreds($request);
     }
-//    public function sendFailedLoginResponse(Request $request)
-//    {
-//        print_r($request->all());die;
-//        return redirect()->route('login'); //just an available path to test
-//    }
+    /**
+     * It is a helper method being called in login method
+     * it will throw a flash message on incorrect/invalid credentials
+     * @version 1.0.0
+     */
+    protected function invalidCreds(Request $request)
+    {
+        throw ValidationException::withMessages([
+            flash('Login failed! Incorrect email or password.')->error(),
+        ]);
+    }
+    //    public function sendFailedLoginResponse(Request $request)
+    //    {
+    //        print_r($request->all());die;
+    //        return redirect()->route('login'); //just an available path to test
+    //    }
 }

@@ -96,10 +96,12 @@ class DriverController extends Controller
      */
     public function getWithdrawalBalance()
     {
-        if (!auth()->user()->has('driver')) {
-            abort(404);
-        }
-        $amount = number_format((float)\auth()->user()->pending_withdraw, 2, '.', '');
+        // dd(auth()->guard('rider')->user()->email);
+        // if (!auth()->user()->has('driver')) {
+        //     abort(404);
+        // }
+        // $amount = number_format((float)\auth()->user()->pending_withdraw, 2, '.', '');
+        $amount = number_format((float)\auth()->guard('rider')->user()->pending_withdraw, 2, '.', '');
         return response()->json([
             'data' => $amount,
             'status' => true,
@@ -163,7 +165,7 @@ class DriverController extends Controller
      * If it is correct then the 'order_status' & 'delivery_status'
      * Will be marked as 'complete'
      * @author Mirza Abdullah Izhar
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function checkVerificationCode(Request $request)
     {
@@ -197,7 +199,8 @@ class DriverController extends Controller
                 VerificationCodes::where('order_id', '=', $request->order_id)
                     ->update(['code->driver_failed_to_enter_code' => 'No']);
                 Orders::where('id', '=', $request->order_id)->update(['order_status' => 'complete', 'delivery_status' => 'complete']);
-                $driver = User::find($request->delivery_boy_id);
+                // $driver = User::find($request->delivery_boy_id);
+                $driver = Drivers::find($request->delivery_boy_id);
                 $order = Orders::find($request->order_id);
                 $driver->pending_withdraw = $order->driver_charges + $driver->pending_withdraw;
                 $driver->save();
@@ -220,7 +223,7 @@ class DriverController extends Controller
     public function driverFailedToEnterCode(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'order_id' => 'required'
+            'order_id' => 'required|int'
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -365,9 +368,17 @@ class DriverController extends Controller
             ], 500);
         }
     }
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth('rider')->factory()->getTTL() * 60
+        ]);
+    }
     /**
      * Driver logIn
-     * @version 1.0.0
+     * @version 1.1.0
      */
     protected function loginDriver(Request $request)
     {
@@ -383,7 +394,7 @@ class DriverController extends Controller
             ], 422);
         }
         try {
-            $credentials = $request->only('email', 'password');
+            $credentials = request(['email', 'password']);
             $driver_info = [];
             $driver_info = Drivers::where('email', $credentials['email'])->first();
             if (Hash::check($credentials['password'], $driver_info->password)) {
@@ -395,7 +406,9 @@ class DriverController extends Controller
                     'email' => 'mirzaabdullahizhar@gmail.com',
                     'password' => 'Azimraja786'
                 );
-                $token = JWTAuth::attempt($dummy_credentials);
+                // $credentials = request(['email', 'password']);
+                $token = auth('rider')->attempt($credentials);
+                //  $token = JWTAuth::attempt($dummy_credentials);
                 $data_info = array(
                     'id' => $driver_info->id,
                     'f_name' => $driver_info->f_name,
