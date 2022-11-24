@@ -56,6 +56,7 @@ Route::group(['prefix' => 'qty'], function ($router) {
     Route::get('product/{store_id}/{prod_id}', 'QtyController@getById');
     Route::post('update/{prod_id}', 'QtyController@updateById');
     Route::get('multi-curl', 'QtyController@multiCURL');
+    Route::get('shifting-qty', 'QtyController@shiftQtyInProductsToQtyTable');
     // 
     Route::get('all-big-tbl/{store_id}/{branch_col_name}', 'QtyController@allBigTbl');
 });
@@ -101,6 +102,7 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::get('sortByLocation', 'ProductsController@sortByLocation');
     Route::post('recheck_products', 'OrdersController@recheckProducts');
     Route::get('featured/{store_id}', 'ProductsController@featuredProducts');
+    Route::get('drop-qty-column', 'ProductsController@dropProductsTableQtyColumn');
 });
 /*
 |--------------------------------------------------------------------------

@@ -30,6 +30,25 @@ use Throwable;
 
 class ProductsController extends Controller
 {
+    public function dropProductsTableQtyColumn()
+    {
+        try {
+            DB::statement(
+                'ALTER TABLE products DROP qty'
+            );
+            return response()->json([
+                'status' => true,
+                'message' => 'Column dropped successfully'
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
     public function add(Request $request)
     {
         $validate = Products::validator($request);
@@ -388,7 +407,7 @@ class ProductsController extends Controller
      * @version 1.2.0
      */
     public function view(Request $request)
-    { 
+    {
         try {
             $validate = Validator::make($request->route()->parameters(), [
                 'product_id' => 'required|integer'

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Products;
 use App\Qty;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -10,6 +12,35 @@ use Throwable;
 
 class QtyController extends Controller
 {
+
+    public function shiftQtyInProductsToQtyTable()
+    {
+        try {
+            $get_three_columns = Products::select('id', 'user_id', 'qty')
+                ->get();
+            foreach ($get_three_columns as $column) {
+                $qty_table = DB::table('qty')->insert([
+                    'users_id' => $column->user_id,
+                    'products_id' => $column->id,
+                    'qty' => $column->qty,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+            }
+            return response()->json([
+                'data' => [],
+                'status' => true,
+                'message' =>  config('constants.DATA_INSERTION_SUCCESS')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
     // Just Checking
     /**
      * It fetches products qty
@@ -204,7 +235,7 @@ class QtyController extends Controller
                 $ch[$times] = curl_init();
                 curl_setopt_array($ch[$times], array(
                     // CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all-big-tbl/33/branch100',
-                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',    
+                    CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
@@ -249,11 +280,12 @@ class QtyController extends Controller
         }
     }
     /**
-    * It fetches products qty
-    * From the big table with 102 cols
-    * @version 1.0.0
-    */
-    public function allBigTbl(Request $request){
+     * It fetches products qty
+     * From the big table with 102 cols
+     * @version 1.0.0
+     */
+    public function allBigTbl(Request $request)
+    {
         try {
             $validate = Validator::make($request->route()->parameters(), [
                 'store_id' => 'required|integer',
@@ -267,7 +299,7 @@ class QtyController extends Controller
                 ], 422);
             }
             $branch_tbl_info = DB::table('big_branch_table')->where('store_id', $request->store_id)->get();
-            $qty = DB::table($branch_tbl_info[0]->tbl_name)->select('id','prod_id',$request->branch_col_name)->paginate(10);
+            $qty = DB::table($branch_tbl_info[0]->tbl_name)->select('id', 'prod_id', $request->branch_col_name)->paginate(10);
             return response()->json([
                 'data' => $qty,
                 'status' => true,
