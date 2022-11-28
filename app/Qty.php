@@ -12,4 +12,8 @@ class Qty extends Model
      * @var string
      */
     protected $table = 'qty';
+    public function products()
+    {
+        return $this->belongTo(Products::class);
+    }
 }

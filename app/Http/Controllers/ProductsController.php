@@ -257,7 +257,24 @@ class ProductsController extends Controller
 
     public function get_product_info($product_id)
     {
-        $product = Products::find($product_id);
+        $product = Products::with('quantity')->find($product_id);
+        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $product->category = Categories::find($product->category_id);
+        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        return $product;
+    }
+    public function getProductInfoWithQty($product_id, $store_id)
+    {
+        $qty = Products::with('quantity')
+            ->where('user_id', $store_id)
+            ->where('id', $product_id)
+            ->first();
+        $quantity = $qty->quantity->qty;
+        $product = Products::with('quantity')
+            ->where('user_id', $store_id)
+            ->where('id', $product_id)
+            ->select(['*', DB::raw("'$quantity' as qty")])
+            ->first();
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
@@ -410,7 +427,7 @@ class ProductsController extends Controller
     {
         try {
             $validate = Validator::make($request->route()->parameters(), [
-                'product_id' => 'required|integer'
+                'product_id' => 'required|integer',
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -419,9 +436,12 @@ class ProductsController extends Controller
                     'message' => $validate->errors()
                 ], 422);
             }
-            $product = $this->get_product_info($request->product_id);
+            $store = Products::where('id', $request->product_id)->first();
+            $store_id = $store->user_id;
+            $product = $this->getProductInfoWithQty($request->product_id, $store_id);
             if (!empty($product)) {
                 $product->store = User::find($product->user_id);
+                $product->quantity->qty;
                 return response()->json([
                     'data' => $product,
                     'status' => true,

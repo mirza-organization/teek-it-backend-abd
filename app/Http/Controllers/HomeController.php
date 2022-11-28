@@ -96,11 +96,13 @@ class HomeController extends Controller
     {
         if (Auth::user()->hasRole('seller')) {
             $invent = Products::query()->where('user_id', '=', Auth::id())->where('id', '=', $product_id);
+            $store = Products::where('id', $product_id)->first();
+            $store_id = $store->user_id;
             if (empty($invent)) {
                 abort(404);
             }
             $categories = Categories::all();
-            $inventory = Products::get_product_info($product_id);
+            $inventory = Products::getProductInfoWithQty($product_id, $store_id);
             return view('shopkeeper.inventory.edit', compact('inventory', 'categories'));
         } else {
             abort(404);
