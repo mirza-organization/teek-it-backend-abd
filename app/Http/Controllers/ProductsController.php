@@ -582,14 +582,12 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function update_qty($product_id, $qty, $operation)
+    public function updateQty($product_id, $qty, $operation)
     {
         if ($operation == 'subtract') {
             Products::where('id', '=', $product_id)
                 ->decrement('qty', $qty);
         }
-        // DB::table('users')->increment('posts', 5);
-        // DB::table('users')->decrement('likes', 3);
     }
 
     public function exportProducts()

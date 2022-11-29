@@ -416,7 +416,7 @@ class OrdersController extends Controller
             $temp['volumn'] = $product_volumn;
             $temp['seller_id'] = $product_seller_id;
             $grouped_seller[$product_seller_id][] = $temp;
-            (new ProductsController())->update_qty($product_id, $qty, "subtract");
+            (new ProductsController())->updateQty($product_id, $qty, "subtract");
         }
         $count = 0;
         $order_arr = [];
