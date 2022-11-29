@@ -512,7 +512,7 @@ class AuthController extends Controller
                 $pagination = $products->toArray();
                 if (!$products->isEmpty()) {
                     foreach ($products as $product) {
-                        $data[] = (new ProductsController())->get_product_info($product->id);
+                        $data[] = (new ProductsController())->getProductInfo($product->id);
                     }
                     unset($pagination['data']);
                     return response()->json([
@@ -566,7 +566,7 @@ class AuthController extends Controller
                 $pagination = $products->toArray();
                 if (!$products->isEmpty()) {
                     foreach ($products as $product) {
-                        $data[] = (new ProductsController())->get_product_info($product->id);
+                        $data[] = (new ProductsController())->getProductInfo($product->id);
                     }
                     unset($pagination['data']);
                     return response()->json([

@@ -4,20 +4,12 @@ namespace App;
 
 use App\Http\Controllers\RattingsController;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Illuminate\Http\Request;
 use Validator;
-use DB;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Products extends Model
 {
     //
-
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [
@@ -47,7 +39,8 @@ class Products extends Model
             'qty' => 'required|string|max:255'
         ]);
     }
-    public static function get_product_info($product_id)
+
+    public static function getProductInfo($product_id)
     {
         $product = Products::with('quantity')->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
@@ -55,6 +48,7 @@ class Products extends Model
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
+
     public static function getProductInfoWithQty($product_id, $store_id)
     {
         $product = Products::with('quantity')
@@ -71,6 +65,7 @@ class Products extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function quantity()
     {
         return $this->hasOne(Qty::class);

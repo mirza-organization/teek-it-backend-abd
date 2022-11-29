@@ -97,7 +97,6 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::post('search', 'ProductsController@search');
     Route::get('all', 'ProductsController@all');
     Route::get('view/{product_id}', 'ProductsController@view');
-    //Route::post('view-product', 'ProductsController@view');
     Route::post('view/bulk', 'ProductsController@bulkView');
     Route::get('sortbyprice', 'ProductsController@sortByPrice');
     Route::get('sortByLocation', 'ProductsController@sortByLocation');

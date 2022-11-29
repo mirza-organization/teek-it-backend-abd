@@ -90,7 +90,7 @@ class ProductsController extends Controller
                 $product_images->save();
             }
         }
-        $product =  $this->get_product_info($product->id);
+        $product =  $this->getProductInfo($product->id);
         return response()->json([
             'data' => $product,
             'status' => true,
@@ -247,7 +247,7 @@ class ProductsController extends Controller
             }
         }
         $product->save();
-        $product =  $this->get_product_info($product->id);
+        $product =  $this->getProductInfo($product->id);
         return response()->json([
             'data' => $product,
             'status' => true,
@@ -255,7 +255,7 @@ class ProductsController extends Controller
         ], 200);
     }
 
-    public function get_product_info($product_id)
+    public function getProductInfo($product_id)
     {
         $product = Products::with('quantity')->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
@@ -295,7 +295,7 @@ class ProductsController extends Controller
             if (!empty($products)) {
                 $products_data = [];
                 foreach ($products as $product) {
-                    $data = $this->get_product_info($product->id);
+                    $data = $this->getProductInfo($product->id);
                     $data->store = User::find($product->user_id);
                     $products_data[] = $data;
                 }
@@ -331,7 +331,7 @@ class ProductsController extends Controller
         if (!empty($products)) {
             $products_data = [];
             foreach ($products as $product) {
-                $products_data[] = $this->get_product_info($product->id);
+                $products_data[] = $this->getProductInfo($product->id);
             }
             unset($pagination['data']);
             return response()->json([
@@ -357,7 +357,7 @@ class ProductsController extends Controller
             if (!$products->isEmpty()) {
                 $products_data = [];
                 foreach ($products as $product) {
-                    $products_data[] = $this->get_product_info($product->id);
+                    $products_data[] = $this->getProductInfo($product->id);
                 }
                 unset($pagination['data']);
                 return response()->json([
@@ -398,7 +398,7 @@ class ProductsController extends Controller
                     continue;
                 }
                 $i = $i + 1;
-                $t = $this->get_product_info($product->id);
+                $t = $this->getProductInfo($product->id);
                 $t->distance = $product->distance;
                 //$t->distance = round($product->distance);
                 $products_data[] = $t;
@@ -441,7 +441,7 @@ class ProductsController extends Controller
             $product = $this->getProductInfoWithQty($request->product_id, $store_id);
             if (!empty($product)) {
                 $product->store = User::find($product->user_id);
-                $product->quantity->qty;
+                unset($product->quantity);
                 return response()->json([
                     'data' => $product,
                     'status' => true,
@@ -481,7 +481,7 @@ class ProductsController extends Controller
     public function deleteImage($image_id, $product_id)
     {
         productImages::find($image_id)->delete();
-        return $this->get_product_info($product_id);
+        return $this->getProductInfo($product_id);
     }
     /**
      * It list the featured products 
@@ -502,7 +502,7 @@ class ProductsController extends Controller
             if (!$featured_products->isEmpty()) {
                 $products_data = [];
                 foreach ($featured_products as $product) {
-                    $data = $this->get_product_info($product->id);
+                    $data = $this->getProductInfo($product->id);
                     $data->store = User::find($product->user_id);
                     $products_data[] = $data;
                 }
@@ -598,7 +598,7 @@ class ProductsController extends Controller
         $products = Products::query()->where('user_id', '=', $user_id)->orderBy('id', 'ASC')->get();
         $all_products = [];
         foreach ($products as $product) {
-            $pt = json_decode(json_encode($this->get_product_info($product->id)->toArray()));
+            $pt = json_decode(json_encode($this->getProductInfo($product->id)->toArray()));
             unset($pt->category);
             unset($pt->ratting);
             unset($pt->id);
@@ -730,7 +730,7 @@ class ProductsController extends Controller
             if (!$products->isEmpty()) {
                 $products_data = [];
                 foreach ($products as $product) {
-                    $products_data[] = $this->get_product_info($product->id);
+                    $products_data[] = $this->getProductInfo($product->id);
                 }
                 unset($pagination['data']);
                 return response()->json([

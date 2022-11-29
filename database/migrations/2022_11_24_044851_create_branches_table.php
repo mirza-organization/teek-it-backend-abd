@@ -16,9 +16,9 @@ class CreateBranchesTable extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('parent_id');
-            $table->foreign('parent_id')->references('id')->on('users');
+            // $table->foreign('parent_id')->references('id')->on('users');
             $table->unsignedBigInteger('child_id');
-            $table->foreign('child_id')->references('id')->on('users');
+            // $table->foreign('child_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

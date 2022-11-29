@@ -81,10 +81,10 @@ class HomeController extends Controller
             $inventories = [];
             $featured_products = [];
             foreach ($inventory as $in) {
-                $inventories[] = Products::get_product_info($in->id);
+                $inventories[] = Products::getProductInfo($in->id);
             }
             foreach ($featured as $in) {
-                $featured_products[] = Products::get_product_info($in->id);
+                $featured_products[] = Products::getProductInfo($in->id);
             }
             return view('shopkeeper.inventory.list', compact('inventories', 'featured_products', 'inventory_p', 'categories'));
         } else {
@@ -556,7 +556,7 @@ class HomeController extends Controller
         //        $inventory_p = $inventory;
         //        $inventories = [];
         //        foreach ($inventory as $in){
-        //            $inventories[] = Products::get_product_info($in->id);
+        //            $inventories[] = Products::getProductInfo($in->id);
         //        }
         $return_arr = [];
         // $orders = Orders::query()->where('seller_id', '=', Auth::id())->where('payment_status', '!=', 'hidden')->orderByDesc('id');
@@ -575,7 +575,7 @@ class HomeController extends Controller
             $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
             $item_arr = [];
             foreach ($items as $item) {
-                $product = (new ProductsController())->get_product_info($item->product_id);
+                $product = (new ProductsController())->getProductInfo($item->product_id);
                 $item['product'] = $product;
                 $item_arr[] = $item;
             }
@@ -852,7 +852,7 @@ class HomeController extends Controller
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
-                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $product = (new ProductsController())->getProductInfo($item->product_id);
                     $item['product'] = $product;
                     $item_arr[] = $item;
                 }
@@ -1072,7 +1072,7 @@ class HomeController extends Controller
                 $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
-                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $product = (new ProductsController())->getProductInfo($item->product_id);
                     $item['product'] = $product;
                     $item_arr[] = $item;
                 }
@@ -1113,7 +1113,7 @@ class HomeController extends Controller
                 $items = OrderItems::query()->where('order_id', '=', $order->order_id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
-                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $product = (new ProductsController())->getProductInfo($item->product_id);
                     $item['product'] = $product;
                     $item_arr[] = $item;
                 }
@@ -1155,7 +1155,7 @@ class HomeController extends Controller
                 $items = OrderItems::query()->where('order_id', '=', $order->order_id)->get();
                 $item_arr = [];
                 foreach ($items as $item) {
-                    $product = (new ProductsController())->get_product_info($item->product_id);
+                    $product = (new ProductsController())->getProductInfo($item->product_id);
                     $item['product'] = $product;
                     $item_arr[] = $item;
                 }

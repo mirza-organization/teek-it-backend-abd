@@ -19,7 +19,6 @@ class CreateProductsTable extends Migration
             $table->integer('category_id');
             $table->string('product_name');
             $table->string('sku');
-            $table->string('qty');
             $table->string('price');
             $table->string('discount_percentage');
             $table->string('dimension')->nullable();
@@ -32,14 +31,6 @@ class CreateProductsTable extends Migration
             $table->string('bike')->nullable();
             $table->string('van')->nullable();
             $table->string('feature_img')->nullable();
-
-
-//            $table->string('feature_img');
-//            $table->text('product_description');
-//            $table->string('color');
-//            $table->string('size');
-//            $table->string('price');
-//            $table->string('qty');
             $table->timestamps();
         });
     }

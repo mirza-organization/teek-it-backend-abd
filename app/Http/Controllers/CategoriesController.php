@@ -134,7 +134,7 @@ class CategoriesController extends Controller
                     //    if (!empty($products)) {
                     //        $products_data = [];
                     //        foreach ($products as $product) {
-                    //            $products_data[] = (new ProductsController())->get_product_info($product->id);
+                    //            $products_data[] = (new ProductsController())->getProductInfo($product->id);
                     //        }
                     //        $category['products'] = $products_data;
                     //
@@ -178,7 +178,7 @@ class CategoriesController extends Controller
             if (!$products->isEmpty()) {
                 $products_data = [];
                 foreach ($products as $product) {
-                    $products_data[] = (new ProductsController())->get_product_info($product->id);
+                    $products_data[] = (new ProductsController())->getProductInfo($product->id);
                 }
                 unset($pagination['data']);
                 return response()->json([

@@ -78,7 +78,7 @@ class OrdersController extends Controller
             if (!$recent_orders_prods_ids->isEmpty()) {
                 $recent_orders_prods_data = [];
                 foreach ($recent_orders_prods_ids as $product_id) {
-                    $recent_orders_prods_data[] = (new ProductsController())->get_product_info($product_id->product_id);
+                    $recent_orders_prods_data[] = (new ProductsController())->getProductInfo($product_id->product_id);
                 }
                 return response()->json([
                     'data' => $recent_orders_prods_data,

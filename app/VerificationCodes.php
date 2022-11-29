@@ -16,7 +16,7 @@ use DB;
 class VerificationCodes extends Model
 {
     //
-    public static function get_product_info($product_id){
+    public static function getProductInfo($product_id){
         $product = Products::find($product_id);
         $product->images = productImages::query()->where('product_id','=',$product->id)->get();
         $product->category = Categories::find($product->category_id);
