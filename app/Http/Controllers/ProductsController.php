@@ -20,6 +20,7 @@ use Jenssegers\Agent\Agent;
 use App\Models\JwtToken;
 use App\User;
 use App\Models\Role;
+use App\Qty;
 use Crypt;
 use Hash;
 use Mail;
@@ -585,7 +586,7 @@ class ProductsController extends Controller
     public function updateQty($product_id, $qty, $operation)
     {
         if ($operation == 'subtract') {
-            Products::where('id', '=', $product_id)
+            $qty = Qty::where('products_id', '=', $product_id)
                 ->decrement('qty', $qty);
         }
     }

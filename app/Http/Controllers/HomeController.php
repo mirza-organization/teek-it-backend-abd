@@ -12,6 +12,7 @@ use App\Orders;
 use App\Pages;
 use App\productImages;
 use App\Products;
+use App\Qty;
 use App\Services\TwilioSmsService;
 use App\User;
 use App\VerificationCodes;
@@ -359,6 +360,12 @@ class HomeController extends Controller
             $data['van'] = ($data['vehicle'] == 'van') ? 1 : 0;
             $data['discount_percentage'] = (!isset($data['discount_percentage'])) ? 0.00 : $data['discount_percentage'];
             unset($data['gallery']);
+            Qty::where('products_id', $product_id)
+                ->where('users_id', Auth::id())
+                ->update([
+                    'qty' => $data['qty'],
+                ]);
+            unset($data['qty']);
             $product = Products::find($product_id);
             if (!empty($product)) {
                 $filename = $product->feature_img;
