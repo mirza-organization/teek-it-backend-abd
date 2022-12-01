@@ -207,6 +207,7 @@ class CategoriesController extends Controller
     public function stores($category_id): \Illuminate\Http\JsonResponse
     {
         try {
+
             if (!Categories::where('id', $category_id)->exists()) {
                 return response()->json(['data' => [], 'status' => false, 'message' => config('constants.NO_RECORD')], 422);
             }
@@ -214,6 +215,7 @@ class CategoriesController extends Controller
                 ->select(DB::raw('distinct(user_id) as store_id'))
                 ->join('products', 'categories.id', '=', 'products.category_id')
                 ->join('users', 'products.user_id', '=', 'users.id')
+                ->join('qty', 'products.id', '=', 'qty.products_id')
                 ->where('qty', '>', 0)
                 ->where('status', '=', 1)
                 ->where('is_active', '=', 1)

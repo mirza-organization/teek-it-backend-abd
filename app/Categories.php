@@ -11,6 +11,7 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Illuminate\Http\Request;
 use Validator;
 use DB;
+
 class Categories extends Model
 {
     //
@@ -26,12 +27,12 @@ class Categories extends Model
     {
         return Validator::make($request->all(), [
             'category_name' => 'required|string|max:255',
-//            'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            //            'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     }
 
     public function products()
     {
-        return $this->hasMany(Products::class,'category_id','id');
+        return $this->hasMany(Products::class, 'category_id', 'id');
     }
 }

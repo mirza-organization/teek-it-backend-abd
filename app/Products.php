@@ -70,4 +70,8 @@ class Products extends Model
     {
         return $this->hasOne(Qty::class);
     }
+    public function category()
+    {
+        return $this->belongsTo(Categories::class);
+    }
 }
