@@ -141,7 +141,7 @@ return [
     'TWILIO_SID' => 'AC111bcbe5a67369f76fe3d8ec63e7d58f',
     'TWILIO_TOKEN' => '6d64ae8220a96bb56e48e5d5b6ffa65f',
     'TWILIO_FROM' => 'TeekIt',
-    
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
@@ -195,8 +195,8 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
-        Zizaco\Entrust\EntrustServiceProvider::class,
-        Barryvdh\Cors\ServiceProvider::class,
+        //  Zizaco\Entrust\EntrustServiceProvider::class,
+        // Barryvdh\Cors\ServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
         PrettyRoutes\ServiceProvider::class,
     ],
@@ -250,7 +250,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-        'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
+        //'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
         'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,

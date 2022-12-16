@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App;
 
-use Zizaco\Entrust\EntrustRole;
-use Illuminate\Http\Request;
-use Dingo\Api\Routing\Helpers;
 
+use Illuminate\Database\Eloquent\Model;
 use Validator;
 
-class Role extends EntrustRole
+class Role extends Model
 {
     protected $fillable = [
         'name', 'display_name', 'description'
@@ -33,6 +31,14 @@ class Role extends EntrustRole
         ]);
     }
 
+    // public function users()
+    // {
+    //     return $this->belongsToMany('App\User', 'role_user');
+    // }
+    public function permissions()
+    {
+        return    $this->belongsToMany(Permission::class);
+    }
     public function users()
     {
         return $this->belongsToMany('App\User', 'role_user');

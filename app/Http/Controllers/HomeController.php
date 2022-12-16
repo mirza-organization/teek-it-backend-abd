@@ -10,6 +10,7 @@ use App\Mail\StoreRegisterMail;
 use App\OrderItems;
 use App\Orders;
 use App\Pages;
+use App\Role;
 use App\productImages;
 use App\Products;
 use App\Qty;
@@ -21,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
@@ -48,7 +50,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        if (Auth::user()->hasRole('seller')) {
+
+        if (Gate::allows('seller')) {
             $user = User::query()->where('id', '=', Auth::id())->get();
             $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
             $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
@@ -67,7 +70,7 @@ class HomeController extends Controller
 
     public function inventory(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
             $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
             if ($request->search) {
@@ -95,7 +98,7 @@ class HomeController extends Controller
 
     public function inventoryEdit($product_id)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $invent = Products::query()->where('user_id', '=', Auth::id())->where('id', '=', $product_id);
             $store = Products::where('id', $product_id)->first();
             $store_id = $store->user_id;
@@ -112,7 +115,7 @@ class HomeController extends Controller
 
     public function inventoryAdd(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $categories = Categories::all();
             $inventory = new Products();
             return view('shopkeeper.inventory.add', compact('inventory', 'categories'));
@@ -123,7 +126,7 @@ class HomeController extends Controller
 
     public function inventoryAddBulk(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             return view('shopkeeper.inventory.add_bulk');
         } else {
             abort(404);
@@ -132,7 +135,7 @@ class HomeController extends Controller
 
     public function deleteImg($image_id)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             productImages::find($image_id)->delete();
             return redirect()->back();
         } else {
@@ -199,7 +202,7 @@ class HomeController extends Controller
      */
     public function markAsFeatured(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $count = DB::table('products')
                 ->select()
                 ->where('user_id', Auth::id())
@@ -225,7 +228,7 @@ class HomeController extends Controller
      */
     public function removeFromFeatured(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             DB::table('products')
                 ->where('id', $request->product_id)
                 ->update(['featured' => 0]);
@@ -240,7 +243,7 @@ class HomeController extends Controller
      */
     public function inventoryAddDB(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $validatedData = Validator::make($request->all(), [
                 'product_name' => 'required',
                 'sku' => 'required',
@@ -326,7 +329,7 @@ class HomeController extends Controller
      */
     public function inventoryUpdate(Request $request, $product_id)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $validatedData = Validator::make($request->all(), [
                 'product_name' => 'required',
                 'sku' => 'required',
@@ -789,7 +792,7 @@ class HomeController extends Controller
      */
     public function admin_home()
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
             $help_page = Pages::query()->where('page_type', '=', 'help')->first();
             $faq_page = Pages::query()->where('page_type', '=', 'faq')->first();
@@ -813,7 +816,7 @@ class HomeController extends Controller
      */
     public function aSetting()
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
             $help_page = Pages::query()->where('page_type', '=', 'help')->first();
             $faq_page = Pages::query()->where('page_type', '=', 'faq')->first();
@@ -838,17 +841,19 @@ class HomeController extends Controller
     public function adminCustomerDetails($user_id)
     {
         $return_arr = [];
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $user = User::find($user_id);
-            if ($user->hasRole('seller')) {
+            if (Gate::allows('seller')) {
                 $orders = Orders::query()->where('seller_id', '=', $user_id);
                 $role_id = 2;
+                dd($orders);
             }
-            if ($user->hasRole('buyer')) {
+
+            if (Gate::allows('buyer')) {
                 $orders = Orders::query()->where('user_id', '=', $user_id);
                 $role_id = 3;
             }
-            if ($user->hasRole('delivery_boy')) {
+            if (Gate::allows('delivery_boy')) {
                 $orders = Orders::query()->where('delivery_boy_id', '=', $user_id);
                 $role_id = 4;
             }
@@ -953,7 +958,7 @@ class HomeController extends Controller
      */
     public function deleteCat(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             DB::table('categories')->where('id', '=', $request->id)->delete();
             flash('Category Deleted Successfully')->success();
         }
@@ -962,7 +967,7 @@ class HomeController extends Controller
 
     public function updatePages(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->update(['page_content' => $request->tos]);
             $help_page = Pages::query()->where('page_type', '=', 'help')->update(['page_content' => $request->help]);
             $faq_page = Pages::query()->where('page_type', '=', 'faq')->update(['page_content' => $request->faq]);
@@ -978,11 +983,10 @@ class HomeController extends Controller
      */
     public function adminStores(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
                 $query->where('role_id', 2);
             });
-
             if ($request->search) {
                 $users = $users->where('business_name', 'LIKE', $request->search);
             }
@@ -999,7 +1003,7 @@ class HomeController extends Controller
      */
     public function adminUsersDel(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             for ($i = 0; $i < count($request->users); $i++) {
                 // $user =  User::find($request->users[$i]);
                 // if($user->hasRole('seller')){
@@ -1018,7 +1022,7 @@ class HomeController extends Controller
      */
     public function adminCustomers(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
                 $query->where('role_id', 3);
             });
@@ -1039,7 +1043,7 @@ class HomeController extends Controller
      */
     public function adminDrivers(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $users = User::query()->whereHas('roles', function ($query) {
                 $query->where('role_id', 4);
             });
@@ -1061,7 +1065,7 @@ class HomeController extends Controller
      */
     public function adminOrders(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $return_arr = [];
             $orders = Orders::query()->where('payment_status', '!=', 'hidden')->orderByDesc('id');
             if ($request->search) {
@@ -1099,7 +1103,7 @@ class HomeController extends Controller
      */
     public function adminOrdersVerified(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $return_arr = [];
             $verified_orders = VerificationCodes::query()
                 ->where('code->driver_failed_to_enter_code', '=', 'No')
@@ -1141,7 +1145,7 @@ class HomeController extends Controller
      */
     public function adminOrdersUnverified(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $return_arr = [];
             $verified_orders = VerificationCodes::query()
                 ->where('code->driver_failed_to_enter_code', '=', 'Yes')
@@ -1183,7 +1187,7 @@ class HomeController extends Controller
      */
     public function adminOrdersDel(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             for ($i = 0; $i < count($request->orders); $i++) {
                 DB::table('orders')->where('id', '=', $request->orders[$i])->delete();
                 DB::table('order_items')->where('order_id', '=', $request->orders[$i])->delete();
@@ -1195,13 +1199,13 @@ class HomeController extends Controller
 
     public function withdrawals()
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $user_id = Auth::id();
             $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
             $transactions = $return_data;
             return view('shopkeeper.withdrawal', compact('transactions'));
         }
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $user_id = Auth::id();
             $return_data = WithdrawalRequests::has('user.seller')->get();
             $transactions = $return_data;
@@ -1211,13 +1215,13 @@ class HomeController extends Controller
 
     public function withdrawalDrivers()
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             $user_id = Auth::id();
             $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
             $transactions = $return_data;
             return view('shopkeeper.withdrawal', compact('transactions'));
         }
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $transactions = WithdrawalRequests::has('user.driver')->get();
             return view('admin.withdrawal-drivers', compact('transactions'));
         }
@@ -1225,7 +1229,7 @@ class HomeController extends Controller
 
     public function withdrawalsRequest(Request $request)
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('seller')) {
             if (auth()->user()->pending_withdraw < $request->amount) {
                 flash('Please Choose Correct Value')->error();
             } else {
@@ -1252,7 +1256,7 @@ class HomeController extends Controller
             //            $transactions =$return_data;
             //            return view('shopkeeper.withdrawal', compact('transactions'));
         }
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             $with = WithdrawalRequests::find($request->id);
             $with->status = $request->status;
             $with->transaction_id = $request->t_id;
@@ -1284,7 +1288,7 @@ class HomeController extends Controller
 
     public function adminQueries()
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             return view('admin.queries');
         } else {
             abort(404);
@@ -1293,7 +1297,7 @@ class HomeController extends Controller
 
     public function myOrderCount()
     {
-        if (Auth::user()->hasRole('seller')) {
+        if (Gate::allows('superadmin')) {
             //$pending_orders = Orders::query()->where('order_status','=','ready')->where('seller_id','=',Auth::id())->count();
             //$total_products = Orders::query()->where('payment_status','!=','hidden')->where('seller_id','=',Auth::id())->count();
             $total_orders = Orders::query()->where('seller_id', '=', Auth::id())->count();

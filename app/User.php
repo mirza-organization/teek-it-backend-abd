@@ -14,7 +14,7 @@ use DB;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
-    use EntrustUserTrait;
+    // use EntrustUserTrait;
 
     /**
      * The attributes that are mass assignable.
@@ -120,7 +120,11 @@ class User extends Authenticatable implements JWTSubject
     // Many-to-many relationship
     public function roles()
     {
-        return $this->belongsToMany('App\Models\Role', 'role_user');
+        return $this->belongsToMany('App\Role', 'role_user');
+    }
+    public function role()
+    {
+        return $this->belongsTo('App\Role');
     }
     // Many-to-many relationship
     public function seller()

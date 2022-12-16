@@ -7,6 +7,7 @@ use App\notifications;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -178,7 +179,7 @@ class NotificationsController extends Controller
      */
     public function notificationHome(Request $request)
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             return view('admin.notification');
         } else {
             abort(404);
@@ -192,7 +193,7 @@ class NotificationsController extends Controller
     public function notificationSend(Request $request)
     {
         try {
-            if (Auth::user()->hasRole('superadmin')) {
+            if (Gate::allows('superadmin')) {
                 $validatedData = notifications::validator($request);
                 if ($validatedData->fails()) {
                     flash('Error in sending notification because a required field is missing or invalid data.')->error();

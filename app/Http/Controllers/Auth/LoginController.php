@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 use Laracasts\Flash\Flash;
+use App\Role;
 
 class LoginController extends Controller
 {
@@ -56,7 +58,7 @@ class LoginController extends Controller
             // Make sure the user is active
             if ($user->is_active && $this->attemptLogin($request) && $user->email_verified_at != null) {
                 // Send the normal successful login response
-                if ($user->hasRole('seller') || $user->hasRole('superadmin')) {
+                if (Gate::allows('seller') || Gate::allows('superadmin')) {
                     return $this->sendLoginResponse($request);
                 } else {
                     return redirect()

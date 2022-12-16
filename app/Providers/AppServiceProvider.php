@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -24,7 +25,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Gate::before(function ($user, $ability) {
+            Gate::define($ability, function ($user) use ($ability) {
+                if ($user->role->name == $ability) {
+                    return true;
+                }
+                return false;
+            });
+        });
         Schema::defaultStringLength(191);
     }
 }

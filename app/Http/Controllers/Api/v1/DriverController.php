@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
@@ -60,7 +61,7 @@ class DriverController extends Controller
 
     public function submitWithdrawal(Request $request)
     {
-        if (!auth()->user()->has('driver')) {
+        if (!auth()->guard('rider')->user()) {
             abort(404);
         }
         $user = User::find(\auth()->id());
@@ -136,10 +137,12 @@ class DriverController extends Controller
 
     public function driverAllWithdrawalRequests()
     {
-        if (!auth()->user()->has('driver')) {
+
+        if (!auth()->guard('rider')->user()) {
             abort(404);
         }
-        $user_id = Auth::id();
+        // $user_id = Auth::id();
+        $user_id = auth()->guard('rider')->user()->id;
         $withdrawals = WithdrawalRequests::where('user_id', '=', $user_id)
             ->orderByDesc('created_at')->get();
         $data = array();

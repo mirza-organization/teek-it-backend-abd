@@ -14,6 +14,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        //\Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
@@ -39,9 +40,9 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-//            'throttle:60,1',
+            //            'throttle:60,1',
             'bindings',
-            \Barryvdh\Cors\HandleCors::class,
+            // \Barryvdh\Cors\HandleCors::class,
         ],
     ];
 
@@ -65,7 +66,7 @@ class Kernel extends HttpKernel
         'role' => \Zizaco\Entrust\Middleware\EntrustRole::class,
         'permission' => \Zizaco\Entrust\Middleware\EntrustPermission::class,
         'ability' => \Zizaco\Entrust\Middleware\EntrustAbility::class,
-        'role'=> \App\Http\Middleware\EntrustRole::class,
+        'role' => \App\Http\Middleware\EntrustRole::class,
         'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
     ];
 

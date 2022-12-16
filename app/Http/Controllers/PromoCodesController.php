@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
 use App\Orders;
 use App\PromoCodes;
+use App\Role;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -22,7 +23,7 @@ class PromoCodesController extends Controller
      */
     public function promocodesHome()
     {
-        if (Auth::user()->hasRole('superadmin')) {
+        if (Gate::allows('superadmin')) {
             //Get stores names for select dropdown
             $stores = Role::find(2)->users;
             $promo_codes = PromoCodes::paginate(10);
@@ -81,7 +82,7 @@ class PromoCodesController extends Controller
     public function promoCodesDel(Request $request)
     {
         try {
-            if (Auth::user()->hasRole('superadmin')) {
+            if (Gate::allows('superadmin')) {
                 for ($i = 0; $i < count($request->promocodes); $i++) {
                     PromoCodes::where('id', '=', $request->promocodes[$i])->delete();
                 }

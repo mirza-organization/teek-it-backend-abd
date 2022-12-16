@@ -2,14 +2,15 @@
 
 namespace App;
 
-use App\Http\Controllers\RattingsController;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 use Validator;
+use Illuminate\Http\Request;
+use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Model;
+use App\Http\Controllers\RattingsController;
 
 class Products extends Model
 {
-    //
+    use Searchable;
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [

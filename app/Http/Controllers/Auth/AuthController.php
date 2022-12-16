@@ -19,10 +19,11 @@ use Jenssegers\Agent\Agent;
 use App\Models\JwtToken;
 use Illuminate\Http\Request;
 use App\User;
-use App\Models\Role;
+use App\Role;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -506,7 +507,7 @@ class AuthController extends Controller
         try {
             $user = User::find($seller_id);
             $data = [];
-            if ($user->hasRole('seller')) {
+            if (Gate::allows('seller')) {
                 // $info = $this->getSellerInfo($user); 
                 $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
                 $pagination = $products->toArray();
@@ -554,7 +555,7 @@ class AuthController extends Controller
         try {
             $user = User::find($seller_id);
             $data = [];
-            if ($user->hasRole('seller')) {
+            if (Gate::allows('seller')) {
                 $keywords = explode(" ", $product_name);
                 $article = Products::query();
                 foreach ($keywords as $word) {
@@ -605,7 +606,7 @@ class AuthController extends Controller
             $users = User::query()->where('seller_id', '=', Auth::id())->get();
             $data = [];
             foreach ($users as $user) {
-                if ($user->hasRole('delivery_boy')) {
+                if (Gate::allows('delivery_boy')) {
                     $data[] = $this->getSellerInfo($user);
                 }
             }

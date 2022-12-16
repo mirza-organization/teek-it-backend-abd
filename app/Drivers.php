@@ -49,4 +49,8 @@ class Drivers extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    public function role()
+    {
+        return $this->belongsTo('App\Role');
+    }
 }
