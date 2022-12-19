@@ -215,7 +215,6 @@ class ProductsController extends Controller
                 $product_images->product_id = (int)$product->id;
                 $product_images->product_image = $importData[18];
                 $product_images->save();
-
                 $j++;
             }
             return response()->json([
