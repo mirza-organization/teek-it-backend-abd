@@ -129,7 +129,7 @@ class User extends Authenticatable implements JWTSubject
     // Many-to-many relationship
     public function seller()
     {
-        return $this->belongsToMany('App\Models\Role', 'role_user')->wherePivot('role_id', 2);
+        return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
     }
     // Many-to-many relationship
     public function driver()
