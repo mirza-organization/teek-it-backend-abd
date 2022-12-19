@@ -50,6 +50,31 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+    /**
+     * Since our qty has now it's separate migration,
+     * this will help us add qty with given details to qty table
+     * @version 1.0.0
+     */
+    public function addProductQty($product_id, $user_id, $product_quantity)
+    {
+        $quantity = new Qty();
+        $quantity->products_id = $product_id;
+        $quantity->users_id = $user_id;
+        $quantity->qty = $product_quantity;
+        $quantity->save();
+    }
+    /**
+     * Since our qty has now it's separate migration,
+     * this will help us update qty with given details to qty table
+     * @version 1.0.0
+     */
+    public function updateProductQty($product_id, $user_id, $product_quantity)
+    {
+        Qty::where('products_id', $product_id)
+            ->where('users_id', $user_id)->update([
+                'qty' => $product_quantity
+            ]);
+    }
     public function add(Request $request)
     {
         $validate = Products::validator($request);
@@ -70,9 +95,13 @@ class ProductsController extends Controller
         $product->lat = $request->lat;
         $product->lon = $request->lon;
         $product->price = $request->price;
-        $product->qty = $request->qty;
+        // $product->qty = $request->qty;
         $product->user_id = $user_id;
         $product->save();
+        //this function will add qty to it's particular table
+        $product_id = $product->id;
+        $product_quantity = $request->qty;
+        $this->addProductQty($product_id, $user_id, $product_quantity);
         if ($request->hasFile('images')) {
             $images = $request->file('images');
             foreach ($images as $image) {
@@ -160,7 +189,7 @@ class ProductsController extends Controller
                 $product->category_id = $importData[0];
                 $product->product_name = $importData[1];
                 $product->sku = $importData[2];
-                $product->qty = ($importData[3] == "") ? 0 : $importData[3];
+                // $product->qty = ($importData[3] == "") ? 0 : $importData[3];
                 $product->price = str_replace(',', '', $importData[4]);
                 $product->discount_percentage = ($importData[5] == "") ? 0 : $importData[5];
                 $product->weight = $importData[6];
@@ -177,6 +206,10 @@ class ProductsController extends Controller
                 $product->width = $importData[16];
                 $product->length = $importData[17];
                 $product->save();
+                //this function will add qty to it's particular table
+                $product_id = (int)$product->id;
+                $product_quantity = ($importData[3] == "") ? 0 : $importData[3];
+                $this->addProductQty($product_id, $user_id, $product_quantity);
 
                 $product_images = new productImages();
                 $product_images->product_id = (int)$product->id;
@@ -248,6 +281,10 @@ class ProductsController extends Controller
             }
         }
         $product->save();
+        //this function will update qty in it's particular table with given data
+        $product_id = $product->id;
+        $product_quantity = $request->qty;
+        $this->updateProductQty($product_id, $user_id, $product_quantity);
         $product =  $this->getProductInfo($product->id);
         return response()->json([
             'data' => $product,
@@ -255,7 +292,11 @@ class ProductsController extends Controller
             'message' => config('constants.DATA_UPDATED_SUCCESS')
         ], 200);
     }
-
+    /**
+     * This function return product information
+     * as well as qty data for the products from qty table
+     * @version 1.0.0
+     */
     public function getProductInfo($product_id)
     {
         $product = Products::with('quantity')->find($product_id);
@@ -274,7 +315,7 @@ class ProductsController extends Controller
         $product = Products::with('quantity')
             ->where('user_id', $store_id)
             ->where('id', $product_id)
-            ->select(['*', DB::raw("'$quantity' as qty")])
+            ->select(['*', DB::raw("$quantity as qty")])
             ->first();
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
@@ -703,9 +744,6 @@ class ProductsController extends Controller
             }
             $keywords = explode(" ", $request->product_name);
             $article = Products::search($request->product_name);
-            // $article->where('user_id', $request->store_id);
-            // $article->where('category_id', $request->category_id);
-            // dd($article->get());
             //foreach ($keywords as $word) {
             // $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
             $article->where('status', 1);

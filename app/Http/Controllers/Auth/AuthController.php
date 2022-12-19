@@ -52,7 +52,7 @@ class AuthController extends Controller
                 $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
                 return response()->json($response, 400);
             }
-            $role = Role::where('name', $request->get('role'))->first();
+            //$role = Role::where('name', $request->get('role'))->first();
             if ($request->get('role') == 'buyer') {
                 $is_active = 1;
             } else {
@@ -71,6 +71,7 @@ class AuthController extends Controller
                 'seller_id' => $request->seller_id,
                 'postcode' => $request->postal_code,
                 'is_active' => $is_active,
+                'role_id' => 3,
                 'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
             ]);
             if ($User) {
@@ -88,7 +89,7 @@ class AuthController extends Controller
                 }
             }
 
-            $User->roles()->sync($role->id);
+            // $User->roles()->sync($role->id);
             $verification_code = Crypt::encrypt($User->email);
 
             $FRONTEND_URL = env('FRONTEND_URL');
@@ -275,7 +276,7 @@ class AuthController extends Controller
             'is_online' => $user->is_online,
             'last_login' => $user->last_login,
             'seller_info' => $this->getSellerInfo($seller_info),
-            'roles' => $user->roles->pluck('name'),
+            'roles' => $user->role()->pluck('name'),
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         );
         return response()->json([
@@ -339,7 +340,7 @@ class AuthController extends Controller
             'business_hours' => $user->business_hours,
             'bank_details' => $user->bank_details,
             'last_login' => $user->last_login,
-            'roles' => $user->roles->pluck('name'),
+            'roles' => $user->role()->pluck('name'),
             'user_img' => $imagePath,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
@@ -739,8 +740,9 @@ class AuthController extends Controller
                 'lon' => $request->lon,
                 'postcode' => $request->postcode,
                 'contact' => $request->contact,
+                'role_id' => 3,
             ]);
-            $user->roles()->sync(3);
+            //$user->roles()->sync(3);
             $user = User::where('email', '=', $user->email)->first();
             $seller_info = [];
             $seller_info = User::find($user->seller_id);
@@ -764,7 +766,9 @@ class AuthController extends Controller
                 'is_online' => $user->is_online,
                 'last_login' => $user->last_login,
                 'seller_info' => $this->getSellerInfo($seller_info),
-                'roles' => $user->roles->pluck('name'),
+                'roles' => [
+                    'buyer'
+                ],
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
             );
             $token = JWTAuth::fromUser($user);
@@ -834,7 +838,9 @@ class AuthController extends Controller
                 'is_online' => $user->is_online,
                 'last_login' => $user->last_login,
                 'seller_info' => $this->getSellerInfo($seller_info),
-                'roles' => $user->roles->pluck('name'),
+                'roles' => [
+                    'buyer'
+                ],
                 'expires_in' => JWTAuth::factory()->getTTL() * 60,
             );
             $token = JWTAuth::fromUser($user);
