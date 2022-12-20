@@ -259,7 +259,7 @@ class ProductsController extends Controller
         $product->lat = $request->lat;
         $product->lon = $request->lon;
         $product->price = $request->price;
-        $product->qty = $request->qty;
+        // $product->qty = $request->qty;
         $product->user_id = $user_id;
         if ($request->hasFile('images')) {
             $images = $request->file('images');

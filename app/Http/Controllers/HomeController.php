@@ -277,6 +277,7 @@ class HomeController extends Controller
             $data['van'] = ($data['vehicle'] == 'van') ? 1 : 0;
             $data['discount_percentage'] = (!isset($data['discount_percentage'])) ? 0.00 : $data['discount_percentage'];
             unset($data['gallery']);
+            unset($data['qty']);
             $user_id = Auth::id();
             $data['user_id'] = $user_id;
             $product = new Products();
@@ -298,6 +299,9 @@ class HomeController extends Controller
                     $product->$key = ($key == 'contact') ? '+44' . $value : $value;
                 }
                 $product->save();
+                $product_id = $product->id;
+                $product_quantity = $request->qty;
+                $this->addProductQty($product_id, $user_id, $product_quantity);
                 if ($request->hasFile('gallery')) {
                     $images = $request->file('gallery');
                     foreach ($images as $image) {
@@ -596,6 +600,19 @@ class HomeController extends Controller
         return view('shopkeeper.orders.list', compact('orders', 'orders_p'));
     }
     /**
+     * Since our qty has now it's separate migration,
+     * this will help us add qty with given details to qty table
+     * @version 1.0.0
+     */
+    public function addProductQty($product_id, $user_id, $product_quantity)
+    {
+        $quantity = new Qty();
+        $quantity->products_id = $product_id;
+        $quantity->users_id = $user_id;
+        $quantity->qty = $product_quantity;
+        $quantity->save();
+    }
+    /**
      * Convert's CSV file to JSON
      * @author Huzaifa Haleem
      * @version 1.0.0
@@ -672,7 +689,6 @@ class HomeController extends Controller
                 $product->category_id = $importData[0];
                 $product->product_name = $importData[1];
                 $product->sku = $importData[2];
-                $product->qty = ($importData[3] == "") ? 0 : $importData[3];
                 $product->price = str_replace(',', '', $importData[4]);
                 $product->discount_percentage = ($importData[5] == "") ? 0 : $importData[5];
                 $product->weight = $importData[6];
@@ -690,6 +706,10 @@ class HomeController extends Controller
                 $product->length = $importData[17];
                 $product->save();
 
+                //this function will add qty to it's particular table
+                $product_id = (int)$product->id;
+                $product_quantity = ($importData[3] == "") ? 0 : $importData[3];
+                $this->addProductQty($product_id, $user_id, $product_quantity);
                 $product_images = new productImages();
                 $product_images->product_id = (int)$product->id;
                 $product_images->product_image = $importData[18];
@@ -846,7 +866,6 @@ class HomeController extends Controller
             if (Gate::allows('seller')) {
                 $orders = Orders::query()->where('seller_id', '=', $user_id);
                 $role_id = 2;
-                dd($orders);
             }
 
             if (Gate::allows('buyer')) {

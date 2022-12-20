@@ -252,8 +252,6 @@ class AuthController extends Controller
 
         $user = User::find($user->id);
 
-        $seller_info = [];
-        $seller_info = User::find($user->seller_id);
         $url = URL::to('/');
         $imagePath = $user['user_img'];
         $data_info = array(
@@ -275,7 +273,6 @@ class AuthController extends Controller
             'total_withdraw' => $user->total_withdraw,
             'is_online' => $user->is_online,
             'last_login' => $user->last_login,
-            'seller_info' => $this->getSellerInfo($seller_info),
             'roles' => $user->role()->pluck('name'),
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
         );
@@ -318,12 +315,9 @@ class AuthController extends Controller
     protected function respondWithToken($token)
     {
         $user = JWTAuth::user();
-        $seller_info = [];
-        $seller_info = User::find($user->seller_id);
 
         $url = URL::to('/');
         $imagePath = $user['user_img'];
-
         $data_info = array(
             'id' => $user->id,
             'name' => $user->name,
@@ -345,7 +339,6 @@ class AuthController extends Controller
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
             'vehicle_type' => $user->vehicle_type,
-            'seller_info' => $this->getSellerInfo($seller_info),
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60,
@@ -742,10 +735,7 @@ class AuthController extends Controller
                 'contact' => $request->contact,
                 'role_id' => 3,
             ]);
-            //$user->roles()->sync(3);
             $user = User::where('email', '=', $user->email)->first();
-            $seller_info = [];
-            $seller_info = User::find($user->seller_id);
             $data_info = array(
                 'id' => $user->id,
                 'name' => $user->name,
@@ -765,7 +755,6 @@ class AuthController extends Controller
                 'total_withdraw' => $user->total_withdraw,
                 'is_online' => $user->is_online,
                 'last_login' => $user->last_login,
-                'seller_info' => $this->getSellerInfo($seller_info),
                 'roles' => [
                     'buyer'
                 ],
@@ -816,8 +805,6 @@ class AuthController extends Controller
                     'message' =>  config('constants.INVALID_CREDENTIALS')
                 ], 401);
             }
-            $seller_info = [];
-            $seller_info = User::find($user->seller_id);
             $data_info = array(
                 'id' => $user->id,
                 'name' => $user->name,
@@ -837,7 +824,6 @@ class AuthController extends Controller
                 'total_withdraw' => $user->total_withdraw,
                 'is_online' => $user->is_online,
                 'last_login' => $user->last_login,
-                'seller_info' => $this->getSellerInfo($seller_info),
                 'roles' => [
                     'buyer'
                 ],
