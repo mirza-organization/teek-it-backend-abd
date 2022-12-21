@@ -306,6 +306,7 @@ class ProductsController extends Controller
             ->select(['*', DB::raw("$quantity as qty")])
             ->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
