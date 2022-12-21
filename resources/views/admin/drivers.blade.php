@@ -12,7 +12,7 @@
                     <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>
                     </button> -->
-                    <button type="button" class="btn btn-danger" onclick="delUsers()">
+                    <button type="button" class="btn btn-danger" onclick="delDrivers()">
                         <a class="text-white">Delete</a>
                     </button>
                 </div>
@@ -41,14 +41,14 @@
             </div>
         </form>
         <div class="row">
-            @foreach($users as $user)
+            @foreach($drivers as $driver)
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal{{$user->id}}" tabindex="-1" role="dialog"
+            <div class="modal fade" id="exampleModal{{$driver->id}}" tabindex="-1" role="dialog"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">{{$user->name}} {{$user->l_name}}</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">{{$driver->f_name}} {{$driver->l_name}}</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -58,11 +58,10 @@
                             $fields = [
                                 'is_online',
                                 'is_active'
-                                //'business_name'
                             ];
                             ?>
                             <div class="row">
-                                @foreach(json_decode($user) as $key=>$u)
+                                @foreach(json_decode($driver) as $key=>$u)
                                 @if(!empty($u) && !in_array($key,$fields))
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -77,13 +76,13 @@
                                     <div class="form-group">
                                         <label for="" class="mt-5">
 
-                                            @if($user->is_active==0)
+                                            @if($driver->is_active==0)
                                             <a
-                                                href="{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}">
+                                                href="{{route('change_user_status',['user_id'=>$driver->id,'status'=>1])}}">
                                                 <span class="text-success">Click here to Enable Account</span></a>
                                             @else
                                             <a
-                                                href="{{route('change_user_status',['user_id'=>$user->id,'status'=>0])}}">
+                                                href="{{route('change_user_status',['user_id'=>$driver->id,'status'=>0])}}">
                                                 <span class="text-danger">Click here to Disable Account </span></a>
                                             @endif
                                         </label>
@@ -100,23 +99,23 @@
                 </div>
             </div>
             <div class="col-md-4 pl-4 pr-4 pb-4">
-                <div class="card @if($user->is_active==0)
+                <div class="card @if($driver->is_active==0)
                        bg-danger
                     @else
                        bg-success
                     @endif">
                     <div class="card-body">
-                        <input type="checkbox" class="select-checkbox" title="Select" id="{{$user->id}}">
+                        <input type="checkbox" class="select-checkbox" title="Select" id="{{$driver->id}}">
                         <a class="d-block text-right float-right" title="Edit"
-                            href="{{route('customer_details',['user_id'=>$user->id])}}" pdata-toggle="modal"
-                            pdata-target="#exampleModal{{$user->id}}">
+                            href="{{route('driver_details',['driver_id'=>$driver->id])}}" pdata-toggle="modal"
+                            pdata-target="#exampleModal{{$driver->id}}">
                             <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>
                         <div class="card-text">
                             <div class="col-md-12">
                                 <span class="img-container">
-                                    <img class="d-block m-auto" src=@if($user->user_img)
-                                    "{{config('constants.BUCKET') . $user->user_img}}"
+                                    <img class="d-block m-auto" src=@if($driver->profile_img)
+                                    "{{config('constants.BUCKET') . $driver->profile_img}}"
                                     @else
                                     "{{asset('/res/res/img/driver.png')}}"
                                     @endif alt="">
@@ -126,7 +125,7 @@
 
                         <div class="">
                             <h3 class="d-block text-center p-3 pb-0 m-0 text-site-primary text-lg">
-                                <a href="#" class="d-block text-site-primary">{{$user->name}} {{$user->l_name}}</a>
+                                <a href="#" class="d-block text-site-primary">{{$driver->f_name}} {{$driver->l_name}}</a>
                             </h3>
                         </div>
                     </div>
@@ -134,7 +133,7 @@
             </div>
             @endforeach
             <div class="col-md-12">
-                {{$users->links()}}
+                {{$drivers->links()}}
             </div>
         </div>
         <!-- /.row -->

@@ -61,9 +61,7 @@ class DriverController extends Controller
 
     public function submitWithdrawal(Request $request)
     {
-        if (!auth()->guard('rider')->user()) {
-            abort(404);
-        }
+        if (!\auth()->guard('rider')->user()) abort(404);
         $user = User::find(\auth()->id());
         if (empty($user->bank_details)) {
             return response()->json(['message' => 'Please update your bank account info.'], 403);
@@ -97,11 +95,6 @@ class DriverController extends Controller
      */
     public function getWithdrawalBalance()
     {
-        // dd(auth()->guard('rider')->user()->email);
-        // if (!auth()->user()->has('driver')) {
-        //     abort(404);
-        // }
-        // $amount = number_format((float)\auth()->user()->pending_withdraw, 2, '.', '');
         $amount = number_format((float)\auth()->guard('rider')->user()->pending_withdraw, 2, '.', '');
         return response()->json([
             'data' => $amount,

@@ -536,6 +536,42 @@
         }
     }
 
+    function delDrivers() {
+        var checkboxes = document.querySelectorAll('.select-checkbox');
+        var drivers = [];
+        var x = 0;
+        for (var i = 0; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked) {
+                drivers[x] = checkboxes[i].id;
+                x++;
+            }
+        }
+        if (drivers.length != 0) {
+            Swal.fire({
+                title: 'Warning!',
+                text: 'Are you sure you want to delete the selected drivers?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{route('admin.del.drivers')}}",
+                        type: "get",
+                        data: {
+                            "drivers": drivers
+                        },
+                        success: function(response) {
+                            if (response == "Drivers Deleted Successfully") {
+                                window.location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+    
     function delOrders() {
         var checkboxes = document.querySelectorAll('.select-checkbox');
         var orders = [];

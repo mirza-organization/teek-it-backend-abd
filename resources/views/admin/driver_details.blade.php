@@ -8,12 +8,7 @@
                 <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
                 <a class="text-site-primary text-center m-auto d-block"
                     style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">
-                    @if($role_id==2)
-                    Store Details
-                    @endif
-                    @if($role_id==3)
-                    Customer Details
-                    @endif
+                    Driver Details
                 </a>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -22,7 +17,6 @@
 <!-- /.content-header -->
 
 <!-- Main content -->
-<!-- {{route('admin.image.update',['id'=>$user->id])}} -->
 <div class="content">
     <div class="container-fluid">
         <div class="row">
@@ -32,7 +26,7 @@
                         <div class="card-body p-2 pl-5 pr-5 pb-5">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="modal fade" id="editStoreModal{{$user->id}}" tabindex="-1" role="dialog"
+                                    <div class="modal fade" id="editStoreModal{{$driver->id}}" tabindex="-1" role="dialog"
                                         aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
@@ -42,7 +36,7 @@
                                                     <div class="modal-header">
                                                         <h5 class="modal-title display-center" id="exampleModalLabel">
                                                             <h5 class="modal-title" id="exampleModalLabel">
-                                                                {{$user->business_name}}
+                                                                {{$driver->business_name}}
                                                             </h5>
                                                         </h5>
                                                         <button type="button" class="close" data-dismiss="modal"
@@ -54,7 +48,7 @@
                                                         <div class="form-group">
 
                                                             <input type="hidden" id="id" name="id" class="form-control"
-                                                                value="{{$user->id}}">
+                                                                value="{{$driver->id}}">
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-md-6">
@@ -62,7 +56,7 @@
                                                                     <label for="">Name</label>
                                                                     <input type="text" name="name" id="name"
                                                                         class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
-                                                                        value="{{$user->name}}">
+                                                                        value="{{$driver->name}}">
                                                                     @if ($errors->has('name'))
                                                                     <span class="invalid-feedback" role="alert">
                                                                         <strong>{{ $errors->first('name') }}</strong>
@@ -76,7 +70,7 @@
                                                                     <label for="">Business Name</label>
                                                                     <input type="tel" name="business_name"
                                                                         id="business_name" class="form-control"
-                                                                        value="{{$user->business_name}}" required>
+                                                                        value="{{$driver->business_name}}" required>
                                                                     <p id="business_name"
                                                                         class="text-danger business_name error"></p>
                                                                 </div>
@@ -89,7 +83,7 @@
                                                                         <div class="col-md-6">
                                                                             <input type="text" class="form-control"
                                                                                 id="phone" name="phone"
-                                                                                value="{{$user->phone}}">
+                                                                                value="{{$driver->phone}}">
 
 
                                                                         </div>
@@ -108,7 +102,7 @@
                                                                             <input type="text" class="form-control"
                                                                                 id="business_phone"
                                                                                 name="business_phone"
-                                                                                value="{{$user->business_phone}}">
+                                                                                value="{{$driver->business_phone}}">
                                                                         </div>
                                                                     </div>
                                                                     <p id="business_phone"
@@ -122,8 +116,8 @@
                                                                     <label for="">Image</label>
                                                                     <input type="file" name="store_image"
                                                                         accept="image/*" id="store_image"
-                                                                        class="form-control" value="$user->user_img">
-                                                                    <img src="{{config('constants.BUCKET') . $user->user_img}}"
+                                                                        class="form-control" value="$driver->user_img">
+                                                                    <img src="{{config('constants.BUCKET') . $driver->user_img}}"
                                                                         alt="" width="50px" height="50px">
                                                                 </div>
                                                                 <p id="store_image"
@@ -146,13 +140,13 @@
                                         </div>
                                     </div>
                                     <!-- Modal -->
-                                    <div class="modal fade" id="exampleModal{{$user->id}}" tabindex="-1" role="dialog"
+                                    <div class="modal fade" id="exampleModal{{$driver->id}}" tabindex="-1" role="dialog"
                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">{{$user->name}}
-                                                        {{$user->l_name}}
+                                                    <h5 class="modal-title" id="exampleModalLabel">{{$driver->name}}
+                                                        {{$driver->l_name}}
                                                     </h5>
                                                     <button type="button" class="close" data-dismiss="modal"
                                                         aria-label="Close">
@@ -174,7 +168,7 @@
 
                                                     <div class="row">
 
-                                                        @foreach(json_decode($user) as $key=>$u)
+                                                        @foreach(json_decode($driver) as $key=>$u)
                                                         @if(!is_null($u) && !in_array($key,$fields))
                                                         <?php
                                                         if ($key == 'f_name') {
@@ -199,14 +193,14 @@
                                                         <div class="col-md-12">
                                                             <div class="form-group">
                                                                 <label for="" class="mt-5">
-                                                                    @if($user->is_active==0)
+                                                                    @if($driver->is_active==0)
                                                                     <a
-                                                                        href="{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}">
+                                                                        href="{{route('change_user_status',['user_id'=>$driver->id,'status'=>1])}}">
                                                                         <span class="text-success">Click here to Enable
                                                                             Account</span></a>
                                                                     @else
                                                                     <a
-                                                                        href="{{route('change_user_status',['user_id'=>$user->id,'status'=>0])}}">
+                                                                        href="{{route('change_user_status',['user_id'=>$driver->id,'status'=>0])}}">
                                                                         <span class="text-danger">Click here to Disable
                                                                             Account </span></a>
                                                                     @endif
@@ -225,10 +219,10 @@
                                         </div>
                                     </div>
                                     <div class="p-2 mb-2">
-                                        @if($user->is_active==0)
+                                        @if($driver->is_active==0)
                                         <label class="switch float-right">
                                             <input type="checkbox"
-                                                onclick="window.location.href='{{route('change_user_status',['user_id'=>$user->id,'status'=>1])}}'">
+                                                onclick="window.location.href='{{route('change_user_status',['user_id'=>$driver->id,'status'=>1])}}'">
                                             <span class="slider round"></span>
                                         </label>
 
@@ -237,13 +231,13 @@
 
                                         <label class="switch float-right">
                                             <input type="checkbox" checked
-                                                onclick="window.location.href='{{route('change_user_status',['user_id'=>$user->id,'status'=>0])}}'">
+                                                onclick="window.location.href='{{route('change_user_status',['user_id'=>$driver->id,'status'=>0])}}'">
                                             <span class="slider round"></span>
                                         </label>
 
                                         <h4 class="float-right pr-3">Block</h4>
                                         @endif
-                                        <a href="" data-toggle="modal" data-target="#editStoreModal{{$user->id}}"
+                                        <a href="" data-toggle="modal" data-target="#editStoreModal{{$driver->id}}"
                                             class=" d-block text-right float-right pr-3"><img class="img-size-16"
                                                 src="/res/res/img/edit.png"></a>
                                     </div>
@@ -253,8 +247,8 @@
                                         <div class="col-md-3">
                                             <span class="img-container">
                                                 <img style="width: 250px;" class="d-block m-auto"
-                                                    src=@if($user->user_img)
-                                                "{{config('constants.BUCKET') . $user->user_img}}"
+                                                    src=@if($driver->user_img)
+                                                "{{config('constants.BUCKET') . $driver->user_img}}"
                                                 @else
                                                 "{{asset('/res/res/img/customer.png')}}"
                                                 @endif alt="">
@@ -268,16 +262,13 @@
                                                 'is_active',
                                                 'updated_at',
                                                 'created_at',
-                                                'email_verified_at',
+                                                // 'email_verified_at',
                                                 'settings',
-                                                'user_img'
+                                                'profile_img',
+                                                'application_fee'
                                             ];
-                                            if ($role_id == 3) // Customer
-                                                array_push($fields,  'lat', 'lon', 'pending_withdraw', 'total_withdraw', 'application_fee');
-                                            if ($role_id == 4) // Driver
-                                                array_push($fields,  'application_fee');
                                             ?>
-                                            @foreach(json_decode($user) as $key=>$u)
+                                            @foreach(json_decode($driver) as $key=>$u)
                                             @if(!is_null($u) && !in_array($key,$fields))
                                             <?php
                                             if ($key == 'f_name') {
@@ -343,9 +334,9 @@
                                                                         @endforeach
                                                                     </tbody>
                                                                 </table>
-                                                                @elseif($user->roles[0]->name=='seller')
+                                                                @elseif($driver->roles[0]->name=='seller')
                                                                 <input type="number" class="form-control"
-                                                                    data-id="{{json_decode($user)->id}}"
+                                                                    data-id="{{json_decode($driver)->id}}"
                                                                     id="application_fee" name="application_fee"
                                                                     value="{{$u}}" step="0.01">
                                                                 @else
@@ -353,7 +344,7 @@
                                                                 @endif
                                                             </span>
                                                             @if($key=='application_fee' &&
-                                                            $user->roles[0]->name=='seller')
+                                                            $driver->roles[0]->name=='seller')
                                                             <br>
                                                             <button class="btn btn-primary"
                                                                 id="application_fee_update">Update</button>
@@ -436,8 +427,6 @@
                                 @endforeach
                             </div>
                         </div>
-
-
                     </div>
                 </div>
             </div>
