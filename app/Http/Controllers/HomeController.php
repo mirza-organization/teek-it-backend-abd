@@ -880,6 +880,7 @@ class HomeController extends Controller
                 $order['items'] = $item_arr;
                 $return_arr[] = $order;
             }
+            $role_id = $user->role_id;
             $orders = $return_arr;
             return view('admin.customer_details', compact('orders', 'orders_p', 'user', 'role_id'));
         } else {
