@@ -298,7 +298,13 @@ class ProductsController extends Controller
      */
     public function getProductInfo($product_id)
     {
-        $product = Products::with('quantity')->find($product_id);
+        $qty = Products::with('quantity')
+            ->where('id', $product_id)
+            ->first();
+        $quantity = $qty->quantity->qty;
+        $product = Products::with('quantity')
+            ->select(['*', DB::raw("$quantity as qty")])
+            ->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
@@ -743,7 +749,7 @@ class ProductsController extends Controller
             }
             $keywords = explode(" ", $request->product_name);
 
-            $article = Products::search($request->product_name); 
+            $article = Products::search($request->product_name);
             // dd($article);
             //foreach ($keywords as $word) {
             // $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $request->product_name . '%')
