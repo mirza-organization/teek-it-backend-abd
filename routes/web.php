@@ -115,10 +115,12 @@ Route::post('/acategories/add_cat', 'HomeController@addCat')->name('add_cat');
 Route::get('/acategories/delete_cat/{id}', 'HomeController@deleteCat')->name('delete_cat');
 Route::get('/queries', 'HomeController@adminQueries');
 Route::get('/customer/{user_id}/details', 'HomeController@adminCustomerDetails')->name('customer_details');
+Route::get('/driver/{driver_id}/details', 'HomeController@adminDriverDetails')->name('driver_details');
 Route::get('/store/application-fee/{user_id}/{application_fee}', 'Admin\UserAndRoleController@updateApplicationFee')->name('application_fee');
 Route::post('/update_pages', 'HomeController@updatePages')->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', 'HomeController@changeUserStatus')->name('change_user_status');
 Route::get('/users_del', 'HomeController@adminUsersDel')->name('admin.del.users');
+Route::get('/drivers_del', 'HomeController@adminDriversDel')->name('admin.del.drivers');
 Route::post('/store_info/update', 'HomeController@updateStoreInfo')->name('admin.image.update');
 /*
 |--------------------------------------------------------------------------

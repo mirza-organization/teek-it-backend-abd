@@ -8,7 +8,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Drivers extends Authenticatable implements JWTSubject
-
 {
     use Notifiable;
     /**
@@ -35,11 +34,19 @@ class Drivers extends Authenticatable implements JWTSubject
         'dob',
         'driving_licence_number'
     ];
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password'
+    ];
+
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
-
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *

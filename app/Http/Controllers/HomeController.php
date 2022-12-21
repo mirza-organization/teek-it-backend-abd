@@ -10,7 +10,7 @@ use App\Mail\StoreRegisterMail;
 use App\OrderItems;
 use App\Orders;
 use App\Pages;
-use App\Role;
+use App\Drivers;
 use App\productImages;
 use App\Products;
 use App\Qty;
@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Stripe;
-use Throwable;
 
 class HomeController extends Controller
 {
@@ -856,26 +855,58 @@ class HomeController extends Controller
     /**
      * Return's customer details view
      * @author Huzaifa Haleem
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function adminCustomerDetails($user_id)
     {
         $return_arr = [];
         if (Gate::allows('superadmin')) {
             $user = User::find($user_id);
-            if (Gate::allows('seller')) {
-                $orders = Orders::query()->where('seller_id', '=', $user_id);
-                $role_id = 2;
+            // For seller
+            if ($user->role_id == 2) $orders = Orders::query()->where('seller_id', '=', $user_id);
+            // For buyer
+            if ($user->role_id == 3) $orders = Orders::query()->where('user_id', '=', $user_id);
+            $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
+            $orders = $orders->paginate(10);
+            $orders_p = $orders;
+            foreach ($orders as $order) {
+                $items = OrderItems::query()->where('order_id', '=', $order->id)->get();
+                $item_arr = [];
+                foreach ($items as $item) {
+                    $product = (new ProductsController())->getProductInfo($item->product_id);
+                    $item['product'] = $product;
+                    $item_arr[] = $item;
+                }
+                $order['items'] = $item_arr;
+                $return_arr[] = $order;
             }
-
-            if (Gate::allows('buyer')) {
-                $orders = Orders::query()->where('user_id', '=', $user_id);
-                $role_id = 3;
-            }
-            if (Gate::allows('delivery_boy')) {
-                $orders = Orders::query()->where('delivery_boy_id', '=', $user_id);
-                $role_id = 4;
-            }
+            $role_id = $user->role_id;
+            $orders = $return_arr;
+            return view('admin.customer_details', compact('orders', 'orders_p', 'user', 'role_id'));
+        } else {
+            abort(401);
+        }
+    }
+    /**
+     * Return's driver details view
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminDriverDetails($driver_id)
+    {
+        if (Gate::allows('superadmin')) {
+            $return_arr = [];
+            /**
+             * In Teek it delivery boy == driver
+             * So when we need delivery boy details
+             * We have to goto the drivers table
+             */
+            $driver = Drivers::find($driver_id);
+            $orders = Orders::query()
+                ->where('delivery_boy_id', '=', $driver_id)
+                ->where('payment_status', '!=', 'hidden')
+                ->orderByDesc('id');
+            $role_id = 4;
             $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
             $orders = $orders->paginate(10);
             $orders_p = $orders;
@@ -891,7 +922,7 @@ class HomeController extends Controller
                 $return_arr[] = $order;
             }
             $orders = $return_arr;
-            return view('admin.customer_details', compact('orders', 'orders_p', 'user', 'role_id'));
+            return view('admin.driver_details', compact('orders', 'orders_p', 'driver', 'role_id'));
         } else {
             abort(401);
         }
@@ -1035,6 +1066,21 @@ class HomeController extends Controller
         }
     }
     /**
+     * Delete selected drivers
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminDriversDel(Request $request)
+    {
+        if (Gate::allows('superadmin')) {
+            for ($i = 0; $i < count($request->drivers); $i++) {
+                DB::table('drivers')->where('id', '=', $request->drivers[$i])->delete();
+                DB::table('driver_documents')->where('driver_id', '=', $request->drivers[$i])->delete();
+            }
+            return response("Drivers Deleted Successfully");
+        }
+    }
+    /**
      * Render customers listing view for admin
      * @author Huzaifa Haleem
      * @version 1.0.0
@@ -1063,16 +1109,10 @@ class HomeController extends Controller
     public function adminDrivers(Request $request)
     {
         if (Gate::allows('superadmin')) {
-            $users = User::query()->whereHas('roles', function ($query) {
-                $query->where('role_id', 4);
-            });
-
-            if ($request->search) {
-                $users = $users->where('name', 'LIKE', $request->search);
-            }
-
-            $users = $users->paginate(9);
-            return view('admin.drivers', compact('users'));
+            $drivers = Drivers::query();
+            if ($request->search) $drivers = $drivers->where('f_name', 'LIKE', $request->search);
+            $drivers = $drivers->paginate(9);
+            return view('admin.drivers', compact('drivers'));
         } else {
             abort(404);
         }
