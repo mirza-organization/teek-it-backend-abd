@@ -25,8 +25,9 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class DriverController extends Controller
 {
     /**
-     * @param $id
-     * @return mixed
+     * It will fetch & show the driver's 
+     * info
+     * @version 1.0.0
      */
     public function info($id)
     {
@@ -45,8 +46,8 @@ class DriverController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @return mixed
+     * It will add driver location 
+     * @version 1.0.0
      */
     public function addLatLon(Request $request)
     {
@@ -58,7 +59,10 @@ class DriverController extends Controller
         return User::where('id', auth()->id())
             ->update($data);
     }
-
+    /**
+     * It will submit driver's withdrawl 
+     * @version 1.0.0
+     */
     public function submitWithdrawal(Request $request)
     {
         if (!\auth()->guard('rider')->user()) abort(404);
@@ -102,7 +106,10 @@ class DriverController extends Controller
             'message' => ""
         ], 200);
     }
-
+    /**
+     * It will submit driver's bank account details 
+     * @version 1.0.0
+     */
     public function submitBankAccountDetails(Request $request)
     {
         $validator = \Validator::make($request->all(), [
@@ -127,7 +134,10 @@ class DriverController extends Controller
             'message' => config("constants.BANK_DETAILS_UPDATED")
         ], 200);
     }
-
+    /**
+     * It will show drivers withdrawl requests 
+     * @version 1.0.0
+     */
     public function driverAllWithdrawalRequests()
     {
 

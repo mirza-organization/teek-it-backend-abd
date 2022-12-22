@@ -82,7 +82,10 @@ class PagesController extends Controller
     {
         //
     }
-
+    /**
+     * Fetches the page via given page type
+     * @version 1.0.0
+     */
     public function getPage(Request $request)
     {
         $page = Pages::query()->where('page_type', '=', $request->page_type)->get();
