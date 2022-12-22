@@ -209,7 +209,10 @@ class AuthController extends Controller
             ], 401);
         }
     }
-
+    /**
+     * It will update the password 
+     * @version 1.0.0
+     */
     public function changePassword(Request $request)
     {
         $validate = Validator::make($request->all(), [
@@ -241,9 +244,10 @@ class AuthController extends Controller
             ], 404);
         }
     }
+
     /**
-     * Get the authenticated User.
-     *
+     *  It will Get the authenticated User.
+     * @version 1.0.0
      * @return \Illuminate\Http\JsonResponse
      */
     public function me()
@@ -283,8 +287,10 @@ class AuthController extends Controller
         ], 200);
     }
     /**
-     * Log the user out (Invalidate the token).
-     *
+     * It will Log the user out 
+     * (Invalidate the token).
+     * @version 1.0.0
+
      * @return \Illuminate\Http\JsonResponse
      */
     public function logout()
@@ -297,8 +303,9 @@ class AuthController extends Controller
         ], 200);
     }
     /**
-     * Refresh a token.
-     *
+     * It will Refresh a token.
+     * @version 1.0.0
+
      * @return \Illuminate\Http\JsonResponse
      */
     public function refresh()
@@ -306,10 +313,10 @@ class AuthController extends Controller
         return $this->respondWithToken(JWTAuth::refresh());
     }
     /**
-     * Get the token array structure.
+     * It will Get the token array structure.
      *
      * @param string $token
-     *
+     * @version 1.0.0
      * @return \Illuminate\Http\JsonResponse
      */
     protected function respondWithToken($token)
@@ -374,7 +381,11 @@ class AuthController extends Controller
         );
         return $data_info;
     }
-
+    /**
+     * It will get user via given id
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     public function get_user($user_id)
     {
         $data_info = $this->getSellerInfo(User::find($user_id));
@@ -407,7 +418,12 @@ class AuthController extends Controller
             $jwtToken->save();
         }
     }
-
+    /**
+     * It will update user details
+     * via given id
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     public function updateUser(Request $request)
     {
         $validate = User::updateValidator($request);
@@ -453,7 +469,11 @@ class AuthController extends Controller
             ], 404);
         }
     }
-
+    /**
+     * It will update user status
+     * @author Mirza Abdullah Izhar
+     * @version 1.1.0
+     */
     public function updateStatus(Request $request)
     {
         $user = User::find(Auth::id());
@@ -603,7 +623,11 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
+    /**
+     * Get delivery boy info w.r.t delivery boy 'id' 
+     * @author Mirza Abdullah Izhar
+     * @version 1.3.0
+     */
     public function getDeliveryBoyInfo($delivery_boy_info)
     {
         $user = User::find($delivery_boy_info);

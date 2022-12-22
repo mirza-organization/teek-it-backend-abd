@@ -66,7 +66,10 @@ class HomeController extends Controller
             return $this->admin_home();
         }
     }
-
+    /**
+     * It will show the inventory 
+     * @version 1.0.0
+     */
     public function inventory(Request $request)
     {
         if (Gate::allows('seller')) {
@@ -94,7 +97,11 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * It will redirect us to
+     * edit inventory page 
+     * @version 1.0.0
+     */
     public function inventoryEdit($product_id)
     {
         if (Gate::allows('seller')) {
@@ -111,7 +118,11 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * It will redirect us to add
+     * inventory page 
+     * @version 1.0.0
+     */
     public function inventoryAdd(Request $request)
     {
         if (Gate::allows('seller')) {
@@ -122,7 +133,11 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * It will redirect us to add
+     * inventory in bilk qty page 
+     * @version 1.0.0
+     */
     public function inventoryAddBulk(Request $request)
     {
         if (Gate::allows('seller')) {
@@ -131,7 +146,10 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * It will delete the product image 
+     * @version 1.0.0
+     */
     public function deleteImg($image_id)
     {
         if (Gate::allows('seller')) {
@@ -562,7 +580,10 @@ class HomeController extends Controller
         flash('Bank Details Updated');
         return redirect()->back();
     }
-
+    /**
+     * It will showorders
+     * @version 1.0.0
+     */
     public function orders(Request $request)
     {
         //        $inventory = Products::query()->where('user_id','=',Auth::id())->paginate(9);
@@ -1255,7 +1276,11 @@ class HomeController extends Controller
             return response("Orders Deleted Successfully");
         }
     }
-
+    /**
+     * It will show withdrawls to seller/admin
+     * based on their auth id
+     * @version 1.0.0
+     */
     public function withdrawals()
     {
         if (Gate::allows('seller')) {
@@ -1271,7 +1296,10 @@ class HomeController extends Controller
             return view('admin.withdrawal', compact('transactions'));
         }
     }
-
+    /**
+     * It will show driver withdrawls
+     * @version 1.0.0
+     */
     public function withdrawalDrivers()
     {
         if (Gate::allows('seller')) {
@@ -1281,11 +1309,15 @@ class HomeController extends Controller
             return view('shopkeeper.withdrawal', compact('transactions'));
         }
         if (Gate::allows('superadmin')) {
-            $transactions = WithdrawalRequests::has('user.driver')->get();
-            return view('admin.withdrawal-drivers', compact('transactions'));
+
+            // $transactions = WithdrawalRequests::has('user.driver')->get();
+            return view('admin.withdrawal-drivers');
         }
     }
-
+    /**
+     * It will show seller withdrawls requests
+     * @version 1.0.0
+     */
     public function withdrawalsRequest(Request $request)
     {
         if (Gate::allows('seller')) {
@@ -1324,7 +1356,10 @@ class HomeController extends Controller
             return Redirect::back();
         }
     }
-
+    /**
+     * It will change the store status
+     * @version 1.0.0
+     */
     public function changeUserStatus($user_id, $status)
     {
         User::query()->where('id', '=', $user_id)->update(['is_active' => $status]);
@@ -1353,7 +1388,10 @@ class HomeController extends Controller
             abort(404);
         }
     }
-
+    /**
+     * It will show the order count
+     * @version 1.0.0
+     */
     public function myOrderCount()
     {
         if (Gate::allows('superadmin')) {
@@ -1367,7 +1405,11 @@ class HomeController extends Controller
             return response()->json($response);
         }
     }
-
+    /**
+     * It will show complete orders
+     * based on the given criteria
+     * @version 1.0.0
+     */
     public function completeOrders()
     {
         $orders = DB::table('orders')
@@ -1382,6 +1424,8 @@ class HomeController extends Controller
     /**
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
+     * It will mark the order as complete
+     * @version 1.0.0 
      */
     public function markCompleteOrder($order_id)
     {
@@ -1408,6 +1452,7 @@ class HomeController extends Controller
      * @throws Stripe\Exception\ApiErrorException
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
+     * It will change the order status to canceled
      */
     public function cancelOrder($order_id)
     {

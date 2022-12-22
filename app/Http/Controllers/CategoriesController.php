@@ -162,7 +162,10 @@ class CategoriesController extends Controller
             ], 500);
         }
     }
-
+    /**
+     * It will get the products w.r.t category id 
+     * @version 1.0.0
+     */
     public function products($category_id)
     {
         try {
@@ -203,7 +206,10 @@ class CategoriesController extends Controller
             ], 500);
         }
     }
-
+    /**
+     * It will get the stores w.r.t category id 
+     * @version 1.0.0
+     */
     public function stores($category_id): \Illuminate\Http\JsonResponse
     {
         try {

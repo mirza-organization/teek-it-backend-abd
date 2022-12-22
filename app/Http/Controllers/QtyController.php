@@ -12,6 +12,12 @@ use Throwable;
 
 class QtyController extends Controller
 {
+    /**
+     *One time use method which will 
+     *shift qty in products table
+     *to qty table    
+     * @version 1.0.0
+     */
     public function shiftQtyInProductsToQtyTable()
     {
         try {
@@ -73,7 +79,10 @@ class QtyController extends Controller
             ], 500);
         }
     }
-
+    /**
+     *It will get the store by given id    
+     * @version 1.0.0
+     */
     public function getByStoreId(Request $request)
     {
         try {

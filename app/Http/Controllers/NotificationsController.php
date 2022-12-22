@@ -102,6 +102,10 @@ class NotificationsController extends Controller
     ///
     ///
 
+    /**
+     * it will fetch all the notifications
+     * @version 1.0.0
+     */
     public function getNotifications()
     {
         $notifications = notifications::query()->where('user_id', '=', Auth::id())->get();
@@ -119,7 +123,11 @@ class NotificationsController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * it will delete the notification via 
+     * given id
+     * @version 1.0.0
+     */
     public function deleteNotification($notification_id)
     {
         try {

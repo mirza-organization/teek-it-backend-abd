@@ -23,7 +23,11 @@ class OrderController extends Controller
         $order->save();
         return $order->toArray();
     }
-
+    /**
+     * It will get order details via
+     * given id
+     * @version 1.0.0
+     */
     public function getOrderDetails(Request $request)
     {
         try {

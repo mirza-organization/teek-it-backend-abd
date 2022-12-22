@@ -448,7 +448,7 @@ class OrdersController extends Controller
             $new_order = new Orders();
             $new_order->user_id = $user_id;
             $new_order->order_total = $order_total;
-            $new_order->total_items = $total_items; 
+            $new_order->total_items = $total_items;
             $new_order->lat = ($request->type == 'delivery') ? $customer_lat : NULL;
             $new_order->lon = ($request->type == 'delivery') ? $customer_lon : NULL;
             $new_order->type = $request->type;
@@ -580,7 +580,11 @@ class OrdersController extends Controller
             ], 200);
         }
     }
-
+    /**
+     * Update's the order
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
     public function updateOrder(Request $request)
     {
         $order_ids = $request->ids;

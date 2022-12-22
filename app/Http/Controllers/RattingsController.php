@@ -14,6 +14,10 @@ use Throwable;
 
 class RattingsController extends Controller
 {
+    /**
+     *It will add rating to a specific product    
+     * @version 1.0.0
+     */
     public function add(Request $request)
     {
         $validate = Rattings::validator($request);
@@ -30,7 +34,10 @@ class RattingsController extends Controller
         //  $ratting->save();
         return (new ProductsController)->view($request->get('product_id'));
     }
-
+    /**
+     *It will update rating of a specific product    
+     * @version 1.0.0
+     */
     public function update(Request $request)
     {
         $validate = Rattings::updateValidator($request);
@@ -47,7 +54,10 @@ class RattingsController extends Controller
         $ratting->save();
         return (new ProductsController)->view($request->get('product_id'));
     }
-
+    /**
+     *It will delete rating of a specific product    
+     * @version 1.0.0
+     */
     public function delete($ratting_id)
     {
         try {
@@ -76,7 +86,10 @@ class RattingsController extends Controller
             ], 500);
         }
     }
-
+    /**
+     *It will fetch rating via product id    
+     * @version 1.0.0
+     */
     public function get_ratting($product_id)
     {
         $raw_ratting = Rattings::query()->where('product_id', '=', $product_id);

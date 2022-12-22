@@ -41,7 +41,10 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
-
+    /**
+     * It will log the user in
+     * @version 1.3.0
+     */
     public function login(\Illuminate\Http\Request $request)
     {
         $this->validateLogin($request);

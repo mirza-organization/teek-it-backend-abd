@@ -31,6 +31,11 @@ use Throwable;
 
 class ProductsController extends Controller
 {
+    /**
+     * one time use method to drop
+     * qty column from products table
+     * @version 1.0.0
+     */
     public function dropProductsTableQtyColumn()
     {
         try {
@@ -75,6 +80,11 @@ class ProductsController extends Controller
                 'qty' => $product_quantity
             ]);
     }
+    /**
+     *It will insert a single product 
+     *and insert it's given qty to qty table      
+     * @version 1.0.0
+     */
     public function add(Request $request)
     {
         $validate = Products::validator($request);
@@ -231,7 +241,11 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-
+    /**
+     *It will update a single product 
+     *and update the given qty in qty table      
+     * @version 1.0.0
+     */
     public function update(Request $request, $id)
     {
         $validate = Products::updateValidator($request);
@@ -370,7 +384,10 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-
+    /**
+     *View products in bulk with array of given ids   
+     * @version 1.0.0
+     */
     public function bulkView(Request $request)
     {
         $ids = explode(',', $request->ids);
@@ -396,7 +413,10 @@ class ProductsController extends Controller
             ], 200);
         }
     }
-
+    /**
+     *It will sort the products by price    
+     * @version 1.0.0
+     */
     public function sortByPrice()
     {
         try {
@@ -430,7 +450,10 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-
+    /**
+     *It will sort the products by location    
+     * @version 1.0.0
+     */
     public function sortByLocation(Request $request)
     {
         $latitude = $request->get('lat');
@@ -637,7 +660,10 @@ class ProductsController extends Controller
                 ->decrement('qty', $qty);
         }
     }
-
+    /**
+     *It will export products into csv    
+     * @version 1.0.0
+     */
     public function exportProducts()
     {
         $user_id = Auth::id();
@@ -677,7 +703,10 @@ class ProductsController extends Controller
         return  $this->jsonToCsv(json_encode($all_products), $destinationPath . $file, true);
         //return response()->download($destinationPath.$file);
     }
-
+    /**
+     *helper function for exporting products    
+     * @version 1.0.0
+     */
     function jsonToCsv($json, $csvFilePath = false, $boolOutputFile = false)
     {
         // See if the string contains something
@@ -835,6 +864,11 @@ class ProductsController extends Controller
             'time' => $pm,
         ];
     }
+    /**
+     *It will get the duration between given
+     *lat,lon    
+     * @version 1.0.0
+     */
     public function getDurationBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     {
         $count = count($longitude2);

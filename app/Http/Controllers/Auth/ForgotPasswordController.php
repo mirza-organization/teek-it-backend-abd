@@ -33,7 +33,10 @@ class ForgotPasswordController extends Controller
     {
         $this->middleware('guest');
     }
-
+    /**
+     * It will get the reset email token 
+     * @version 1.3.0
+     */
     public function getResetToken(Request $request)
     {
         $validate = Validator::make($request->all(), [
@@ -72,7 +75,7 @@ class ForgotPasswordController extends Controller
             $message->to($request->email, $user->name)
                 ->subject(env('APP_NAME') . ': Password Reset');
         });
-        
+
         return response()->json(['status' => true, 'message' => 'Password reset link sent on your email.'], 200);
     }
 }
