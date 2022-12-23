@@ -376,7 +376,7 @@ class AuthController extends Controller
             'total_withdraw' => $user->total_withdraw,
             'address_1' => $user->address_1,
             'is_online' => $user->is_online,
-            'roles' => 'seller',
+            'roles' => ['sellers'],
             'user_img' => $user->user_img
         );
         return $data_info;
