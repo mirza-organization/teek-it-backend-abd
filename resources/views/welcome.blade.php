@@ -1,6 +1,5 @@
 @extends('layouts.admin.app')
 @section('content')
-
     <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
@@ -8,7 +7,7 @@
                 <div class="col-sm-12">
                     <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
                     <a class="text-site-primary text-center m-auto d-block" href="index.html"
-                       style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Home</a>
+                        style="width: fit-content;text-decoration: underline; font-size: 3.0em; line-height: 1;">Home</a>
                 </div><!-- /.col -->
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -27,30 +26,31 @@
                                 <div class="col-md-3 pl- pr- pb-">
                                     <div class="">
                                         <h5 class="d-block text-center p-3 pb-0 m-0 text-site-primary"><a
-                                                class="font-weight-bold  text-site-primary"
-                                                href="#">Company Logo</a></h5>
+                                                class="font-weight-bold  text-site-primary" href="#">Company Logo</a>
+                                        </h5>
                                     </div>
                                     <div class="card-text">
                                         <div class="col-md-12">
-                    <span class="img-container">
-                    <img alt="" class="d-block m-auto img-fluid" src="res/img/store_logo.png">
-                    </span>
+                                            <span class="img-container">
+                                                <img alt="" class="d-block m-auto img-fluid"
+                                                    src="res/img/store_logo.png">
+                                            </span>
                                         </div>
                                     </div>
-
 
                                 </div>
                                 <div class="col-md-2" style="margin-top: 9%;">
                                     <div class="">
                                         <h5 class="d-block text-center p-3 pb-0 m-0 text-site-primary"><a
-                                                class="font-weight-bold  text-site-primary"
-                                                href="#">Favicon</a></h5>
+                                                class="font-weight-bold  text-site-primary" href="#">Favicon</a></h5>
                                     </div>
                                     <div class="card-text">
                                         <div class="col-md-12">
-                    <span class="img-container" style="padding: 20px;width: fit-content;margin: 0 auto;">
-                    <img alt="" class="d-block m-auto" style="max-width: 50px;" src="res/img/store_logo.png">
-                    </span>
+                                            <span class="img-container"
+                                                style="padding: 20px;width: fit-content;margin: 0 auto;">
+                                                <img alt="" class="d-block m-auto" style="max-width: 50px;"
+                                                    src="res/img/store_logo.png">
+                                            </span>
                                         </div>
                                     </div>
 
@@ -58,18 +58,18 @@
                                 </div>
                                 <div class="col-md-7">
                                     <h5 class="font-weight-bold d-block text-center p-3 pb-0 m-0 text-site-primary">
-                                        <a class="ml-2 mr-2 text-site-primary text-left float-left"
-                                           href="#">Teek IT</a>
+                                        <a class="ml-2 mr-2 text-site-primary text-left float-left" href="#">Teek
+                                            IT</a>
                                         <a class="ml-2 mr-2 text-site-primary text-center d-inline-block"
-                                           href="#">Slogan</a>
+                                            href="#">Slogan</a>
                                         <a class="ml-2 mr-2 text-site-primary text-right float-right"
-                                           href="#">Edit</a></h5>
+                                            href="#">Edit</a>
+                                    </h5>
                                     <div class="row">
                                         <div class="col-md-12">
                                             <textarea
                                                 style="border:0;margin-top: 0px;margin-bottom: 0px;height: 227px;min-height: 227px;max-height: 227px;width: 100%;min-width: 100%;max-width: 100%;background: #f4f6f9;border-radius: 15px;"
-                                                placeholder="Help" name="" class="form-control" onresize="return 0;"
-                                                id=""></textarea>
+                                                placeholder="Help" name="" class="form-control" onresize="return 0;" id=""></textarea>
                                         </div>
                                     </div>
                                 </div>

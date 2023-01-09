@@ -61,7 +61,7 @@ class LoginController extends Controller
             // Make sure the user is active
             if ($user->is_active && $this->attemptLogin($request) && $user->email_verified_at != null) {
                 // Send the normal successful login response
-                if (Gate::allows('seller') || Gate::allows('superadmin')) {
+                if (Gate::allows('seller') || Gate::allows('child_seller') || Gate::allows('superadmin')) {
                     return $this->sendLoginResponse($request);
                 } else {
                     return redirect()

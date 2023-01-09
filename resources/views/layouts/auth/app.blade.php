@@ -30,20 +30,25 @@
                 <a class="navbar-brand" target="_blank" href="https://teekit.co.uk/">
                     <img style=" max-height: 50px;" src="{{ asset('res/res/img/logo.png') }}" alt="TeekIt Logo">
                 </a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                    data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                    aria-label="Toggle navigation">
                     <!-- <span class="fas fa-bars"></span> -->
                     <i class="fas fa-sign-in-alt"></i>
                     Login
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <form class="e my-2 my-lg-0 ml-auto w-lg-50" style="min-width: 45vw;" method="POST" action="{{ route('login') }}">
+                    <form class="e my-2 my-lg-0 ml-auto w-lg-50" style="min-width: 45vw;" method="POST"
+                        action="{{ route('login') }}">
                         <div class="row">
                             <div class="col-md-5">
-                                {{csrf_field()}}
+                                {{ csrf_field() }}
                                 <div class="form-group">
 
-                                    <input class="form-control mr-sm-2" type="Email" required autocomplete="off" name="email" placeholder="email" aria-label="email" value="{{ old('email') }}">
+                                    <input class="form-control mr-sm-2" type="Email" required autocomplete="off"
+                                        name="email" placeholder="email" aria-label="email"
+                                        value="{{ old('email') }}">
                                     <label for="checkauto">
                                         <input name="remember" id="checkauto" type="checkbox"> Keep me Logged in
                                     </label>
@@ -51,18 +56,20 @@
                             </div>
                             <div class="col-md-5">
                                 <div class="form-group">
-                                    <input class="form-control mr-sm-2" type="password" autocomplete="off" placeholder="Password" name="password" required>
+                                    <input class="form-control mr-sm-2" type="password" autocomplete="off"
+                                        placeholder="Password" name="password" required>
                                     <p for="">
-                                        <a class="text-dark" href="{{ route('password.request') }}">Forgot Password?</a>
+                                        <a class="text-dark" href="{{ route('password.request') }}">Forgot
+                                            Password?</a>
                                     </p>
                                 </div>
                             </div>
-
                             <div class="col-md-2">
 
                                 <div class="form-group">
 
-                                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style=" /* padding: 5px 25px; */ display: block; width: 100%; margin-top: 15px!important; background: #3663ae; border: 0; border-radius: 0; color: white; ">Login</button>
+                                    <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"
+                                        style=" /* padding: 5px 25px; */ display: block; width: 100%; margin-top: 15px!important; background: #3663ae; border: 0; border-radius: 0; color: white; ">Login</button>
                                 </div>
                             </div>
                         </div>
@@ -74,13 +81,14 @@
         <div class="container">
             @include('flash::message')
             @if (session('status'))
-            <div class="alert alert-success" role="alert">
-                {{ session('status') }}
-            </div>
+                <div class="alert alert-success" role="alert">
+                    {{ session('status') }}
+                </div>
             @endif
             <div class="row mtd" style="margin-top: 20vh">
                 <div class="col-md-8">
-                    <img style="max-height: 540px;margin: 0 auto;display: block;width: auto;max-width: 500px;height: 100%;width: 100%;object-fit: contain;" src="{{asset('bike.png')}}" alt="">
+                    <img style="max-height: 540px;margin: 0 auto;display: block;width: auto;max-width: 500px;height: 100%;width: 100%;object-fit: contain;"
+                        src="{{ asset('bike.png') }}" alt="">
                 </div>
                 <div class="col-md-4">
                     @yield('content')
@@ -91,7 +99,8 @@
     </div>
     <!-- /.content-wrapper -->
 
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyDS4Nf8Ict_2h4lih9DCIt_EpkkBnVd85A">
+    <script
+        src="https://maps.googleapis.com/maps/api/js?libraries=geometry,places&key=AIzaSyDS4Nf8Ict_2h4lih9DCIt_EpkkBnVd85A">
     </script>
     <script>
         // Google Map Code - Begins
@@ -266,9 +275,14 @@
             let Address = [];
             let lat = $('input[id="Address[lat]"]').val();
             let lon = $('input[id="Address[lon]"]').val();
+            let select_values = $('#select_values').val();
+            let checked_value = 0;
+            if ($('#chkSelect').is(':checked')) {
+                checked_value = 1;
+            }
             $('#signup').html(spinner);
             $.ajax({
-                url: "{{route('register')}}",
+                url: "{{ route('register') }}",
                 type: "post",
                 data: {
                     _token: "{{ csrf_token() }}",
@@ -280,7 +294,9 @@
                     company_phone: company_phone,
                     location_text: location_text,
                     lat: lat,
-                    lon: lon
+                    lon: lon,
+                    select_values: select_values,
+                    checked_value: checked_value
                 },
                 success: function(response) {
                     $('#signup').text('Sign up');
@@ -318,10 +334,27 @@
                         if (response.errors.location_text) {
                             $('.location').html(response.errors.location_text[0]);
                         }
+                        if ($('#chkSelect').is(":checked")) {
+                            if (response.errors.select_values) {
+                                $('.select_values').html(response.errors.select_values[0]);
+                            }
+                        }
 
                     }
                 }
             });
+        }
+
+        function checkbox() {
+            // $(function() {
+            $("#chkSelect").click(function() {
+                if ($(this).is(":checked")) {
+                    $("#content").show();
+                } else {
+                    $("#content").hide();
+                }
+            });
+            // });
         }
     </script>
 

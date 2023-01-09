@@ -49,7 +49,20 @@ class HomeController extends Controller
      */
     public function index()
     {
-
+        if (Gate::allows('child_seller')) {
+            $child_store = User::where('id', Auth::id())->first();
+            $user = User::query()->where('id', '=', Auth::id())->get();
+            $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', $child_store->parent_store_id)->count();
+            $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', $child_store->parent_store_id)->count();
+            $total_products = Products::query()->where('user_id', '=', $child_store->parent_store_id)->count();
+            $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', $child_store->parent_store_id)->sum('order_total');
+            $all_orders = Orders::where('seller_id', $child_store->parent_store_id)
+                ->whereNotNull('order_status')
+                ->orderby(\DB::raw('case when is_viewed = 0 then 0 when order_status = "pending" then 1 when order_status = "ready" then 2 when order_status = "assigned" then 3
+                 when order_status = "onTheWay" then 4 when order_status = "delivered" then 5 end'))
+                ->paginate(5);
+            return view('shopkeeper.child_dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
+        }
         if (Gate::allows('seller')) {
             $user = User::query()->where('id', '=', Auth::id())->get();
             $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
@@ -72,9 +85,28 @@ class HomeController extends Controller
      */
     public function inventory(Request $request)
     {
-        if (Gate::allows('seller')) {
-            $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
-            $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+        if (Gate::allows('seller') || Gate::allows('child_seller')) {
+            if (Gate::allows('child_seller')) {
+                $qty = Qty::where('users_id', Auth::id())->get();
+                $parent = User::where('id', Auth::id())->first();
+                $product_ids = Products::where('user_id', $parent)->pluck('id');
+                $parent = $parent->parent_store_id;
+                $featured = Products::query()->where('user_id', $parent)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+                if (!empty($qty)) {
+                    $inventory = Qty::with([
+                        'product' => function ($q) {
+                            $q->where('qty.parent_id', 365);
+                        }
+                    ])->first();
+                    //$inventory = Products::with('quantities')->first();
+                    dd($inventory);
+                } else {
+                    $inventory = Products::with('quantity')->where('user_id', $parent);
+                }
+            } else {
+                $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
+                $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+            }
             if ($request->search) {
                 $inventory = $inventory->where('product_name', 'LIKE', $request->search);
             }
@@ -82,7 +114,11 @@ class HomeController extends Controller
                 $inventory = $inventory->where('category_id', '=', $request->category);
             }
             $categories = Categories::all();
-            $inventory = $inventory->paginate(9);
+            if (Gate::allows('child_seller')) {
+                $inventory = $inventory->paginate(20);
+            } else {
+                $inventory = $inventory->paginate(9);
+            }
             $inventory_p = $inventory;
             $inventories = [];
             $featured_products = [];
@@ -96,6 +132,23 @@ class HomeController extends Controller
         } else {
             abort(404);
         }
+    }
+    /**
+     * It edit the qty for a child store
+     * @version 1.0.0
+     */
+    public function editQty(Request $request)
+    {
+        $validatedData = Validator::make($request->all(), [
+            'qty' => 'required|numeric|min:0',
+        ]);
+
+        if ($validatedData->fails()) {
+            flash('Invalid data.')->error();
+            return Redirect::back()->withInput($request->input());
+        }
+        return redirect()->back();
+        // dd($request->all());
     }
     /**
      * It will redirect us to
@@ -1283,7 +1336,7 @@ class HomeController extends Controller
      */
     public function withdrawals()
     {
-        if (Gate::allows('seller')) {
+        if (Gate::allows('seller') || Gate::allows('child_seller')) {
             $user_id = Auth::id();
             $return_data = WithdrawalRequests::query()->where('user_id', '=', $user_id)->get();
             $transactions = $return_data;

@@ -75,4 +75,8 @@ class Products extends Model
     {
         return $this->belongsTo(Categories::class);
     }
+    public function quantities()
+    {
+        return $this->belongsTo(Qty::class);
+    }
 }

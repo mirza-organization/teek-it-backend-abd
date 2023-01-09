@@ -16,4 +16,8 @@ class Qty extends Model
     {
         return $this->belongTo(Products::class);
     }
+    public function product()
+    {
+        return $this->hasMany(Products::class);
+    }
 }
