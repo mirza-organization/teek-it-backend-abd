@@ -21,6 +21,7 @@ class CreateOrdersTable extends Migration
             $table->string('total_items');
             $table->string('lat');
             $table->string('lon');
+            $table->string('device', 9)->nullable();
             $table->string('payment_status');
             $table->timestamps();
         });

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Mail\StoreRegisterMail;
-use App\Models\Role;
+use App\Role;
 use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -55,26 +55,28 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => 'required|string|max:80',
-            'email' => 'required|string|email|max:80|unique:users',
-            'password' => 'required|string|min:8|max:50',
-            'phone' => 'required|string|min:10|max:10',
-            'company_name' => 'required|string|max:80',
-            'company_phone' => 'required|string|min:10|max:10',
-            'location_text' => 'required|string',
-
-            //'username' => 'required|string|max:255|unique:users',
-            //'city' => 'required|string|max:255',
-            //'postcode' => 'required|string|max:255',
-            //'phone_number' => 'required|string|max:255',
-            //'age' => 'required|string|max:255',
-            //'gender' => 'required|string|max:255',
-            //'driving_lesson_cost' => 'string|max:255',
-            //'approved_driving_instructor' => 'boolean',
-            //'years_of_experience' => 'string',
-            //'role' => 'required|string|max:255',
-        ]);
+        if ($data['checked_value'] != 0) {
+            return Validator::make($data, [
+                'name' => 'required|string|max:80',
+                'email' => 'required|string|email|max:80|unique:users',
+                'password' => 'required|string|min:8|max:50',
+                'phone' => 'required|string|min:10|max:10',
+                'company_name' => 'required|string|max:80',
+                'company_phone' => 'required|string|min:10|max:10',
+                'location_text' => 'required|string',
+                'select_values' => 'required',
+            ]);
+        } else {
+            return Validator::make($data, [
+                'name' => 'required|string|max:80',
+                'email' => 'required|string|email|max:80|unique:users',
+                'password' => 'required|string|min:8|max:50',
+                'phone' => 'required|string|min:10|max:10',
+                'company_name' => 'required|string|max:80',
+                'company_phone' => 'required|string|min:10|max:10',
+                'location_text' => 'required|string',
+            ]);
+        }
     }
 
     /**
@@ -85,11 +87,11 @@ class RegisterController extends Controller
      */
     protected function register(Request $request)
     {
-
+        // dd($request->all());
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
             return response()->json([
-                'errors' => $is_valid->errors()
+                'errors' => $is_valid->errors(),
             ], 200);
             exit;
             // exit;
@@ -140,7 +142,11 @@ class RegisterController extends Controller
             },
             "submitted" : null
         }';
-        $role = Role::where('name', 'seller')->first();
+        //$role = Role::where('name', 'seller')->first();
+        if ($request->input('select_values')) {
+            $parent = User::where('name', $request->input('select_values'))->first();
+            $parent_store_id = $parent->id;
+        }
         $User = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -154,17 +160,37 @@ class RegisterController extends Controller
             'lon' => $data['Address']['lon'],
             'business_hours' => $business_hours,
             'settings' => '{"notification_music": 1}',
+            'role_id' => $request->input('select_values') ? 5 : NULL,
+            'parent_store_id' => $request->input('select_values') ? $parent_store_id : NULL,
             'is_active' => 0,
         ]);
         if ($User) {
             echo "User Created";
         }
-        $User->roles()->sync($role->id);
-
+        // $User->roles()->sync($role->id);
         $verification_code = Crypt::encrypt($User->email);
         $FRONTEND_URL = env('FRONTEND_URL');
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
-        $html = '<html>
+        if ($request->input('select_values')) {
+            $parent_store = $request->input('select_values');
+            $html = '<html>
+            Hi, Team Teek IT.<br><br>
+            ' .  $parent_store  . ' child store has signed up today.
+            <br>
+           Please verify their details and take your decision to allow or disallow the store on our platform.<br><br>
+           <strong>Store Name:</strong> '  .  $User->business_name   .  '<br>
+           <strong>Owner Name:</strong> '  .  $User->name   .  '<br>
+           <strong>Email:</strong> '  .  $User->email  .  '<br>
+           <strong>Parent Store:</strong> '  .  $parent_store  .  '<br>
+           <strong>Contact:</strong> '  .  $User->business_phone  .  '<br>
+           <strong>Address:</strong> '  .  $User->address_1  .  '
+           <br><br>
+            <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
+            ' . $account_verification_link . '
+            <br><br><br>
+        </html>';
+        } else {
+            $html = '<html>
             Hi, Team Teek IT.<br><br>
            A new store signed up today.
             <br>
@@ -179,6 +205,7 @@ class RegisterController extends Controller
             ' . $account_verification_link . '
             <br><br><br>
         </html>';
+        }
         $subject = env('APP_NAME') . ': Account Verification';
         Mail::to(config('constants.ADMIN_EMAIL'))
             ->send(new StoreRegisterMail($html, $subject));

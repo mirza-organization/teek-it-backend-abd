@@ -43,7 +43,8 @@ class User extends Authenticatable implements JWTSubject
         'vehicle_type',
         'lat',
         'lon',
-        'role_id'
+        'role_id',
+        'parent_store_id'
     ];
 
     /**

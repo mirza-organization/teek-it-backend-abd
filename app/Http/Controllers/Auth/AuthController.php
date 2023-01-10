@@ -376,7 +376,7 @@ class AuthController extends Controller
             'total_withdraw' => $user->total_withdraw,
             'address_1' => $user->address_1,
             'is_online' => $user->is_online,
-            'roles' => 'seller',
+            'roles' => ['sellers'],
             'user_img' => $user->user_img
         );
         return $data_info;
@@ -554,21 +554,16 @@ class AuthController extends Controller
     /**
      * Search products w.r.t Seller/Store 'id' & Product Name
      * @author Mirza Abdullah Izhar
-     * @version 1.3.0
+     * @version 1.4.0
      */
     public function searchSellerProducts($seller_id, $product_name)
     {
-
         try {
             $user = User::find($seller_id);
             $data = [];
-            $keywords = explode(" ", $product_name);
-            $article = Products::query();
-            foreach ($keywords as $word) {
-                $article->where('product_name', 'LIKE', '%' . $word . '%', 'AND', 'LIKE', '%' . $product_name . '%')
-                    ->where('user_id', '=', $user->id)
-                    ->where('status', '=', 1);
-            }
+            $article = Products::search($product_name)
+                ->where('user_id', $user->id)
+                ->where('status', 1);
             $products = $article->paginate(20);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
