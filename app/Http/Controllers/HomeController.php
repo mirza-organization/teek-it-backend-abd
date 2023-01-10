@@ -93,13 +93,28 @@ class HomeController extends Controller
                 $parent = $parent->parent_store_id;
                 $featured = Products::query()->where('user_id', $parent)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
                 if (!empty($qty)) {
-                    $inventory = Qty::with([
-                        'product' => function ($q) {
-                            $q->where('qty.parent_id', 365);
-                        }
-                    ])->first();
-                    //$inventory = Products::with('quantities')->first();
-                    dd($inventory);
+                    // $inventory = DB::table('products')
+                    //     //->distinct()
+                    //     // ->where('user_id', $parent)
+                    //     ->select('qty.id', 'products.id', 'products.product_name', 'qty.qty')
+                    //     ->join('qty', function ($join) {
+                    //         $join->on('qty.users_id', '=', 'products.user_id');
+                    //         // $join->on('qty.products_id', '=', 'products.id');
+                    //     })
+                    //     ->where('qty.parent_id', 490)
+                    //     ->where('qty.users_id', 365)
+                    //     ->get()->take(5);
+
+                    // $inventory = Qty::where('qty.parent_id', 490)
+                    //     ->where('qty.users_id', 365)
+                    //     ->with('product')->get();
+                    $inventory = Products::where('user_id', 365)
+                        ->with([
+                            'quantities' => function ($q) {
+                                $q->where('users_id', 365);
+                            }
+                        ]);
+                    // dd($inventory);
                 } else {
                     $inventory = Products::with('quantity')->where('user_id', $parent);
                 }
@@ -115,15 +130,22 @@ class HomeController extends Controller
             }
             $categories = Categories::all();
             if (Gate::allows('child_seller')) {
+
+
                 $inventory = $inventory->paginate(20);
+
+                //dd($inventory);
             } else {
                 $inventory = $inventory->paginate(9);
             }
             $inventory_p = $inventory;
-            $inventories = [];
-            $featured_products = [];
-            foreach ($inventory as $in) {
-                $inventories[] = Products::getProductInfo($in->id);
+            $inventories = $inventory;
+            if (Gate::allows('seller')) {
+                $featured_products = [];
+                $inventories = [];
+                foreach ($inventory as $in) {
+                    $inventories[] = Products::getProductInfo($in->id);
+                }
             }
             foreach ($featured as $in) {
                 $featured_products[] = Products::getProductInfo($in->id);

@@ -401,9 +401,21 @@
                         <form action="{{ route('edit-qty') }}" method="post">
                             @csrf
                             <td>
-                                <input class="form-control" min="0" style="width:50px;" type="number"
-                                    name="qty" value="{{ $inventory->quantity->qty ?? '0' }}">
+                                <?php $q['qty'] = []; ?>
+                                @foreach ($inventory->quantities as $quantity)
+                                    @if ($quantity->count() > 1)
+                                        @if ($quantity->parent_id == Auth::id())
+                                            <?php $q['qty'] = $quantity->qty; ?>
+                                        @endif
+                                    @elseif($quantity->count() == 1)
+                                        <?php $q['qty'] = $quantity->qty; ?>
+                                    @endif
+                                @endforeach
+                                <input class="form-control" min="0" style="plwidth:50px;" type="number"
+                                    name="qty" value="<?php print_r($q['qty']); ?>">
                                 <input type="hidden" name="id" value="{{ $inventory->id }}">
+
+
                             </td>
                             <td>
                                 <button class="btn btn-success" type="submit">Update</button>

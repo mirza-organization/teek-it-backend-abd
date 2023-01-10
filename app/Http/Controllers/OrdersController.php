@@ -362,6 +362,7 @@ class OrdersController extends Controller
      */
     public function new(Request $request)
     {
+        // dd($request->all());
         if ($request->has('type')) {
             if ($request->type == 'delivery') {
                 $validatedData = Validator::make($request->all(), [
@@ -372,7 +373,8 @@ class OrdersController extends Controller
                     'address' => 'required',
                     'house_no' => 'required',
                     'delivery_charges' => 'required',
-                    'service_charges' => 'required'
+                    'service_charges' => 'required',
+                    'device' => 'sometimes'
                 ]);
                 if ($validatedData->fails()) {
                     return response()->json([
@@ -465,6 +467,7 @@ class OrdersController extends Controller
             $new_order->description = $request->description;
             $new_order->payment_status = $request->payment_status ?? "hidden";
             $new_order->seller_id = $seller_id;
+            $new_order->device = $request->device ?? NULL;
             $new_order->save();
             $order_id = $new_order->id;
             if ($request->type == 'delivery') {
