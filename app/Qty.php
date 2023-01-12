@@ -11,6 +11,7 @@ class Qty extends Model
      *
      * @var string
      */
+    protected $guarded = [];
     protected $table = 'qty';
     public function products()
     {

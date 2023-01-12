@@ -33,7 +33,7 @@ Route::get('/', 'HomeController@index')->name('home');
 */
 Route::get('/inventory', 'HomeController@inventory')->name('inventory');
 Route::get('/inventory/edit/{product_id}', 'HomeController@inventoryEdit');
-Route::post('edit', 'HomeController@editQty')->name('edit-qty');
+Route::post('edit', 'HomeController@updateChildQty')->name('edit-qty');
 Route::get('/inventory/add', 'HomeController@inventoryAdd');
 Route::get('/inventory/add_bulk', 'HomeController@inventoryAddBulk');
 Route::post('/inventory/add', 'HomeController@inventoryAddDB')->name('add_inventory');

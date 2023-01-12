@@ -81,7 +81,7 @@ class HomeController extends Controller
     }
     /**
      * It will show the inventory 
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function inventory(Request $request)
     {
@@ -89,55 +89,33 @@ class HomeController extends Controller
             if (Gate::allows('child_seller')) {
                 $qty = Qty::where('users_id', Auth::id())->get();
                 $parent = User::where('id', Auth::id())->first();
-                $product_ids = Products::where('user_id', $parent)->pluck('id');
                 $parent = $parent->parent_store_id;
                 $featured = Products::query()->where('user_id', $parent)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
                 if (!empty($qty)) {
-                    // $inventory = DB::table('products')
-                    //     //->distinct()
-                    //     // ->where('user_id', $parent)
-                    //     ->select('qty.id', 'products.id', 'products.product_name', 'qty.qty')
-                    //     ->join('qty', function ($join) {
-                    //         $join->on('qty.users_id', '=', 'products.user_id');
-                    //         // $join->on('qty.products_id', '=', 'products.id');
-                    //     })
-                    //     ->where('qty.parent_id', 490)
-                    //     ->where('qty.users_id', 365)
-                    //     ->get()->take(5);
-
-                    // $inventory = Qty::where('qty.parent_id', 490)
-                    //     ->where('qty.users_id', 365)
-                    //     ->with('product')->get();
-                    $inventory = Products::where('user_id', 365)
+                    $inventory = Products::where('user_id', $parent)
                         ->with([
-                            'quantities' => function ($q) {
-                                $q->where('users_id', 365);
+                            'quantities' => function ($q) use ($parent) {
+                                $q->where('users_id', $parent);
                             }
                         ]);
-                    // dd($inventory);
                 } else {
                     $inventory = Products::with('quantity')->where('user_id', $parent);
                 }
-            } else {
+            }
+            //if not child seller condition for parent store will run
+            else {
                 $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
                 $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
             }
+            //searching product by name and category
             if ($request->search) {
-                $inventory = $inventory->where('product_name', 'LIKE', $request->search);
+                $inventory = $inventory->where('product_name', 'LIKE', "%{$request->search}%");
             }
             if ($request->category) {
                 $inventory = $inventory->where('category_id', '=', $request->category);
             }
             $categories = Categories::all();
-            if (Gate::allows('child_seller')) {
-
-
-                $inventory = $inventory->paginate(20);
-
-                //dd($inventory);
-            } else {
-                $inventory = $inventory->paginate(9);
-            }
+            Gate::allows('child_seller') ? $inventory = $inventory->paginate(20) : $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
             $inventories = $inventory;
             if (Gate::allows('seller')) {
@@ -156,21 +134,39 @@ class HomeController extends Controller
         }
     }
     /**
-     * It edit the qty for a child store
+     * It edits the qty for a child store
      * @version 1.0.0
      */
-    public function editQty(Request $request)
+    public function updateChildQty(Request $request)
     {
         $validatedData = Validator::make($request->all(), [
             'qty' => 'required|numeric|min:0',
         ]);
-
         if ($validatedData->fails()) {
             flash('Invalid data.')->error();
             return Redirect::back()->withInput($request->input());
         }
+        $quantity = Qty::where('child_store_id', Auth::id())
+            ->where('users_id', $request->input('parent_id'))
+            ->where('products_id', $request->input('product_id'))->get();
+        if ($quantity->isEmpty()) {
+            Qty::create([
+                'child_store_id' => Auth::id(),
+                'qty' => $request->input('qty'),
+                'products_id' => $request->input('product_id'),
+                'users_id' => $request->input('parent_id'),
+            ]);
+        } else {
+            Qty::where('child_store_id', Auth::id())
+                ->where('users_id', $request->input('parent_id'))
+                ->where('products_id', $request->input('product_id'))->update([
+                    'child_store_id' => Auth::id(),
+                    'qty' => $request->input('qty'),
+                    'products_id' => $request->input('product_id'),
+                    'users_id' => $request->input('parent_id'),
+                ]);
+        }
         return redirect()->back();
-        // dd($request->all());
     }
     /**
      * It will redirect us to
