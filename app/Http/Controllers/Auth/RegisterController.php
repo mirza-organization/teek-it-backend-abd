@@ -87,17 +87,12 @@ class RegisterController extends Controller
      */
     protected function register(Request $request)
     {
-        // dd($request->all());
         $is_valid = $this->validator($request->all());
         if ($is_valid->fails()) {
             return response()->json([
                 'errors' => $is_valid->errors(),
             ], 200);
             exit;
-            // exit;
-            // \flash('Email Already Exists Or Incorrect Values In Other Form Fields Or Missing Form Fields')->error();
-            // return Redirect::back()->withInput($request->input())
-            //     ->withErrors(['name.required', 'Name is required']);
         }
         $data = $request->toArray();
         $data['Address']['lat'] = $data['lat'];
@@ -142,7 +137,6 @@ class RegisterController extends Controller
             },
             "submitted" : null
         }';
-        //$role = Role::where('name', 'seller')->first();
         if ($request->input('select_values')) {
             $parent = User::where('name', $request->input('select_values'))->first();
             $parent_store_id = $parent->id;
@@ -160,14 +154,13 @@ class RegisterController extends Controller
             'lon' => $data['Address']['lon'],
             'business_hours' => $business_hours,
             'settings' => '{"notification_music": 1}',
-            'role_id' => $request->input('select_values') ? 5 : NULL,
+            'role_id' => $request->input('select_values') ? 5 : 2,
             'parent_store_id' => $request->input('select_values') ? $parent_store_id : NULL,
             'is_active' => 0,
         ]);
         if ($User) {
             echo "User Created";
         }
-        // $User->roles()->sync($role->id);
         $verification_code = Crypt::encrypt($User->email);
         $FRONTEND_URL = env('FRONTEND_URL');
         $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
@@ -212,8 +205,6 @@ class RegisterController extends Controller
         Mail::to('mirzaabdullahizhar.teekit@gmail.com')
             ->send(new StoreRegisterMail($html, $subject));
 
-        // Flash::message('We have Sent you an Email to Verify your Account');
-
         $admin_users = Role::with('users')->where('name', 'superadmin')->first();
         $store_link = $FRONTEND_URL . '/customer/' . $User->id . '/details';
         $admin_subject = env('APP_NAME') . ': New Store Registered';
@@ -230,7 +221,5 @@ class RegisterController extends Controller
             if (!empty($adminHtml)) Mail::to($user->email)
                 ->send(new StoreRegisterMail($adminHtml, $admin_subject));
         }
-
-        // return Redirect::route('login');
     }
 }

@@ -392,6 +392,9 @@
             @foreach ($inventories as $key => $inventory)
                 <tbody>
                     <tr>
+                        <td>
+                            <input type="checkbox" class="select-checkbox" title="Select" id="{{ $inventory->id }}">
+                        </td>
                         <td>{{ $inventory->id }}</td>
                         <td>{{ $inventory->product_name }}</td>
                         <td></td>
@@ -401,21 +404,29 @@
                         <form action="{{ route('edit-qty') }}" method="post">
                             @csrf
                             <td>
-                                <?php $q['qty'] = []; ?>
+                                <?php
+                                $q['qty'] = [];
+                                $q['qty_id'] = [];
+                                ?>
                                 @foreach ($inventory->quantities as $quantity)
                                     @if ($quantity->count() > 1)
-                                        @if ($quantity->parent_id == Auth::id())
-                                            <?php $q['qty'] = $quantity->qty; ?>
+                                        @if ($quantity->child_store_id == Auth::id())
+                                            <?php
+                                            $q['qty'] = $quantity->qty;
+                                            $q['qty_id'] = $quantity->id;
+                                            ?>
                                         @endif
                                     @elseif($quantity->count() == 1)
-                                        <?php $q['qty'] = $quantity->qty; ?>
+                                        <?php $q['qty'] = $quantity->qty;
+                                        $q['qty_id'] = $quantity->id;
+                                        ?>
                                     @endif
                                 @endforeach
                                 <input class="form-control" min="0" style="plwidth:50px;" type="number"
-                                    name="qty" value="<?php print_r($q['qty']); ?>">
-                                <input type="hidden" name="id" value="{{ $inventory->id }}">
-
-
+                                    name="qty" id="qty" value="<?php print_r($q['qty']); ?>">
+                                <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
+                                <input type="hidden" id="parent_id" name="parent_id"
+                                    value="{{ $inventory->user_id }}">
                             </td>
                             <td>
                                 <button class="btn btn-success" type="submit">Update</button>
