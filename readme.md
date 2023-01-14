@@ -60,10 +60,11 @@ WantedBy=default.target
 4) systemctl enable meilisearch
 5) systemctl start meilisearch
 6) systemctl status meilisearch (Check that the service is actually running)
-7) Now connect Laravel with Meilisearch by adding the following into your .env file:-
+7) Now connect Laravel with Meilisearch by adding the following into your .env file:<br>
 SCOUT_DRIVER=meilisearch
 MEILISEARCH_HOST=http://127.0.0.1:7700
 MEILISEARCH_KEY=masterKey
+
 8) Run the following commands:<br>
 php artisan scout:import "App\Products"
 php artisan scout:sync-index-settings
