@@ -1,4 +1,5 @@
 **How To Deploy Teek it On A Cloud Server With Ubuntu Terminal**
+
 Web App:
 1) composer install.
 2) Create & modify the .env file.
@@ -13,6 +14,7 @@ DB:
 5) Import your local DB into the live DB.
 
 **How To Resolve Digital Ocean Droplet Console Time Out Error**
+
 First check the set of rules of your default UFW firewall:
 sudo ufw status numbered
 
@@ -26,14 +28,15 @@ Now restart your SSH:
 sudo systemctl start ssh
 
 **How To Install Meili Search**
-How To Install On Localhost:-
+
+How To Install On Localhost:
 Reference:
 https://docs.meilisearch.com/learn/getting_started/quick_start.html#setup-and-installation
 
 Goto the reference Doc & jump to the Local installation section. From there you can select the method of installation according to your own OS. After downloading meilisearch pkg just run it & see if it's working or not.
 Defautl port for meilisearch is localhost:7700
 
-How To Install On Production:-
+How To Install On Production:
 Reference: 
 https://postsrc.com/posts/setting-up-meilisearch-on-production-ubuntu-for-laravel-project
 https://docs.meilisearch.com/learn/cookbooks/running_production.html#a-quick-introduction
