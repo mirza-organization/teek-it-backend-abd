@@ -16,6 +16,7 @@ DB:
 **How To Resolve Digital Ocean Droplet Console Time Out Error**
 
 First check the set of rules of your default UFW firewall:
+-----
 sudo ufw status numbered
 
 Now check the default port of your SSH:
@@ -34,7 +35,7 @@ Reference:
 https://docs.meilisearch.com/learn/getting_started/quick_start.html#setup-and-installation
 
 Goto the reference Doc & jump to the Local installation section. From there you can select the method of installation according to your own OS. After downloading meilisearch pkg just run it & see if it's working or not.
-Defautl port for meilisearch is localhost:7700
+Default port for meilisearch is localhost:7700
 
 How To Install On Production:
 Reference: 
