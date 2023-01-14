@@ -1,4 +1,4 @@
-<!-- *********************How To Deploy Teek it On A Cloud Server With Ubuntu Terminal********************* -->
+**How To Deploy Teek it On A Cloud Server With Ubuntu Terminal**
 Web App:
 1) composer install.
 2) Create & modify the .env file.
@@ -12,7 +12,7 @@ DB:
 	https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-phpmyadmin-on-ubuntu-20-04
 5) Import your local DB into the live DB.
 
-<!-- *********************How To Resolve Digital Ocean Droplet Console Time Out Error********************* -->
+**How To Resolve Digital Ocean Droplet Console Time Out Error**
 First check the set of rules of your default UFW firewall:
 sudo ufw status numbered
 
@@ -25,7 +25,7 @@ sudo ufw allow ssh_port_number (type your SSH port default number here)
 Now restart your SSH:
 sudo systemctl start ssh
 
-<!-- *********************How To Install Meili Search********************* -->
+**How To Install Meili Search**
 How To Install On Localhost:-
 Reference:
 https://docs.meilisearch.com/learn/getting_started/quick_start.html#setup-and-installation
@@ -33,7 +33,6 @@ https://docs.meilisearch.com/learn/getting_started/quick_start.html#setup-and-in
 Goto the reference Doc & jump to the Local installation section. From there you can select the method of installation according to your own OS. After downloading meilisearch pkg just run it & see if it's working or not.
 Defautl port for meilisearch is localhost:7700
 
-////////////////////////////////////
 How To Install On Production:-
 Reference: 
 https://postsrc.com/posts/setting-up-meilisearch-on-production-ubuntu-for-laravel-project
@@ -43,6 +42,7 @@ https://docs.meilisearch.com/learn/cookbooks/running_production.html#a-quick-int
 2) Enter: ./meilisearch --help (In case of any help required)
 3) nano /etc/systemd/system/meilisearch.service
 Paste the following script, do note that you will have to change the master key into your own securely defined master key:-
+
 [Unit]
 Description=MeiliSearch
 After=systemd-user-sessions.service
@@ -53,6 +53,7 @@ ExecStart=/usr/bin/meilisearch --http-addr 127.0.0.1:7700 --env production --mas
 
 [Install]
 WantedBy=default.target
+
 4) systemctl enable meilisearch
 5) systemctl start meilisearch
 6) systemctl status meilisearch (Check that the service is actually running)
