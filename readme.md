@@ -1,5 +1,5 @@
 **How To Deploy Teek it On A Cloud Server With Ubuntu Terminal**
-
+-----
 Web App:
 1) composer install.
 2) Create & modify the .env file.
@@ -14,8 +14,9 @@ DB:
 5) Import your local DB into the live DB.
 
 **How To Resolve Digital Ocean Droplet Console Time Out Error**
-
+-----
 First check the set of rules of your default UFW firewall:
+
 -----
 sudo ufw status numbered
 
