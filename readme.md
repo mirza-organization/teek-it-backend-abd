@@ -15,29 +15,29 @@ DB:
 
 **How To Resolve Digital Ocean Droplet Console Time Out Error**
 -----
-First check the set of rules of your default UFW firewall: <br>
+First check the set of rules of your default UFW firewall:<br>
 sudo ufw status numbered
 
-Now check the default port of your SSH:
+Now check the default port of your SSH:<br>
 grep -i port /etc/ssh/sshd_config
 
-Now if UFW is not allowing SSH port then please add it in UFW rules:
+Now if UFW is not allowing SSH port then please add it in UFW rules:<br>
 sudo ufw allow ssh_port_number (type your SSH port default number here)
 
-Now restart your SSH:
+Now restart your SSH:<br>
 sudo systemctl start ssh
 
 **How To Install Meili Search**
 -----
-How To Install On Localhost:
-Reference:
+How To Install On Localhost:<br>
+Reference:<br>
 https://docs.meilisearch.com/learn/getting_started/quick_start.html#setup-and-installation
 
-Goto the reference Doc & jump to the Local installation section. From there you can select the method of installation according to your own OS. After downloading meilisearch pkg just run it & see if it's working or not.
+Goto the reference Doc & jump to the Local installation section. From there you can select the method of installation according to your own OS. After downloading meilisearch pkg just run it & see if it's working or not. 
 Default port for meilisearch is localhost:7700
 
-How To Install On Production:
-Reference: 
+How To Install On Production:<br>
+Reference:<br>
 https://postsrc.com/posts/setting-up-meilisearch-on-production-ubuntu-for-laravel-project
 https://docs.meilisearch.com/learn/cookbooks/running_production.html#a-quick-introduction
 
@@ -64,7 +64,7 @@ WantedBy=default.target
 SCOUT_DRIVER=meilisearch
 MEILISEARCH_HOST=http://127.0.0.1:7700
 MEILISEARCH_KEY=masterKey
-8) Run the following commands:-
+8) Run the following commands:<br>
 php artisan scout:import "App\Products"
 php artisan scout:sync-index-settings
 
