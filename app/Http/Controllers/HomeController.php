@@ -88,8 +88,8 @@ class HomeController extends Controller
         if (Gate::allows('seller') || Gate::allows('child_seller')) {
             if (Gate::allows('child_seller')) {
                 $qty = Qty::where('users_id', Auth::id())->get();
-                $parent = User::where('id', Auth::id())->first();
-                $parent = $parent->parent_store_id;
+                $seller = User::where('id', Auth::id())->first();
+                $parent = $seller->parent_store_id;
                 $featured = Products::query()->where('user_id', $parent)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
                 if (!empty($qty)) {
                     $inventory = Products::where('user_id', $parent)
@@ -108,12 +108,8 @@ class HomeController extends Controller
                 $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
             }
             //searching product by name and category
-            if ($request->search) {
-                $inventory = $inventory->where('product_name', 'LIKE', "%{$request->search}%");
-            }
-            if ($request->category) {
-                $inventory = $inventory->where('category_id', '=', $request->category);
-            }
+            if ($request->search) $inventory = $inventory->where('product_name', 'LIKE', "%{$request->search}%");
+            if ($request->category) $inventory = $inventory->where('category_id', '=', $request->category);
             $categories = Categories::all();
             Gate::allows('child_seller') ? $inventory = $inventory->paginate(20) : $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
