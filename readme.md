@@ -15,9 +15,7 @@ DB:
 
 **How To Resolve Digital Ocean Droplet Console Time Out Error**
 -----
-First check the set of rules of your default UFW firewall:
-
------
+First check the set of rules of your default UFW firewall: <br>
 sudo ufw status numbered
 
 Now check the default port of your SSH:
@@ -30,7 +28,7 @@ Now restart your SSH:
 sudo systemctl start ssh
 
 **How To Install Meili Search**
-
+-----
 How To Install On Localhost:
 Reference:
 https://docs.meilisearch.com/learn/getting_started/quick_start.html#setup-and-installation
