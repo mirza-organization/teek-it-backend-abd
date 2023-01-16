@@ -114,6 +114,7 @@ class HomeController extends Controller
             Gate::allows('child_seller') ? $inventory = $inventory->paginate(20) : $inventory = $inventory->paginate(9);
             $inventory_p = $inventory;
             $inventories = $inventory;
+            $featured_products = [];
             if (Gate::allows('seller')) {
                 $featured_products = [];
                 $inventories = [];
