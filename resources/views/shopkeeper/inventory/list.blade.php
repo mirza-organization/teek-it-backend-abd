@@ -376,10 +376,9 @@
                 <!-- /.container-products-ends -->
         </div>
     @elseif(Auth::user()->role->name == 'child_seller')
-        <table class="table">
+        <table class="table mt-4">
             <thead>
                 <tr>
-                    <th scope="col">#</th>
                     <th scope="col">Product Name</th>
                     <th></th>
                     <th></th>
@@ -392,16 +391,12 @@
             @foreach ($inventories as $key => $inventory)
                 <tbody>
                     <tr>
-                        <td>
-                            <input type="checkbox" class="select-checkbox" title="Select" id="{{ $inventory->id }}">
-                        </td>
-                        <td>{{ $inventory->id }}</td>
                         <td>{{ $inventory->product_name }}</td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
-                        <form action="{{ route('edit-qty') }}" method="post">
+                        <form action="{{ route('update_child_qty') }}" method="post">
                             @csrf
                             <td>
                                 <?php
@@ -422,8 +417,8 @@
                                         ?>
                                     @endif
                                 @endforeach
-                                <input class="form-control" min="0" style="plwidth:50px;" type="number"
-                                    name="qty" id="qty" value="<?php print_r($q['qty']); ?>">
+                                <input class="form-control" min="0" style="width:80px;" type="number"
+                                    name="qty" id="qty" value="<?php $q['qty'] ? print_r($q['qty']) : print_r(0); ?>">
                                 <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
                                 <input type="hidden" id="parent_id" name="parent_id"
                                     value="{{ $inventory->user_id }}">
