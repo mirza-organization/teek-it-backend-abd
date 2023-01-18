@@ -181,32 +181,11 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
 
     Route::get('keys', 'Auth\AuthController@keys');
 });
-// Superadmin Routes
-//Route::group(['middleware' => ['jwt.verify','role:superadmin'],'prefix' => 'sadmin','namespace'=>'Admin'], function($router)
-//{
-//
-//    // User Routes
-//    Route::post('user','UserAndRoleController@createUser');
-//    Route::post('user/update', 'UserAndRoleController@updateUser');
-//    Route::get('users', 'UserAndRoleController@getUsers');
-//    Route::post('users/dt', 'UserAndRoleController@getDTUsers');
-//    Route::get('user/{id}', 'UserAndRoleController@getUser');
-//    Route::delete('user/{id}/delete', 'UserAndRoleController@deleteUser');
-//    Route::get('user/{id}/reset-password', 'UserAndRoleController@resetPassword');
-//
-//    Route::post('user/role/assign', 'UserAndRoleController@assignRole');
-//    Route::get('user/role/{id}', 'UserAndRoleController@getUserRole');
-//
-//    // Role Routes
-//    Route::post('role', 'UserAndRoleController@createRole');
-//    Route::post('role/update', 'UserAndRoleController@updateRole');
-//    Route::get('roles', 'UserAndRoleController@getRoles');
-//    Route::post('roles/dt', 'UserAndRoleController@getDTRoles');
-//    Route::get('role/{id}', 'UserAndRoleController@getRole');
-//    Route::delete('role/{id}/delete', 'UserAndRoleController@deleteRole');
-//
-//});
-
+/*
+|--------------------------------------------------------------------------
+| Random API Routes
+|--------------------------------------------------------------------------
+*/
 Route::get('payment_intent', function () {
     $ch = curl_init();
     $amount = $_REQUEST['amount'];
