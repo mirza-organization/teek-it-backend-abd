@@ -178,7 +178,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('/fetch_promocode_info', 'PromoCodesController@fetchPromocodeInfo');
         Route::get('/all', 'PromoCodesController@allPromocodes');
     });
-// 
+
     Route::get('keys', 'Auth\AuthController@keys');
 });
 /*
