@@ -94,7 +94,7 @@ Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespa
 |--------------------------------------------------------------------------
 | Admin Routes
 |--------------------------------------------------------------------------
-*/
+// */
 Route::get('/notification/home', 'NotificationsController@notificationHome')->name('admin.notification.home');
 Route::post('/notification/send', 'NotificationsController@notificationSend')->name('admin.notification.send');
 Route::get('/stores', 'HomeController@adminStores');
