@@ -431,13 +431,14 @@
                 </tbody>
             @endforeach
         </table>
-        @endif
-        <!-- /.content -->
         <div class="row">
             <div class="col-md-12">
-                {{ $inventory_p->links('pagination::bootstrap-4') }}
+                {{ $inventory_p->links() }}
             </div>
         </div>
+        @endif
+        <!-- /.content -->
+
     </div>
     </div>
 @endsection
