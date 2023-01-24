@@ -128,7 +128,7 @@
                             <div class="form-group text-light" id="content" style="display:none">
                                 <label for=""></label>
                                 <select class="form-control" id="select_values" name="select_values">
-                                    <option value="" selected>Select your parent store:</option>
+                                    <option value="" selected>Select your parent store</option>
                                     @foreach ($stores as $store)
                                         <option value="{{ $store->name }}">{{ $store->name }}</option>
                                     @endforeach
@@ -146,60 +146,60 @@
                     </div>
                 </form>
                 <!-- <form style="display: none" method="POST" action="{{ route('login') }}">
-                                                                                                                                                                                                                                        @csrf
+                                                                                                                                                                                                                                                @csrf
 
-                                                                                                                                                                                                                                        <div class="form-group row">
-                                                                                                                                                                                                                                            <div class="col-md-12">
-                                                                                                                                                                                                                                                <input id="email" type="email" placeholder="Email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
+                                                                                                                                                                                                                                                <div class="form-group row">
+                                                                                                                                                                                                                                                    <div class="col-md-12">
+                                                                                                                                                                                                                                                        <input id="email" type="email" placeholder="Email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" value="{{ old('email') }}" required autofocus>
 
-                                                                                                                                                                                                                                                @if ($errors->has('email'))
+                                                                                                                                                                                                                                                        @if ($errors->has('email'))
     <span class="invalid-feedback" role="alert">
-                                                                                                                                                                                                                                                    <strong>{{ $errors->first('email') }}</strong>
-                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                            <strong>{{ $errors->first('email') }}</strong>
+                                                                                                                                                                                                                                                        </span>
     @endif
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                        </div>
-
-                                                                                                                                                                                                                                        <div class="form-group row">
-
-                                                                                                                                                                                                                                            <div class="col-md-12">
-                                                                                                                                                                                                                                                <input id="password" placeholder="Password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
-
-                                                                                                                                                                                                                                                @if ($errors->has('password'))
-    <span class="invalid-feedback" role="alert">
-                                                                                                                                                                                                                                                    <strong>{{ $errors->first('password') }}</strong>
-                                                                                                                                                                                                                                                </span>
-    @endif
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                        </div>
-
-                                                                                                                                                                                                                                        <div class="form-group row">
-                                                                                                                                                                                                                                            <div class="col-md-12">
-                                                                                                                                                                                                                                                <div class="form-check">
-                                                                                                                                                                                                                                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-
-                                                                                                                                                                                                                                                    <label class="form-check-label te" for="remember">
-                                                                                                                                                                                                                                                        {{ __('Remember Me') }}
-                                                                                                                                                                                                                                                    </label>
+                                                                                                                                                                                                                                                    </div>
                                                                                                                                                                                                                                                 </div>
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                        </div>
 
-                                                                                                                                                                                                                                        <div class="form-group row mb-0">
-                                                                                                                                                                                                                                            <div class="col-md-12">
-                                                                                                                                                                                                                                                <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="/* padding: 5px 25px; */display: block;width: 100%;margin-top: 15px!important;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0; ">Login</button>
+                                                                                                                                                                                                                                                <div class="form-group row">
 
-                                                                                                                                                                                                                                                @if (Route::has('password.request'))
-    <a class="btn btn-link text-white" href="{{ route('password.request') }}">
-                                                                                                                                                                                                                                                    {{ __('Forgot Your Password?') }}
-                                                                                                                                                                                                                                                </a>
+                                                                                                                                                                                                                                                    <div class="col-md-12">
+                                                                                                                                                                                                                                                        <input id="password" placeholder="Password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" name="password" required>
+
+                                                                                                                                                                                                                                                        @if ($errors->has('password'))
+    <span class="invalid-feedback" role="alert">
+                                                                                                                                                                                                                                                            <strong>{{ $errors->first('password') }}</strong>
+                                                                                                                                                                                                                                                        </span>
     @endif
-                                                                                                                                                                                                                                                <a class="btn btn-link text-white" href="{{ route('register') }}">
-                                                                                                                                                                                                                                                    {{ __('Create a New Account?') }}
-                                                                                                                                                                                                                                                </a>
-                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                                    </form> -->
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                </div>
+
+                                                                                                                                                                                                                                                <div class="form-group row">
+                                                                                                                                                                                                                                                    <div class="col-md-12">
+                                                                                                                                                                                                                                                        <div class="form-check">
+                                                                                                                                                                                                                                                            <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+
+                                                                                                                                                                                                                                                            <label class="form-check-label te" for="remember">
+                                                                                                                                                                                                                                                                {{ __('Remember Me') }}
+                                                                                                                                                                                                                                                            </label>
+                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                </div>
+
+                                                                                                                                                                                                                                                <div class="form-group row mb-0">
+                                                                                                                                                                                                                                                    <div class="col-md-12">
+                                                                                                                                                                                                                                                        <button class="btn btn-outline-primary my-2 my-sm-0" type="submit" style="/* padding: 5px 25px; */display: block;width: 100%;margin-top: 15px!important;background: #ffec00;border: 0;border-radius: 0;color: #000100;font-weight: 600;border: 0; ">Login</button>
+
+                                                                                                                                                                                                                                                        @if (Route::has('password.request'))
+    <a class="btn btn-link text-white" href="{{ route('password.request') }}">
+                                                                                                                                                                                                                                                            {{ __('Forgot Your Password?') }}
+                                                                                                                                                                                                                                                        </a>
+    @endif
+                                                                                                                                                                                                                                                        <a class="btn btn-link text-white" href="{{ route('register') }}">
+                                                                                                                                                                                                                                                            {{ __('Create a New Account?') }}
+                                                                                                                                                                                                                                                        </a>
+                                                                                                                                                                                                                                                    </div>
+                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                            </form> -->
             </div>
         </div>
     </div>
@@ -221,6 +221,7 @@
                                     <div class="row">
                                         <div class="col-md-12 mt-3 mb-3">
                                             <div class="form-group" style="height:100%; width:100%">
+                                                <label for="Address">Address</label>
                                                 <input type="text" class="form-control" name="modal_location_text"
                                                     id="modal_location_text" />
                                                 <div class="mt-3 mb-3"

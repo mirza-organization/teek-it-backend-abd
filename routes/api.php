@@ -55,6 +55,7 @@ Route::group(['prefix' => 'qty'], function ($router) {
     Route::get('product/{store_id}', 'QtyController@getByStoreId');
     Route::get('product/{store_id}/{prod_id}', 'QtyController@getById');
     Route::post('update/{prod_id}', 'QtyController@updateById');
+    Route::post('insert_parent_qty_to_child', 'QtyController@insertParentQtyToChild');
     Route::get('multi-curl', 'QtyController@multiCURL');
     Route::get('shifting-qty', 'QtyController@shiftQtyInProductsToQtyTable');
     // 

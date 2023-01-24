@@ -302,4 +302,52 @@ class QtyController extends Controller
             ], 500);
         }
     }
+    /**
+     * This method will share parent store
+     * qty with their child store
+     * @version 1.0.0
+     */
+    public function insertParentQtyToChild(Request $request)
+    {
+        try {
+            $validate = Validator::make($request->all(), [
+                'parent_store' => 'required|integer',
+                'child_store' => 'required|integer'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validate->errors()
+                ], 422);
+            }
+            $parent_store_data = Qty::where('users_id', $request->parent_store)->get();
+            if ($parent_store_data->isEmpty()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.NO_SELLER')
+                ], 200);
+            }
+            foreach ($parent_store_data as $data) {
+                $data = Qty::create([
+                    'users_id' => $request->parent_store,
+                    'products_id' => $data->products_id,
+                    'child_store_id' => $request->child_store,
+                    'qty' => $data->qty,
+                ]);
+            }
+            return response()->json([
+                'status' => true,
+                'message' => config('constants.DATA_INSERTION_SUCCESS')
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
 }

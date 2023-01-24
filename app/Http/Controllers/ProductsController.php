@@ -756,7 +756,7 @@ class ProductsController extends Controller
     /**
      * It searches all products with w.r.t all given filters
      * @author Mirza Abdullah Izhar
-     * @version 1.6.0
+     * @version 1.7.0
      */
     public function search(Request $request)
     {
@@ -777,27 +777,25 @@ class ProductsController extends Controller
             if (isset($miles)) {
                 $store_ids =  $this->searchWrtNearByStores($user_lat, $user_lon,  $miles);
             }
-            $article = Products::search($request->product_name);
+            $productName = $request->product_name;
+            // $article = Products::query();
+            $article = Products::search($productName);
             $article->where('status', 1);
             if (isset($store_ids)) $article->whereIn('user_id', $store_ids['ids']);
             if (isset($request->category_id)) $article->where('category_id', $request->category_id);
             if (isset($request->store_id)) $article->where('user_id', $request->store_id);
             if (isset($request->brand)) $article->where('brand', $request->brand);
-            $article = $article->get()->pluck('id');
-            $products = Products::whereIn('id', $article);
             /**
              * For price range
              */
-            if (isset($request->min_price) && !isset($request->max_price)) $products->where('price', '>=', $request->min_price);
-            if (!isset($request->min_price) && isset($request->max_price)) $products->where('price', '<=', $request->max_price);
-            if (isset($request->min_price) && isset($request->max_price)) $products->whereBetween('price', [$request->min_price, $request->max_price]);
+            if (isset($request->min_price)) $article->where('price >', $request->min_price);
+            if (isset($request->max_price)) $article->where('price <', $request->max_price);
             /**
              * For weight range
              */
-            if (isset($request->min_weight) && !isset($request->max_weight)) $products->where('weight', '>=', $request->min_weight);
-            if (!isset($request->min_weight) && isset($request->max_weight)) $products->where('weight', '<=', $request->max_weight);
-            if (isset($request->min_weight) && isset($request->max_weight)) $products->whereBetween('weight', [$request->min_weight, $request->max_weight]);
-            $products = $products->paginate(10);
+            if (isset($request->min_weight)) $article->where('weight >', $request->min_weight);
+            if (isset($request->max_weight)) $article->where('weight <', $request->max_weight);
+            $products = $article->paginate(20);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 $products_data = [];
