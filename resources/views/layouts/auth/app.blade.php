@@ -347,7 +347,7 @@
 
         function checkbox() {
             // $(function() {
-            $("#chkSelect").click(function() {
+            $("#chkSelect").change(function() {
                 if ($(this).is(":checked")) {
                     $("#content").show();
                 } else {
