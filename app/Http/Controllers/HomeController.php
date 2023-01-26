@@ -87,25 +87,27 @@ class HomeController extends Controller
     {
         if (Gate::allows('seller') || Gate::allows('child_seller')) {
             if (Gate::allows('child_seller')) {
-                $qty = Qty::where('users_id', Auth::id())->get();
-                $seller = User::where('id', Auth::id())->first();
-                $parent = $seller->parent_store_id;
-                $featured = Products::query()->where('user_id', $parent)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+                $child_seller_id = Auth::id();
+                $qty = Qty::where('users_id', $child_seller_id)->first();
+                $child_seller = User::where('id', $child_seller_id)->first();
+                $parent_seller_id = $child_seller->parent_store_id;
+                $featured = Products::query()->where('user_id', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
                 if (!empty($qty)) {
-                    $inventory = Products::where('user_id', $parent)
+                    $inventory = Products::where('user_id', $parent_seller_id) 
                         ->with([
-                            'quantities' => function ($q) use ($parent) {
-                                $q->where('users_id', $parent);
+                            'quantities' => function ($q) use ($child_seller_id) {
+                                $q->where('users_id', $child_seller_id);
                             }
                         ]);
                 } else {
-                    $inventory = Products::with('quantity')->where('user_id', $parent);
+                    $inventory = Products::with('quantity')->where('user_id', $parent_seller_id);
                 }
             }
-            //if not child seller condition for parent store will run
+            //if not child seller then this condition will run for parent store
             else {
-                $inventory = Products::query()->where('user_id', '=', Auth::id())->orderBy('id', 'DESC');
-                $featured = Products::query()->where('user_id', '=', Auth::id())->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+                $parent_seller_id = Auth::id();
+                $inventory = Products::query()->where('user_id', '=', $parent_seller_id)->orderBy('id', 'DESC');
+                $featured = Products::query()->where('user_id', '=', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
             }
             //searching product by name and category
             if ($request->search) $inventory = $inventory->where('product_name', 'LIKE', "%{$request->search}%");

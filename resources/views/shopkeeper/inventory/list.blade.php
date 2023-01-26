@@ -404,21 +404,24 @@
                                 $q['qty_id'] = [];
                                 ?>
                                 @foreach ($inventory->quantities as $quantity)
-                                    @if ($quantity->count() > 1)
-                                        @if ($quantity->child_store_id == Auth::id())
-                                            <?php
-                                            $q['qty'] = $quantity->qty;
-                                            $q['qty_id'] = $quantity->id;
-                                            ?>
-                                        @endif
-                                    @elseif($quantity->count() == 1)
-                                        <?php $q['qty'] = $quantity->qty;
+                                    {{-- {{dd($quantity)}} --}}
+                                    {{-- Product id == $inventory->id --}}
+                                    @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
+                                        <?php
+                                        $q['qty'] = $quantity->qty;
                                         $q['qty_id'] = $quantity->id;
                                         ?>
                                     @endif
+                                    {{-- @if ($quantity->count() > 1)
+                                    @elseif($quantity->count() == 1)
+                                        <?php
+                                        $q['qty'] = $quantity->qty;
+                                        $q['qty_id'] = $quantity->id;
+                                        ?>
+                                    @endif --}}
                                 @endforeach
                                 <input class="form-control" min="0" style="width:80px;" type="number"
-                                    name="qty" id="qty" value="<?php $q['qty'] ? print_r($q['qty']) : print_r(0); ?>">
+                                    name="qty" id="qty" value="<?php echo !empty($q['qty']) ? $q['qty'] : 0; ?>">
                                 <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
                                 <input type="hidden" id="parent_id" name="parent_id"
                                     value="{{ $inventory->user_id }}">
