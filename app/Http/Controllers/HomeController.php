@@ -90,10 +90,10 @@ class HomeController extends Controller
                 $child_seller_id = Auth::id();
                 $qty = Qty::where('users_id', $child_seller_id)->first();
                 $child_seller = User::where('id', $child_seller_id)->first();
-                $parent_seller_id = $child_seller->parent_store_id;
+                $parent_seller_id = $child_seller->parent_store_id; 
                 $featured = Products::query()->where('user_id', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
                 if (!empty($qty)) {
-                    $inventory = Products::where('user_id', $parent_seller_id) 
+                    $inventory = Products::where('user_id', $parent_seller_id)
                         ->with([
                             'quantities' => function ($q) use ($child_seller_id) {
                                 $q->where('users_id', $child_seller_id);
@@ -131,41 +131,6 @@ class HomeController extends Controller
         } else {
             abort(404);
         }
-    }
-    /**
-     * It edits the qty for a child store
-     * @version 1.0.0
-     */
-    public function updateChildQty(Request $request)
-    {
-        $validatedData = Validator::make($request->all(), [
-            'qty' => 'required|numeric|min:0',
-        ]);
-        if ($validatedData->fails()) {
-            flash('Invalid data.')->error();
-            return Redirect::back()->withInput($request->input());
-        }
-        $quantity = Qty::where('child_store_id', Auth::id())
-            ->where('users_id', $request->input('parent_id'))
-            ->where('products_id', $request->input('product_id'))->get();
-        if ($quantity->isEmpty()) {
-            Qty::create([
-                'child_store_id' => Auth::id(),
-                'qty' => $request->input('qty'),
-                'products_id' => $request->input('product_id'),
-                'users_id' => $request->input('parent_id'),
-            ]);
-        } else {
-            Qty::where('child_store_id', Auth::id())
-                ->where('users_id', $request->input('parent_id'))
-                ->where('products_id', $request->input('product_id'))->update([
-                    'child_store_id' => Auth::id(),
-                    'qty' => $request->input('qty'),
-                    'products_id' => $request->input('product_id'),
-                    'users_id' => $request->input('parent_id'),
-                ]);
-        }
-        return redirect()->back();
     }
     /**
      * It will redirect us to
@@ -1125,9 +1090,10 @@ class HomeController extends Controller
     public function adminStores(Request $request)
     {
         if (Gate::allows('superadmin')) {
-            $users = User::query()->whereHas('roles', function ($query) {
-                $query->where('role_id', 2);
-            });
+            // $users = User::query()->whereHas('roles', function ($query) {
+            //     $query->where('role_id', 2);
+            // });
+            $users = User::query()->where('role_id', 2);
             if ($request->search) {
                 $users = $users->where('business_name', 'LIKE', $request->search);
             }
@@ -1179,10 +1145,10 @@ class HomeController extends Controller
     public function adminCustomers(Request $request)
     {
         if (Gate::allows('superadmin')) {
-            $users = User::query()->whereHas('roles', function ($query) {
-                $query->where('role_id', 3);
-            });
-
+            // $users = User::query()->whereHas('roles', function ($query) {
+            //     $query->where('role_id', 3);
+            // });
+            $users = User::query()->where('role_id', 3);
             if ($request->search) {
                 $users = $users->where('name', 'LIKE', $request->search);
             }

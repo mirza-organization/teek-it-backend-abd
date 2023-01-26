@@ -6,7 +6,9 @@ use App\Products;
 use App\Qty;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
@@ -303,6 +305,45 @@ class QtyController extends Controller
         }
     }
     /**
+     * It edits the qty for a child store
+     * @version 1.0.0
+     */
+    public function updateChildQty(Request $request)
+    {
+        $validatedData = Validator::make($request->all(), [
+            'qty' => 'required|int|min:0',
+        ]);
+        if ($validatedData->fails()) {
+            flash('Invalid data')->error();
+            return Redirect::back()->withInput($request->input());
+        }
+        Qty::updateOrInsert(
+            ['users_id' => Auth::id(), 'products_id' => $request->input('product_id')],
+            ['qty' => $request->input('qty')]
+        );
+        // $quantity = Qty::where('child_store_id', Auth::id())
+        //     ->where('users_id', $request->input('parent_id'))
+        //     ->where('products_id', $request->input('product_id'))->get();
+        // if ($quantity->isEmpty()) {
+        //     Qty::create([
+        //         'child_store_id' => Auth::id(),
+        //         'qty' => $request->input('qty'),
+        //         'products_id' => $request->input('product_id'),
+        //         'users_id' => $request->input('parent_id'),
+        //     ]);
+        // } else {
+        //     Qty::where('child_store_id', Auth::id())
+        //         ->where('users_id', $request->input('parent_id'))
+        //         ->where('products_id', $request->input('product_id'))->update([
+        //             'child_store_id' => Auth::id(),
+        //             'qty' => $request->input('qty'),
+        //             'products_id' => $request->input('product_id'),
+        //             'users_id' => $request->input('parent_id'),
+        //         ]);
+        // }
+        return redirect()->back();
+    }
+    /**
      * This method will share parent store
      * qty with their child store
      * @version 1.0.0
@@ -311,8 +352,8 @@ class QtyController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
-                'parent_store' => 'required|integer',
-                'child_store' => 'required|integer'
+                'parent_store' => 'required|int',
+                'child_store' => 'required|int'
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -331,13 +372,14 @@ class QtyController extends Controller
             }
             foreach ($parent_store_data as $data) {
                 $data = Qty::create([
-                    'users_id' => $request->parent_store,
+                    'users_id' => $request->child_store,
                     'products_id' => $data->products_id,
-                    'child_store_id' => $request->child_store,
+                    // 'child_store_id' => $request->child_store,
                     'qty' => $data->qty,
                 ]);
             }
             return response()->json([
+                'data' => [],
                 'status' => true,
                 'message' => config('constants.DATA_INSERTION_SUCCESS')
             ], 200);

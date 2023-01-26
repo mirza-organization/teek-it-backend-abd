@@ -105,7 +105,6 @@
                                                                     style="height: 200px;object-fit: contain"
                                                                     src="{{ asset($inventory->feature_img) }}">
                                                             @else
-                                                                <!-- <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{ asset('user_imgs/' . $inventory->feature_img) }}" > -->
                                                                 <img class="d-block m-auto "
                                                                     style="height: 200px;object-fit: contain"
                                                                     src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
@@ -379,8 +378,8 @@
         <table class="table mt-4">
             <thead>
                 <tr>
-                    <th scope="col">Product Name</th>
-                    <th></th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Name</th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -391,8 +390,18 @@
             @foreach ($inventories as $key => $inventory)
                 <tbody>
                     <tr>
+                        <td class="col-md-2" style="padding:0px;">
+                            <span class="img-container pt-30 pb-30 mb-3">
+                                @if (str_contains($inventory->feature_img, 'https://'))
+                                    <img class="d-block m-auto " style="height: 200px;object-fit: contain"
+                                        src="{{ asset($inventory->feature_img) }}">
+                                @else
+                                    <img class="d-block m-auto " style="height: 200px;object-fit: contain"
+                                        src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
+                                @endif
+                            </span>
+                        </td>
                         <td>{{ $inventory->product_name }}</td>
-                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -400,31 +409,23 @@
                             @csrf
                             <td>
                                 <?php
-                                $q['qty'] = [];
-                                $q['qty_id'] = [];
+                                $q['qty'] = 0;
                                 ?>
                                 @foreach ($inventory->quantities as $quantity)
-                                    {{-- {{dd($quantity)}} --}}
                                     {{-- Product id == $inventory->id --}}
                                     @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
                                         <?php
                                         $q['qty'] = $quantity->qty;
-                                        $q['qty_id'] = $quantity->id;
                                         ?>
                                     @endif
-                                    {{-- @if ($quantity->count() > 1)
-                                    @elseif($quantity->count() == 1)
-                                        <?php
-                                        $q['qty'] = $quantity->qty;
-                                        $q['qty_id'] = $quantity->id;
-                                        ?>
-                                    @endif --}}
                                 @endforeach
                                 <input class="form-control" min="0" style="width:80px;" type="number"
                                     name="qty" id="qty" value="<?php echo !empty($q['qty']) ? $q['qty'] : 0; ?>">
                                 <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
-                                <input type="hidden" id="parent_id" name="parent_id"
-                                    value="{{ $inventory->user_id }}">
+                                {{-- The following code was unnecessary --}}
+                                {{-- <input type="hidden" id="parent_id" name="parent_id"
+                                    value="{{ $inventory->user_id }}"> --}}
+                                {{-- <input type="hidden" id="qty_id" name="qty_id" value="<?php echo $q['qty_id']; ?>"> --}}
                             </td>
                             <td>
                                 <button class="btn btn-success" type="submit">Update</button>
