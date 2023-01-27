@@ -341,7 +341,12 @@ class QtyController extends Controller
         //             'users_id' => $request->input('parent_id'),
         //         ]);
         // }
-        return redirect()->back();
+        //return redirect()->back();
+        return response()->json([
+            'status' => 200,
+            'error' => 'false',
+            'qty' => $request->input('qty')
+        ]);
     }
     /**
      * This method will share parent store

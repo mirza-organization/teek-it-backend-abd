@@ -52,11 +52,11 @@ class HomeController extends Controller
         if (Gate::allows('child_seller')) {
             $child_store = User::where('id', Auth::id())->first();
             $user = User::query()->where('id', '=', Auth::id())->get();
-            $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', $child_store->parent_store_id)->count();
-            $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', $child_store->parent_store_id)->count();
-            $total_products = Products::query()->where('user_id', '=', $child_store->parent_store_id)->count();
-            $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', $child_store->parent_store_id)->sum('order_total');
-            $all_orders = Orders::where('seller_id', $child_store->parent_store_id)
+            $pending_orders = Orders::query()->where('order_status', '=', 'pending')->where('seller_id', '=', Auth::id())->count();
+            $total_orders = Orders::query()->where('payment_status', '!=', 'hidden')->where('seller_id', '=', Auth::id())->count();
+            $total_products = Products::query()->where('user_id', '=', Auth::id())->count();
+            $total_sales = Orders::query()->where('payment_status', '=', 'paid')->where('seller_id', '=', Auth::id())->sum('order_total');
+            $all_orders = Orders::where('seller_id', Auth::id())
                 ->whereNotNull('order_status')
                 ->orderby(\DB::raw('case when is_viewed = 0 then 0 when order_status = "pending" then 1 when order_status = "ready" then 2 when order_status = "assigned" then 3
                  when order_status = "onTheWay" then 4 when order_status = "delivered" then 5 end'))
@@ -90,7 +90,7 @@ class HomeController extends Controller
                 $child_seller_id = Auth::id();
                 $qty = Qty::where('users_id', $child_seller_id)->first();
                 $child_seller = User::where('id', $child_seller_id)->first();
-                $parent_seller_id = $child_seller->parent_store_id; 
+                $parent_seller_id = $child_seller->parent_store_id;
                 $featured = Products::query()->where('user_id', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
                 if (!empty($qty)) {
                     $inventory = Products::where('user_id', $parent_seller_id)

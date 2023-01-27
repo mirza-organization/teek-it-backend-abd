@@ -58,6 +58,22 @@
                     </div>
                 </form>
             </div>
+            @if (Auth::user()->role->name == 'child_seller')
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <h1 class="m-0 text-dark text-center">Inventory</h1>
+                            </div><!-- /.col -->
+                        </div><!-- /.row -->
+                    </div><!-- /.container-fluid -->
+                </div>
+                <div class="float-right m-2">
+                    <button type="button" class="btn btn-primary">
+                        <a class="text-white" href="#">Update Bulk</a>
+                    </button>
+                </div>
+            @endif
             @if (Auth::user()->role->name == 'seller')
                 @if (!empty($featured_products))
                     <div class="content-header">
@@ -212,7 +228,6 @@
                     </div>
                     <!-- /.container-featured-products-ends -->
                 @endif
-
                 <div class="content-header">
                     <div class="container-fluid">
                         <div class="row mb-2">
@@ -222,7 +237,6 @@
                         </div><!-- /.row -->
                     </div><!-- /.container-fluid -->
                 </div>
-
                 <!-- /.container-products-begins -->
                 <div class="container-fluid">
                     <div class="row">
@@ -375,37 +389,36 @@
                 <!-- /.container-products-ends -->
         </div>
     @elseif(Auth::user()->role->name == 'child_seller')
-        <table class="table mt-4">
-            <thead>
+        <table class="table align-middle mb-0 bg-white">
+            <thead class="bg-light">
                 <tr>
-                    <th scope="col">Image</th>
-                    <th scope="col">Name</th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th scope="col">Qty</th>
-                    <th scope="col">Action</th>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Qty</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             @foreach ($inventories as $key => $inventory)
                 <tbody>
                     <tr>
                         <td class="col-md-2" style="padding:0px;">
-                            <span class="img-container pt-30 pb-30 mb-3">
+                            <div class="d-flex align-items-center img-container pt-30 pb-30 mb-3"
+                                style="border-radius:5%">
                                 @if (str_contains($inventory->feature_img, 'https://'))
-                                    <img class="d-block m-auto " style="height: 200px;object-fit: contain"
+                                    <img class="d-block m-auto "
+                                        style="height: 140px;object-fit: contain;border-radius:5% "
                                         src="{{ asset($inventory->feature_img) }}">
                                 @else
                                     <img class="d-block m-auto " style="height: 200px;object-fit: contain"
                                         src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
                                 @endif
-                            </span>
+                            </div>
                         </td>
-                        <td>{{ $inventory->product_name }}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <form action="{{ route('update_child_qty') }}" method="post">
+                        <td>
+                            <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
+                        </td>
+
+                        <form action="{{ route('update_child_qty') }}" class="updateQty" method="post">
                             @csrf
                             <td>
                                 <?php
@@ -419,7 +432,7 @@
                                         ?>
                                     @endif
                                 @endforeach
-                                <input class="form-control" min="0" style="width:80px;" type="number"
+                                <input class="form-control qtyInput" min="0" style="width:80px;" type="number"
                                     name="qty" id="qty" value="<?php echo !empty($q['qty']) ? $q['qty'] : 0; ?>">
                                 <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
                                 {{-- The following code was unnecessary --}}
@@ -435,6 +448,7 @@
                 </tbody>
             @endforeach
         </table>
+
         <div class="row">
             <div class="col-md-12">
                 {{ $inventory_p->links() }}
@@ -446,8 +460,6 @@
     </div>
     </div>
 @endsection
-
-
 @section('scripts')
     <script>
         function disableAll(ev) {

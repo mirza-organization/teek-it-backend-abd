@@ -485,7 +485,20 @@
         });
 
 
-
+        $(document).ready(function() {
+            $(".updateQty").on('submit', (function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: "POST",
+                    data: new FormData(this),
+                    contentType: false,
+                    cache: false,
+                    processData: false,
+                    success: function(response) {}
+                });
+            }));
+        });
 
         function updateBulk() {
             $('#update_bulk').submit();
