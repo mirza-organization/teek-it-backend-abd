@@ -910,15 +910,12 @@ class ProductsController extends Controller
                 $file = fopen($filepath, "r");
                 $i = 0;
                 while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
-                    // $num = count($filedata);
                     if ($i == 0) {
                         $i++;
                         continue;
                     };
-                    // $date = Carbon::now();
-                    // print_r($date); exit;
                     DB::statement('CREATE Temporary TABLE temp_products LIKE products');
-                    $db = DB::statement('INSERT INTO `temp_products`( `user_id`, `category_id`,`product_name`, `sku`, `qty`, `price`, `featured`, `discount_percentage`, `contact`)VALUES (' . $request->store_id . ',' . $filedata[0] . ',' . $filedata[0] . ',' . $filedata[1] . ',3, ' . $filedata[2] . ',1,20,02083541500 )');
+                    $db = DB::statement('INSERT INTO `temp_products`( `user_id`, `category_id`,`product_name`, `sku`, `price`, `featured`, `discount_percentage`, `contact`)VALUES (' . $request->store_id . ',' . $filedata[0] . ',' . $filedata[0] . ',' . $filedata[1] . ',3, ' . $filedata[2] . ',1,20,02083541500 )');
                     DB::statement('UPDATE products,temp_products SET products.price = temp_products.price, products.updated_at = "' . Carbon::now() . '" WHERE products.user_id = temp_products.user_id AND products.category_id = temp_products.category_id AND products.sku = temp_products.sku');
                     DB::statement('DROP Temporary TABLE temp_products');
                 }
