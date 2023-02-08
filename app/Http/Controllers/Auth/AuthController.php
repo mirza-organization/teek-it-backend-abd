@@ -376,7 +376,7 @@ class AuthController extends Controller
             'total_withdraw' => $user->total_withdraw,
             'address_1' => $user->address_1,
             'is_online' => $user->is_online,
-            'roles' => ['sellers'],
+            'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers'],
             'user_img' => $user->user_img
         );
         return $data_info;
@@ -490,12 +490,15 @@ class AuthController extends Controller
     public function sellers()
     {
         try {
-            $users = User::where('is_active', '=', 1)->get();
+            $users = User::where('is_active', '=', 1)
+            ->whereIn('role_id', [2,5])
+            ->get();
             $data = [];
             foreach ($users as $user) {
-                if (!$user->seller->isEmpty()) {
-                    if ($user->seller[0]->name == 'seller') $data[] = $this->getSellerInfo($user);
-                }
+                // if (!$user->seller->isEmpty()) {
+                //     if ($user->seller[0]->name == 'seller') $data[] = $this->getSellerInfo($user);
+                // }
+                $data[] = $this->getSellerInfo($user);
             }
             return response()->json([
                 'data' => $data,
