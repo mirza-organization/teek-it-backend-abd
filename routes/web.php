@@ -123,9 +123,14 @@ Route::get('/users/{user_id}/status/{status}', 'HomeController@changeUserStatus'
 Route::get('/users_del', 'HomeController@adminUsersDel')->name('admin.del.users');
 Route::get('/drivers_del', 'HomeController@adminDriversDel')->name('admin.del.drivers');
 Route::post('/store_info/update', 'HomeController@updateStoreInfo')->name('admin.image.update');
+Route::get('/stuart/job/creation/{order_id}', 'StuartDeliveryController@stuartJobCreation')->name('stuart.job.creation');
+Route::post('/stuart/job/status', 'StuartDeliveryController@stuartJobStatus')->name('stuart.job.status');
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route
 |--------------------------------------------------------------------------
 */
 Route::get('/my_order_count', 'HomeController@myOrderCount')->name('my_order_count');
+
+
+

@@ -22,14 +22,14 @@
                         <!-- small box -->
                         <div class="small-box bg-info">
                             <div class="inner">
-                                <h3>{{$pending_orders}}</h3>
-
+                                <h3>{{ $pending_orders }}</h3>
                                 <p>Pending Orders</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-bag"></i>
                             </div>
-                            <a href="{{route('orders')}}" class="small-box-footer d-none">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ route('orders') }}" class="small-box-footer d-none">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -37,14 +37,14 @@
                         <!-- small box -->
                         <div class="small-box bg-success">
                             <div class="inner">
-                                <h3>{{$total_orders}}</h3>
-
+                                <h3>{{ $total_orders }}</h3>
                                 <p>Total Orders</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-stats-bars fas fa-status-bar"></i>
                             </div>
-                            <a href="{{route('orders')}}" class="small-box-footer d-none">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ route('orders') }}" class="small-box-footer d-none">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -52,14 +52,14 @@
                         <!-- small box -->
                         <div class="small-box bg-warning">
                             <div class="inner">
-                                <h3>{{$total_products}}</h3>
-
+                                <h3>{{ $total_products }}</h3>
                                 <p>Total Products</p>
                             </div>
                             <div class="icon">
                                 <i class="ion ion-person-add"></i>
                             </div>
-                            <a href="{{route('inventory')}}" class="small-box-footer d-none">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ route('inventory') }}" class="small-box-footer d-none">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                         </div>
                     </div>
                     <!-- ./col -->
@@ -67,11 +67,11 @@
                         <!-- small box -->
                         <div class="small-box bg-danger">
                             <div class="inner">
-                                <h3>£{{$total_sales}}</h3>
-
+                                <h3>£{{ $total_sales }}</h3>
                                 <p>Total Sales</p>
                             </div>
-                            <a href="{{route('orders')}}" class="small-box-footer d-none">More info <i class="fas fa-arrow-circle-right"></i></a>
+                            <a href="{{ route('orders') }}" class="small-box-footer d-none">More info <i
+                                    class="fas fa-arrow-circle-right"></i></a>
                             <div class="icon">
                                 <i class="ion ion-pie-graph"></i>
                             </div>
@@ -84,5 +84,4 @@
         </div>
         <!-- /.content -->
     </div>
-
 @endsection

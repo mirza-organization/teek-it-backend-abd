@@ -5,6 +5,7 @@
 /vendor
 .idea/
 .env
+composer.json
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml

@@ -103,7 +103,7 @@ class AuthController extends Controller
                 <a href="' . $account_verification_link . '">Verify</a> OR Copy This in your Browser
                 ' . $account_verification_link . '
             <br><br><br>
-            For more information please visit https://teekit.co.uk/ 
+            For more information please visit https://teekit.co.uk/
             If you have any further inquiries please email admin@teekit.co.uk
             </html>';
 
@@ -210,7 +210,7 @@ class AuthController extends Controller
         }
     }
     /**
-     * It will update the password 
+     * It will update the password
      * @version 1.0.0
      */
     public function changePassword(Request $request)
@@ -287,7 +287,7 @@ class AuthController extends Controller
         ], 200);
     }
     /**
-     * It will Log the user out 
+     * It will Log the user out
      * (Invalidate the token).
      * @version 1.0.0
 
@@ -358,8 +358,9 @@ class AuthController extends Controller
     }
     /**
      * Fetch seller/store information w.r.t ID
+     * If seller/store have distance it will return distance
      * @author Mirza Abdullah Izhar
-     * @version 1.1.0
+     * @version 2.1.0
      */
     private function getSellerInfo($seller_info)
     {
@@ -379,6 +380,7 @@ class AuthController extends Controller
             'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers'],
             'user_img' => $user->user_img
         );
+        if (isset($user->distance)) $data_info['distance'] = $user->distance;
         return $data_info;
     }
     /**
@@ -483,21 +485,41 @@ class AuthController extends Controller
         return $response;
     }
     /**
-     * Listing of all Sellers/Stores
+     * Listing of all Sellers/Stores within 5 miles
+     * @param lat mandatory
+     * @param lon mandatory
      * @author Mirza Abdullah Izhar
-     * @version 1.2.0
+     * @version 2.1.0
      */
-    public function sellers()
+    public function sellers(Request $request)
     {
         try {
-            $users = User::where('is_active', '=', 1)
-            ->whereIn('role_id', [2,5])
-            ->get();
+            $validate = Validator::make($request->query(), [
+                'lat' => 'required|numeric|between:-90,90',
+                'lon' => 'required|numeric|between:-180,180',
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validate->errors()
+                ], 422);
+            }
+            $lat = $request->query('lat');
+            $lon = $request->query('lon');
+            $users = User::selectRaw("*,
+            ( 3959 * acos( cos( radians(?) ) *
+              cos( radians( lat ) )
+              * cos( radians( lon ) - radians(?)
+              ) + sin( radians(?) ) *
+              sin( radians( lat ) ) )
+            ) AS distance", [$lat, $lon, $lat])
+                ->havingRaw("distance <= ?", [5])
+                ->where('is_active', 1)
+                ->whereIn('role_id', [2, 5])
+                ->get();
             $data = [];
             foreach ($users as $user) {
-                // if (!$user->seller->isEmpty()) {
-                //     if ($user->seller[0]->name == 'seller') $data[] = $this->getSellerInfo($user);
-                // }
                 $data[] = $this->getSellerInfo($user);
             }
             return response()->json([
@@ -524,7 +546,7 @@ class AuthController extends Controller
         try {
             $user = User::find($seller_id);
             $data = [];
-            // $info = $this->getSellerInfo($user); 
+            // $info = $this->getSellerInfo($user);
             $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
@@ -622,7 +644,7 @@ class AuthController extends Controller
         }
     }
     /**
-     * Get delivery boy info w.r.t delivery boy 'id' 
+     * Get delivery boy info w.r.t delivery boy 'id'
      * @author Mirza Abdullah Izhar
      * @version 1.3.0
      */
@@ -694,7 +716,7 @@ class AuthController extends Controller
             //         'status' => false,
             //         'message' => $validatedData->errors()
             //     ], 422);
-            // } 
+            // }
             // $user = User::find($request->user_id);
             $user = User::find(Auth::id());
             if (!empty($user)) {

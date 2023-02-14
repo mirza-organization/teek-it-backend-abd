@@ -233,7 +233,7 @@ class OrdersController extends Controller
         }
     }
     /**
-     * List all (assigned,complete,pending_approval,cancelled) orders 
+     * List all (assigned,complete,pending_approval,cancelled) orders
      * for a specific delivery boy
      * @author Huzaifa Haleem
      * @version 1.1.1
@@ -292,9 +292,9 @@ class OrdersController extends Controller
         }
     }
     /**
-     * This API is consumed on two occasions 
+     * This API is consumed on two occasions
      * 1) When the driver is "ACCEPTING" the order
-     * 2) When the driver is "COMPLETING" the order  
+     * 2) When the driver is "COMPLETING" the order
      * @author Huzaifa Haleem
      * @version 1.1.1
      */
@@ -305,15 +305,6 @@ class OrdersController extends Controller
             $order->delivery_status = $request->delivery_status;
             $order->delivery_boy_id = $request->delivery_boy_id;
             $order->order_status = $request->order_status;
-            // if ($request->order_status == 'delivered' && $request->delivery_status == 'pending_approval') {
-            //     $order->delivery_status = 'complete';
-            //     $user = User::find($order->seller_id);
-            //     $user_money = $user->pending_withdraw;
-            //     $user->pending_withdraw = $order->order_total + $user_money;
-            //     $user->save();
-            //     //$this->calculateDriverFair($order, $user);
-            // }
-            // $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
             return response()->json([
@@ -362,7 +353,6 @@ class OrdersController extends Controller
      */
     public function new(Request $request)
     {
-        // dd($request->all());
         if ($request->has('type')) {
             if ($request->type == 'delivery') {
                 $validatedData = Validator::make($request->all(), [
@@ -477,7 +467,7 @@ class OrdersController extends Controller
                     $verification_code = $verification_code . substr($rand_number, 0, 1);
                 }
                 if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
-                    // For sending SMS notification for "New Order" 
+                    // For sending SMS notification for "New Order"
                     $sms = new TwilioSmsService();
                     $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
                     $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
@@ -493,7 +483,7 @@ class OrdersController extends Controller
                     $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
                     $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number
                     $sms->sendSms('+447817332090', $message_for_admin); //Junaid Number
-                    $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number     
+                    $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number
                 }
                 $verification_codes = new VerificationCodes();
                 $verification_codes->order_id = $order_id;

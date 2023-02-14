@@ -81,8 +81,8 @@ class ProductsController extends Controller
             ]);
     }
     /**
-     *It will insert a single product 
-     *and insert it's given qty to qty table      
+     *It will insert a single product
+     *and insert it's given qty to qty table
      * @version 1.0.0
      */
     public function add(Request $request)
@@ -167,18 +167,18 @@ class ProductsController extends Controller
             //Check for file extension and size
             // $this->checkUploadedFileProperties($extension, $fileSize);
 
-            //Where uploaded file will be stored on the server 
+            //Where uploaded file will be stored on the server
             $location = public_path('upload/csv');
             // Upload file
             $file->move($location, $filename);
-            // In case the uploaded file path is to be stored in the database 
+            // In case the uploaded file path is to be stored in the database
             $filepath = $location . "/" . $filename;
             // Reading file
             $file = fopen($filepath, "r");
             // Read through the file and store the contents as an array
             $importData_arr = array();
             $i = 0;
-            //Read the contents of the uploaded file 
+            //Read the contents of the uploaded file
             while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
                 $num = count($filedata);
                 // Skip first row (Remove below comment if you want to skip the first row)
@@ -242,8 +242,8 @@ class ProductsController extends Controller
         }
     }
     /**
-     *It will update a single product 
-     *and update the given qty in qty table      
+     *It will update a single product
+     *and update the given qty in qty table
      * @version 1.0.0
      */
     public function update(Request $request, $id)
@@ -385,7 +385,7 @@ class ProductsController extends Controller
         }
     }
     /**
-     *View products in bulk with array of given ids   
+     *View products in bulk with array of given ids
      * @version 1.0.0
      */
     public function bulkView(Request $request)
@@ -414,7 +414,7 @@ class ProductsController extends Controller
         }
     }
     /**
-     *It will sort the products by price    
+     *It will sort the products by price
      * @version 1.0.0
      */
     public function sortByPrice()
@@ -451,7 +451,7 @@ class ProductsController extends Controller
         }
     }
     /**
-     *It will sort the products by location    
+     *It will sort the products by location
      * @version 1.0.0
      */
     public function sortByLocation(Request $request)
@@ -459,7 +459,6 @@ class ProductsController extends Controller
         $latitude = $request->get('lat');
         $longitude = $request->get('lon');
         $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
-        //$products = Products::query()->paginate()->sortBy('price');
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];
@@ -555,7 +554,7 @@ class ProductsController extends Controller
         return $this->getProductInfo($product_id);
     }
     /**
-     * It list the featured products 
+     * It list the featured products
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
@@ -661,7 +660,7 @@ class ProductsController extends Controller
         }
     }
     /**
-     *It will export products into csv    
+     *It will export products into csv
      * @version 1.0.0
      */
     public function exportProducts()
@@ -686,25 +685,15 @@ class ProductsController extends Controller
             $pt->images = implode(',', $temp_img);
             $all_products[] = $pt;
         }
-        //        $all_products['is_valid'] = true;
-        //        echo "<pre>";
-        //        print_r(json_encode($all_products));die;
-        //        print_r($all_products);
-        //        die;
-        //        $file = time() . '_export.json';
-        //        $destinationPath=public_path()."/upload/json/";
-        //        if (!is_dir($destinationPath)) {  mkdir($destinationPath,0777,true);  }
-        //        File::put($destinationPath.$file,json_encode($all_products));
         $destinationPath = public_path() . "/upload/csv/";
         if (!is_dir($destinationPath)) {
             mkdir($destinationPath, 0777, true);
         }
         $file = time() . '_export.csv';
         return  $this->jsonToCsv(json_encode($all_products), $destinationPath . $file, true);
-        //return response()->download($destinationPath.$file);
     }
     /**
-     *helper function for exporting products    
+     *helper function for exporting products
      * @version 1.0.0
      */
     function jsonToCsv($json, $csvFilePath = false, $boolOutputFile = false)
@@ -835,9 +824,9 @@ class ProductsController extends Controller
         $store_data = DB::table('users AS user')->selectRaw("*,
             (  3961 * acos( cos( radians(" . $user_lat . ") ) *
             cos( radians(user.lat) ) *
-            cos( radians(user.lon) - radians(" . $user_lon . ") ) + 
+            cos( radians(user.lon) - radians(" . $user_lon . ") ) +
             sin( radians(" . $user_lat . ") ) *
-            sin( radians(user.lat) ) ) ) 
+            sin( radians(user.lat) ) ) )
             AS distance")
             ->having("distance", "<", $radius)
             ->orderBy("distance", "ASC")
@@ -857,7 +846,7 @@ class ProductsController extends Controller
     }
     /**
      *It will get the duration between given
-     *lat,lon    
+     *lat,lon
      * @version 1.0.0
      */
     public function getDurationBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
@@ -881,9 +870,9 @@ class ProductsController extends Controller
         return  $duration;
     }
     /**
-     * Update product price from csv file w.r.t their SKU and store_id 
+     * Update product price from csv file w.r.t their SKU and store_id
      * @author Mirza Abdullah Izhar
-     * 
+     *
      */
     public function updatePriceBulk(Request $request, $delimiter = ',', $filename = '')
     {
@@ -935,101 +924,4 @@ class ProductsController extends Controller
             ], 500);
         }
     }
-    /**
-     * Update product price from csv file w.r.t their SKU and store_id 
-     * @author Mirza Abdullah Izhar
-     * 
-     */
-    // public function updatePriceBulk(Request $request)
-    // {
-    // try {
-    //     $validator = \Validator::make($request->all(), [
-    //         'file' => 'required',
-    //         'store_id' => 'required',
-    //     ]);
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'data' => $validator->errors(),
-    //             'status' => false,
-    //             'message' => ""
-    //         ], 422);
-    //     }
-    // if ($request->hasFile('file')) {
-    //     $file = $request->file('file');
-    //     // File Details
-    //     $filename = $file->getClientOriginalName();
-    // $extension = $file->getClientOriginalExtension();
-    // $tempPath = $file->getRealPath();
-    // $fileSize = $file->getSize();
-    // $mimeType = $file->getMimeType();
-    //$valid_extension = array("csv");
-    // $maxFileSize = 2097152;
-    // if (in_array(strtolower($extension), $valid_extension)) {
-    // if ($fileSize <= $maxFileSize) {
-    // $location = public_path('upload/csv');
-    // $file->move($location, $filename);
-    // $filepath = $location . "/" . $filename;
-    // // Reading file
-    // $file = fopen($filepath, "r");
-    // $i = 0;
-    // while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
-    //     $num = count($filedata);
-    //     if ($i == 0) {
-    //         $i++;
-    //         continue;
-    //     };
-    //     for ($c = 0; $c < $num; $c++) {
-    //         $importData_arr[$i][] = $filedata[$c];
-    //     }
-    //     $i++;
-    //     Products::where('user_id', $request->store_id)
-    //         ->where('category_id', $filedata[0])
-    //         ->where('sku', $filedata[1])
-    //         ->chunk(100, function ($users) {
-    //             foreach ($users as $user) {
-    //                 $user->update(['price' => $filedata[]]);
-    //             }
-    //         });
-    // DB::table('products')->where('user_id', $request->store_id)
-    // ->where('category_id', $filedata[0])
-    // ->where('sku', $filedata[1])
-    // ->update(['price' => $filedata[2]]);
-    //}
-    // fclose($file);
-    // // Insert to MySQL database
-    // foreach ($importData_arr as $importData) {
-
-    //     DB::table('products')->where('user_id', $request->store_id)
-    //         ->where('category_id', $importData[0])
-    //         ->where('sku', $importData[1])
-    //         ->update(['price' => $importData[2]]);
-    // }
-    // return response()->json([
-    //     'data' => [],
-    //     'status' => true,
-    //     'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
-    // ], 200);
-    // } else {
-    //     return response()->json([
-    //         'data' => [],
-    //         'status' => false,
-    //         'message' =>  config('constants.FILE_TOO_LARGE'),
-    //     ], 200);
-    // }
-    // } else {
-    //     return response()->json([
-    //         'data' => [],
-    //         'status' => false,
-    //         'message' =>  config('constants.INVALID_FILE'),
-    //     ], 200);
-    // }
-    //  }
-    //     } catch (Throwable $error) {
-    //         report($error);
-    //         return response()->json([
-    //             'data' => [],
-    //             'status' => false,
-    //             'message' => $error
-    //         ], 500);
-    //     }
 }
