@@ -35,18 +35,6 @@
                     </li>
                 </ul>
 
-                <!-- SEARCH FORM -->
-                <!-- <form class="d-block w-100 ml-3">
-                    <div class="input-group input-group-sm" style=" border-bottom: 1px solid #d4d4d4; ">
-                        <div class="input-group-append">
-                            <button class="bg-transparent  btn btn-navbar" type="submit">
-                                <i class="bg-transparent fas fa-search" style="    color: #3a4b83;"></i>
-                            </button>
-                        </div>
-                        <input aria-label="Search" class="bg-transparent  form-control form-control-navbar w-100" placeholder="Search" type="search">
-                    </div>
-                </form> -->
-
                 <!-- Right navbar links -->
                 <ul class="navbar-nav ml-sm-5">
                     <li class="nav-item d-block">
@@ -133,8 +121,7 @@
                                 </p>
                             </a>
                         </li>
-                        <li
-                            class="nav-item has-treeview {{ request()->is('orders') || request()->is('complete-orders') ? 'active' : '' }}">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link ">
                                 <i class="nav-icon fas fa-clipboard-list"></i>
                                 <p>
@@ -144,27 +131,27 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="/aorders" class="nav-link">
+                                    <a href="/aorders" class="nav-link @if (request()->is('aorders')) active @endif">
                                         <i class="fas fa-gears nav-icon"></i>
-                                        <p>Orders</p>
+                                        <p>All</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/aorders/verified" class="nav-link">
+                                    <a href="/aorders/verified" class="nav-link @if (request()->is('aorders/verified')) active @endif">
                                         <i class="fas fa-gears nav-icon"></i>
-                                        <p>Verified Orders</p>
+                                        <p>Verified</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/aorders/unverified" class="nav-link">
+                                    <a href="/aorders/unverified" class="nav-link @if (request()->is('aorders/unverified')) active @endif">
                                         <i class="fas fa-gears nav-icon"></i>
-                                        <p>Unverified Orders</p>
+                                        <p>Unverified</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="/complete-orders" class="nav-link">
+                                    <a href="/complete-orders" class="nav-link @if (request()->is('complete-orders')) active @endif">
                                         <i class="fas fa-money nav-icon"></i>
-                                        <p>Complete Orders</p>
+                                        <p>Completed</p>
                                     </a>
                                 </li>
                             </ul>
@@ -210,14 +197,6 @@
                                 </p>
                             </a>
                         </li>
-                        {{-- <li class="nav-item"> --}}
-                        {{-- <a class="nav-link {{ (request()->is('queries')) ? 'active' : '' }}" href="/queries"> --}}
-                        {{-- <i class="nav-icon fas fa-question-circle"></i> --}}
-                        {{-- <p class="ml-2"> --}}
-                        {{-- Queries --}}
-                        {{-- </p> --}}
-                        {{-- </a> --}}
-                        {{-- </li> --}}
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -425,14 +404,6 @@
         }
     </style>
     <style>
-        /*input.form-control{*/
-        /*    border: 0;*/
-        /*    border-bottom: 1px solid;*/
-        /*    border-radius: 0;*/
-        /*    color: #8aa7d7;*/
-        /*    border-color: #3663ae;*/
-        /*    padding-left: 3px;*/
-        /*}*/
         input.form-control,
         select.form-control {
             border: 0;
@@ -608,8 +579,6 @@
                 });
             }
         }
-
-
 
         function delPromoCodes() {
             var checkboxes = document.querySelectorAll('.select-checkbox');
