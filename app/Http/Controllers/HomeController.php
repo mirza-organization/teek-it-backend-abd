@@ -920,8 +920,11 @@ class HomeController extends Controller
             $user = User::find($user_id);
             // For seller
             if ($user->role_id == 2) $orders = Orders::query()->where('seller_id', '=', $user_id);
+            // For child seller
+            if ($user->role_id == 5) $orders = Orders::query()->where('seller_id', '=', $user_id);
             // For buyer
             if ($user->role_id == 3) $orders = Orders::query()->where('user_id', '=', $user_id);
+
             $orders = $orders->where('payment_status', '!=', 'hidden')->orderByDesc('id');
             $orders = $orders->paginate(10);
             $orders_p = $orders;

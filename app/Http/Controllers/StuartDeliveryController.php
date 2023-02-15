@@ -36,6 +36,8 @@ class StuartDeliveryController extends Controller
     public function stuartJobCreation(Request $request)
     {
         try {
+            $order_details = Orders::query()->where('id', '=', $request->order_id)->first();
+            dd($order_details);
             $access_token = $this->stuartAccessToken();
             $job = [
                 'job' => [
@@ -43,31 +45,31 @@ class StuartDeliveryController extends Controller
                     'pickups' => [
                         [
                             'address' => '32 Coombe Ln, Raynes Park, London SW20 0LA',
-                            'comment' => 'Ask Bobby',
+                            // 'comment' => 'Ask Bobby',
                             'contact' => [
                                 'firstname' => 'Bobby',
                                 'lastname' => 'Brown',
                                 'phone' => '+33610101010',
-                                'email' => 'bobby.brown@pizzashop.com',
-                                'company' => 'Pizza Shop'
+                                // 'email' => 'bobby.brown@pizzashop.com',
+                                // 'company' => 'Pizza Shop'
                             ]
                         ]
                     ],
                     'dropoffs' => [
                         [
                             'package_type' => 'medium',
-                            'package_description' => 'yellow package',
-                            'client_reference' => '[your_client_ref]',
-                            'address' => '23 Ethelbert Rd, London SW20 8QD',
-                            'comment' => '3rd floor on the right',
+                            'package_description' => 'Package purchased from Teek it',
+                            // 'client_reference' => '[your_client_ref]',
+                            'address' => $order_details->address,
+                            'comment' => 'Please try to call the customer before reaching the destination.',
                             'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',
                             'end_customer_time_window_end' => '2021-12-12T13:00:00.000+02:00',
                             'contact' => [
-                                'firstname' => 'Julia',
-                                'lastname' => 'Moore',
-                                'phone' => '+33712222222',
-                                'email' => 'client3@email.com',
-                                'company' => 'Sample Company Inc.'
+                                'firstname' => $order_details->receiver_name,
+                                'lastname' => $order_details->receiver_name,
+                                'phone' => $order_details->phone_number,
+                                // 'email' => 'client3@email.com',
+                                // 'company' => 'Sample Company Inc.'
                             ]
                         ]
                     ]

@@ -130,8 +130,6 @@
                                                                         class="text-danger store_image error">
                                                                     </p>
                                                                 </div>
-
-
                                                             </div>
                                                         </div>
                                                         <div class="modal-footer hidden ">
@@ -172,9 +170,7 @@
                                                         ];
                                                         
                                                         ?>
-
                                                         <div class="row">
-
                                                             @foreach (json_decode($user) as $key => $u)
                                                                 @if (!is_null($u) && !in_array($key, $fields))
                                                                     <?php
@@ -251,7 +247,7 @@
                                                 class=" d-block text-right float-right pr-3"><img class="img-size-16"
                                                     src="/res/res/img/edit.png"></a>
                                         </div>
-                                    </div>
+                                    </div> 
                                     <div class="col-md-12">
                                         <div class="row">
                                             <div class="col-md-3">
@@ -284,7 +280,7 @@
                                                         if ($key == 'l_name') {
                                                             $key = 'Last_name';
                                                         }
-                                                        ?>
+                                                        ?> 
                                                         <table class="table">
                                                             <thead>
                                                                 <tr>
@@ -349,8 +345,8 @@
                                                                                             </tr>
                                                                                         @endforeach
                                                                                     </tbody>
-                                                                                </table>
-                                                                            @elseif($user->roles[0]->name == 'seller')
+                                                                                </table> 
+                                                                            @elseif($user->role_id == 5)
                                                                                 <input type="number" class="form-control"
                                                                                     data-id="{{ json_decode($user)->id }}"
                                                                                     id="application_fee"
@@ -359,18 +355,18 @@
                                                                                     step="0.01">
                                                                             @else
                                                                                 {{ $u }}
-                                                                            @endif
+                                                                            @endif 
                                                                         </span>
-                                                                        @if ($key == 'application_fee' && $user->roles[0]->name == 'seller')
+                                                                        @if ($key == 'application_fee' && $user->role_id == 5)
                                                                             <br>
                                                                             <button class="btn btn-primary"
                                                                                 id="application_fee_update">Update</button>
                                                                         @endif
-                                                                    </th>
-                                                                </tr>
+                                                                    </th> 
+                                                                </tr> 
                                                             </thead>
                                                         </table>
-                                                    @endif
+                                                    @endif 
                                                 @endforeach
                                             </div>
                                         </div>
@@ -384,7 +380,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <h1 class="text-center text-secondary">Orders</h1>
-                </div>
+                </div> 
                 @if ($orders)
                     @foreach ($orders as $order)
                         <div class="col-md-12 p-4 pr-4">
