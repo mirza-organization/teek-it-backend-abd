@@ -37,7 +37,7 @@ class StuartDeliveryController extends Controller
     {
         try {
             $order_details = Orders::query()->where('id', '=', $request->order_id)->first();
-            dd($order_details);
+            // dd($order_details);
             $access_token = $this->stuartAccessToken();
             $job = [
                 'job' => [
