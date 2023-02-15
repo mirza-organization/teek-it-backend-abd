@@ -92,8 +92,6 @@
                                                                                 <input type="text" class="form-control"
                                                                                     id="phone" name="phone"
                                                                                     value="{{ $user->phone }}">
-
-
                                                                             </div>
 
                                                                         </div>

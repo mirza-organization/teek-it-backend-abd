@@ -96,7 +96,8 @@ Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespa
 */
 Route::get('/notification/home', 'NotificationsController@notificationHome')->name('admin.notification.home');
 Route::post('/notification/send', 'NotificationsController@notificationSend')->name('admin.notification.send');
-Route::get('/stores', 'HomeController@adminStores');
+Route::get('/admin/sellers/parent', 'HomeController@adminParentSellers')->name('admin.sellers.parent');
+Route::get('/admin/sellers/child', 'HomeController@adminChildSellers')->name('admin.sellers.child');
 Route::get('/customers', 'HomeController@adminCustomers');
 Route::get('/drivers', 'HomeController@adminDrivers')->name('admin.drivers');
 Route::get('/promocodes/home', 'PromoCodesController@promocodesHome')->name('admin.promocodes.home');

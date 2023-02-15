@@ -1083,22 +1083,38 @@ class HomeController extends Controller
         }
     }
     /**
-     * Render stores listing view for admin
+     * Render parent sellers list view for admin
      * @author Huzaifa Haleem
-     * @version 1.0.0
+     * @version 1.1.0
      */
-    public function adminStores(Request $request)
+    public function adminParentSellers(Request $request)
     {
         if (Gate::allows('superadmin')) {
-            // $users = User::query()->whereHas('roles', function ($query) {
-            //     $query->where('role_id', 2);
-            // });
             $users = User::query()->where('role_id', 2);
             if ($request->search) {
                 $users = $users->where('business_name', 'LIKE', $request->search);
             }
             $users = $users->paginate(9);
-            return view('admin.stores', compact('users'));
+            return view('admin.parent_sellers', compact('users'));
+        } else {
+            abort(404);
+        }
+    }
+    
+    /**
+     * Render child sellers list view for admin
+     * @author Mirza Abdullah Izhar
+     * @version 1.0.0
+     */
+    public function adminChildSellers(Request $request)
+    {
+        if (Gate::allows('superadmin')) {
+            $users = User::query()->where('role_id', 5);
+            if ($request->search) {
+                $users = $users->where('business_name', 'LIKE', $request->search);
+            }
+            $users = $users->paginate(9);
+            return view('admin.child_sellers', compact('users'));
         } else {
             abort(404);
         }

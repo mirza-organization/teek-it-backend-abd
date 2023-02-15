@@ -97,13 +97,28 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('stores') ? 'active' : '' }}" href="/stores">
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link ">
                                 <i class="nav-icon fas fa-store-alt"></i>
-                                <p class="ml-2">
-                                    Stores
+                                <p>
+                                    Sellers
+                                    <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{route('admin.sellers.parent')}}" class="nav-link @if (request()->is('admin/sellers/parent')) active @endif">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Parent</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{route('admin.sellers.child')}}" class="nav-link @if (request()->is('admin/sellers/child')) active @endif">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Child</p>
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link  {{ request()->is('customers') ? 'active' : '' }}" href="/customers">
