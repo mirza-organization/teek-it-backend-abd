@@ -924,4 +924,85 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+
+    public function updatePriceAndQtyBulk(Request $request, $delimiter = ',', $filename = '', $batchSize = 1000)
+    {
+        try {
+            $validator = \Validator::make($request->all(), [
+                'file' => 'required',
+                'store_id' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'data' => $validator->errors(),
+                    'status' => false,
+                    'message' => ""
+                ], 422);
+            }
+
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+
+                // File Details
+                $filename = $file->getClientOriginalName();
+                $location = public_path('upload/csv');
+                $file->move($location, $filename);
+                $filepath = $location . "/" . $filename;
+
+                // Reading file
+                $file = fopen($filepath, "r");
+                $i = 0;
+
+                while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
+                    if ($i == 0) {
+                        $i++;
+                        continue;
+                    }
+                    $catgory_id = $filedata[0];
+                    $sku = $filedata[1];
+                    $price = $filedata[2];
+                    $qty = $filedata[3];
+
+                    // Find product by sku, user_id, category_id and update price and quantity
+                    $product = Product::where('user_id', '=', $request->store_id)
+                        ->where('sku', '=', $sku)
+                        ->where('category_id', '=', $catgory_id)
+                        ->first();
+
+                    if ($product) {
+                        $product->price = $price;
+                        $product->save();
+
+                        $productQty = Qty::where('prod_id', $product->id)->first();
+
+                        if ($productQty) {
+                            $productQty->qty = $qty;
+                            $productQty->save();
+                        }
+                    }
+
+                    $i++;
+                    if ($i % $batchSize == 0) {
+                        usleep(500000); // Wait for 0.5 seconds between batches to avoid overwhelming the database
+                    }
+                }
+
+                fclose($file);
+
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
 }
