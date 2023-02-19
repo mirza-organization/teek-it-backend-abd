@@ -55,11 +55,9 @@ Route::group(['prefix' => 'qty'], function ($router) {
     Route::get('product/{store_id}', 'QtyController@getByStoreId');
     Route::get('product/{store_id}/{prod_id}', 'QtyController@getById');
     Route::post('update/{prod_id}', 'QtyController@updateById');
-    Route::post('insert_parent_qty_to_child', 'QtyController@insertParentQtyToChild');
-    Route::get('multi-curl', 'QtyController@multiCURL');
-    Route::get('shifting-qty', 'QtyController@shiftQtyInProductsToQtyTable');
-    // 
-    Route::get('all-big-tbl/{store_id}/{branch_col_name}', 'QtyController@allBigTbl');
+    // Route::post('insert_parent_qty_to_child', 'QtyController@insertParentQtyToChild');
+    // Route::get('multi-curl', 'QtyController@multiCURL');
+    // Route::get('shifting-qty', 'QtyController@shiftQtyInProductsToQtyTable');
 });
 /*
 |--------------------------------------------------------------------------
@@ -135,7 +133,7 @@ Route::group(['middleware' => ['jwt.verify']], function ($router) {
         Route::post('add', 'ProductsController@add');
         Route::post('add/bulk', 'ProductsController@importProductsAPI');
         Route::post('update/{product_id}', 'ProductsController@update');
-        Route::post('update_price/bulk', 'ProductsController@updatePriceBulk');
+        Route::post('update_price_qty/bulk', 'ProductsController@updatePriceAndQtyBulk');
         Route::get('delete/{product_id}', 'ProductsController@delete');
         Route::get('delete_image/{image_id}/{product_id}', 'ProductsController@deleteImage');
         Route::post('ratings/add', 'RattingsController@add');

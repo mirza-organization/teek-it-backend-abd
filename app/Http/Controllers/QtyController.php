@@ -15,9 +15,9 @@ use Throwable;
 class QtyController extends Controller
 {
     /**
-     *One time use method which will 
+     *One time use method which will
      *shift qty in products table
-     *to qty table    
+     *to qty table
      * @version 1.0.0
      */
     public function shiftQtyInProductsToQtyTable()
@@ -55,7 +55,7 @@ class QtyController extends Controller
      */
     public function all()
     {
-        // ini_set('memory_limit', '1024M'); 
+        // ini_set('memory_limit', '1024M');
         try {
             $qty = Qty::simplePaginate(10);
             // Is Null Kaam Nahi Kr Raha
@@ -82,7 +82,7 @@ class QtyController extends Controller
         }
     }
     /**
-     *It will get the store by given id    
+     *It will get the store by given id
      * @version 1.0.0
      */
     public function getByStoreId(Request $request)
@@ -270,41 +270,6 @@ class QtyController extends Controller
         }
     }
     /**
-     * It fetches products qty
-     * From the big table with 102 cols
-     * @version 1.0.0
-     */
-    public function allBigTbl(Request $request)
-    {
-        try {
-            $validate = Validator::make($request->route()->parameters(), [
-                'store_id' => 'required|integer',
-                'branch_col_name' => 'required|string'
-            ]);
-            if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validate->errors()
-                ], 422);
-            }
-            $branch_tbl_info = DB::table('big_branch_table')->where('store_id', $request->store_id)->get();
-            $qty = DB::table($branch_tbl_info[0]->tbl_name)->select('id', 'prod_id', $request->branch_col_name)->paginate(10);
-            return response()->json([
-                'data' => $qty,
-                'status' => true,
-                'message' => '',
-            ], 200);
-        } catch (Throwable $error) {
-            report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
-        }
-    }
-    /**
      * It edits the qty for a child store
      * @version 1.0.0
      */
@@ -321,27 +286,6 @@ class QtyController extends Controller
             ['users_id' => Auth::id(), 'products_id' => $request->input('product_id')],
             ['qty' => $request->input('qty')]
         );
-        // $quantity = Qty::where('child_store_id', Auth::id())
-        //     ->where('users_id', $request->input('parent_id'))
-        //     ->where('products_id', $request->input('product_id'))->get();
-        // if ($quantity->isEmpty()) {
-        //     Qty::create([
-        //         'child_store_id' => Auth::id(),
-        //         'qty' => $request->input('qty'),
-        //         'products_id' => $request->input('product_id'),
-        //         'users_id' => $request->input('parent_id'),
-        //     ]);
-        // } else {
-        //     Qty::where('child_store_id', Auth::id())
-        //         ->where('users_id', $request->input('parent_id'))
-        //         ->where('products_id', $request->input('product_id'))->update([
-        //             'child_store_id' => Auth::id(),
-        //             'qty' => $request->input('qty'),
-        //             'products_id' => $request->input('product_id'),
-        //             'users_id' => $request->input('parent_id'),
-        //         ]);
-        // }
-        //return redirect()->back();
         return response()->json([
             'status' => 200,
             'error' => 'false',

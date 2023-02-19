@@ -862,61 +862,62 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      *
      */
-    public function updatePriceBulk(Request $request, $delimiter = ',', $filename = '')
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'file' => 'required',
-                'store_id' => 'required',
-            ]);
-            if ($validator->fails()) {
-                return response()->json([
-                    'data' => $validator->errors(),
-                    'status' => false,
-                    'message' => ""
-                ], 422);
-            }
-            if ($request->hasFile('file')) {
-                $file = $request->file('file');
-                // File Details
-                $filename = $file->getClientOriginalName();
-                $location = public_path('upload/csv');
-                $file->move($location, $filename);
-                $filepath = $location . "/" . $filename;
-                // Reading file
-                $file = fopen($filepath, "r");
-                $i = 0;
-                while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
-                    if ($i == 0) {
-                        $i++;
-                        continue;
-                    };
-                    DB::statement('CREATE Temporary TABLE temp_products LIKE products');
-                    $db = DB::statement('INSERT INTO `temp_products`( `user_id`, `category_id`,`product_name`, `sku`, `price`, `featured`, `discount_percentage`, `contact`)VALUES (' . $request->store_id . ',' . $filedata[0] . ',' . $filedata[0] . ',' . $filedata[1] . ',3, ' . $filedata[2] . ',1,20,02083541500 )');
-                    DB::statement('UPDATE products,temp_products SET products.price = temp_products.price, products.updated_at = "' . Carbon::now() . '" WHERE products.user_id = temp_products.user_id AND products.category_id = temp_products.category_id AND products.sku = temp_products.sku');
-                    DB::statement('DROP Temporary TABLE temp_products');
-                }
-                fclose($file);
-                return response()->json([
-                    'data' => [],
-                    'status' => true,
-                    'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
-                ], 200);
-            }
-        } catch (Throwable $error) {
-            report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
-        }
-    }
+    // public function updatePriceBulk(Request $request, $delimiter = ',', $filename = '')
+    // {
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'file' => 'required',
+    //             'store_id' => 'required',
+    //         ]);
+    //         if ($validator->fails()) {
+    //             return response()->json([
+    //                 'data' => $validator->errors(),
+    //                 'status' => false,
+    //                 'message' => ""
+    //             ], 422);
+    //         }
+    //         if ($request->hasFile('file')) {
+    //             $file = $request->file('file');
+    //             // File Details
+    //             $filename = $file->getClientOriginalName();
+    //             $location = public_path('upload/csv');
+    //             $file->move($location, $filename);
+    //             $filepath = $location . "/" . $filename;
+    //             // Reading file
+    //             $file = fopen($filepath, "r");
+    //             $i = 0;
+    //             while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
+    //                 if ($i == 0) {
+    //                     $i++;
+    //                     continue;
+    //                 };
+    //                 DB::statement('CREATE Temporary TABLE temp_products LIKE products');
+    //                 $db = DB::statement('INSERT INTO `temp_products`( `user_id`, `category_id`,`product_name`, `sku`, `price`, `featured`, `discount_percentage`, `contact`)VALUES (' . $request->store_id . ',' . $filedata[0] . ',' . $filedata[0] . ',' . $filedata[1] . ',3, ' . $filedata[2] . ',1,20,02083541500 )');
+    //                 DB::statement('UPDATE products,temp_products SET products.price = temp_products.price, products.updated_at = "' . Carbon::now() . '" WHERE products.user_id = temp_products.user_id AND products.category_id = temp_products.category_id AND products.sku = temp_products.sku');
+    //                 DB::statement('DROP Temporary TABLE temp_products');
+    //             }
+    //             fclose($file);
+    //             return response()->json([
+    //                 'data' => [],
+    //                 'status' => true,
+    //                 'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
+    //             ], 200);
+    //         }
+    //     } catch (Throwable $error) {
+    //         report($error);
+    //         return response()->json([
+    //             'data' => [],
+    //             'status' => false,
+    //             'message' => $error
+    //         ], 500);
+    //     }
+    // }
 
     public function updatePriceAndQtyBulk(Request $request, $delimiter = ',', $filename = '', $batchSize = 1000)
     {
+        ini_set('max_execution_time', 120);
         try {
-            $validator = \Validator::make($request->all(), [
+            $validator = Validator::make($request->all(), [
                 'file' => 'required',
                 'store_id' => 'required',
             ]);
@@ -951,9 +952,8 @@ class ProductsController extends Controller
                     $sku = $filedata[1];
                     $price = $filedata[2];
                     $qty = $filedata[3];
-
                     // Find product by sku, user_id, category_id and update price and quantity
-                    $product = Product::where('user_id', '=', $request->store_id)
+                    $product = Products::where('user_id', '=', $request->store_id)
                         ->where('sku', '=', $sku)
                         ->where('category_id', '=', $catgory_id)
                         ->first();
@@ -962,7 +962,9 @@ class ProductsController extends Controller
                         $product->price = $price;
                         $product->save();
 
-                        $productQty = Qty::where('prod_id', $product->id)->first();
+                        $productQty = Qty::where('users_id', $request->store_id)
+                        ->where('products_id', $product->id)
+                        ->first();
 
                         if ($productQty) {
                             $productQty->qty = $qty;

@@ -80,7 +80,7 @@ class HomeController extends Controller
         }
     }
     /**
-     * It will show the inventory 
+     * It will show the inventory
      * @version 1.1.0
      */
     public function inventory(Request $request)
@@ -134,7 +134,7 @@ class HomeController extends Controller
     }
     /**
      * It will redirect us to
-     * edit inventory page 
+     * edit inventory page
      * @version 1.0.0
      */
     public function inventoryEdit($product_id)
@@ -155,7 +155,7 @@ class HomeController extends Controller
     }
     /**
      * It will redirect us to add
-     * inventory page 
+     * inventory page
      * @version 1.0.0
      */
     public function inventoryAdd(Request $request)
@@ -170,7 +170,7 @@ class HomeController extends Controller
     }
     /**
      * It will redirect us to add
-     * inventory in bilk qty page 
+     * inventory in bilk qty page
      * @version 1.0.0
      */
     public function inventoryAddBulk(Request $request)
@@ -182,7 +182,7 @@ class HomeController extends Controller
         }
     }
     /**
-     * It will delete the product image 
+     * It will delete the product image
      * @version 1.0.0
      */
     public function deleteImg($image_id)
@@ -712,18 +712,18 @@ class HomeController extends Controller
             //Check for file extension and size
             // $this->checkUploadedFileProperties($extension, $fileSize);
 
-            //Where uploaded file will be stored on the server 
+            //Where uploaded file will be stored on the server
             $location = public_path('upload/csv');
             // Upload file
             $file->move($location, $filename);
-            // In case the uploaded file path is to be stored in the database 
+            // In case the uploaded file path is to be stored in the database
             $filepath = $location . "/" . $filename;
             // Reading file
             $file = fopen($filepath, "r");
             // Read through the file and store the contents as an array
             $importData_arr = array();
             $i = 0;
-            //Read the contents of the uploaded file 
+            //Read the contents of the uploaded file
             while (($filedata = fgetcsv($file, 1000, ",")) !== FALSE) {
                 $num = count($filedata);
                 // Skip first row (Remove below comment if you want to skip the first row)
@@ -918,10 +918,8 @@ class HomeController extends Controller
         $return_arr = [];
         if (Gate::allows('superadmin')) {
             $user = User::find($user_id);
-            // For seller
-            if ($user->role_id == 2) $orders = Orders::query()->where('seller_id', '=', $user_id);
-            // For child seller
-            if ($user->role_id == 5) $orders = Orders::query()->where('seller_id', '=', $user_id);
+            // 2: Parent seller, 5: Child seller
+            if ($user->role_id == 2 || $user->role_id == 5) $orders = Orders::query()->where('seller_id', '=', $user_id);
             // For buyer
             if ($user->role_id == 3) $orders = Orders::query()->where('user_id', '=', $user_id);
 
@@ -1103,7 +1101,7 @@ class HomeController extends Controller
             abort(404);
         }
     }
-    
+
     /**
      * Render child sellers list view for admin
      * @author Mirza Abdullah Izhar
@@ -1480,7 +1478,7 @@ class HomeController extends Controller
      * @throws \Twilio\Exceptions\TwilioException
      * @throws \Twilio\Exceptions\ConfigurationException
      * It will mark the order as complete
-     * @version 1.0.0 
+     * @version 1.0.0
      */
     public function markCompleteOrder($order_id)
     {
