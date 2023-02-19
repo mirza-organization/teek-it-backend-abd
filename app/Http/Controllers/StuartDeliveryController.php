@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StuartDelivery;
 use App\Orders;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
@@ -36,20 +37,22 @@ class StuartDeliveryController extends Controller
     public function stuartJobCreation(Request $request)
     {
         try {
-            $order_details = Orders::query()->where('id', '=', $request->order_id)->first();
+            $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
+            // $seller_details = User::where('id', '=', $order_details->seller_id)->first();
             // dd($order_details);
+            // $order_details->receiver_name;
             $access_token = $this->stuartAccessToken();
             $job = [
                 'job' => [
                     // 'pickup_at' => Carbon::now()->addMinutes(10),
                     'pickups' => [
                         [
-                            'address' => '32 Coombe Ln, Raynes Park, London SW20 0LA',
-                            // 'comment' => 'Ask Bobby',
+                            'address' => $order_details->store->address_1,
+                            'comment' => 'Please come at the pickup point as early as possible. Also call us to confirm the order package type.',
                             'contact' => [
-                                'firstname' => 'Bobby',
-                                'lastname' => 'Brown',
-                                'phone' => '+33610101010',
+                                'firstname' => $order_details->store->name,
+                                // 'lastname' => 'null',
+                                'phone' => $order_details->store->business_phone,
                                 // 'email' => 'bobby.brown@pizzashop.com',
                                 // 'company' => 'Pizza Shop'
                             ]
@@ -57,16 +60,16 @@ class StuartDeliveryController extends Controller
                     ],
                     'dropoffs' => [
                         [
-                            'package_type' => 'medium',
-                            'package_description' => 'Package purchased from Teek it',
+                            // 'package_type' => 'medium',
+                            'package_description' => 'Package purchased from Teek it.',
                             // 'client_reference' => '[your_client_ref]',
-                            'address' => $order_details->address,
+                            'address' => $order_details->address . ' House#' . $order_details->house_no,
                             'comment' => 'Please try to call the customer before reaching the destination.',
-                            'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',
-                            'end_customer_time_window_end' => '2021-12-12T13:00:00.000+02:00',
+                            // 'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',
+                            // 'end_customer_time_window_end' => '2021-12-12T13:00:00.000+02:00',
                             'contact' => [
                                 'firstname' => $order_details->receiver_name,
-                                'lastname' => $order_details->receiver_name,
+                                // 'lastname' => 'null',
                                 'phone' => $order_details->phone_number,
                                 // 'email' => 'client3@email.com',
                                 // 'company' => 'Sample Company Inc.'
@@ -77,7 +80,6 @@ class StuartDeliveryController extends Controller
             ];
             $response = Http::withToken($access_token)->post('https://api.sandbox.stuart.com/v2/jobs', $job);
             $data = $response->json();
-            // dd($data);
             $data = StuartDelivery::create([
                 'order_id' => $request->order_id,
                 'job_id' => $data['id']

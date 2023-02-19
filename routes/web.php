@@ -86,9 +86,6 @@ Route::get('/withdrawals-drivers', 'HomeController@withdrawalDrivers')->name('wi
 Route::post('/withdrawals', 'HomeController@withdrawalsRequest')->name('withdraw_request');
 
 Route::get('auth/verify', 'Auth\AuthController@verify');
-Route::group(['middleware' => ['role:superadmin'], 'prefix' => 'admin', 'namespace' => 'Admin'], function ($router) {
-    //Route::get('/test', 'HomeController@index')->name('home');
-});
 /*
 |--------------------------------------------------------------------------
 | Admin Routes

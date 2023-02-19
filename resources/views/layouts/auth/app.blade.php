@@ -45,10 +45,8 @@
                             <div class="col-md-5">
                                 {{ csrf_field() }}
                                 <div class="form-group">
-
-                                    <input class="form-control mr-sm-2" type="Email" required autocomplete="off"
-                                        name="email" placeholder="email" aria-label="email"
-                                        value="{{ old('email') }}">
+                                    <input class="form-control mr-sm-2" type="email" required autocomplete="off"
+                                        name="email" placeholder="email" aria-label="email" value="{{ old('email') }}">
                                     <label for="checkauto">
                                         <input name="remember" id="checkauto" type="checkbox"> Keep me Logged in
                                     </label>
@@ -58,16 +56,14 @@
                                 <div class="form-group">
                                     <input class="form-control mr-sm-2" type="password" autocomplete="off"
                                         placeholder="Password" name="password" required>
-                                    <p for="">
+                                    <p>
                                         <a class="text-dark" href="{{ route('password.request') }}">Forgot
                                             Password?</a>
                                     </p>
                                 </div>
                             </div>
                             <div class="col-md-2">
-
                                 <div class="form-group">
-
                                     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"
                                         style=" /* padding: 5px 25px; */ display: block; width: 100%; margin-top: 15px!important; background: #3663ae; border: 0; border-radius: 0; color: white; ">Login</button>
                                 </div>
@@ -81,9 +77,9 @@
         <div class="container">
             @include('flash::message')
             @if (session('status'))
-                <div class="alert alert-success" role="alert">
-                    {{ session('status') }}
-                </div>
+            <div class="alert alert-success" role="alert">
+                {{ session('status') }}
+            </div>
             @endif
             <div class="row mtd" style="margin-top: 20vh">
                 <div class="col-md-8">
@@ -238,14 +234,14 @@
                 // To disable the input fields
                 document.getElementById("time[" + day + "][open]").classList.add('disabled-input-field');
                 document.getElementById("time[" + day + "][close]").classList.add('disabled-input-field');
-                // To remove the required attribute from the input fields 
+                // To remove the required attribute from the input fields
                 document.getElementById("time[" + day + "][open]").required = false;
                 document.getElementById("time[" + day + "][close]").required = false;
             } else {
                 // To enable the input fields
                 document.getElementById("time[" + day + "][open]").classList.remove('disabled-input-field');
                 document.getElementById("time[" + day + "][close]").classList.remove('disabled-input-field');
-                // To add the required attribute from the input fields 
+                // To add the required attribute from the input fields
                 document.getElementById("time[" + day + "][open]").required = true;
                 document.getElementById("time[" + day + "][close]").required = true;
             }

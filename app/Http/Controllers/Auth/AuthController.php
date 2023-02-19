@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\DeletedUsers;
-use App\Drivers;
+
 use App\Http\Controllers\ProductsController;
 use App\Products;
-use App\Utils\Constants\AppConst;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Keys;
@@ -19,7 +17,6 @@ use Jenssegers\Agent\Agent;
 use App\Models\JwtToken;
 use Illuminate\Http\Request;
 use App\User;
-use App\Role;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -362,7 +359,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 2.1.0
      */
-    private function getSellerInfo($seller_info)
+    private function getSellerInfo($seller_info, $distance = null)
     {
         $user = $seller_info;
         if (!$user) return null;
@@ -380,7 +377,7 @@ class AuthController extends Controller
             'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers'],
             'user_img' => $user->user_img
         );
-        if (isset($user->distance)) $data_info['distance'] = $user->distance;
+        if (!is_null($distance)) $data_info['distance'] = $distance;
         return $data_info;
     }
     /**
@@ -507,20 +504,15 @@ class AuthController extends Controller
             }
             $lat = $request->query('lat');
             $lon = $request->query('lon');
-            $users = User::selectRaw("*,
-            ( 3959 * acos( cos( radians(?) ) *
-              cos( radians( lat ) )
-              * cos( radians( lon ) - radians(?)
-              ) + sin( radians(?) ) *
-              sin( radians( lat ) ) )
-            ) AS distance", [$lat, $lon, $lat])
-                ->havingRaw("distance <= ?", [5])
-                ->where('is_active', 1)
+            $users = User::where('is_active', 1)
                 ->whereIn('role_id', [2, 5])
                 ->get();
             $data = [];
             foreach ($users as $user) {
-                $data[] = $this->getSellerInfo($user);
+                $distance = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
+                if ($distance <= 5) {
+                    $data[] = $this->getSellerInfo($user, $distance);
+                }
             }
             return response()->json([
                 'data' => $data,
@@ -892,5 +884,24 @@ class AuthController extends Controller
                 'message' => $error
             ], 500);
         }
+    }
+
+    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
+    {
+        $address1 = $latitude1 . ',' . $longitude1;
+        $address2 = $latitude2 . ',' . $longitude2;
+
+        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+
+        // Google Distance Matrix
+        // $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=".$latitude1.",".$longitude1."&destinations=".$latitude2.",".$longitude2."&mode=driving&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+
+        $query = file_get_contents($url);
+        $results = json_decode($query, true);
+        $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+
+        $miles = (int)$distanceString[0] * 0.621371;
+        // return $miles > 1 ? $miles : 1;
+        return $miles;
     }
 }
