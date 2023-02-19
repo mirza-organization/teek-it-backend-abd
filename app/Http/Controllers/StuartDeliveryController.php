@@ -38,9 +38,6 @@ class StuartDeliveryController extends Controller
     {
         try {
             $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
-            // $seller_details = User::where('id', '=', $order_details->seller_id)->first();
-            // dd($order_details);
-            // $order_details->receiver_name;
             $access_token = $this->stuartAccessToken();
             $job = [
                 'job' => [
@@ -53,8 +50,8 @@ class StuartDeliveryController extends Controller
                                 'firstname' => $order_details->store->name,
                                 // 'lastname' => 'null',
                                 'phone' => $order_details->store->business_phone,
-                                // 'email' => 'bobby.brown@pizzashop.com',
-                                // 'company' => 'Pizza Shop'
+                                'email' => $order_details->store->email,
+                                'company' => $order_details->store->business_name
                             ]
                         ]
                     ],
