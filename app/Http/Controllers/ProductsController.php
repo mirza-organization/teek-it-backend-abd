@@ -1,29 +1,17 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Http\Controllers\OrdersController;
 use App\Categories;
-use App\Http\Controllers\Api\v1\OrderController;
 use App\productImages;
 use App\Products;
-use App\Rattings;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use JWTAuth;
-use Jenssegers\Agent\Agent;
-use App\Models\JwtToken;
 use App\User;
-use App\Models\Role;
 use App\Qty;
-use Crypt;
-use Hash;
-use Mail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Stripe\Product;
@@ -877,7 +865,7 @@ class ProductsController extends Controller
     public function updatePriceBulk(Request $request, $delimiter = ',', $filename = '')
     {
         try {
-            $validator = \Validator::make($request->all(), [
+            $validator = Validator::make($request->all(), [
                 'file' => 'required',
                 'store_id' => 'required',
             ]);
