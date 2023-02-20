@@ -39,5 +39,7 @@ return [
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
+    'STUART_JOBS' => 'https://api.sandbox.stuart.com/v2/jobs',
+    'STUART_TOKEN' => 'https://api.sandbox.stuart.com/oauth/token',
     'ADMIN_EMAIL' => 'admin@teekit.co.uk',
 ];

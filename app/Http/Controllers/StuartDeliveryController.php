@@ -20,7 +20,7 @@ class StuartDeliveryController extends Controller
      */
     public function stuartAccessToken()
     {
-        $stuart_auth = Http::asForm()->post('https://api.sandbox.stuart.com/oauth/token', [
+        $stuart_auth = Http::asForm()->post(''. config("constants.STUART_TOKEN") .'', [
             'client_id' => config('app.STUART_SANDBOX_CLIENT_ID'),
             'client_secret' => config('app.STUART_SANDBOX_CLIENT_SECRET'),
             'grant_type' => 'client_credentials',
@@ -75,7 +75,7 @@ class StuartDeliveryController extends Controller
                     ]
                 ]
             ];
-            $response = Http::withToken($access_token)->post('https://api.sandbox.stuart.com/v2/jobs', $job);
+            $response = Http::withToken($access_token)->post(''. config("constants.STUART_JOBS") .'', $job);
             $data = $response->json();
             if ($data && !isset($data['error'])) {
                 $data = StuartDelivery::create([
@@ -114,7 +114,7 @@ class StuartDeliveryController extends Controller
         try {
             $data = StuartDelivery::select('job_id')->where('order_id', $request->order_id)->first();
             $access_token = $this->stuartAccessToken();
-            $response = Http::withToken($access_token)->patch('https://api.sandbox.stuart.com/v2/jobs/' . $data->job_id);
+            $response = Http::withToken($access_token)->patch(''. config("constants.STUART_JOBS") .'/' . $data->job_id);
             $data = $response->json();
             if ($data['status'] == 'finished') {
                 Orders::where('id', $request->order_id)->update([
