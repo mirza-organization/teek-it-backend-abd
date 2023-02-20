@@ -77,21 +77,24 @@ class StuartDeliveryController extends Controller
             ];
             $response = Http::withToken($access_token)->post('https://api.sandbox.stuart.com/v2/jobs', $job);
             $data = $response->json();
-            $data = StuartDelivery::create([
-                'order_id' => $request->order_id,
-                'job_id' => $data['id']
-            ]);
-            if ($data) {
+            if ($data && !isset($data['error'])) {
+                $data = StuartDelivery::create([
+                    'order_id' => $request->order_id,
+                    'job_id' => $data['id']
+                ]);
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'stuartDelivery'
                 ]);
                 // return response()->json(json_decode($response->getBody()->getContents()));
                 flash('Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button')->success();
                 return Redirect::back();
+            } else {
+                flash($data['message'])->error();
+                return Redirect::back();
             }
         } catch (Throwable $error) {
             report($error);
-            flash('An other delivery is in progress')->error();
+            flash($data['message'])->error();
             return Redirect::back();
             // return response()->json([
             //     'data' => [],
@@ -113,7 +116,7 @@ class StuartDeliveryController extends Controller
             $access_token = $this->stuartAccessToken();
             $response = Http::withToken($access_token)->patch('https://api.sandbox.stuart.com/v2/jobs/' . $data->job_id);
             $data = $response->json();
-            if($data['status']=='finished'){
+            if ($data['status'] == 'finished') {
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'complete'
                 ]);
@@ -122,7 +125,7 @@ class StuartDeliveryController extends Controller
                     'status' => true,
                     'message' => 'completed'
                 ], 200);
-            }else{
+            } else {
                 return response()->json([
                     'data' => $data,
                     'status' => true,
