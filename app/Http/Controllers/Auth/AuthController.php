@@ -359,7 +359,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 2.1.0
      */
-    private function getSellerInfo($seller_info, $distance = null)
+    private function getSellerInfo($seller_info, $result = null)
     {
         $user = $seller_info;
         if (!$user) return null;
@@ -377,7 +377,10 @@ class AuthController extends Controller
             'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers'],
             'user_img' => $user->user_img
         );
-        if (!is_null($distance)) $data_info['distance'] = $distance;
+        if (!is_null($result)){
+            $data_info['distance'] = $result['distance'];
+            $data_info['duration'] = $result['duration'];
+        }
         return $data_info;
     }
     /**
@@ -509,9 +512,9 @@ class AuthController extends Controller
                 ->get();
             $data = [];
             foreach ($users as $user) {
-                $distance = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
-                if ($distance <= 5) {
-                    $data[] = $this->getSellerInfo($user, $distance);
+                $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
+                if ($result['distance'] <= 5) {
+                    $data[] = $this->getSellerInfo($user, $result);
                 }
             }
             return response()->json([
@@ -891,17 +894,17 @@ class AuthController extends Controller
         $address1 = $latitude1 . ',' . $longitude1;
         $address2 = $latitude2 . ',' . $longitude2;
 
-        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
-
-        // Google Distance Matrix
-        // $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=".$latitude1.",".$longitude1."&destinations=".$latitude2.",".$longitude2."&mode=driving&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&departure_time=" . time() . "&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
 
         $query = file_get_contents($url);
         $results = json_decode($query, true);
-        $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
 
-        $miles = (int)$distanceString[0] * 0.621371;
-        // return $miles > 1 ? $miles : 1;
-        return $miles;
+        $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+        $distanceInMiles = (int)$distanceString[0] * 0.621371;
+
+        $durationInSeconds = $results['routes'][0]['legs'][0]['duration']['value'];
+        $durationInMinutes = round($durationInSeconds / 60);
+
+        return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
     }
 }
