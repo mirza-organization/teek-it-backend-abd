@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\StuartDelivery;
 use App\Orders;
-use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
@@ -20,7 +19,7 @@ class StuartDeliveryController extends Controller
      */
     public function stuartAccessToken()
     {
-        $stuart_auth = Http::asForm()->post(''. config("constants.STUART_TOKEN") .'', [
+        $stuart_auth = Http::asForm()->post('' . config("constants.STUART_TOKEN") . '', [
             'client_id' => config('app.STUART_SANDBOX_CLIENT_ID'),
             'client_secret' => config('app.STUART_SANDBOX_CLIENT_SECRET'),
             'grant_type' => 'client_credentials',
@@ -38,10 +37,13 @@ class StuartDeliveryController extends Controller
     {
         try {
             $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
+            $transport_type = (new Orders())->fetchTransportType($request->order_id);
             $access_token = $this->stuartAccessToken();
+
             $job = [
                 'job' => [
                     // 'pickup_at' => Carbon::now()->addMinutes(10),
+                    'assignment_code' => $request->order_id,
                     'pickups' => [
                         [
                             'address' => $order_details->store->address_1,
@@ -57,9 +59,10 @@ class StuartDeliveryController extends Controller
                     ],
                     'dropoffs' => [
                         [
-                            // 'package_type' => 'medium',
+                            'package_type' => 'medium',
                             'package_description' => 'Package purchased from Teek it.',
-                            // 'client_reference' => '[your_client_ref]',
+                            'transport_type' => $transport_type,
+                            'client_reference' => $request->order_id,
                             'address' => $order_details->address . ' House#' . $order_details->house_no,
                             'comment' => 'Please try to call the customer before reaching the destination.',
                             // 'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',
@@ -75,7 +78,7 @@ class StuartDeliveryController extends Controller
                     ]
                 ]
             ];
-            $response = Http::withToken($access_token)->post(''. config("constants.STUART_JOBS") .'', $job);
+            $response = Http::withToken($access_token)->post('' . config("constants.STUART_JOBS") . '', $job);
             $data = $response->json();
             if ($data && !isset($data['error'])) {
                 $data = StuartDelivery::create([
@@ -85,22 +88,18 @@ class StuartDeliveryController extends Controller
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'stuartDelivery'
                 ]);
-                // return response()->json(json_decode($response->getBody()->getContents()));
                 flash('Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button')->success();
                 return Redirect::back();
             } else {
-                flash($data['message'])->error();
+                $message = $data['message'];
+                if($data['error'] == 'JOB_DISTANCE_NOT_ALLOWED') $message = $message . " " . $transport_type;
+                flash($message)->error();
                 return Redirect::back();
             }
         } catch (Throwable $error) {
             report($error);
             flash($data['message'])->error();
             return Redirect::back();
-            // return response()->json([
-            //     'data' => [],
-            //     'status' => false,
-            //     'message' => $error
-            // ], 500);
         }
     }
 
@@ -114,7 +113,7 @@ class StuartDeliveryController extends Controller
         try {
             $data = StuartDelivery::select('job_id')->where('order_id', $request->order_id)->first();
             $access_token = $this->stuartAccessToken();
-            $response = Http::withToken($access_token)->patch(''. config("constants.STUART_JOBS") .'/' . $data->job_id);
+            $response = Http::withToken($access_token)->patch('' . config("constants.STUART_JOBS") . '/' . $data->job_id);
             $data = $response->json();
             if ($data['status'] == 'finished') {
                 Orders::where('id', $request->order_id)->update([
