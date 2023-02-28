@@ -396,12 +396,14 @@ class OrdersController extends Controller
         foreach ($request->items as $item) {
             $product_id = $item['product_id'];
             $qty = $item['qty'];
+            $user_choice = $item['user_choice'];
             $product_price = (new ProductsController())->get_product_price($product_id);
             $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
             $product_volumn = (new ProductsController())->get_product_volumn($product_id);
             $product_weight = (new ProductsController())->get_product_weight($product_id);
             $temp = [];
             $temp['qty'] = $qty;
+            $temp['user_choice'] = $user_choice;
             $temp['product_id'] = $product_id;
             $temp['price'] = $product_price;
             $temp['weight'] = $product_weight;
@@ -497,6 +499,7 @@ class OrdersController extends Controller
                 $new_order_item->product_id = $order_item['product_id'];
                 $new_order_item->product_price = $order_item['price'];
                 $new_order_item->product_qty = $order_item['qty'];
+                $new_order_item->user_choice = $order_item['user_choice'];
                 $new_order_item->save();
             }
             $count++;
