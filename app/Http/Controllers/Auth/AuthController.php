@@ -19,11 +19,11 @@ use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
-use PhpParser\Node\Expr\Cast\Double;
 use Throwable;
 
 class AuthController extends Controller
@@ -508,17 +508,18 @@ class AuthController extends Controller
             }
             $lat = $request->query('lat');
             $lon = $request->query('lon');
-            $users = User::where('is_active', 1)
-                ->whereIn('role_id', [2, 5])
-                ->orderBy('business_name', 'asc')
-                ->get();
             $data = [];
-            foreach ($users as $user) {
-                $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
-                if ($result['distance'] < 5) {
-                    $data[] = $this->getSellerInfo($user, $result);
+            $data = Cache::remember('sellers', 60, function () use ($lat, $lon) {
+                $users = User::where('is_active', 1)
+                    ->whereIn('role_id', [2, 5])
+                    ->orderBy('business_name', 'asc')
+                    ->get();
+                foreach ($users as $user) {
+                    $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
+                    if ($result['distance'] < 5) $data[] = $this->getSellerInfo($user, $result);
                 }
-            }
+                return $data;
+            });
             return response()->json([
                 'data' => $data,
                 'status' => true,
@@ -902,7 +903,7 @@ class AuthController extends Controller
         $distanceString = explode(' ', $results['rows'][0]['elements'][0]['distance']['text']);
         $durationInMinutes = explode(' ', $results['rows'][0]['elements'][0]['duration']['text']);
 
-        return ['distance' => (double)$distanceString[0], 'duration' => (double)$durationInMinutes[0]];
+        return ['distance' => (float)$distanceString[0], 'duration' => (float)$durationInMinutes[0]];
     }
 
     // public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
