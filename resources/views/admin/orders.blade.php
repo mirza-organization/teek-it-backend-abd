@@ -137,6 +137,24 @@
                                         <br>
                                         <strong class="text-site-primary"> QTY: </strong>
                                         {{ $item->product_qty }}
+                                        <br>
+                                        <strong class="text-site-primary"> User Choice: </strong>
+                                        @if ($item->user_choice == 1)
+                                            <b>Alternative product that does the job</b>
+                                            <a href="#" class="d-block btn btn-warning">Select Alternative Product</a>
+                                        @elseif ($item->user_choice == 2)
+                                            <b>Remove only this product from order</b>
+                                            <a href="#" class="d-block btn btn-dark">Remove</a>
+                                        @elseif ($item->user_choice == 3)
+                                            {{-- 3 == Search for product in other stores --}}
+                                            <b>Don't be worried the user will search for a product in other stores against this product</b>
+                                        @elseif ($item->user_choice == 4)
+                                            {{-- 4 == Request a call from the store --}}
+                                            <b>Call the user if this product is out of stock</b>
+                                        @elseif ($item->user_choice == 5)
+                                            <b>Cancel the order</b>
+                                            <a href="#" class="d-block btn btn-danger">Cancel Order</a>
+                                        @endif
                                     </div>
                                     <div class="col-md-12"><br></div>
                                 </div>

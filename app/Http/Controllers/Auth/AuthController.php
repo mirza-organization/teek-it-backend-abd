@@ -510,11 +510,12 @@ class AuthController extends Controller
             $lon = $request->query('lon');
             $users = User::where('is_active', 1)
                 ->whereIn('role_id', [2, 5])
+                ->orderBy('business_name', 'asc')
                 ->get();
             $data = [];
             foreach ($users as $user) {
                 $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
-                if ($result['distance'] <= 5) {
+                if ($result['distance'] < 5) {
                     $data[] = $this->getSellerInfo($user, $result);
                 }
             }
@@ -894,19 +895,14 @@ class AuthController extends Controller
     {
         $address1 = $latitude1 . ',' . $longitude1;
         $address2 = $latitude2 . ',' . $longitude2;
+        /* Rameesha's URL */
+        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($address1) . "&destinations=" . urlencode($address2) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
-        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&departure_time=" . time() . "&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+        $results = json_decode(file_get_contents($url), true);
+        $distanceString = explode(' ', $results['rows'][0]['elements'][0]['distance']['text']);
+        $durationInMinutes = explode(' ', $results['rows'][0]['elements'][0]['duration']['text']);
 
-        $query = file_get_contents($url);
-        $results = json_decode($query, true);
-
-        $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
-        $distanceInMiles = (Double)$distanceString[0] * 0.621371;
-
-        $durationInSeconds = $results['routes'][0]['legs'][0]['duration']['value'];
-        $durationInMinutes = round($durationInSeconds / 60);
-
-        return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
+        return ['distance' => (double)$distanceString[0], 'duration' => (double)$durationInMinutes[0]];
     }
 
     // public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
@@ -914,17 +910,31 @@ class AuthController extends Controller
     //     $address1 = $latitude1 . ',' . $longitude1;
     //     $address2 = $latitude2 . ',' . $longitude2;
 
-    //     $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+    //     /* Old URL */
+    //     // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&departure_time=" . time() . "&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
+
+    //     /* Rameesha's URL */
+    //     $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($address1) . "&destinations=" . urlencode($address2) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
     //     $query = file_get_contents($url);
     //     $results = json_decode($query, true);
+    //     // dd($results);
+    //     /* Old Variables */
+    //     // $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+    //     // $distanceInMiles = (Double)$distanceString[0] * 0.621371;
+    //     /* New Variables */
+    //     $distanceString = explode(' ', $results['rows'][0]['elements'][0]['distance']['text']);
+    //     // dd($results);
+    //     // $distanceInMiles = (float)$distanceString[0] * 0.621371;
 
-    //     $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
-    //     $distanceInKm = (float)$distanceString[0] * 1.0 / 1000;
+    //     /* Old Variables */
+    //     // $durationInSeconds = $results['routes'][0]['legs'][0]['duration']['value'];
+    //     // $durationInMinutes = round($durationInSeconds / 60);
+    //     /* New Variables */
+    //     $durationInMinutes = explode(' ', $results['rows'][0]['elements'][0]['duration']['text']);
+    //     // $durationInMinutes = round($durationInSeconds / 60);
 
-    //     $durationInSeconds = $results['routes'][0]['legs'][0]['duration']['value'];
-    //     $durationInMinutes = round($durationInSeconds / 60);
-
-    //     return ['distance' => $distanceInKm, 'duration' => $durationInMinutes];
+    //     // return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
+    //     return ['distance' => $distanceString, 'duration' => $durationInMinutes];
     // }
 }
