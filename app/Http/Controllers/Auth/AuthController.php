@@ -495,31 +495,44 @@ class AuthController extends Controller
     public function sellers(Request $request)
     {
         try {
-            $validate = Validator::make($request->query(), [
-                'lat' => 'required|numeric|between:-90,90',
-                'lon' => 'required|numeric|between:-180,180',
-            ]);
-            if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validate->errors()
-                ], 422);
-            }
-            $lat = $request->query('lat');
-            $lon = $request->query('lon');
+            // $validate = Validator::make($request->query(), [
+            //     'lat' => 'required|numeric|between:-90,90',
+            //     'lon' => 'required|numeric|between:-180,180',
+            // ]);
+            // if ($validate->fails()) {
+            //     return response()->json([
+            //         'data' => [],
+            //         'status' => false,
+            //         'message' => $validate->errors()
+            //     ], 422);
+            // }
             $data = [];
-            $data = Cache::remember('sellers', 60, function () use ($lat, $lon) {
-                $users = User::where('is_active', 1)
-                    ->whereIn('role_id', [2, 5])
-                    ->orderBy('business_name', 'asc')
-                    ->get();
-                foreach ($users as $user) {
-                    $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
-                    if ($result['distance'] < 5) $data[] = $this->getSellerInfo($user, $result);
-                }
-                return $data;
-            });
+            if ($request->query('lat') && $request->query('lon')) {
+                $lat = $request->query('lat');
+                $lon = $request->query('lon');
+                $data = Cache::remember('sellersLatLon', 60, function () use ($lat, $lon) {
+                    $users = User::where('is_active', 1)
+                        ->whereIn('role_id', [2, 5])
+                        ->orderBy('business_name', 'asc')
+                        ->get();
+                    foreach ($users as $user) {
+                        $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
+                        if ($result['distance'] < 5) $data[] = $this->getSellerInfo($user, $result);
+                    }
+                    return $data;
+                });
+            } else {
+                $data = Cache::remember('sellers', 60, function () {
+                    $users = User::where('is_active', 1)
+                        ->whereIn('role_id', [2, 5])
+                        ->orderBy('business_name', 'asc')
+                        ->get();
+                    foreach ($users as $user) {
+                        $data[] = $this->getSellerInfo($user);
+                    }
+                    return $data;
+                });
+            }
             return response()->json([
                 'data' => $data,
                 'status' => true,
