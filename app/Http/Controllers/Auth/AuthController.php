@@ -511,7 +511,6 @@ class AuthController extends Controller
             if ($request->query('lat') && $request->query('lon')) {
                 $lat = $request->query('lat');
                 $lon = $request->query('lon');
-                // dd($lon);
                 $users = User::where('is_active', 1)
                     ->whereIn('role_id', [2, 5])
                     ->orderBy('business_name', 'asc')
