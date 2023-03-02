@@ -368,15 +368,16 @@ class AuthController extends Controller
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'address_1' => $user->address_1,
             'business_name' => $user->business_name,
             'business_location' => $user->business_location,
             'business_hours' => $user->business_hours,
+            'user_img' => $user->user_img,
             'pending_withdraw' => $user->pending_withdraw,
             'total_withdraw' => $user->total_withdraw,
-            'address_1' => $user->address_1,
+            'parent_store_id' => $user->parent_store_id,
             'is_online' => $user->is_online,
-            'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers'],
-            'user_img' => $user->user_img
+            'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers']
         );
         if (!is_null($result)) {
             $data_info['distance'] = $result['distance'];
@@ -510,17 +511,15 @@ class AuthController extends Controller
             if ($request->query('lat') && $request->query('lon')) {
                 $lat = $request->query('lat');
                 $lon = $request->query('lon');
-                $data = Cache::remember('sellersLatLon', 60, function () use ($lat, $lon) {
-                    $users = User::where('is_active', 1)
-                        ->whereIn('role_id', [2, 5])
-                        ->orderBy('business_name', 'asc')
-                        ->get();
-                    foreach ($users as $user) {
-                        $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
-                        if ($result['distance'] < 5) $data[] = $this->getSellerInfo($user, $result);
-                    }
-                    return $data;
-                });
+                // dd($lon);
+                $users = User::where('is_active', 1)
+                    ->whereIn('role_id', [2, 5])
+                    ->orderBy('business_name', 'asc')
+                    ->get();
+                foreach ($users as $user) {
+                    $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
+                    if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
+                }
             } else {
                 $data = Cache::remember('sellers', 60, function () {
                     $users = User::where('is_active', 1)
@@ -557,7 +556,6 @@ class AuthController extends Controller
         try {
             $user = User::find($seller_id);
             $data = [];
-            // $info = $this->getSellerInfo($user);
             $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
@@ -905,18 +903,20 @@ class AuthController extends Controller
         }
     }
 
-    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
+    public function getDistanceBetweenPointsNew($destination_lat, $destination_lon, $origin_lat, $origin_lon)
     {
-        $address1 = $latitude1 . ',' . $longitude1;
-        $address2 = $latitude2 . ',' . $longitude2;
+        $destination_address = $destination_lat . ',' . $destination_lon;
+        $origing_address = $origin_lat . ',' . $origin_lon;
         /* Rameesha's URL */
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($address1) . "&destinations=" . urlencode($address2) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
+        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
-        $results = json_decode(file_get_contents($url), true);
-        $distanceString = explode(' ', $results['rows'][0]['elements'][0]['distance']['text']);
-        $durationInMinutes = explode(' ', $results['rows'][0]['elements'][0]['duration']['text']);
+        $results = json_decode(file_get_contents($url), true); 
+        $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
+        $distanceInMiles = (double)$meters[0] * 0.000621;
 
-        return ['distance' => (float)$distanceString[0], 'duration' => (float)$durationInMinutes[0]];
+        $durationInSeconds = explode(' ', $results['rows'][0]['elements'][0]['duration']['value']);
+        $durationInMinutes = round((int)$durationInSeconds[0] / 60);
+        return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
     }
 
     // public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)

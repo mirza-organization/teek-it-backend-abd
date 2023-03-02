@@ -3,19 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Categories;
+use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
 use App\Products;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
-use JWTAuth;
 use App\User;
-use Crypt;
-use Hash;
-use Mail;
-use Psy\Command\WhereamiCommand;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
-use Validator;
 
 class CategoriesController extends Controller
 {
@@ -210,27 +206,50 @@ class CategoriesController extends Controller
      * It will get the stores w.r.t category id 
      * @version 1.0.0
      */
-    public function stores($category_id): \Illuminate\Http\JsonResponse
+    public function stores(Request $request, $category_id)
     {
         try {
-
-            if (!Categories::where('id', $category_id)->exists()) {
-                return response()->json(['data' => [], 'status' => false, 'message' => config('constants.NO_RECORD')], 422);
+            $validate = Validator::make($request->query(), [
+                'lat' => 'required|numeric|between:-90,90',
+                'lon' => 'required|numeric|between:-180,180',
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validate->errors()
+                ], 422);
             }
+            if (!Categories::where('id', $category_id)->exists()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 422);
+            }
+            $data = [];
+            $buyer_lat = $request->query('lat');
+            $buyer_lon = $request->query('lon');
             $ids = DB::table('categories')
                 ->select(DB::raw('distinct(user_id) as store_id'))
                 ->join('products', 'categories.id', '=', 'products.category_id')
                 ->join('users', 'products.user_id', '=', 'users.id')
                 ->join('qty', 'products.id', '=', 'qty.products_id')
-                ->where('qty', '>', 0)
-                ->where('status', '=', 1)
-                ->where('is_active', '=', 1)
+                ->where('qty', '>', 0) //Products Should Be In Stock
+                ->where('status', '=', 1) //Products Should Be Live
+                ->where('is_active', '=', 1) //Seller Should Be Active
                 ->where('categories.id', '=', $category_id)
                 ->get()->pluck('store_id');
-            $stores = User::whereIn('id', $ids)->get()->toArray();
+            // $stores = User::whereIn('id', $ids)->get()->toArray();
+            $stores = User::whereIn('id', $ids)->get();
+            foreach ($stores as $store) {
+                $result = (new AuthController())->getDistanceBetweenPointsNew($store->lat, $store->lon, $buyer_lat, $buyer_lon);
+                if ($result['distance'] < 5) $data[] = (new AuthController())->getSellerInfo($store, $result);
+            }
             return response()->json([
-                'stores' => $stores,
+                'stores' => $data,
                 'status' => true,
+                'message' => ''
             ], 200);
         } catch (Throwable $error) {
             report($error);
