@@ -349,166 +349,175 @@ class OrdersController extends Controller
     /**
      * Inserts a newly arrived order
      * @author Mirza Abdullah Izhar
-     * @version 1.3.0
+     * @version 1.9.0
      */
     public function new(Request $request)
     {
-        if ($request->has('type')) {
-            if ($request->type == 'delivery') {
-                $validatedData = Validator::make($request->all(), [
-                    'lat' => 'required',
-                    'lon' => 'required',
-                    'receiver_name' => 'required',
-                    'phone_number' => 'required|string|min:13|max:13',
-                    'address' => 'required',
-                    'house_no' => 'required',
-                    'delivery_charges' => 'required',
-                    'service_charges' => 'required',
-                    'device' => 'sometimes'
-                ]);
-                if ($validatedData->fails()) {
-                    return response()->json([
-                        'data' => [],
-                        'status' => false,
-                        'message' => $validatedData->errors()
-                    ], 422);
+        try {
+            if ($request->has('type')) {
+                if ($request->type == 'delivery') {
+                    $validatedData = Validator::make($request->all(), [
+                        'lat' => 'required',
+                        'lon' => 'required',
+                        'receiver_name' => 'required',
+                        'phone_number' => 'required|string|min:13|max:13',
+                        'address' => 'required',
+                        'house_no' => 'required',
+                        'delivery_charges' => 'required',
+                        'service_charges' => 'required',
+                        'device' => 'sometimes'
+                    ]);
+                    if ($validatedData->fails()) {
+                        return response()->json([
+                            'data' => [],
+                            'status' => false,
+                            'message' => $validatedData->errors()
+                        ], 422);
+                    }
+                } elseif ($request->type == 'self-pickup') {
+                    $validatedData = Validator::make($request->all(), [
+                        'phone_number' => 'string|min:13|max:13'
+                    ]);
+                    if ($validatedData->fails()) {
+                        return response()->json([
+                            'data' => [],
+                            'status' => false,
+                            'message' => $validatedData->errors()
+                        ], 422);
+                    }
                 }
-            } elseif ($request->type == 'self-pickup') {
-                $validatedData = Validator::make($request->all(), [
-                    'phone_number' => 'string|min:13|max:13'
-                ]);
-                if ($validatedData->fails()) {
-                    return response()->json([
-                        'data' => [],
-                        'status' => false,
-                        'message' => $validatedData->errors()
-                    ], 422);
-                }
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => 'The type field is required.'
+                ], 422);
             }
-        } else {
+            $grouped_seller = [];
+            foreach ($request->items as $item) {
+                $product_id = $item['product_id'];
+                $qty = $item['qty'];
+                $user_choice = $item['user_choice'];
+                $product_price = (new ProductsController())->get_product_price($product_id);
+                $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
+                $product_volumn = (new ProductsController())->get_product_volumn($product_id);
+                $product_weight = (new ProductsController())->get_product_weight($product_id);
+                $temp = [];
+                $temp['qty'] = $qty;
+                $temp['user_choice'] = $user_choice;
+                $temp['product_id'] = $product_id;
+                $temp['price'] = $product_price;
+                $temp['weight'] = $product_weight;
+                $temp['volumn'] = $product_volumn;
+                $temp['seller_id'] = $product_seller_id;
+                $grouped_seller[$product_seller_id][] = $temp;
+                (new ProductsController())->updateQty($product_id, $qty, "subtract");
+            }
+            $count = 0;
+            $order_arr = [];
+            foreach ($grouped_seller as $seller_id => $order) {
+                $user_id = Auth::id();
+                $total_weight = 0;
+                $total_volumn = 0;
+                $order_total = 0;
+                $total_items = 0;
+                foreach ($order as $order_item) {
+                    $total_weight = $total_weight + $order_item['weight'];
+                    $total_volumn = $total_volumn + $order_item['volumn'];
+                    $total_items = $total_items + $order_item['qty'];
+                    $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
+                }
+                $seller = User::find($seller_id);
+                $seller_money = $seller->pending_withdraw;
+                $seller->pending_withdraw = $order_total + $seller_money;
+                $seller->save();
+                if ($request->type == 'delivery') {
+                    $customer_lat = $request->lat;
+                    $customer_lon = $request->lon;
+                    $store_lat = $seller->lat;
+                    $store_lon = $seller->lon;
+                    $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
+                    // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
+                    $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
+                }
+                $new_order = new Orders();
+                $new_order->user_id = $user_id;
+                $new_order->order_total = $order_total;
+                $new_order->total_items = $total_items;
+                $new_order->lat = ($request->type == 'delivery') ? $customer_lat : NULL;
+                $new_order->lon = ($request->type == 'delivery') ? $customer_lon : NULL;
+                $new_order->type = $request->type;
+                if ($request->type == 'delivery') {
+                    $new_order->receiver_name = $request->receiver_name;
+                    $new_order->phone_number = $request->phone_number;
+                    $new_order->address = $request->address;
+                    $new_order->house_no = $request->house_no;
+                    $new_order->flat = $request->flat;
+                    $new_order->driver_charges = $driver_charges;
+                    $new_order->delivery_charges = $request->delivery_charges;
+                    $new_order->service_charges = $request->service_charges;
+                }
+                $new_order->description = $request->description;
+                $new_order->payment_status = $request->payment_status ?? "hidden";
+                $new_order->seller_id = $seller_id;
+                $new_order->device = $request->device ?? NULL;
+                $new_order->save();
+                $order_id = $new_order->id;
+                if ($request->type == 'delivery') {
+                    $verification_code = '';
+                    while (strlen($verification_code) < 6) {
+                        $rand_number = rand(0, time());
+                        $verification_code = $verification_code . substr($rand_number, 0, 1);
+                    }
+                    if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
+                        // For sending SMS notification for "New Order"
+                        $sms = new TwilioSmsService();
+                        $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
+                        $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
+
+                        $sms->sendSms($request->phone_number, $message_for_customer);
+                        // $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
+                        // $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
+
+                        // To restrict "New Order" SMS notifications only for UK numbers
+                        if (strlen($seller->business_phone) == 13 && str_contains($seller->business_phone, '+44')) {
+                            $sms->sendSms($seller->business_phone, $message_for_admin);
+                        }
+                        $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
+                        $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number
+                        $sms->sendSms('+447817332090', $message_for_admin); //Junaid Number
+                        $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number
+                    }
+                    $verification_codes = new VerificationCodes();
+                    $verification_codes->order_id = $order_id;
+                    $verification_codes->code = '{"code": "' . $verification_code . '", "driver_failed_to_enter_code": "NULL"}';
+                    $verification_codes->save();
+                }
+                $order_arr[] = $order_id;
+                foreach ($order as $order_item) {
+                    $new_order_item = new OrderItems();
+                    $new_order_item->order_id = $order_id;
+                    $new_order_item->product_id = $order_item['product_id'];
+                    $new_order_item->product_price = $order_item['price'];
+                    $new_order_item->product_qty = $order_item['qty'];
+                    $new_order_item->user_choice = $order_item['user_choice'];
+                    $new_order_item->save();
+                }
+                $count++;
+            }
+            return response()->json([
+                'data' => $this->get_orders_from_ids($order_arr),
+                'status' => true,
+                'message' => 'Order added successfully.'
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
             return response()->json([
                 'data' => [],
                 'status' => false,
-                'message' => 'The type field is required.'
-            ], 422);
+                'message' => $error
+            ], 500);
         }
-        $grouped_seller = [];
-        foreach ($request->items as $item) {
-            $product_id = $item['product_id'];
-            $qty = $item['qty'];
-            $user_choice = $item['user_choice'];
-            $product_price = (new ProductsController())->get_product_price($product_id);
-            $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
-            $product_volumn = (new ProductsController())->get_product_volumn($product_id);
-            $product_weight = (new ProductsController())->get_product_weight($product_id);
-            $temp = [];
-            $temp['qty'] = $qty;
-            $temp['user_choice'] = $user_choice;
-            $temp['product_id'] = $product_id;
-            $temp['price'] = $product_price;
-            $temp['weight'] = $product_weight;
-            $temp['volumn'] = $product_volumn;
-            $temp['seller_id'] = $product_seller_id;
-            $grouped_seller[$product_seller_id][] = $temp;
-            (new ProductsController())->updateQty($product_id, $qty, "subtract");
-        }
-        $count = 0;
-        $order_arr = [];
-        foreach ($grouped_seller as $seller_id => $order) {
-            $user_id = Auth::id();
-            $total_weight = 0;
-            $total_volumn = 0;
-            $order_total = 0;
-            $total_items = 0;
-            foreach ($order as $order_item) {
-                $total_weight = $total_weight + $order_item['weight'];
-                $total_volumn = $total_volumn + $order_item['volumn'];
-                $total_items = $total_items + $order_item['qty'];
-                $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
-            }
-            $seller = User::find($seller_id);
-            $seller_money = $seller->pending_withdraw;
-            $seller->pending_withdraw = $order_total + $seller_money;
-            $seller->save();
-            if ($request->type == 'delivery') {
-                $customer_lat = $request->lat;
-                $customer_lon = $request->lon;
-                $store_lat = $seller->lat;
-                $store_lon = $seller->lon;
-                $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
-                // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
-                $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
-            }
-            $new_order = new Orders();
-            $new_order->user_id = $user_id;
-            $new_order->order_total = $order_total;
-            $new_order->total_items = $total_items;
-            $new_order->lat = ($request->type == 'delivery') ? $customer_lat : NULL;
-            $new_order->lon = ($request->type == 'delivery') ? $customer_lon : NULL;
-            $new_order->type = $request->type;
-            if ($request->type == 'delivery') {
-                $new_order->receiver_name = $request->receiver_name;
-                $new_order->phone_number = $request->phone_number;
-                $new_order->address = $request->address;
-                $new_order->house_no = $request->house_no;
-                $new_order->flat = $request->flat;
-                $new_order->driver_charges = $driver_charges;
-                $new_order->delivery_charges = $request->delivery_charges;
-                $new_order->service_charges = $request->service_charges;
-            }
-            $new_order->description = $request->description;
-            $new_order->payment_status = $request->payment_status ?? "hidden";
-            $new_order->seller_id = $seller_id;
-            $new_order->device = $request->device ?? NULL;
-            $new_order->save();
-            $order_id = $new_order->id;
-            if ($request->type == 'delivery') {
-                $verification_code = '';
-                while (strlen($verification_code) < 6) {
-                    $rand_number = rand(0, time());
-                    $verification_code = $verification_code . substr($rand_number, 0, 1);
-                }
-                if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
-                    // For sending SMS notification for "New Order"
-                    $sms = new TwilioSmsService();
-                    $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
-                    $message_for_customer = "Thanks for your order. Your order has been accepted by the store. Please quote verification code: " . $verification_code . " on delivery. TeekIt";
-
-                    $sms->sendSms($request->phone_number, $message_for_customer);
-                    // $sms->sendSms('+923362451199', $message_for_customer); //Rameesha Number
-                    // $sms->sendSms('+923002986281', $message_for_customer); //Fahad Number
-
-                    // To restrict "New Order" SMS notifications only for UK numbers
-                    if (strlen($seller->business_phone) == 13 && str_contains($seller->business_phone, '+44')) {
-                        $sms->sendSms($seller->business_phone, $message_for_admin);
-                    }
-                    $sms->sendSms('+447976621849', $message_for_admin); //Azim Number
-                    $sms->sendSms('+447490020063', $message_for_admin); //Eesa Number
-                    $sms->sendSms('+447817332090', $message_for_admin); //Junaid Number
-                    $sms->sendSms('+923170155625', $message_for_admin); //Mirza Number
-                }
-                $verification_codes = new VerificationCodes();
-                $verification_codes->order_id = $order_id;
-                $verification_codes->code = '{"code": "' . $verification_code . '", "driver_failed_to_enter_code": "NULL"}';
-                $verification_codes->save();
-            }
-            $order_arr[] = $order_id;
-            foreach ($order as $order_item) {
-                $new_order_item = new OrderItems();
-                $new_order_item->order_id = $order_id;
-                $new_order_item->product_id = $order_item['product_id'];
-                $new_order_item->product_price = $order_item['price'];
-                $new_order_item->product_qty = $order_item['qty'];
-                $new_order_item->user_choice = $order_item['user_choice'];
-                $new_order_item->save();
-            }
-            $count++;
-        }
-        return response()->json([
-            'data' => $this->get_orders_from_ids($order_arr),
-            'status' => true,
-            'message' => 'Order added successfully.'
-        ], 200);
     }
     /**
      * Cancel's a customer order
