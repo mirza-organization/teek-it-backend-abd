@@ -360,7 +360,7 @@ class AuthController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 2.1.0
      */
-    private function getSellerInfo($seller_info, $result = null)
+    public function getSellerInfo($seller_info, $result = null)
     {
         $user = $seller_info;
         if (!$user) return null;
