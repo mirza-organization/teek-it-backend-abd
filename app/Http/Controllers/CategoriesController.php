@@ -13,6 +13,8 @@ use App\User;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 
+use function PHPUnit\Framework\isEmpty;
+
 class CategoriesController extends Controller
 {
     /**
@@ -243,8 +245,15 @@ class CategoriesController extends Controller
             // $stores = User::whereIn('id', $ids)->get()->toArray();
             $stores = User::whereIn('id', $ids)->get();
             foreach ($stores as $store) {
-                $result = (new AuthController())->getDistanceBetweenPointsNew($store->lat, $store->lon, $buyer_lat, $buyer_lon);
-                if ($result['distance'] < 5) $data[] = (new AuthController())->getSellerInfo($store, $result);
+                $result = (new UsersController())->getDistanceBetweenPoints($store->lat, $store->lon, $buyer_lat, $buyer_lon);
+                if (isset($result['distance']) && $result['distance'] < 5) $data[] = (new UsersController())->getSellerInfo($store, $result);
+            }
+            if (count($data) === 0) {
+                return response()->json([
+                    'stores' => [],
+                    'status' => true,
+                    'message' => 'No stores found against this category in this area.'
+                ], 200);
             }
             return response()->json([
                 'stores' => $data,

@@ -995,4 +995,43 @@ class ProductsController extends Controller
             ], 500);
         }
     }
+    /**
+     * Listing of all products w.r.t Seller/Store 'id'
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
+    public function sellerProducts($seller_id)
+    { 
+        try {
+            $user = User::find($seller_id);
+            $data = [];
+            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
+            $pagination = $products->toArray();
+            if (!$products->isEmpty()) {
+                foreach ($products as $product) {
+                    $data[] = (new ProductsController())->getProductInfo($product->id);
+                }
+                unset($pagination['data']);
+                return response()->json([
+                    'data' => $data,
+                    'status' => true,
+                    'message' => '',
+                    'pagination' => $pagination
+                ], 200);
+            } else {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
 }

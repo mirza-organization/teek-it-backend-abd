@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductsController;
 use App\Products;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\UsersController;
 use App\Keys;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -35,7 +36,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'sellers', 'sellerProducts', 'searchSellerProducts', 'loginGoogle', 'registerGoogle']]);
+        $this->middleware('jwt.verify', ['except' => ['login', 'register', 'verify', 'searchSellerProducts', 'loginGoogle', 'registerGoogle']]);
     }
     /**
      * Register For Mobile App
@@ -354,37 +355,37 @@ class AuthController extends Controller
             'message' =>  config('constants.LOGIN_SUCCESS')
         ], 200);
     }
-    /**
-     * Fetch seller/store information w.r.t ID
-     * If seller/store have distance it will return distance
-     * @author Mirza Abdullah Izhar
-     * @version 2.1.0
-     */
-    public function getSellerInfo($seller_info, $result = null)
-    {
-        $user = $seller_info;
-        if (!$user) return null;
-        $data_info = array(
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'address_1' => $user->address_1,
-            'business_name' => $user->business_name,
-            'business_location' => $user->business_location,
-            'business_hours' => $user->business_hours,
-            'user_img' => $user->user_img,
-            'pending_withdraw' => $user->pending_withdraw,
-            'total_withdraw' => $user->total_withdraw,
-            'parent_store_id' => $user->parent_store_id,
-            'is_online' => $user->is_online,
-            'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers']
-        );
-        if (!is_null($result)) {
-            $data_info['distance'] = $result['distance'];
-            $data_info['duration'] = $result['duration'];
-        }
-        return $data_info;
-    }
+    // /**
+    //  * Fetch seller/store information w.r.t ID
+    //  * If seller/store have distance it will return distance
+    //  * @author Mirza Abdullah Izhar
+    //  * @version 2.1.0
+    //  */
+    // public function getSellerInfo($seller_info, $result = null)
+    // {
+    //     $user = $seller_info;
+    //     if (!$user) return null;
+    //     $data_info = array(
+    //         'id' => $user->id,
+    //         'name' => $user->name,
+    //         'email' => $user->email,
+    //         'address_1' => $user->address_1,
+    //         'business_name' => $user->business_name,
+    //         'business_location' => $user->business_location,
+    //         'business_hours' => $user->business_hours,
+    //         'user_img' => $user->user_img,
+    //         'pending_withdraw' => $user->pending_withdraw,
+    //         'total_withdraw' => $user->total_withdraw,
+    //         'parent_store_id' => $user->parent_store_id,
+    //         'is_online' => $user->is_online,
+    //         'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers']
+    //     );
+    //     if (!is_null($result)) {
+    //         $data_info['distance'] = $result['distance'];
+    //         $data_info['duration'] = $result['duration'];
+    //     }
+    //     return $data_info;
+    // }
     /**
      * It will get user via given id
      * @author Mirza Abdullah Izhar
@@ -392,7 +393,7 @@ class AuthController extends Controller
      */
     public function get_user($user_id)
     {
-        $data_info = $this->getSellerInfo(User::find($user_id));
+        $data_info = (new UsersController())->getSellerInfo(User::find($user_id));
         return $data_info;
     }
 
@@ -487,104 +488,6 @@ class AuthController extends Controller
         return $response;
     }
     /**
-     * Listing of all Sellers/Stores within 5 miles
-     * @param lat mandatory
-     * @param lon mandatory
-     * @author Mirza Abdullah Izhar
-     * @version 2.1.0
-     */
-    public function sellers(Request $request)
-    {
-        try {
-            // $validate = Validator::make($request->query(), [
-            //     'lat' => 'required|numeric|between:-90,90',
-            //     'lon' => 'required|numeric|between:-180,180',
-            // ]);
-            // if ($validate->fails()) {
-            //     return response()->json([
-            //         'data' => [],
-            //         'status' => false,
-            //         'message' => $validate->errors()
-            //     ], 422);
-            // }
-            $data = [];
-            if ($request->query('lat') && $request->query('lon')) {
-                $lat = $request->query('lat');
-                $lon = $request->query('lon');
-                $users = User::where('is_active', 1)
-                    ->whereIn('role_id', [2, 5])
-                    ->orderBy('business_name', 'asc')
-                    ->get();
-                foreach ($users as $user) {
-                    $result = $this->getDistanceBetweenPointsNew($user->lat, $user->lon, $lat, $lon);
-                    if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
-                }
-            } else {
-                $data = Cache::remember('sellers', 60, function () {
-                    $users = User::where('is_active', 1)
-                        ->whereIn('role_id', [2, 5])
-                        ->orderBy('business_name', 'asc')
-                        ->get();
-                    foreach ($users as $user) {
-                        $data[] = $this->getSellerInfo($user);
-                    }
-                    return $data;
-                });
-            }
-            return response()->json([
-                'data' => $data,
-                'status' => true,
-                'message' => ''
-            ], 200);
-        } catch (Throwable $error) {
-            report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
-        }
-    }
-    /**
-     * Listing of all products w.r.t Seller/Store 'id'
-     * @author Mirza Abdullah Izhar
-     * @version 1.2.0
-     */
-    public function sellerProducts($seller_id)
-    {
-        try {
-            $user = User::find($seller_id);
-            $data = [];
-            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
-            $pagination = $products->toArray();
-            if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->getProductInfo($product->id);
-                }
-                unset($pagination['data']);
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
-            } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
-            }
-        } catch (Throwable $error) {
-            report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
-        }
-    }
-    /**
      * Search products w.r.t Seller/Store 'id' & Product Name
      * @author Mirza Abdullah Izhar
      * @version 1.4.0
@@ -634,7 +537,7 @@ class AuthController extends Controller
             $data = [];
             foreach ($users as $user) {
                 if (Gate::allows('delivery_boy')) {
-                    $data[] = $this->getSellerInfo($user);
+                    $data[] = (new UsersController())->getSellerInfo($user);
                 }
             }
             return response()->json([
@@ -902,21 +805,21 @@ class AuthController extends Controller
         }
     }
 
-    public function getDistanceBetweenPointsNew($destination_lat, $destination_lon, $origin_lat, $origin_lon)
-    {
-        $destination_address = $destination_lat . ',' . $destination_lon;
-        $origing_address = $origin_lat . ',' . $origin_lon;
-        /* Rameesha's URL */
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
+    // public function getDistanceBetweenPointsNew($destination_lat, $destination_lon, $origin_lat, $origin_lon)
+    // {
+    //     $destination_address = $destination_lat . ',' . $destination_lon;
+    //     $origing_address = $origin_lat . ',' . $origin_lon;
+    //     /* Rameesha's URL */
+    //     $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
-        $results = json_decode(file_get_contents($url), true); 
-        $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
-        $distanceInMiles = (double)$meters[0] * 0.000621;
-
-        $durationInSeconds = explode(' ', $results['rows'][0]['elements'][0]['duration']['value']);
-        $durationInMinutes = round((int)$durationInSeconds[0] / 60);
-        return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
-    }
+    //     $results = json_decode(file_get_contents($url), true);  
+    //     $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
+    //     $distanceInMiles = (double)$meters[0] * 0.000621;
+        
+    //     $durationInSeconds = explode(' ', $results['rows'][0]['elements'][0]['duration']['value']);
+    //     $durationInMinutes = round((int)$durationInSeconds[0] / 60); 
+    //     return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
+    // }
 
     // public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
     // {

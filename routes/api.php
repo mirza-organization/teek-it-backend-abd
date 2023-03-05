@@ -84,8 +84,7 @@ Route::group(['prefix' => 'page'], function ($router) {
 | Seller API Routes
 |--------------------------------------------------------------------------
 */
-Route::get('sellers', 'Auth\AuthController@sellers');
-Route::get('sellers/{seller_id}', 'Auth\AuthController@sellerProducts');
+Route::get('sellers', 'UsersController@sellers');
 Route::get('sellers/{seller_id}/{product_name}', 'Auth\AuthController@searchSellerProducts');
 /*
 |--------------------------------------------------------------------------
@@ -97,6 +96,7 @@ Route::group(['prefix' => 'product'], function ($router) {
     Route::get('all', 'ProductsController@all');
     Route::get('view/{product_id}', 'ProductsController@view');
     Route::post('view/bulk', 'ProductsController@bulkView');
+    Route::get('seller/{seller_id}', 'ProductsController@sellerProducts');
     Route::get('sortbyprice', 'ProductsController@sortByPrice');
     Route::get('sortByLocation', 'ProductsController@sortByLocation');
     Route::post('recheck_products', 'OrdersController@recheckProducts');
