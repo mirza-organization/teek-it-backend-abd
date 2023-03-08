@@ -592,7 +592,7 @@ class ProductsController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function get_product_price($product_id)
+    public function getProductPrice($product_id)
     {
         $product = Products::find($product_id);
         if ($product->discount_percentage > 0) {
@@ -605,7 +605,7 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function get_product_volumn($product_id)
+    public function getProductVolumn($product_id)
     {
         $product = DB::table('products')
             ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
@@ -618,7 +618,7 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function get_product_weight($product_id)
+    public function getProductWeight($product_id)
     {
         $product = DB::table('products')
             ->select('weight')
@@ -631,7 +631,7 @@ class ProductsController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function get_product_seller_id($product_id)
+    public function getProductSellerID($product_id)
     {
         return Products::find($product_id)->user_id;
     }

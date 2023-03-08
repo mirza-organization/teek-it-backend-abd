@@ -14,8 +14,6 @@ use Throwable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 
-use function PHPUnit\Framework\isEmpty;
-
 class UsersController extends Controller
 {
     /**

@@ -398,10 +398,10 @@ class OrdersController extends Controller
                 $product_id = $item['product_id'];
                 $qty = $item['qty'];
                 $user_choice = $item['user_choice'];
-                $product_price = (new ProductsController())->get_product_price($product_id);
-                $product_seller_id = (new ProductsController())->get_product_seller_id($product_id);
-                $product_volumn = (new ProductsController())->get_product_volumn($product_id);
-                $product_weight = (new ProductsController())->get_product_weight($product_id);
+                $product_price = (new ProductsController())->getProductPrice($product_id);
+                $product_seller_id = (new ProductsController())->getProductSellerID($product_id);
+                $product_volumn = (new ProductsController())->getProductVolumn($product_id);
+                $product_weight = (new ProductsController())->getProductWeight($product_id);
                 $temp = [];
                 $temp['qty'] = $qty;
                 $temp['user_choice'] = $user_choice;
@@ -436,7 +436,7 @@ class OrdersController extends Controller
                     $customer_lon = $request->lon;
                     $store_lat = $seller->lat;
                     $store_lon = $seller->lon;
-                    $distance = $this->getDistanceBetweenPointsNew($customer_lat, $customer_lon, $store_lat, $store_lon);
+                    $distance = $this->getDistanceBetweenPoints($customer_lat, $customer_lon, $store_lat, $store_lon);
                     // $distance = $this->calculateDistance($customer_lat, $customer_lon, $store_lat, $store_lon);
                     $driver_charges = $this->calculateDriverFair2($total_weight, $total_volumn, $distance);
                 }
@@ -660,23 +660,49 @@ class OrdersController extends Controller
         // $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
-    public function getDistanceBetweenPointsNew($latitude1, $longitude1, $latitude2, $longitude2)
+
+    // public function getDistanceBetweenPoints($destination_lat, $destination_lon, $origin_lat, $origin_lon)
+    // {
+    //     $destination_address = $destination_lat . ',' . $destination_lon;
+    //     $origing_address = $origin_lat . ',' . $origin_lon;
+    //     /* Rameesha's URL */
+    //     $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
+
+    //     $results = json_decode(file_get_contents($url), true);
+    //     $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
+    //     $distanceInMiles = (float)$meters[0] * 0.000621;
+
+    //     $durationInSeconds = explode(' ', $results['rows'][0]['elements'][0]['duration']['value']);
+    //     $durationInMinutes = round((int)$durationInSeconds[0] / 60);
+    //     return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
+    // }
+
+    // public function getDistanceBetweenPoints($latitude1, $longitude1, $latitude2, $longitude2)
+    public function getDistanceBetweenPoints($destination_lat, $destination_lon, $origin_lat, $origin_lon)
     {
-        $address1 = $latitude1 . ',' . $longitude1;
-        $address2 = $latitude2 . ',' . $longitude2;
+        // $address1 = $latitude1 . ',' . $longitude1;
+        // $address2 = $latitude2 . ',' . $longitude2;
+       
+        // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
 
-        $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
-
+        $destination_address = $destination_lat . ',' . $destination_lon;
+        $origing_address = $origin_lat . ',' . $origin_lon;
         // Google Distance Matrix
         // $url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=".$latitude1.",".$longitude1."&destinations=".$latitude2.",".$longitude2."&mode=driving&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
 
-        $query = file_get_contents($url);
-        $results = json_decode($query, true);
-        $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+        $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
-        $miles = (int)$distanceString[0] * 0.621371;
+        // $query = file_get_contents($url);
+        // $results = json_decode($query, true);
+        // $distanceString = explode(' ', $results['routes'][0]['legs'][0]['distance']['text']);
+
+        $results = json_decode(file_get_contents($url), true);
+        $meters = $results['rows'][0]['elements'][0]['distance']['value'];
+        $distanceInMiles = $meters * 0.000621;
+        
+        // $miles = (int)$distanceString[0] * 0.621371;
         // return $miles > 1 ? $miles : 1;
-        return $miles;
+        return (double) $distanceInMiles;
     }
 
     /**
@@ -788,7 +814,7 @@ class OrdersController extends Controller
     //     $drop_off = 1.10;
     //     $fee = 0.20;
     //     if (is_null($order->parent_id)) {
-    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lon, $store->lat, $store->lon);
+    //         $distance = $this->getDistanceBetweenPoints($order->lat, $order->lon, $store->lat, $store->lon);
     //         $totalFair = ($distance * $fair_per_mile) + $pickup + $drop_off;
     //         $teekitCharges = $totalFair * $fee;
     //         $driver->pending_withdraw = ($totalFair - $teekitCharges) + $driver_money;
@@ -798,7 +824,7 @@ class OrdersController extends Controller
     //         $order->save();
     //     } else {
     //         $oldOrder = Orders::find($order->parent_id);
-    //         $distance = $this->getDistanceBetweenPointsNew($order->lat, $order->lon, $oldOrder->lat, $oldOrder->lon);
+    //         $distance = $this->getDistanceBetweenPoints($order->lat, $order->lon, $oldOrder->lat, $oldOrder->lon);
     //         $pickup_val = $oldOrder->seller_id == $order->seller_id ? 0.0 : $pickup;
     //         $totalFair = ($distance * $fair_per_mile) + $drop_off + $pickup_val;
     //         $teekitCharges = $totalFair * $fee;

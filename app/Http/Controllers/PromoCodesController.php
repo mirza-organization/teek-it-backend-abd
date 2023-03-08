@@ -133,50 +133,6 @@ class PromoCodesController extends Controller
         }
     }
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\PromoCodes  $promoCodes
-     * @return \Illuminate\Http\Response
-     */
-    public function show(PromoCodes $promoCodes)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\PromoCodes  $promoCodes
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(PromoCodes $promoCodes)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\PromoCodes  $promoCodes
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, PromoCodes $promoCodes)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\PromoCodes  $promoCodes
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(PromoCodes $promoCodes)
-    {
-        //
-    }
-    /**
      * Validates either the given promo code is correct or not
      * It also checks that either the user is submitting this
      * Promo code for the right order number or not 
@@ -208,7 +164,7 @@ class PromoCodesController extends Controller
                     ], 200);
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-                    if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = NULL);
+                    if (empty($promo_codes[0]->store_id)) $promo_codes[0]->store_id = NULL;
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
                     /**
@@ -219,7 +175,7 @@ class PromoCodesController extends Controller
                         $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
                             if (!empty($promo_code_data->usage_limit)) {
-                                if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
+                                if ($this->promoCodeUsageLimit($promo_code_data, $request->user_id) == 1) {
                                     $data[0]['promo_code'] = $promo_codes[0];
                                     $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
                                     return response()->json([
@@ -243,7 +199,7 @@ class PromoCodesController extends Controller
                             ], 200);
                         }
                     }
-                    $this->promoCodeUsageLimit($promo_code_data);
+                    $this->promoCodeUsageLimit($promo_code_data, $request->user_id);
                     $data[0]['promo_code'] = $promo_codes[0];
                     $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
                     return response()->json([
@@ -271,14 +227,16 @@ class PromoCodesController extends Controller
     /**
      * function will return boolean values i.e 1 = true, 0 = false
      */
-    public function promoCodeUsageLimit($promo_code_data)
+    public function promoCodeUsageLimit($promo_code_data, $user_id)
     {
         $status = 1;
-        $usage_limit = DB::table('promo_codes_usage_limit')->where('user_id', '=', Auth::id())
-            ->where('promo_code_id', $promo_code_data->id)->first();
+        $usage_limit = DB::table('promo_codes_usage_limit')
+            ->where('user_id', '=', $user_id)
+            ->where('promo_code_id', $promo_code_data->id)
+            ->first();
         if (empty($usage_limit)) {
             DB::table('promo_codes_usage_limit')->insert([
-                'user_id' => Auth::id(),
+                'user_id' => $user_id,
                 'promo_code_id' =>  $promo_code_data->id,
                 'total_used' => 1,
                 'created_at' => Carbon::now(),
@@ -289,7 +247,7 @@ class PromoCodesController extends Controller
             if ($usage_limit->total_used < $promo_code_data->usage_limit) {
                 DB::table('promo_codes_usage_limit')
                     ->where('promo_code_id', '=', $promo_code_data->id)
-                    ->where('user_id', '=', Auth::id())
+                    ->where('user_id', '=', $user_id)
                     ->increment('total_used', 1);
                 $status = 1;
             } else {
@@ -352,6 +310,7 @@ class PromoCodesController extends Controller
     {
         try {
             $validatedData = Validator::make($request->all(), [
+                'user_id' => 'required|int',
                 'promo_code' => 'required|string|max:20'
             ]);
             if ($validatedData->fails()) {
@@ -373,7 +332,7 @@ class PromoCodesController extends Controller
                     ], 200);
                 } else {
                     $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
-                    if (empty($promo_codes[0]->store_id)) ($promo_codes[0]->store_id = NULL);
+                    if (empty($promo_codes[0]->store_id)) $promo_codes[0]->store_id = NULL;
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
                     /**
@@ -383,23 +342,13 @@ class PromoCodesController extends Controller
                     if (!empty($promo_codes[0]->order_number)) {
                         $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
-                            if (!empty($promo_code_data->usage_limit)) {
-                                if ($this->promoCodeUsageLimit($promo_code_data) == 1) {
-                                    $data[0]['promo_code'] = $promo_codes[0];
-                                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
-                                    return response()->json([
-                                        'data' => $data,
-                                        'status' => true,
-                                        'message' => config('constants.VALID_PROMOCODE')
-                                    ], 200);
-                                } else {
-                                    return response()->json([
-                                        'data' => [],
-                                        'status' => false,
-                                        'message' => config('constants.MAX_LIMIT')
-                                    ], 200);
-                                }
-                            }
+                            $data[0]['promo_code'] = $promo_codes[0];
+                            $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+                            return response()->json([
+                                'data' => $data,
+                                'status' => true,
+                                'message' => config('constants.VALID_PROMOCODE')
+                            ], 200);
                         } else {
                             return response()->json([
                                 'data' => [],
@@ -432,4 +381,91 @@ class PromoCodesController extends Controller
             ], 500);
         }
     }
+
+    // Backup method
+    // public function fetchPromocodeInfo(Request $request)
+    // {
+    //     try {
+    //         $validatedData = Validator::make($request->all(), [
+    //             'user_id' => 'required|int',
+    //             'promo_code' => 'required|string|max:20'
+    //         ]);
+    //         if ($validatedData->fails()) {
+    //             return response()->json([
+    //                 'data' => [],
+    //                 'status' => false,
+    //                 'message' => $validatedData->errors()
+    //             ], 422);
+    //         }
+    //         $promocodes_count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
+    //         if ($promocodes_count == 1) {
+    //             $expiry_dt = PromoCodes::where('promo_code', '=', $request->promo_code)->pluck('expiry_dt')->first();
+    //             $current_date = date('Y-m-d');
+    //             if ($expiry_dt < $current_date) {
+    //                 return response()->json([
+    //                     'data' => [],
+    //                     'status' => false,
+    //                     'message' =>  config('constants.EXPIRED_PROMOCODE')
+    //                 ], 200);
+    //             } else {
+    //                 $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
+    //                 if (empty($promo_codes[0]->store_id)) $promo_codes[0]->store_id = NULL;
+    //                 //below query will pass required data to our helper functions down below to validate
+    //                 $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
+    //                 /**
+    //                  * This condition will only work if the  
+    //                  * Promo code is only valid for a specific order#
+    //                  */
+    //                 if (!empty($promo_codes[0]->order_number)) {
+    //                     $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
+    //                     if ($promo_codes[0]->order_number == $user_orders_count + 1) {
+    //                         if (!empty($promo_code_data->usage_limit)) {
+    //                             if ($this->promoCodeUsageLimit($promo_code_data, $request->user_id) == 1) {
+    //                                 $data[0]['promo_code'] = $promo_codes[0];
+    //                                 $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+    //                                 return response()->json([
+    //                                     'data' => $data,
+    //                                     'status' => true,
+    //                                     'message' => config('constants.VALID_PROMOCODE')
+    //                                 ], 200);
+    //                             } else {
+    //                                 return response()->json([
+    //                                     'data' => [],
+    //                                     'status' => false,
+    //                                     'message' => config('constants.MAX_LIMIT')
+    //                                 ], 200);
+    //                             }
+    //                         }
+    //                     } else {
+    //                         return response()->json([
+    //                             'data' => [],
+    //                             'status' => false,
+    //                             'message' => 'This promo code is only valid for order#' . $promo_codes[0]->order_number
+    //                         ], 200);
+    //                     }
+    //                 }
+    //                 $data[0]['promo_code'] = $promo_codes[0];
+    //                 $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+    //                 return response()->json([
+    //                     'data' => $data,
+    //                     'status' => true,
+    //                     'message' => config('constants.VALID_PROMOCODE')
+    //                 ], 200);
+    //             }
+    //         } else {
+    //             return response()->json([
+    //                 'data' => [],
+    //                 'status' => false,
+    //                 'message' => config('constants.INVALID_PROMOCODE')
+    //             ], 200);
+    //         }
+    //     } catch (Throwable $error) {
+    //         report($error);
+    //         return response()->json([
+    //             'data' => [],
+    //             'status' => false,
+    //             'message' => $error
+    //         ], 500);
+    //     }
+    // }
 }
