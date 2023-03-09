@@ -10,8 +10,8 @@
                         style="width: fit-content;font-size: 3.0em; line-height: 1;">Orders</a>
                     <div class="float-right">
                         <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
-                                        <a class="text-white">Select All</a>
-                                    </button> -->
+                                                <a class="text-white">Select All</a>
+                                            </button> -->
                         <button type="button" class="btn btn-danger" onclick="delOrders()">
                             <a class="text-white">Delete</a>
                         </button>
@@ -74,7 +74,7 @@
                                                 </div>
                                             </button>
                                             <button id="status_btn_{{ $order->id }}"
-                                                onclick="get_stuart_status({{ $order->id }})"
+                                                onclick="getStuartStatus({{ $order->id }})"
                                                 class="btn btn-success float-right">Check Status</button>
                                         </div>
                                     @elseif ($order->order_status == 'delivered')
@@ -113,8 +113,7 @@
                                                                 src="{{ $item->product->feature_img }}" alt="">
                                                         @else
                                                             <img class="d-block m-auto "
-                                                                src="{{ config('constants.BUCKET') . $item->product->feature_img }}"
-                                                                alt="">
+                                                                src="{{ config('constants.BUCKET') . $item->product->feature_img }}">
                                                         @endif
                                                     </span>
                                                 </div>
@@ -160,7 +159,22 @@
                                                         <b>Call the user if this product is out of stock</b>
                                                     @elseif ($item->user_choice == 5)
                                                         <b>Cancel the order</b>
-                                                        <a href="#" class="d-block btn btn-danger">Cancel Order</a>
+                                                        <div>
+                                                            <button id="loader_btn_{{ $order->id }}"
+                                                                class="btn btn-success d-none col-12">
+                                                                <div class="spinner-border text-white" role="status">
+                                                                    <span class="sr-only">Loading...</span>
+                                                                </div>
+                                                            </button>
+                                                            {{-- <button id="#" onclick="#"
+                                                                class="d-block btn btn-danger col-12">
+                                                                Cancel Order
+                                                            </button> --}}
+                                                            <a href="{{ route('cancel_order', ['order_id' => $order->id]) }}"
+                                                                class="d-block btn btn-danger" onclick="cancelOrder(event)">
+                                                                Cancel Order
+                                                            </a>
+                                                        </div>
                                                     @endif
                                                 </div>
                                                 <div class="col-md-12"><br></div>
@@ -248,7 +262,7 @@
             });
         }
 
-        function get_stuart_status(order_id) {
+        function getStuartStatus(order_id) {
             $.ajax({
                 type: 'POST',
                 url: "{{ route('stuart.job.status') }}",
@@ -289,7 +303,7 @@
             });
         }
 
-        function close_modal(id) {
+        function closeModal(id) {
             $('#' + id).modal().hide();
         }
     </script>
