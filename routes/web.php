@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,7 @@ Route::get('/orders/ready_state/{order_id}', 'HomeController@changeOrderStatus')
 Route::get('/orders/mark_as_delivered/{order_id}', 'HomeController@markAsDelivered')->name('mark_as_delivered');
 Route::get('/orders/mark_as_completed/{order_id}', 'HomeController@markAsCompleted')->name('mark_as_completed');
 Route::get('/orders/cancel/{order_id}', 'HomeController@cancelOrder')->name('cancel_order');
+Route::get('/order/{order_id}/remove/{item_id}/product/{product_price}/{product_qty}', 'HomeController@removeProductFromOrder')->name('remove_order_product');
 Route::get('/orders/verify/{order_id}', 'HomeController@clickToVerify')->name('verify_order');
 /*
 |--------------------------------------------------------------------------

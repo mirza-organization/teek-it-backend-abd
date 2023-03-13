@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Stripe;
+use Throwable;
 
 class HomeController extends Controller
 {
@@ -1512,25 +1513,55 @@ class HomeController extends Controller
         $order = Orders::findOrFail($order_id);
         $order->load('user');
         $order->load('store');
+        // dd($order->transaction_id);
         Stripe\Stripe::setApiKey(config('app.STRIPE_SECRET'));
         Stripe\Refund::create(['charge' => $order->transaction_id]);
-        $order->order_status = 'canceled';
+        $order->order_status = 'cancelled';
         $order->save();
-        $order->update(['order_status' => 'ready']);
         $message = "Hello " . $order->user->name . " .
             Your order from " . $order->store->name . " was unsuccessful.
-            Unfortunately " . $order->store->name . " were unable to complete your order. You have not been
-            charged.
-            If you need any assistance, please contact us via email at:
+            Unfortunately " . $order->store->name . " is unable to complete your order. But don't worry 
+            you have not been charged.
+            If you need any kinda of assistance, please contact us via email at:
             admin@teekit.co.uk";
         $sms = new TwilioSmsService();
         $sms->sendSms($order->user->phone, $message);
         Mail::to([$order->user->email])
             ->send(new OrderIsCanceledMail($order));
-        flash('Order is successfully canceled')->success();
+        flash('Order is successfully cancelled')->success();
         return back();
     }
+    /**
+     * It will remove a single product from the given order
+     * @version 1.0.0
+     */
+    public function removeProductFromOrder($order_id, $item_id, $product_price, $product_qty)
+    {
+        try {
+            // dd(Products::find($product_id)->price);
+            // exit;
+            // First subtract the product price & qty from the orders table
+            // Orders::find($order_id)
+            //     ->decrement('order_total', $product_price)
+            //     ->decrement('total_items', $product_qty);
 
+            $order = Orders::find($order_id);
+            $order->order_total -= $product_price;
+            $order->total_items -= $product_qty;
+            $order->save();
+
+            // Now remove the product from order items table
+            $removed = OrderItems::where('id', '=', $item_id)->delete();
+            if ($removed) {
+                flash('Product Has Been Removed Successfully')->success();
+                return Redirect::back();
+            }
+        } catch (Throwable $error) {
+            report($error);
+            flash('Error In Removing The Product')->error();
+            return Redirect::back();
+        }
+    }
     /**
      * it will update the store info via popup modal
      * @author Mirza Abdullah Izhar

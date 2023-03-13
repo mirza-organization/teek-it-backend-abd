@@ -10,8 +10,8 @@
                         style="width: fit-content;font-size: 3.0em; line-height: 1;">Orders</a>
                     <div class="float-right">
                         <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
-                                                <a class="text-white">Select All</a>
-                                            </button> -->
+                                                    <a class="text-white">Select All</a>
+                                                </button> -->
                         <button type="button" class="btn btn-danger" onclick="delOrders()">
                             <a class="text-white">Delete</a>
                         </button>
@@ -149,32 +149,26 @@
                                                             Product</a>
                                                     @elseif ($item->user_choice == 2)
                                                         <b>Remove only this product from order</b>
-                                                        <a href="#" class="d-block btn btn-dark">Remove</a>
+                                                        <a href="{{ route('remove_order_product', [
+                                                            'order_id' => $order->id,
+                                                            'item_id' => $item->id,
+                                                            'product_price' => $item->product_price,
+                                                            'product_qty' => $item->product_qty,
+                                                        ]) }}"
+                                                            class="d-block btn btn-dark">Remove</a>
                                                     @elseif ($item->user_choice == 3)
                                                         {{-- 3 == Search for product in other stores --}}
-                                                        <b>Don't be worried the user will search for a product in other
-                                                            stores against this product</b>
+                                                        <b>Don't worry! if you don't have this product the user will search
+                                                            for an alternative product by himself if you remove this</b>
                                                     @elseif ($item->user_choice == 4)
                                                         {{-- 4 == Request a call from the store --}}
                                                         <b>Call the user if this product is out of stock</b>
                                                     @elseif ($item->user_choice == 5)
-                                                        <b>Cancel the order</b>
-                                                        <div>
-                                                            <button id="loader_btn_{{ $order->id }}"
-                                                                class="btn btn-success d-none col-12">
-                                                                <div class="spinner-border text-white" role="status">
-                                                                    <span class="sr-only">Loading...</span>
-                                                                </div>
-                                                            </button>
-                                                            {{-- <button id="#" onclick="#"
-                                                                class="d-block btn btn-danger col-12">
-                                                                Cancel Order
-                                                            </button> --}}
-                                                            <a href="{{ route('cancel_order', ['order_id' => $order->id]) }}"
-                                                                class="d-block btn btn-danger" onclick="cancelOrder(event)">
-                                                                Cancel Order
-                                                            </a>
-                                                        </div>
+                                                        <b>Cancel the order if this product is out of stock</b>
+                                                        <a href="{{ route('cancel_order', ['order_id' => $order->id]) }}"
+                                                            class="d-block btn btn-danger" onclick="cancelOrder(event)">
+                                                            Cancel Order
+                                                        </a>
                                                     @endif
                                                 </div>
                                                 <div class="col-md-12"><br></div>

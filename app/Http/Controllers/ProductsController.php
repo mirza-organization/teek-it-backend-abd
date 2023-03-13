@@ -7,6 +7,7 @@ use App\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Orders;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -308,7 +309,6 @@ class ProductsController extends Controller
             ->select(['*', DB::raw("$quantity as qty")])
             ->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
-
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
@@ -921,7 +921,6 @@ class ProductsController extends Controller
                 'file' => 'required',
                 'store_id' => 'required',
             ]);
-
             if ($validator->fails()) {
                 return response()->json([
                     'data' => $validator->errors(),
@@ -929,7 +928,6 @@ class ProductsController extends Controller
                     'message' => ""
                 ], 422);
             }
-
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
 
