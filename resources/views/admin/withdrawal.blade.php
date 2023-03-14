@@ -49,8 +49,8 @@
                                             <td>{{$transaction->transaction_id}}</td>
                                             <td>{{$transaction->created_at}}</td>
                                             <td>
-                                                <a href="#" data-toggle="modal" data-target="#bankModal{{$transaction->id}}" class="btn btn-xs btn-warning">View Bank Detail</a>
-                                                <a href="#" data-toggle="modal" data-target="#transactionModal{{$transaction->id}}"  class="btn btn-primary btn-xs">Update Transaction ID</a>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#bankModal{{$transaction->id}}" class="btn btn-xs btn-warning">View Bank Detail</a>
+                                                <a href="#" data-bs-toggle="modal" data-bs-target="#transactionModal{{$transaction->id}}"  class="btn btn-primary btn-xs">Update Transaction ID</a>
                                             </td>
                                         </tr>
                                             <!-- Modal -->
@@ -60,7 +60,7 @@
 {{--                                                        <form action="">--}}
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="exampleModalLabel">User Bank Detail</h5>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                             </div>
@@ -91,7 +91,7 @@
                                                         <form action="{{route('withdraw_request')}}" method="POST">
                                                             <div class="modal-header">
                                                                 <h5 class="modal-title" id="exampleModalLabel">Update</h5>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                             </div>
@@ -123,7 +123,7 @@
                                                             </div>
                                                             <input type="hidden" name="id" value="{{$transaction->id}}">
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                 <button type="submit" class="btn btn-primary">Save changes</button>
                                                             </div>
                                                         </form>

@@ -178,6 +178,7 @@
     <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> --}}
      <!-- Bootstrap 5 -->
      <script src="{{ asset('bootstrap5/js/bootstrap.min.js') }}"></script>
+     <script src="{{ asset('bootstrap5/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
 

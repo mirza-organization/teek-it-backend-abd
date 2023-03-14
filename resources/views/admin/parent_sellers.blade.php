@@ -48,7 +48,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">{{$user->business_name}}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <div class="modal-footer hidden d-none">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>
@@ -110,8 +110,8 @@
                     <div class="card-body">
                         <input type="checkbox" class="select-checkbox" title="Select" id="{{$user->id}}">
                         <a href="{{route('customer_details',['user_id'=>$user->id])}}"
-                            class="d-block text-right float-right" title="Edit" pdata-toggle="modal"
-                            pdata-target="#exampleModal{{$user->id}}">
+                            class="d-block text-right float-right" title="Edit" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal{{$user->id}}">
                             <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>
                         <a href="/aorders?store_id={{$user->id}}" class="d-block text-right mr-3 float-right mb-3"

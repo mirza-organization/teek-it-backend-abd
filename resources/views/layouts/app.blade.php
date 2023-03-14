@@ -97,6 +97,7 @@
 <!-- Scripts -->   
 <!-- Bootstrap 5 -->
 <script src="{{ asset('bootstrap5/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('bootstrap5/js/bootstrap.bundle.min.js') }}"></script>
 
  @yield('scripts')
     

@@ -46,7 +46,7 @@
                                                                 {{ $user->business_name }}
                                                             </h5>
                                                         </h5>
-                                                        <button type="button" class="close" data-dismiss="modal"
+                                                        <button type="button" class="close" data-bs-dismiss="modal"
                                                             aria-label="Close">
                                                             <span aria-hidden="true">×</span>
                                                         </button>
@@ -134,7 +134,7 @@
                                                     </div>
                                                     <div class="modal-footer hidden ">
                                                         <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">Close</button>
+                                                            data-bs-dismiss="modal">Close</button>
                                                         <button type="submit" id="user_info_update"
                                                             onclick="updateStoreInfo()" class="btn btn-primary">Save
                                                             changes</button>
@@ -153,7 +153,7 @@
                                                         {{ $user->name }}
                                                         {{ $user->l_name }}
                                                     </h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
+                                                    <button type="button" class="close" data-bs-dismiss="modal"
                                                         aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
@@ -215,7 +215,7 @@
                                                 </div>
                                                 <div class="modal-footer hidden d-none">
                                                     <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Close</button>
+                                                        data-bs-dismiss="modal">Close</button>
                                                     <button type="button" class="btn btn-primary">Save
                                                         changes</button>
                                                 </div>
@@ -240,7 +240,7 @@
 
                                         <h4 class="float-right pr-3">Block</h4>
                                         @endif
-                                        <a href="" data-toggle="modal" data-target="#editStoreModal{{ $user->id }}"
+                                        <a href="" data-bs-toggle="modal" data-bs-target="#editStoreModal{{ $user->id }}"
                                             class=" d-block text-right float-right pr-3"><img class="img-size-16"
                                                 src="/res/res/img/edit.png"></a>
                                     </div>

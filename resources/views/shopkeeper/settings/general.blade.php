@@ -94,7 +94,7 @@
                                                 <div class="row form-inline">
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label data-toggle="modal" data-target="#map_modal">Set
+                                                            <label data-bs-toggle="modal" data-target="#map_modal">Set
                                                                 Location: &emsp; <i
                                                                     class="fa fa-map-marker text-danger"></i>
                                                                 {{substr($address, 0, 15) . '...'}}</label>
@@ -102,7 +102,7 @@
                                                     </div>
                                                     <div class="col-md-4">
                                                         <div class="form-group">
-                                                            <label data-toggle="modal" data-target="#map_modal">Use
+                                                            <label data-bs-toggle="modal" data-bs-target="#map_modal">Use
                                                                 Current Location: &emsp; <i
                                                                     class="fa fa-map-marked text-primary"></i></label>
                                                         </div>
@@ -337,7 +337,7 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 <h4 class="modal-title">Add Location</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
             </div>
             <!-- Modal body -->
             <form action="{{route('location_update')}}" method="POST" enctype="multipart/form-data">
@@ -406,7 +406,7 @@
 
             <!-- Modal footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>
             </div>
 
         </div>

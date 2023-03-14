@@ -14,7 +14,7 @@
                     <a class="text-site-primary text-center m-auto d-block"
                         style="width: fit-content; font-size: 3.0em; line-height: 1;">Categories</a>
                     <div class="container">
-                        <a href="" data-toggle="modal" data-target="#exampleModal"
+                        <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal"
                             class=" d-block text-right float-right btn btn-primary">Add Category</a>
                     </div>
                 </div><!-- /.col -->
@@ -40,7 +40,7 @@
                                     {{ csrf_field() }}
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">{{ $user->category_name }}</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">×</span>
                                         </button>
                                     </div>
@@ -65,7 +65,7 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer hidden ">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                         <button type="submit" class="btn btn-primary">Save changes</button>
                                     </div>
                                 </form>
@@ -75,7 +75,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-12 pl-4 pr-4 pb-4">
                         <div class="change-height card" style="height: 317px;">
                             <div class="card-body">
-                                <a href="#" data-toggle="modal" data-target="#exampleModal{{ $user->id }}"
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#exampleModal{{ $user->id }}"
                                     class="d-block text-right float-right" title="Edit">
                                     <img class="img-size-16" src="/res/res/img/edit.png">
                                 </a>
@@ -121,7 +121,7 @@
                     {{ csrf_field() }}
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Add Category</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
@@ -144,7 +144,7 @@
                         </div>
                     </div>
                     <div class="modal-footer hidden ">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save changes</button>
                     </div>
                 </form>

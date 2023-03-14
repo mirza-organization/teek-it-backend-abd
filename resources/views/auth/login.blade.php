@@ -97,7 +97,7 @@
                 </div>
                 <div class="form-group row">
                     <div class="col-md-12">
-                        <div class="form-group" data-toggle="modal" data-target="#map_modal" style="cursor: pointer;">
+                        <div class="form-group" data-bs-toggle="modal" data-bs-target="#map_modal" style="cursor: pointer;">
                             <i class="fas fa-map-marked-alt text-light fa-2x"></i>
                             &nbsp;&nbsp;&nbsp;
                             <span class="text-light" id="user_location">Set Location</span>
@@ -145,7 +145,7 @@
             <!-- Modal Header -->
             <div class="modal-header">
                 <h4 class="modal-title">Add Location</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
             </div>
             <!-- Modal body -->
             <div class="modal-body">
@@ -189,7 +189,7 @@
             </div>
             <!-- Modal footer -->
             <div class="modal-footer">
-                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>
             </div>
 
         </div>
