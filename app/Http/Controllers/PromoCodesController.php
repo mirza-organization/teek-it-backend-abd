@@ -27,10 +27,6 @@ class PromoCodesController extends Controller
             //Get stores names for select dropdown
             $stores = Role::find(2)->users;
             $promo_codes = PromoCodes::paginate(10);
-            // $stores = \DB::select('SELECT *
-            // FROM users A
-            //  LEFT JOIN role_user B
-            // ON A.id= B.user_id WHERE B.role_id=2');
             return view('admin.promo_codes', compact('promo_codes', 'stores'));
         } else {
             abort(404);
@@ -199,7 +195,26 @@ class PromoCodesController extends Controller
                             ], 200);
                         }
                     }
-                    $this->promoCodeUsageLimit($promo_code_data, $request->user_id);
+                    /**
+                     * If the Promo code does not belongs to a specific order# 
+                     * Still we have to validate it's usage limit 
+                     */
+                    if ($this->promoCodeUsageLimit($promo_code_data, $request->user_id) == 1) {
+                        $data[0]['promo_code'] = $promo_codes[0];
+                        $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+                        return response()->json([
+                            'data' => $data,
+                            'status' => true,
+                            'message' => config('constants.VALID_PROMOCODE')
+                        ], 200);
+                    } else {
+                        return response()->json([
+                            'data' => [],
+                            'status' => false,
+                            'message' => config('constants.MAX_LIMIT')
+                        ], 200);
+                    }
+
                     $data[0]['promo_code'] = $promo_codes[0];
                     $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
                     return response()->json([

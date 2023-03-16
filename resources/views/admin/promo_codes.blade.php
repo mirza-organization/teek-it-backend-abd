@@ -45,13 +45,12 @@
                                                     <div class="form-group">
                                                         <label for="">Discount type</label>
                                                         <select name="discount_type" class="form-control" required>
-                                                            <option value="{{ $promo_code->discount_type }}" disabled
-                                                                selected>
-                                                                {{ $promo_code->discount_type == 0 ? 'Percentage' : 'Fixed amount' }}
+                                                            <option value="0"
+                                                                @if ($promo_code->discount_type == 0) selected @endif>Percentage
                                                             </option>
-                                                            <option value="0">Percentage
-                                                            </option>
-                                                            <option value="1">Fixed amount
+                                                            <option value="1"
+                                                                @if ($promo_code->discount_type == 1) selected @endif>Fixed
+                                                                amount
                                                             </option>
                                                         </select>
                                                     </div>
