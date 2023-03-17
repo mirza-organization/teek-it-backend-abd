@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
-
+use App\Services\JsonResponseCustom;
 use function PHPUnit\Framework\isEmpty;
 
 class CategoriesController extends Controller
@@ -22,15 +22,17 @@ class CategoriesController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
+    protected $jsonresponse;
+    protected $response;
+    public function __construct(JsonResponseCustom $jsonresponse)
+    {
+        $this->response = $jsonresponse;
+    }
     public function add(Request $request)
     {
         $validate = Categories::validator($request);
         if ($validate->fails()) {
-            return response()->json([
-                'data' => $validate->messages(),
-                'status' => false,
-                'message' => config('constants.VALIDATION_ERROR')
-            ], 400);
+            $this->response->getApiResponse($validate->messages(), false, config('constants.VALIDATION_ERROR'), 400);
         }
         $category = new Categories();
         $category->category_name = $request->category_name;
@@ -40,7 +42,7 @@ class CategoriesController extends Controller
             $cat_name = str_replace(' ', '_', $category->category_name);
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+            if (Storage::disk('user_public')->exists($filename)) { // check file exists in directory or not
                 info("file is store successfully : " . $filename);
                 $filename = "/user_imgs/" . $filename;
             } else {
@@ -49,26 +51,23 @@ class CategoriesController extends Controller
             $category->category_image = $filename;
         }
         $category->save();
-        return response()->json([
-            'data' => $category,
-            'status' => true,
-            'message' => config('constants.DATA_INSERTION_SUCCESS')
-        ], 200);
+        $this->response->getApiResponse($category, true, config('constants.DATA_INSERTION_SUCCESS'), 200);
     }
     /**
      * Update category
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
+    /**
+     * Update category
+     * @author Mirza Abdullah Izhar
+     * @version 1.2.0
+     */
     public function update(Request $request, $id)
     {
         $validate = Categories::updateValidator($request);
         if ($validate->fails()) {
-            return response()->json([
-                'data' =>  $validate->messages(),
-                'status' => false,
-                'message' => config('constants.VALIDATION_ERROR')
-            ], 400);
+            $this->response->getApiResponse($validate->messages(), false, config('constants.VALIDATION_ERROR'), 400);
         }
         $category = Categories::find($id);
         $category->category_name = $request->category_name;
@@ -78,7 +77,7 @@ class CategoriesController extends Controller
             $cat_name = str_replace(' ', '_', $category->category_name);
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) {  // check file exists in directory or not
+            if (Storage::disk('user_public')->exists($filename)) { // check file exists in directory or not
                 info("file is store successfully : " . $filename);
                 $filename = "/user_imgs/" . $filename;
             } else {
@@ -87,11 +86,7 @@ class CategoriesController extends Controller
             $category->category_image = $filename;
         }
         $category->save();
-        return response()->json([
-            'data' =>  $category,
-            'status' => true,
-            'message' => config('constants.DATA_UPDATED_SUCCESS')
-        ], 200);
+        $this->response->getApiResponse($category, true, config('constants.DATA_UPDATED_SUCCESS'), 200);
     }
     /**
      * List all categories w.r.t store ID or without store ID
@@ -111,17 +106,9 @@ class CategoriesController extends Controller
                     ->groupBy('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
                     ->get();
                 if (!$categories->isEmpty()) {
-                    return response()->json([
-                        'data' => $categories,
-                        'status' => true,
-                        'message' => '',
-                    ], 200);
+                    $this->response->getApiResponse($categories, true, '', 200);
                 } else {
-                    return response()->json([
-                        'data' => [],
-                        'status' => false,
-                        'message' => config('constants.NO_RECORD')
-                    ], 200);
+                    $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
                 }
             }
             $categories = $categories->get();
@@ -139,25 +126,13 @@ class CategoriesController extends Controller
                     //    }
                     $categories_data[] = $category;
                 }
-                return response()->json([
-                    'data' => $categories_data,
-                    'status' => true,
-                    'message' => ''
-                ], 200);
+                $this->response->getApiResponse($categories_data, true, '', 200);
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            $this->response->getApiResponse(null, false, $error, 500);
         }
     }
     /**
@@ -173,7 +148,8 @@ class CategoriesController extends Controller
                 $query->where('is_active', 1);
             })->where('category_id', '=', $category_id)
                 ->where('status', 1);
-            if (\request()->has('store_id')) $products->where('user_id', $storeId);
+            if (\request()->has('store_id'))
+                $products->where('user_id', $storeId);
             $products = $products->paginate();
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
@@ -182,26 +158,13 @@ class CategoriesController extends Controller
                     $products_data[] = (new ProductsController())->getProductInfo($product->id);
                 }
                 unset($pagination['data']);
-                return response()->json([
-                    'data' => $products_data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
+                $this->response->getApiResponse_ext($products_data, true, null, 200, 'pagination', $pagination);
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD'),
-                ], 200);
+                $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            $this->response->getApiResponse(null, false, $error, 500);
         }
     }
     /**
@@ -216,18 +179,10 @@ class CategoriesController extends Controller
                 'lon' => 'required|numeric|between:-180,180',
             ]);
             if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validate->errors()
-                ], 422);
+                $this->response->getApiResponse(null, false, $validate->errors(), 422);
             }
             if (!Categories::where('id', $category_id)->exists()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 422);
+                $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 422);
             }
             $data = [];
             $buyer_lat = $request->query('lat');
@@ -246,22 +201,16 @@ class CategoriesController extends Controller
             $stores = User::whereIn('id', $ids)->get();
             foreach ($stores as $store) {
                 $result = (new UsersController())->getDistanceBetweenPoints($store->lat, $store->lon, $buyer_lat, $buyer_lon);
-                if (isset($result['distance']) && $result['distance'] < 5) $data[] = (new UsersController())->getSellerInfo($store, $result);
+                if (isset($result['distance']) && $result['distance'] < 5)
+                    $data[] = (new UsersController())->getSellerInfo($store, $result);
             }
             if (count($data) === 0) {
-                return response()->json([
-                    'stores' => [],
-                    'status' => true,
-                    'message' => 'No stores found against this category in this area.'
-                ], 200);
+                $this->response->getApiResponse_ext(null, true, 'No stores found against this category in this area.', 200, null, null);
             }
-            return response()->json([
-                'stores' => $data,
-                'status' => true,
-                'message' => ''
-            ], 200);
+            $this->response->getApiResponse_ext($data, true, '', 200, 'stores', null);
         } catch (Throwable $error) {
             report($error);
+            $this->response->getApiResponse_ext(null, false, $error, 500, 'stores', null);
             return response()->json([
                 'stores' => [],
                 'status' => false,
