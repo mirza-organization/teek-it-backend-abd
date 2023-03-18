@@ -11,18 +11,17 @@ class JsonResponseCustom
             'message' => $message,
             $code
         ]);
-
     }
-    public function getApiResponse_ext( $data1, $status, $message, $code, $att, $data2)
+    
+    public function getApiResponseExtention($data, $status, $message, $http_code, $extra_key, $extra_data)
     {
         return response()->json([
-            'data' => $data1,
+            'data' => $data,
             'status' => $status,
             'message' => $message,
-            $att => $data2,
-            $code
+            $extra_key => $extra_data,
+            $http_code
         ]);
-
     }
 
 }
