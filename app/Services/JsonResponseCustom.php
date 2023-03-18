@@ -3,25 +3,22 @@ namespace App\Services;
 
 class JsonResponseCustom
 {
-    public function getApiResponse($data, $status, $message, $code)
+    public function getApiResponse($data, $status, $message, $http_code)
     {
         return response()->json([
             'data' => $data,
             'status' => $status,
-            'message' => $message,
-            $code
-        ]);
+            'message' => $message
+        ], $http_code);
     }
     
-    public function getApiResponseExtention($data, $status, $message, $http_code, $extra_key, $extra_data)
+    public function getApiResponseExtention($data, $status, $message, $extra_key, $extra_data, $http_code)
     {
         return response()->json([
             'data' => $data,
             'status' => $status,
             'message' => $message,
-            $extra_key => $extra_data,
-            $http_code
-        ]);
+            $extra_key => $extra_data   
+        ], $http_code);
     }
-
 }
