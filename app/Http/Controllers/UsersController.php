@@ -2,12 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Categories;
-use App\Http\Controllers\Auth\AuthController;
-use App\Products;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 use Throwable;

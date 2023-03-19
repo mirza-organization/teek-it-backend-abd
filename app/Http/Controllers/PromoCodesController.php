@@ -7,10 +7,7 @@ use App\Orders;
 use App\PromoCodes;
 use App\Role;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -210,8 +207,6 @@ class PromoCodesController extends Controller
                     if (empty($promo_codes[0]->store_id)) $promo_codes[0]->store_id = NULL;
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
-                    // dd(var_dump($promo_code_data));
-
                     /**
                      * This condition will only work if the  
                      * Promo code is only valid for a specific order#
