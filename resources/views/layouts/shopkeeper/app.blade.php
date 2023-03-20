@@ -13,8 +13,10 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <!-- Font Awesome Icons -->
     <link href="{{ asset('res/plugins/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
-    <!-- Theme style -->
-    <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
+     <!-- Theme style - Bootstrap 4 Css-->
+     <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
+     <!-- Bootstrap 5 Css -->
+     <link href="{{ asset('bootstrap5/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('res/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
@@ -172,8 +174,11 @@
     <!-- REQUIRED SCRIPTS -->
     <!-- jQuery -->
     <script src="{{ asset('res/plugins/jquery/jquery.min.js') }}"></script>
-    <!-- Bootstrap 4 -->
-    <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    {{-- <!-- Bootstrap 4 -->
+    <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> --}}
+     <!-- Bootstrap 5 -->
+     <script src="{{ asset('bootstrap5/js/bootstrap.min.js') }}"></script>
+     <script src="{{ asset('bootstrap5/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
 

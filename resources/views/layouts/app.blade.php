@@ -16,6 +16,9 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
 
+ <!-- Bootstrap 5 Css -->
+ <link href="{{ asset('bootstrap5/css/bootstrap.min.css') }}" rel="stylesheet">
+
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
@@ -92,6 +95,9 @@
 </body>
 
 <!-- Scripts -->   
+<!-- Bootstrap 5 -->
+<script src="{{ asset('bootstrap5/js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('bootstrap5/js/bootstrap.bundle.min.js') }}"></script>
 
  @yield('scripts')
     

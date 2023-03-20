@@ -1,5 +1,6 @@
 @extends('layouts.admin.app')
 @section('content')
+
     <div class="content">
         <!-- Content Header (Page header) -->
         <div class="content-header">
@@ -28,7 +29,7 @@
                                         {{ csrf_field() }}
                                         <div class="modal-header">
                                             <h5 class="modal-title display-center" id="exampleModalLabel">Promo code</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">×</span>
                                             </button>
                                         </div>
@@ -120,7 +121,7 @@
                                         </div>
                                         <div class="modal-footer hidden ">
                                             <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">Close</button>
+                                                data-bs-dismiss="modal">Close</button>
                                             <button type="submit" class="btn btn-primary">Save changes</button>
                                         </div>
                                     </form>
@@ -140,7 +141,7 @@
                                             {{ csrf_field() }}
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="exampleModalLabel">Add Promo Code</h5>
-                                                <button type="button" class="close" data-dismiss="modal"
+                                                <button type="button" class="close" data-bs-dismiss="modal"
                                                     aria-label="Close">
                                                     <span aria-hidden="true">×</span>
                                                 </button>
@@ -219,7 +220,7 @@
                                                 <div class="modal-footer hidden ">
                                                     <button type="button"
                                                         class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
-                                                        data-dismiss="modal">Close</button>
+                                                        data-bs-dismiss="modal">Close</button>
                                                     <button style="background: #ffcf42;color:black;font-weight: 600"
                                                         class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
                                                         type="submit">Add</button>
@@ -241,7 +242,7 @@
                             onclick="delPromoCodes()">
                             <a class="text-white">Delete</a>
                         </button>
-                        <a href="" data-toggle="modal" data-target="#add_promocodeModal"
+                        <a href="" data-bs-toggle="modal" data-bs-target="#add_promocodeModal"
                             class="mx-1 d-block text-right float-right btn btn-primary">Add Promo
                             Code</a>
                     </div>
@@ -277,8 +278,8 @@
                                                 <td>{{ $promo_code->order_number }}</td>
                                                 <td>{{ $promo_code->expiry_dt }}</td>
                                                 <td>
-                                                    <a data-toggle="modal"
-                                                        data-target="#promo_codeModal{{ $promo_code->id }}"
+                                                    <a data-bs-toggle="modal"
+                                                        data-bs-targret="#promo_codeModal{{ $promo_code->id }}"
                                                         class="btn btn-primary btn-xs">Edit Promo Code</a>
                                                 </td>
                                             </tr>

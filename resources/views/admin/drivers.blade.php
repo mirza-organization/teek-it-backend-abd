@@ -49,7 +49,7 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">{{$driver->f_name}} {{$driver->l_name}}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
@@ -92,7 +92,7 @@
                             </div>
                         </div>
                         <div class="modal-footer hidden d-none">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>
@@ -107,8 +107,8 @@
                     <div class="card-body">
                         <input type="checkbox" class="select-checkbox" title="Select" id="{{$driver->id}}">
                         <a class="d-block text-right float-right" title="Edit"
-                            href="{{route('driver_details',['driver_id'=>$driver->id])}}" pdata-toggle="modal"
-                            pdata-target="#exampleModal{{$driver->id}}">
+                            href="{{route('driver_details',['driver_id'=>$driver->id])}}" data-bs-toggle="modal"
+                            data-bs-target="#exampleModal{{$driver->id}}">
                             <img class="img-size-16" src="/res/res/img/edit.png">
                         </a>
                         <div class="card-text">

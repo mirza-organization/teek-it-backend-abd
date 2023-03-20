@@ -168,7 +168,7 @@
                                 </div>
                                 <div class="col-md-7">
                                     <label class=" float-right">
-                                        <a href="" data-toggle="modal" data-target="#editUserModal{{$user[0]->id}}"
+                                        <a href="" data-bs-toggle="modal" data-bs-target="#editUserModal{{$user[0]->id}}"
                                             class="   float-left pr-3"><img class="img-size-16"
                                                 src="/res/res/img/edit.png"></a>
                                     </label>
@@ -223,7 +223,7 @@
                                 Update User Info
                             </h5>
                         </h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">×</span>
                         </button>
                     </div>
@@ -286,7 +286,7 @@
                         </div>
                     </div>
                     <div class="modal-footer hidden ">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" id="user_info_update" onclick="userInfoUpdate()"
                             class="btn btn-primary">Save
                             changes</button>
@@ -374,7 +374,7 @@
                 </div>
             </div>
             <!-- <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-bs-dismiss="modal">Close</button>
             </div> -->
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

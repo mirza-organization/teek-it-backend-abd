@@ -42,7 +42,7 @@
                                 <a href="{{route('cancel_order',['order_id'=>$order->id])}}" onclick="cancelOrder(event)" class=" d-block btn btn-danger float-right" style="margin-right: 20px">Cancel Order</a>
                                 @else
                                 @if(!empty($order->delivery_boy_id))
-                                <a href="" data-toggle="modal" data-target="#detailsModal{{$order->id}}" class=" btn btn-primary d-block float-right">View Driver Details</a>
+                                <a href="" data-bs-toggle="modal" data-bs-target="#detailsModal{{$order->id}}" class=" btn btn-primary d-block float-right">View Driver Details</a>
                                 <?php
                                 $user = \App\User::find($order->delivery_boy_id);
                                 ?>
@@ -52,7 +52,7 @@
                                         <div class="modal-content">
                                             <div class="modal-header">
                                                 <h5 class="modal-title" id="detailsModalLabel">{{$user->name}} {{$user->l_name}}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
@@ -103,7 +103,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer hidden d-none">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                 <button type="button" class="btn btn-primary">Save changes</button>
                                             </div>
                                         </div>
