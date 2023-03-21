@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,7 +30,7 @@ class Categories extends Model
     {
         return Validator::make($request->all(), [
             'category_name' => 'required|string|max:255',
-            //            'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     }
 
@@ -46,16 +47,21 @@ class Categories extends Model
             $file = $image;
             $cat_name = str_replace(' ', '_', $category->category_name);
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+            
             Storage::disk('user_public')->put($filename, File::get($file));
             if (Storage::disk('user_public')->exists($filename)) { // check file exists in directory or not
+                
                 info("file is store successfully : " . $filename);
                 $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
             }
             $category->category_image = $filename;
+        }else{
+            info("Category image is missing");
         }
         $category->save();
+        
         return $category;
     }
 
