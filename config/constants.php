@@ -42,4 +42,12 @@ return [
     'STUART_JOBS' => 'https://api.sandbox.stuart.com/v2/jobs',
     'STUART_TOKEN' => 'https://api.sandbox.stuart.com/oauth/token',
     'ADMIN_EMAIL' => 'admin@teekit.co.uk',
+
+    'HTTP_OK' => 200,
+    'HTTP_SERVER_ERROR' => 500,
+    'HTTP_INVALID_ARGUMETS' => 400,
+    'HTTP_FORBIDDEN' => 403,
+    'HTTP_RESOURCE_EXHAUSTED' => 429,
+    'HTTP_SERVICE_UNAVAILABLE' => 503,
+    'HTTP_GATEWAY_TIMEOUT' => 504,
 ];
