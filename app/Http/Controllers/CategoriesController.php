@@ -35,10 +35,10 @@ class CategoriesController extends Controller
             if ($validate->fails())
                 return $this->response->getApiResponse($validate->messages(), false, config('constants.VALIDATION_ERROR'), 400);
             $category = Categories::add($request);
-            return $this->response->getApiResponse($category, true, config('constants.DATA_INSERTION_SUCCESS'), config('constants.HTTP_OK'));
+            return $this->response->getApiResponse($category, true, config('constants.DATA_INSERTION_SUCCESS'), 200);
         } catch (Throwable $error) {
             report($error);
-            $this->response->getApiResponse([], false, $error, 500);
+           return $this->response->getApiResponse([], false, $error, 500);
         }
     }
     /**
@@ -67,9 +67,9 @@ class CategoriesController extends Controller
         try {
             $categories_data = Categories::allCategories();
             if (!empty($categories_data))
-                return $this->response->getApiResponse($categories_data, true, '', config('constants.HTTP_OK'));
+                return $this->response->getApiResponse($categories_data, true, '', 200);
             else
-                return $this->response->getApiResponse([], false, config('constants.NO_RECORD'), config('constants.HTTP_OK'));
+                return $this->response->getApiResponse([], false, config('constants.NO_RECORD'), 200);
         } catch (Throwable $error) {
             report($error);
             return $this->response->getApiResponse([], false, $error, 500);
@@ -101,6 +101,9 @@ class CategoriesController extends Controller
      */
     public function stores(Request $request, $category_id)
     {
+        $data = [];
+        $buyer_lat = $request->query('lat');
+        $buyer_lon = $request->query('lon');
         try {
             $validate = Validator::make($request->query(), [
                 'lat' => 'required|numeric|between:-90,90',
@@ -113,7 +116,12 @@ class CategoriesController extends Controller
                 return $this->response->getApiResponse([], false, config('constants.NO_RECORD'), 422);
             }
             $data = 0;
-            $data = Categories::stores($request, $category_id);
+            $stores = Categories::stores($category_id);
+            foreach ($stores as $store) {
+                $result = (new UsersController())->getDistanceBetweenPoints($store->lat, $store->lon, $buyer_lat, $buyer_lon);
+                if (isset($result['distance']) && $result['distance'] < 5)
+                    $data[] = (new UsersController())->getSellerInfo($store, $result);
+            }
             if (count($data) === 0) {
                 return $this->response->getApiResponseExtention([], true, 'No stores found against this category in this area.', '','', 200);
             }
