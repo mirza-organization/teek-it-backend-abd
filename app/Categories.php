@@ -34,6 +34,7 @@ class Categories extends Model
     {
         return $this->hasMany(Products::class, 'category_id', 'id');
     }
+    
     public static function add($request)
     {
         $category = new Categories();
@@ -80,6 +81,7 @@ class Categories extends Model
         $category->save();
         return $category;
     }
+
     public static function allCategories()
     {
         $categories = "";
@@ -95,10 +97,12 @@ class Categories extends Model
         $categories = Categories::all();
         return $categories;
     }
+
     public static function getCategoryById()
     {
 
     }
+
     public static function product($category_id)
     {
         $storeId = \request()->store_id;
@@ -121,6 +125,7 @@ class Categories extends Model
         $products = $products->paginate();
         return $products;
     }
+
     public static function stores($category_id)
     {
         $ids = Categories::select('users.id as store_id')
