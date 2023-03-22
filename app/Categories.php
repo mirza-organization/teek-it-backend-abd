@@ -107,22 +107,19 @@ class Categories extends Model
     {
         $storeId = \request()->store_id;
         if ($storeId) {
-            $products = Products::whereHas('user', function ($query) {
+            $products = Products::whereHas('user_id', function ($query) {
                 $query->where('is_active', 1);
             })
                 ->where('category_id', $category_id)
                 ->where('user_id', $storeId)
                 ->where('status', 1)
                 ->get();
-        } else {
-            $products = Products::whereHas('user', function ($query) {
-                $query->where('is_active', 1);
-            })
-                ->where('category_id', $category_id)
-                ->where('status', 1)
-                ->get();
-        }
-        $products = $products->paginate();
+                return $products;
+        } 
+        
+        $products = Products::where('category_id', $category_id)
+            ->where('status', 1)
+            ->get();   
         return $products;
     }
 
