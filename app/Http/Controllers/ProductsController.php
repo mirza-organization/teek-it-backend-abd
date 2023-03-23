@@ -313,6 +313,7 @@ class ProductsController extends Controller
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
+    
     public function getProductInfoWithQty($product_id, $store_id)
     {
         $qty = Products::with('quantity')

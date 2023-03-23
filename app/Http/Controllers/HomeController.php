@@ -341,7 +341,7 @@ class HomeController extends Controller
                     $filename = uniqid($user_id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                     Storage::disk('spaces')->put($filename, File::get($file));
                     if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                        info("file is store successfully : " . $filename);
+                        info("file is stored successfully : " . $filename);
                     } else {
                         info("file is not found :- " . $filename);
                     }
@@ -362,7 +362,7 @@ class HomeController extends Controller
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
                         Storage::disk('spaces')->put($filename, File::get($file));
                         if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                            info("file is store successfully : " . $filename);
+                            info("file is stored successfully : " . $filename);
                         } else {
                             info("file is not found :- " . $filename);
                         }
@@ -434,7 +434,7 @@ class HomeController extends Controller
                     $filename = uniqid($product->id . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
                     Storage::disk('spaces')->put($filename, File::get($file));
                     if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                        info("file is store successfully : " . $filename);
+                        info("file is stored successfully : " . $filename);
                         // $filename = "/user_imgs/" . $filename;
                     } else {
                         info("file is not found :- " . $filename);
@@ -449,7 +449,7 @@ class HomeController extends Controller
                         $filename = uniqid($user_id . "_" . $product->id . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
                         Storage::disk('spaces')->put($filename, File::get($file));
                         if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                            info("file is store successfully : " . $filename);
+                            info("file is stored successfully : " . $filename);
                             // $filename = "/user_imgs/" . $filename;
                         } else {
                             info("file is not found :- " . $filename);
@@ -486,7 +486,7 @@ class HomeController extends Controller
             $filename = uniqid($user->id . '_' . $user->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($filename, File::get($file));
             if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                info("file is store successfully : " . $filename);
+                info("file is stored successfully : " . $filename);
                 // $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
@@ -1016,7 +1016,7 @@ class HomeController extends Controller
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($filename, File::get($file));
             if (Storage::disk('spaces')->exists($filename)) {  //check file exists in directory or not
-                info("file is store successfully : " . $filename);
+                info("file is stored successfully : " . $filename);
                 // $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
@@ -1048,7 +1048,7 @@ class HomeController extends Controller
             $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($filename, File::get($file));
             if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                info("file is store successfully : " . $filename);
+                info("file is stored successfully : " . $filename);
                 // $filename = "/user_imgs/" . $filename;
             } else {
                 info("file is not found :- " . $filename);
@@ -1589,7 +1589,7 @@ class HomeController extends Controller
             $filename = uniqid($store_info->id . "_" . $store_info->name . "_") . "." . $file->getClientOriginalExtension(); //create unique file name...
             Storage::disk('spaces')->put($filename, File::get($file));
             if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                info("file is store successfully : " . $filename);
+                info("file is stored successfully : " . $filename);
             } else {
                 info("file is not found :- " . $filename);
             }
