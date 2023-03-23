@@ -34,7 +34,7 @@ class Categories extends Model
     {
         return $this->hasMany(Products::class, 'category_id', 'id');
     }
-    
+
     public static function add($request)
     {
         $category = new Categories();
@@ -106,20 +106,19 @@ class Categories extends Model
     public static function product($category_id)
     {
         $storeId = \request()->store_id;
-        if ($storeId) {
+        if (!empty($storeId)) {
             $products = Products::whereHas('user_id', function ($query) {
                 $query->where('is_active', 1);
             })
                 ->where('category_id', $category_id)
                 ->where('user_id', $storeId)
                 ->where('status', 1)
-                ->get();
-                return $products;
-        } 
-        
+                ->paginate();
+            return $products;
+        }
         $products = Products::where('category_id', $category_id)
             ->where('status', 1)
-            ->get();   
+            ->paginate();
         return $products;
     }
 

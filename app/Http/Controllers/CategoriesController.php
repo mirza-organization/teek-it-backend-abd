@@ -79,14 +79,11 @@ class CategoriesController extends Controller
     {
         try {
             $products = Categories::product($category_id);
-            $products = $products->paginate();
             $pagination = $products->toArray();
             if (!empty($products)) {
                 $products_data = [];
                 foreach ($products as $product) {
-                   
                     $products_data[] = (new ProductsController())->getProductInfo($product->id);
-
                 }
                 unset($pagination['data']);
                 return $this->response->getApiResponseExtention($products_data, true, '', 'pagination', $pagination, 200);
