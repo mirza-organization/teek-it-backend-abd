@@ -13,9 +13,17 @@ use Illuminate\Support\Facades\Validator;
 use Throwable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use App\Services\JsonResponseCustom;
 
 class UsersController extends Controller
 {
+    protected $jsonresponse;
+    protected $response;
+
+    public function __construct(JsonResponseCustom $jsonresponse)
+    {
+        $this->response = $jsonresponse;
+    }
     /**
      * It will fetch the curved distance between 2 points
      * Google distance matrix API is consumed
@@ -83,22 +91,18 @@ class UsersController extends Controller
                 'lon' => 'required|numeric|between:-180,180',
             ]);
             if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validate->errors()
-                ], 422);
+                return $this->response->getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    422
+                );
             }
             $data = [];
             if ($request->query('lat') && $request->query('lon')) {
-                $lat = $request->query('lat');
-                $lon = $request->query('lon');
-                $users = User::where('is_active', 1)
-                    ->whereIn('role_id', [2, 5])
-                    ->orderBy('business_name', 'asc')
-                    ->get();
+                $users = User::getParentwithChildSellers();
                 foreach ($users as $user) {
-                    $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $lat, $lon);
+                    $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
                     if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
                 }
             } else {
@@ -115,24 +119,27 @@ class UsersController extends Controller
                 });
             }
             if (count($data) === 0) {
-                return response()->json([
-                    'stores' => [],
-                    'status' => true,
-                    'message' => 'No stores found in this area.'
-                ], 200);
+                 return $this->response->getApiResponse(
+                    [],
+                    true,
+                    'No stores found in this area.',
+                    config('constants.HTTP_OK')
+                );
             }
-            return response()->json([
-                'data' => $data,
-                'status' => true,
-                'message' => ''
-            ], 200);
+            return $this->response->getApiResponse(
+                $data,
+                true,
+                '',
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return $this->response->getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
 }

@@ -143,4 +143,11 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany('App\Orders');
     }
+    public static function getParentwithChildSellers()
+    {
+       return User::where('is_active', 1)
+                    ->whereIn('role_id', [2, 5])
+                    ->orderBy('business_name', 'asc')
+                    ->get();
+    }
 }
