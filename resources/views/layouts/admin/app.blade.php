@@ -66,7 +66,6 @@
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
 
-
                 <!-- Sidebar Menu -->
                 <nav class="mt-5">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview"
@@ -108,6 +107,12 @@
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{route('admin.sellers.test.parent')}}" class="nav-link @if (request()->is('admin/test/sellers/parent')) active @endif">
+                                        <i class="fas fa-gears nav-icon"></i>
+                                        <p>Test Parent</p>
+                                    </a>
+                                </li>
                                 <li class="nav-item">
                                     <a href="{{route('admin.sellers.parent')}}" class="nav-link @if (request()->is('admin/sellers/parent')) active @endif">
                                         <i class="fas fa-gears nav-icon"></i>
@@ -239,8 +244,6 @@
     </div>
     <!-- /.content-wrapper -->
 
-
-
     <!-- REQUIRED SCRIPTS -->
 
     <!-- jQuery -->
@@ -254,7 +257,7 @@
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
     <style>
         .ratting span {
-            color: wj
+            
         }
 
         table tr:first-of-type td {
@@ -422,8 +425,7 @@
         .color-red {
             background: red;
         }
-    </style>
-    <style>
+
         input.form-control,
         select.form-control {
             border: 0;
@@ -443,8 +445,6 @@
             border-color: #80bdff;
             color: #8aa7d7 !important;
         }
-
-        .row.mb-2 h1.m-0.text-dark.text-center {}
     </style>
     <!-- Online Source: //cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css -->
     <link rel="stylesheet" href="{{ asset('res/dist/css/jquery.timepicker.min.css') }}">
@@ -681,6 +681,7 @@
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     @yield('scripts')
+    @livewireScripts
 </body>
 
 </html>
