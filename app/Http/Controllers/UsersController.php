@@ -98,7 +98,7 @@ class UsersController extends Controller
                     422
                 );
             }
-            $data = [];
+            $data = []; 
             if ($request->query('lat') && $request->query('lon')) {
                 $users = User::getParentwithChildSellers();
                 foreach ($users as $user) {
