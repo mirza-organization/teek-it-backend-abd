@@ -140,6 +140,7 @@ Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('ad
 Route::post('/store_info/update', [HomeController::class, 'updateStoreInfo'])->name('admin.image.update');
 Route::get('/stuart/job/creation/{order_id}', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
 Route::post('/stuart/job/status', [StuartDeliveryController::class, 'stuartJobStatus'])->name('stuart.job.status');
+
 /*
 |--------------------------------------------------------------------------
 | Total Orders Count Route
