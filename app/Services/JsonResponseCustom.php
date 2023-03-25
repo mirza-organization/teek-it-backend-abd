@@ -3,7 +3,7 @@ namespace App\Services;
 
 class JsonResponseCustom
 {
-    public function getApiResponse($data, $status, $message, $http_code)
+    public static function getApiResponse($data, $status, $message, $http_code)
     {
         return response()->json([
             'data' => $data,
@@ -12,7 +12,7 @@ class JsonResponseCustom
         ], $http_code);
     }
     
-    public function getApiResponseExtention($data, $status, $message, $extra_key, $extra_key_data, $http_code)
+    public static function getApiResponseExtention($data, $status, $message, $extra_key, $extra_key_data, $http_code)
     {
         return response()->json([
             'data' => $data,
