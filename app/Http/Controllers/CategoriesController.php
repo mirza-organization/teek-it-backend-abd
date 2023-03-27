@@ -15,28 +15,20 @@ class CategoriesController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    protected $jsonresponse;
-    protected $response;
-
-    public function __construct(JsonResponseCustom $jsonresponse)
-    {
-        $this->response = $jsonresponse;
-    }
-
     public function add(Request $request)
     {
         try {
             $validate = Categories::validator($request);
             if ($validate->fails()) {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     [],
                     false,
-                    $validate->messages(),
+                    $validate->errors(),
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
             }
             $category = Categories::add($request);
-            return $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 $category,
                 true,
                 config('constants.DATA_INSERTION_SUCCESS'),
@@ -44,7 +36,7 @@ class CategoriesController extends Controller
             );
         } catch (Throwable $error) {
             report($error);
-            return $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 [],
                 false,
                 $error,
@@ -61,7 +53,7 @@ class CategoriesController extends Controller
         try {
             $validate = Categories::validator($request);
             if ($validate->fails()) {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     [],
                     false,
                     $validate->messages(),
@@ -69,7 +61,7 @@ class CategoriesController extends Controller
                 );
             }
             $category = Categories::updateCategory($request, $category_id);
-            return $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 $category,
                 true,
                 config('constants.DATA_UPDATED_SUCCESS'),
@@ -77,7 +69,7 @@ class CategoriesController extends Controller
             );
         } catch (Throwable $error) {
             report($error);
-            return $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 [],
                 false,
                 $error,
@@ -97,14 +89,14 @@ class CategoriesController extends Controller
             else
                 $data = Categories::allCategories();
             if (!empty($data)) {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     $data,
                     true,
                     '',
                     config('constants.HTTP_OK')
                 );
             } else {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     [],
                     false,
                     config('constants.NO_RECORD'),
@@ -113,7 +105,7 @@ class CategoriesController extends Controller
             }
         } catch (Throwable $error) {
             report($error);
-            return $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 [],
                 false,
                 $error,
@@ -130,7 +122,7 @@ class CategoriesController extends Controller
         try {
             $data = Categories::getProducts($category_id);
             if (!empty($data)) {
-                return $this->response->getApiResponseExtention(
+                return JsonResponseCustom::getApiResponseExtention(
                     $data['data'],
                     true,
                     '',
@@ -139,18 +131,18 @@ class CategoriesController extends Controller
                     config('constants.HTTP_OK')
                 );
             } else {
-                return $this->response->getApiResponseExtention(
+                return JsonResponseCustom::getApiResponseExtention(
                     [],
                     false,
                     config('constants.NO_RECORD'),
                     'pagination',
                     [],
-                    config('constants.HTTP_SERVER_ERROR')
+                    config('contants.HTTP_SERVER_ERROR')
                 );
             }
         } catch (Throwable $error) {
             report($error);
-            $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 [],
                 false,
                 $error,
@@ -170,7 +162,7 @@ class CategoriesController extends Controller
                 'lon' => 'required|numeric|between:-180,180',
             ]);
             if ($validate->fails()) {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     [],
                     false,
                     $validate->errors(),
@@ -186,23 +178,23 @@ class CategoriesController extends Controller
                 if (isset($result['distance']) && $result['distance'] < 5) $data[] = (new UsersController())->getSellerInfo($store, $result);
             }
             if (!empty($data)) {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     $data,
                     true,
                     '',
                     config('constants.HTTP_OK')
                 );
             } else {
-                return $this->response->getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     [],
                     false,
-                    'No stores found against this category in this area.',
+                    config('constants.NO_RECORD'),
                     config('constants.HTTP_OK')
                 );
             }
         } catch (Throwable $error) {
             report($error);
-            return $this->response->getApiResponse(
+            return JsonResponseCustom::getApiResponse(
                 [],
                 false,
                 $error,
