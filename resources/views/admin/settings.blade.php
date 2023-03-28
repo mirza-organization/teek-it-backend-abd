@@ -5,8 +5,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-12">
-                <a class="text-site-primary text-center m-auto d-block"
-                    style="width: fit-content;font-size: 3.0em; line-height: 1;">Settings</a>
+                <h1 class="m-0 text-dark text-center">Settings</h1>
             </div><!-- /.col -->
         </div><!-- /.row -->
     </div><!-- /.container-fluid -->

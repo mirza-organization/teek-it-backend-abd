@@ -77,7 +77,7 @@ class HomeController extends Controller
                 ->paginate(5);
             return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
         } else {
-            return $this->admin_home();
+            return $this->adminHome();
         }
     }
     /**
@@ -866,7 +866,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_home()
+    public function adminHome()
     {
         if (Gate::allows('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
@@ -1163,10 +1163,7 @@ class HomeController extends Controller
     public function adminCustomers(Request $request)
     {
         if (Gate::allows('superadmin')) {
-            // $users = User::query()->whereHas('roles', function ($query) {
-            //     $query->where('role_id', 3);
-            // });
-            $users = User::query()->where('role_id', 3);
+            $users = User::where('role_id', 3)->orderByDesc('created_at');
             if ($request->search) {
                 $users = $users->where('name', 'LIKE', $request->search);
             }
@@ -1538,18 +1535,10 @@ class HomeController extends Controller
     public function removeProductFromOrder($order_id, $item_id, $product_price, $product_qty)
     {
         try {
-            // dd(Products::find($product_id)->price);
-            // exit;
-            // First subtract the product price & qty from the orders table
-            // Orders::find($order_id)
-            //     ->decrement('order_total', $product_price)
-            //     ->decrement('total_items', $product_qty);
-
             $order = Orders::find($order_id);
             $order->order_total -= $product_price;
             $order->total_items -= $product_qty;
             $order->save();
-
             // Now remove the product from order items table
             $removed = OrderItems::where('id', '=', $item_id)->delete();
             if ($removed) {

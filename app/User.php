@@ -2,14 +2,13 @@
 
 namespace App;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StoreRegisterMail;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Zizaco\Entrust\Traits\EntrustUserTrait;
 use Illuminate\Http\Request;
 use Validator;
-use DB;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -142,5 +141,37 @@ class User extends Authenticatable implements JWTSubject
     public function orders()
     {
         return $this->hasMany('App\Orders');
+    }
+
+    public static function getParentSellers(string $search = null)
+    {
+        return User::where('role_id', 2)
+            ->where('business_name', 'like', '%' . $search . '%')
+            ->orderBy('created_at', 'desc')
+            ->paginate(9);
+    }
+
+    public static function sendStoreApprovedEmail(object $user)
+    {
+        $html = '<html>
+            Hi, ' . $user->name . '<br><br>
+            Thank you for registering on ' . env('APP_NAME') . '.
+            <br>
+            Your store has been approved. Please login to the
+            <a href="' . env('FRONTEND_URL') . '">Store</a> to update your store
+            <br><br><br>
+                     </html>';
+        $subject = env('APP_NAME') . ': Account Approved!';
+        Mail::to($user->email)
+            ->send(new StoreRegisterMail($html, $subject));
+    }
+
+    public static function activeOrBlockStore(int $user_id, int $status)
+    {
+        User::where('id', '=', $user_id)->update(['is_active' => $status]);
+        if ($status == 1) {
+            $user = User::findOrFail($user_id);
+            static::sendStoreApprovedEmail($user);
+        }
     }
 }
