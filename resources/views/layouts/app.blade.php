@@ -25,8 +25,7 @@
         </div>
         <!-- /.content -->
     </div>
-    <!-- /.content-wrapper -->
-
+<!-- /.content-wrapper -->
     @include('layouts.admin.scripts')
     @livewireScripts
 </body>
