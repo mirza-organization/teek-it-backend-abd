@@ -133,7 +133,7 @@ Route::get('/queries', [HomeController::class, 'adminQueries'])->name('admin.que
 Route::get('/customer/{user_id}/details', [HomeController::class, 'adminCustomerDetails'])->name('customer_details');
 Route::get('/driver/{driver_id}/details', [HomeController::class, 'adminDriverDetails'])->name('driver_details');
 Route::get('/store/application-fee/{user_id}/{application_fee}', [UserAndRoleController::class, 'updateApplicationFee'])->name('application_fee');
-Route::post('/update_pages', [HomeController::class, 'updatePages'])->name('admin.pages.update');
+Route::post('/update_pages', [HomeController::class, 'updatePages'])->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', [HomeController::class, 'changeUserStatus'])->name('change_user_status');
 Route::get('/users_del', [HomeController::class, 'adminUsersDel'])->name('admin.del.users');
 Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');

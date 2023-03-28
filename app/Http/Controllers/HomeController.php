@@ -77,7 +77,7 @@ class HomeController extends Controller
                 ->paginate(5);
             return view('shopkeeper.dashboard', compact('user', 'pending_orders', 'total_products', 'total_orders', 'total_sales', 'all_orders'));
         } else {
-            return $this->admin_home();
+            return $this->adminHome();
         }
     }
     /**
@@ -866,7 +866,7 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function admin_home()
+    public function adminHome()
     {
         if (Gate::allows('superadmin')) {
             $terms_page = Pages::query()->where('page_type', '=', 'terms')->first();
