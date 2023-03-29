@@ -41,7 +41,6 @@ Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('auth/verify', [AuthController::class, 'verify']);
 Route::post('auth/register_google', [AuthController::class, 'registerGoogle']);
 Route::post('auth/login_google', [AuthController::class, 'loginGoogle']);
-
 /*
 |--------------------------------------------------------------------------
 | Authentication API Routes
@@ -59,7 +58,6 @@ Route::prefix('auth')->group(function () {
     Route::get('get_user/{user_id}', [AuthController::class, 'getDeliveryBoyInfo']);
     Route::post('user/delete', [AuthController::class, 'deleteUser']);
 });
-
 /*
 |--------------------------------------------------------------------------
 | Qty API Routes
@@ -86,7 +84,6 @@ Route::prefix('category')->group(function () {
     Route::get('view/{category_id}', [CategoriesController::class, 'products']);
     Route::get('get-stores-by-category/{category_id}', [CategoriesController::class, 'stores']);
 });
-
 /*
 |--------------------------------------------------------------------------
 | Page API Routes
@@ -252,20 +249,11 @@ Route::get('time', function () {
 });
 
 Route::get('generate_hash', function () {
-    try {
-        return response()->json([
-            'data' => Hash::make($_REQUEST['password']),
-            'status' => true,
-            'message' => ''
-        ], 200);
-    } catch (Throwable $error) {
-        report($error);
-        return response()->json([
-            'data' => [],
-            'status' => false,
-            'message' => $error
-        ], 500);
-    }
+    return response()->json([
+        'data' => Hash::make($_REQUEST['password']),
+        'status' => true,
+        'message' => ''
+    ], 200);
 });
 
 Route::fallback(function () {
