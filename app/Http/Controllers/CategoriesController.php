@@ -106,9 +106,9 @@ class CategoriesController extends Controller
                     ->groupBy('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
                     ->get();
                 if (!$categories->isEmpty()) {
-                    $this->response->getApiResponse($categories, true, '', 200);
+                    return $this->response->getApiResponse($categories, true, '', 200);
                 } else {
-                    $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
+                    return $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
                 }
             }
             $categories = $categories->get();
@@ -126,13 +126,13 @@ class CategoriesController extends Controller
                     //    }
                     $categories_data[] = $category;
                 }
-                $this->response->getApiResponse($categories_data, true, '', 200);
+                return $this->response->getApiResponse($categories_data, true, '', 200);
             } else {
-                $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
+                return $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
             }
         } catch (Throwable $error) {
             report($error);
-            $this->response->getApiResponse(null, false, $error, 500);
+            return $this->response->getApiResponse(null, false, $error, 500);
         }
     }
     /**
