@@ -148,4 +148,17 @@ class User extends Authenticatable implements JWTSubject
                     ->orderBy('business_name', 'asc')
                     ->get();
     }
+    public function nearbyUsers($user_lat, $user_lon, $radius)
+    {
+        $users = User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
+            cos( radians(users.lat) ) *
+            cos( radians(users.lon) - radians(" . $user_lon . ") ) +
+            sin( radians(" . $user_lat . ") ) *
+            sin( radians(users.lat) ) ) )
+            AS distance")
+            ->having("distance", "<", $radius)
+            ->orderBy("distance", "ASC")
+            ->get();
+        return $users;
+    }
 }

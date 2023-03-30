@@ -68,10 +68,7 @@ class ProductsController extends Controller
      */
     public function updateProductQty($product_id, $user_id, $product_quantity)
     {
-        Qty::where('products_id', $product_id)
-            ->where('users_id', $user_id)->update([
-                'qty' => $product_quantity
-            ]);
+        Qty::updateProductQty($product_id, $user_id, $product_quantity);
     }
     /**
      *It will insert a single product
@@ -80,6 +77,7 @@ class ProductsController extends Controller
      */
     public function add(Request $request)
     {
+       
         $validate = Products::validator($request);
         if ($validate->fails()) {
             return JsonResponseCustom::getApiResponse(
@@ -99,7 +97,7 @@ class ProductsController extends Controller
         $product->lat = $request->lat;
         $product->lon = $request->lon;
         $product->price = $request->price;
-        // $product->qty = $request->qty;
+        $product->qty = $request->qty;
         $product->user_id = $user_id;
         $product->save();
         //this function will add qty to it's particular table
@@ -438,6 +436,7 @@ class ProductsController extends Controller
                 foreach ($products as $product) {
                     $products_data[] = $this->getProductInfo($product->id);
                 }
+                
                 unset($pagination['data']);
                 return JsonResponseCustom::getApiResponseExtention(
                     $products_data,
@@ -851,16 +850,8 @@ class ProductsController extends Controller
     public function searchWrtNearByStores($user_lat, $user_lon, $miles)
     {
         $radius =  3958.8;
-        $store_data = DB::table('users AS user')->selectRaw("*,
-            (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-            cos( radians(user.lat) ) *
-            cos( radians(user.lon) - radians(" . $user_lon . ") ) +
-            sin( radians(" . $user_lat . ") ) *
-            sin( radians(user.lat) ) ) )
-            AS distance")
-            ->having("distance", "<", $radius)
-            ->orderBy("distance", "ASC")
-            ->get();
+        $store_data = (new User())->nearbyUsers($user_lat, $user_lon, $radius);
+        
         foreach ($store_data as $data) {
             if ($data->distance <= $miles) {
                 $store_ids[] = $data->id;
@@ -973,17 +964,14 @@ class ProductsController extends Controller
             }
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
-
                 // File Details
                 $filename = $file->getClientOriginalName();
                 $location = public_path('upload/csv');
                 $file->move($location, $filename);
                 $filepath = $location . "/" . $filename;
-
                 // Reading file
                 $file = fopen($filepath, "r");
                 $i = 0;
-
                 while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
                     if ($i == 0) {
                         $i++;
@@ -994,25 +982,16 @@ class ProductsController extends Controller
                     $price = $filedata[2];
                     $qty = $filedata[3];
                     // Find product by sku, user_id, category_id and update price and quantity
-                    $product = Products::where('user_id', '=', $request->store_id)
-                        ->where('sku', '=', $sku)
-                        ->where('category_id', '=', $catgory_id)
-                        ->first();
-
+                    $product = (new Products)->getProductsByParameters($request->store_id, $sku, $catgory_id);
                     if ($product) {
                         $product->price = $price;
                         $product->save();
-
-                        $productQty = Qty::where('users_id', $request->store_id)
-                        ->where('products_id', $product->id)
-                        ->first();
-
-                        if ($productQty) {
+                        $productQty = (new Qty())->getQtybyStoreAndProductId($request->store_id, $product->id);
+                        if (!empty($productQty)) {
                             $productQty->qty = $qty;
                             $productQty->save();
                         }
                     }
-
                     $i++;
                     if ($i % $batchSize == 0) {
                         usleep(500000); // Wait for 0.5 seconds between batches to avoid overwhelming the database
@@ -1045,9 +1024,8 @@ class ProductsController extends Controller
     public function sellerProducts($seller_id)
     { 
         try {
-            $user = User::find($seller_id);
             $data = [];
-            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
+            $products = (new products())->getSellerProductsBySellerId($seller_id);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {

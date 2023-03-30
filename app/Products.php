@@ -79,4 +79,17 @@ class Products extends Model
     {
         return $this->hasMany(Qty::class);
     }
+    public function getSellerProductsBySellerId($sellerid)
+    {
+        return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
+
+    }
+    public function getProductsByParameters($store_id, $sku, $catgory_id)
+    {
+        return  Products::where('user_id', '=', $store_id)
+        ->where('sku', '=', $sku)
+        ->where('category_id', '=', $catgory_id)
+        ->first();
+
+    }
 }
