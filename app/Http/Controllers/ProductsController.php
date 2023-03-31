@@ -581,13 +581,7 @@ class ProductsController extends Controller
     public function featuredProducts(Request $request)
     {
         try {
-            $featured_products = Products::whereHas('user', function ($query) {
-                $query->where('is_active', 1);
-            })->where('user_id', '=', $request->store_id)
-                ->where('featured', '=', 1)
-                ->where('status', '=', 1)
-                ->orderByDesc('id')
-                ->paginate(10);
+            $featured_products = (new Products())->getFeaturedProducts($request->store_id); 
             $pagination = $featured_products->toArray();
             if (!$featured_products->isEmpty()) {
                 $products_data = [];
@@ -643,11 +637,8 @@ class ProductsController extends Controller
      */
     public function getProductVolumn($product_id)
     {
-        $product = DB::table('products')
-            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
-            ->where('id', $product_id)
-            ->get();
-        return $product[0]->volumn;
+        $product = (new Products())->getProductVolume($product_id);
+        return $product;
     }
     /**
      * It find's the weight of the given product
@@ -656,11 +647,8 @@ class ProductsController extends Controller
      */
     public function getProductWeight($product_id)
     {
-        $product = DB::table('products')
-            ->select('weight')
-            ->where('id', $product_id)
-            ->get();
-        return $product[0]->weight;
+        $weight = (new Products())->getProductWeight($product_id);
+        return $weight;
     }
     /**
      * It find's the seller_id of the given product
@@ -679,9 +667,7 @@ class ProductsController extends Controller
     public function updateQty($product_id, $qty, $operation)
     {
         if ($operation == 'subtract') {
-            $qty = Qty::where('products_id', '=', $product_id)
-                ->decrement('qty', $qty);
-        }
+            $qty = (new Qty())->updateProductQty($product_id, '', $qty);       }
     }
     /**
      *It will export products into csv
@@ -690,7 +676,7 @@ class ProductsController extends Controller
     public function exportProducts()
     {
         $user_id = Auth::id();
-        $products = Products::query()->where('user_id', '=', $user_id)->orderBy('id', 'ASC')->get();
+        $products = (new Products())->getSellerProductsBySellerIdAsc($user_id);
         $all_products = [];
         foreach ($products as $product) {
             $pt = json_decode(json_encode($this->getProductInfo($product->id)->toArray()));
