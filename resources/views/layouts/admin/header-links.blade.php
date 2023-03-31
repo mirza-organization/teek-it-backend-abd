@@ -10,7 +10,7 @@
 <link rel="dns-prefetch" href="//fonts.gstatic.com">
 <!-- Font Awesome Icons -->
 <link href="{{ asset('res/plugins/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
-<!-- Theme style - Bootstrap 4 Css-->
+<!-- Theme style - Bootstrap 4 CSS -->
 <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
 <!-- Bootstrap 5 CSS -->
 <link href="{{ asset('bootstrap5/css/bootstrap.min.css') }}" rel="stylesheet">
