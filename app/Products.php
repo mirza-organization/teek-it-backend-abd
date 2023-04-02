@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\RattingsController;
-
+use Illuminate\Support\Facades\DB;
 class Products extends Model
 {
     use Searchable;
@@ -79,4 +79,49 @@ class Products extends Model
     {
         return $this->hasMany(Qty::class);
     }
+    public static function getSellerProductsBySellerId($sellerid)
+    {
+        return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
+
+    }
+    public static function getSellerProductsBySellerIdAsc($sellerid)
+    {
+        return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+
+    }
+    public function getProductsByParameters($store_id, $sku, $catgory_id)
+    {
+        return  Products::where('user_id', '=', $store_id)
+        ->where('sku', '=', $sku)
+        ->where('category_id', '=', $catgory_id)
+        ->first();
+
+    }
+    public static function getProductWeight($product_id)
+    {
+        $product = DB::table('products')
+            ->select('weight')
+            ->where('id', $product_id)
+            ->get();
+        return $product[0]->weight;
+
+    }
+    public static function getProductVolume($product_id){
+        $product = DB::table('products')
+            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
+            ->where('id', $product_id)
+            ->get();
+        return $product[0]->volumn;
+    }
+    public static function getFeaturedProducts($store_id)
+    {
+        return Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })->where('user_id', '=', $store_id)
+            ->where('featured', '=', 1)
+            ->where('status', '=', 1)
+            ->orderByDesc('id')
+            ->paginate(10);
+    }
+
 }

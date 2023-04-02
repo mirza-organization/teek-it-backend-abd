@@ -3,17 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Categories;
-use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Http\Request;
-use App\Products;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use App\User;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 use App\Services\JsonResponseCustom;
-use function PHPUnit\Framework\isEmpty;
 
 class CategoriesController extends Controller
 {
@@ -22,149 +15,139 @@ class CategoriesController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.1.0
      */
-    protected $jsonresponse;
-    protected $response;
-    public function __construct(JsonResponseCustom $jsonresponse)
-    {
-        $this->response = $jsonresponse;
-    }
     public function add(Request $request)
     {
-        $validate = Categories::validator($request);
-        if ($validate->fails()) {
-            $this->response->getApiResponse($validate->messages(), false, config('constants.VALIDATION_ERROR'), 400);
-        }
-        $category = new Categories();
-        $category->category_name = $request->category_name;
-        if ($request->hasFile('category_image')) {
-            $image = $request->file('category_image');
-            $file = $image;
-            $cat_name = str_replace(' ', '_', $category->category_name);
-            $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) { // check file exists in directory or not
-                info("file is store successfully : " . $filename);
-                $filename = "/user_imgs/" . $filename;
-            } else {
-                info("file is not found :- " . $filename);
+        try {
+            $validate = Categories::validator($request);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
-            $category->category_image = $filename;
+            $category = Categories::add($request);
+            return JsonResponseCustom::getApiResponse(
+                $category,
+                true,
+                config('constants.DATA_INSERTION_SUCCESS'),
+                config('constants.HTTP_OK')
+            );
+        } catch (Throwable $error) {
+            report($error);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
-        $category->save();
-        $this->response->getApiResponse($category, true, config('constants.DATA_INSERTION_SUCCESS'), 200);
     }
     /**
      * Update category
-     * @author Mirza Abdullah Izhar
-     * @version 1.1.0
-     */
-    /**
-     * Update category
-     * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $category_id)
     {
-        $validate = Categories::updateValidator($request);
-        if ($validate->fails()) {
-            $this->response->getApiResponse($validate->messages(), false, config('constants.VALIDATION_ERROR'), 400);
-        }
-        $category = Categories::find($id);
-        $category->category_name = $request->category_name;
-        if ($request->hasFile('category_image')) {
-            $image = $request->file('category_image');
-            $file = $image;
-            $cat_name = str_replace(' ', '_', $category->category_name);
-            $filename = uniqid("Category_" . $cat_name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-            Storage::disk('user_public')->put($filename, File::get($file));
-            if (Storage::disk('user_public')->exists($filename)) { // check file exists in directory or not
-                info("file is store successfully : " . $filename);
-                $filename = "/user_imgs/" . $filename;
-            } else {
-                info("file is not found :- " . $filename);
+        try {
+            $validate = Categories::validator($request);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->messages(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
-            $category->category_image = $filename;
+            $category = Categories::updateCategory($request, $category_id);
+            return JsonResponseCustom::getApiResponse(
+                $category,
+                true,
+                config('constants.DATA_UPDATED_SUCCESS'),
+                config('constants.HTTP_OK')
+            );
+        } catch (Throwable $error) {
+            report($error);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
-        $category->save();
-        $this->response->getApiResponse($category, true, config('constants.DATA_UPDATED_SUCCESS'), 200);
     }
     /**
      * List all categories w.r.t store ID or without store ID
-     * @author Mirza Abdullah Izhar
-     * @version 1.1.0
+     * @version 1.2.0
      */
     public function all()
     {
         try {
-            $storeId = \request()->store_id;
-            $categories = Categories::query();
-            if (\request()->has('store_id')) {
-                $categories = DB::table('products')
-                    ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-                    ->where('user_id', $storeId)
-                    ->select('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
-                    ->groupBy('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
-                    ->get();
-                if (!$categories->isEmpty()) {
-                    return $this->response->getApiResponse($categories, true, '', 200);
-                } else {
-                    return $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
-                }
-            }
-            $categories = $categories->get();
-            if (!$categories->isEmpty()) {
-                $categories_data = [];
-                foreach ($categories as $category) {
-                    //    $products = Products::query()->where('category_id', '=', $category->id)->get();
-                    //    if (!empty($products)) {
-                    //        $products_data = [];
-                    //        foreach ($products as $product) {
-                    //            $products_data[] = (new ProductsController())->getProductInfo($product->id);
-                    //        }
-                    //        $category['products'] = $products_data;
-                    //
-                    //    }
-                    $categories_data[] = $category;
-                }
-                return $this->response->getApiResponse($categories_data, true, '', 200);
+            if (request()->has('store_id'))
+                $data =  Categories::getAllCategoriesByStoreId(request()->store_id);
+            else
+                $data = Categories::allCategories();
+            if (!empty($data)) {
+                return JsonResponseCustom::getApiResponse(
+                    $data,
+                    true,
+                    '',
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return $this->response->getApiResponse(null, false, $error, 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
-     * It will get the products w.r.t category id 
-     * @version 1.0.0
+     * It will get the products of a specific category 
+     * @version 1.9.0
      */
     public function products($category_id)
     {
         try {
-            $storeId = \request()->store_id;
-            $products = Products::query();
-            $products = $products->whereHas('user', function ($query) {
-                $query->where('is_active', 1);
-            })->where('category_id', '=', $category_id)
-                ->where('status', 1);
-            if (\request()->has('store_id'))
-                $products->where('user_id', $storeId);
-            $products = $products->paginate();
-            $pagination = $products->toArray();
-            if (!$products->isEmpty()) {
-                $products_data = [];
-                foreach ($products as $product) {
-                    $products_data[] = (new ProductsController())->getProductInfo($product->id);
-                }
-                unset($pagination['data']);
-                $this->response->getApiResponse_ext($products_data, true, null, 200, 'pagination', $pagination);
+            $data = Categories::getProducts($category_id);
+            if (!empty($data)) {
+                return JsonResponseCustom::getApiResponseExtention(
+                    $data['data'],
+                    true,
+                    '',
+                    'pagination',
+                    $data['pagination'],
+                    config('constants.HTTP_OK')
+                );
             } else {
-                $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 200);
+                return JsonResponseCustom::getApiResponseExtention(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    'pagination',
+                    [],
+                    config('contants.HTTP_SERVER_ERROR')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            $this->response->getApiResponse(null, false, $error, 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -179,43 +162,44 @@ class CategoriesController extends Controller
                 'lon' => 'required|numeric|between:-180,180',
             ]);
             if ($validate->fails()) {
-                $this->response->getApiResponse(null, false, $validate->errors(), 422);
-            }
-            if (!Categories::where('id', $category_id)->exists()) {
-                $this->response->getApiResponse(null, false, config('constants.NO_RECORD'), 422);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
             $data = [];
-            $buyer_lat = $request->query('lat');
-            $buyer_lon = $request->query('lon');
-            $ids = DB::table('categories')
-                ->select(DB::raw('distinct(user_id) as store_id'))
-                ->join('products', 'categories.id', '=', 'products.category_id')
-                ->join('users', 'products.user_id', '=', 'users.id')
-                ->join('qty', 'products.id', '=', 'qty.products_id')
-                ->where('qty', '>', 0) //Products Should Be In Stock
-                ->where('status', '=', 1) //Products Should Be Live
-                ->where('is_active', '=', 1) //Seller Should Be Active
-                ->where('categories.id', '=', $category_id)
-                ->get()->pluck('store_id');
-            // $stores = User::whereIn('id', $ids)->get()->toArray();
-            $stores = User::whereIn('id', $ids)->get();
+            $buyer_lat = $request->lat;
+            $buyer_lon = $request->lon;
+            $stores = Categories::stores($category_id);
             foreach ($stores as $store) {
                 $result = (new UsersController())->getDistanceBetweenPoints($store->lat, $store->lon, $buyer_lat, $buyer_lon);
-                if (isset($result['distance']) && $result['distance'] < 5)
-                    $data[] = (new UsersController())->getSellerInfo($store, $result);
+                if (isset($result['distance']) && $result['distance'] < 5) $data[] = (new UsersController())->getSellerInfo($store, $result);
             }
-            if (count($data) === 0) {
-                $this->response->getApiResponse_ext(null, true, 'No stores found against this category in this area.', 200, null, null);
+            if (!empty($data)) {
+                return JsonResponseCustom::getApiResponse(
+                    $data,
+                    true,
+                    '',
+                    config('constants.HTTP_OK')
+                );
+            } else {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
-            $this->response->getApiResponse_ext($data, true, '', 200, 'stores', null);
         } catch (Throwable $error) {
             report($error);
-            $this->response->getApiResponse_ext(null, false, $error, 500, 'stores', null);
-            return response()->json([
-                'stores' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
 }

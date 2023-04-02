@@ -17,7 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Stripe\Product;
 use Throwable;
-
+use App\Services\JsonResponseCustom;
 class ProductsController extends Controller
 {
     /**
@@ -44,7 +44,6 @@ class ProductsController extends Controller
     //         ], 500);
     //     }
     // }
-
     /**
      * Since our qty has now it's separate migration,
      * this will help us add qty with given details to qty table
@@ -65,10 +64,7 @@ class ProductsController extends Controller
      */
     public function updateProductQty($product_id, $user_id, $product_quantity)
     {
-        Qty::where('products_id', $product_id)
-            ->where('users_id', $user_id)->update([
-                'qty' => $product_quantity
-            ]);
+        Qty::updateProductQty($product_id, $user_id, $product_quantity);
     }
     /**
      *It will insert a single product
@@ -77,13 +73,15 @@ class ProductsController extends Controller
      */
     public function add(Request $request)
     {
+       
         $validate = Products::validator($request);
         if ($validate->fails()) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.VALIDATION_ERROR')
-            ], 400);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $validate->errors(),
+                config('constants.HTTP_UNPROCESSABLE_REQUEST')
+            );
         }
         $user_id = Auth::id();
         $product = new Products();
@@ -95,7 +93,7 @@ class ProductsController extends Controller
         $product->lat = $request->lat;
         $product->lon = $request->lon;
         $product->price = $request->price;
-        // $product->qty = $request->qty;
+        $product->qty = $request->qty;
         $product->user_id = $user_id;
         $product->save();
         //this function will add qty to it's particular table
@@ -121,11 +119,12 @@ class ProductsController extends Controller
             }
         }
         $product =  $this->getProductInfo($product->id);
-        return response()->json([
-            'data' => $product,
-            'status' => true,
-            'message' => config('constants.DATA_INSERTION_SUCCESS')
-        ], 200);
+        return JsonResponseCustom::getApiResponse(
+            $product,
+            true,
+            config('constants.DATA_INSERTION_SUCCESS'),
+            config('constants.HTTP_OK')
+        );
     }
     /**
      * Upload's bulk products
@@ -141,11 +140,12 @@ class ProductsController extends Controller
                 'store_id' => 'required|integer'
             ]);
             if ($validatedData->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' =>  $validatedData->errors()
-                ], 422);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validatedData->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
             $user_id = $request->store_id;
             $file = $request->file('file');
@@ -217,18 +217,20 @@ class ProductsController extends Controller
                 $product_images->save();
                 $j++;
             }
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' =>  config('constants.DATA_INSERTION_SUCCESS')
-            ], 200);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                config('constants.DATA_INSERTION_SUCCESS'),
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -240,20 +242,23 @@ class ProductsController extends Controller
     {
         $validate = Products::updateValidator($request);
         if ($validate->fails()) {
-            return response()->json([
-                'data' => $validate->messages(),
-                'status' => true,
-                'message' => config('constants.VALIDATION_ERROR')
-            ], 400);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $validate->errors(),
+                config('constants.HTTP_UNPROCESSABLE_REQUEST')
+            );
         }
         $user_id = Auth::id();
         $product = Products::find($id);
         if (empty($product)) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 400);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                config('constants.NO_RECORD'),
+                config('constants.HTTP_INVALID_ARGUMENTS')
+            );
+            
         }
         $product->category_id = $request->category_id;
         $product->product_name = $request->product_name;
@@ -289,11 +294,13 @@ class ProductsController extends Controller
         $product_quantity = $request->qty;
         $this->updateProductQty($product_id, $user_id, $product_quantity);
         $product =  $this->getProductInfo($product->id);
-        return response()->json([
-            'data' => $product,
-            'status' => true,
-            'message' => config('constants.DATA_UPDATED_SUCCESS')
-        ], 200);
+        return JsonResponseCustom::getApiResponse(
+            $product,
+            true,
+            config('constants.DATA_UPDATED_SUCCESS'),
+            config('constants.HTTP_OK')
+        );
+        
     }
     /**
      * This function return product information
@@ -314,6 +321,7 @@ class ProductsController extends Controller
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
+    
     public function getProductInfoWithQty($product_id, $store_id)
     {
         $qty = Products::with('quantity')
@@ -351,26 +359,30 @@ class ProductsController extends Controller
                     $products_data[] = $data;
                 }
                 unset($pagination['data']);
-                return response()->json([
-                    'data' => $products_data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination,
-                ], 200);
+                return JsonResponseCustom::getApiResponseExtention(
+                    $products_data,
+                    true,
+                    '',
+                    'pagination',
+                     $pagination,
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -388,18 +400,22 @@ class ProductsController extends Controller
                 $products_data[] = $this->getProductInfo($product->id);
             }
             unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                'pagination' => $pagination,
-            ], 200);
+            return JsonResponseCustom::getApiResponseExtention(
+                $products_data,
+                true,
+                '',
+                'pagination',
+                $pagination,
+                config('constants.HTTP_OK')
+            );
         } else {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                config('constants.NO_RECORD'),
+                config('constants.HTTP_OK')
+            );
+            
         }
     }
     /**
@@ -416,27 +432,32 @@ class ProductsController extends Controller
                 foreach ($products as $product) {
                     $products_data[] = $this->getProductInfo($product->id);
                 }
+                
                 unset($pagination['data']);
-                return response()->json([
-                    'data' => $products_data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination,
-                ], 200);
+                return JsonResponseCustom::getApiResponseExtention(
+                    $products_data,
+                    true,
+                    '',
+                    'pagination',
+                     $pagination,
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -463,18 +484,19 @@ class ProductsController extends Controller
                 $products_data[] = $t;
             }
             unset($pagination['data']);
-            return response()->json([
-                'data' => $products_data,
-                'status' => true,
-                'message' => '',
-                //'pagination'=>$pagination,
-            ], 200);
+            return JsonResponseCustom::getApiResponse(
+                $products_data,
+                true,
+                '',
+                config('constants.HTTP_OK')
+            );
         } else {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => config('constants.NO_RECORD')
-            ], 200);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                config('constants.NO_RECORD'),
+                config('constants.HTTP_OK')
+            );
         }
     }
     /**
@@ -489,11 +511,12 @@ class ProductsController extends Controller
                 'product_id' => 'required|integer',
             ]);
             if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validate->errors()
-                ], 422);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
             $store = Products::where('id', $request->product_id)->first();
             $store_id = $store->user_id;
@@ -501,25 +524,29 @@ class ProductsController extends Controller
             if (!empty($product)) {
                 $product->store = User::find($product->user_id);
                 unset($product->quantity);
-                return response()->json([
-                    'data' => $product,
-                    'status' => true,
-                    'message' => "",
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    $product,
+                    true,
+                    '',
+                    config('constants.HTTP_OK')
+                );
+                
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -550,13 +577,7 @@ class ProductsController extends Controller
     public function featuredProducts(Request $request)
     {
         try {
-            $featured_products = Products::whereHas('user', function ($query) {
-                $query->where('is_active', 1);
-            })->where('user_id', '=', $request->store_id)
-                ->where('featured', '=', 1)
-                ->where('status', '=', 1)
-                ->orderByDesc('id')
-                ->paginate(10);
+            $featured_products = (new Products())->getFeaturedProducts($request->store_id); 
             $pagination = $featured_products->toArray();
             if (!$featured_products->isEmpty()) {
                 $products_data = [];
@@ -566,26 +587,30 @@ class ProductsController extends Controller
                     $products_data[] = $data;
                 }
                 unset($pagination['data']);
-                return response()->json([
-                    'data' => $products_data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination,
-                ], 200);
+                return JsonResponseCustom::getApiResponseExtention(
+                    $products_data,
+                    true,
+                    '',
+                    'pagination',
+                     $pagination,
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -608,11 +633,8 @@ class ProductsController extends Controller
      */
     public function getProductVolumn($product_id)
     {
-        $product = DB::table('products')
-            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
-            ->where('id', $product_id)
-            ->get();
-        return $product[0]->volumn;
+        $product = (new Products())->getProductVolume($product_id);
+        return $product;
     }
     /**
      * It find's the weight of the given product
@@ -621,11 +643,8 @@ class ProductsController extends Controller
      */
     public function getProductWeight($product_id)
     {
-        $product = DB::table('products')
-            ->select('weight')
-            ->where('id', $product_id)
-            ->get();
-        return $product[0]->weight;
+        $weight = (new Products())->getProductWeight($product_id);
+        return $weight;
     }
     /**
      * It find's the seller_id of the given product
@@ -644,9 +663,7 @@ class ProductsController extends Controller
     public function updateQty($product_id, $qty, $operation)
     {
         if ($operation == 'subtract') {
-            $qty = Qty::where('products_id', '=', $product_id)
-                ->decrement('qty', $qty);
-        }
+            $qty = (new Qty())->updateProductQty($product_id, '', $qty);       }
     }
     /**
      *It will export products into csv
@@ -655,7 +672,7 @@ class ProductsController extends Controller
     public function exportProducts()
     {
         $user_id = Auth::id();
-        $products = Products::query()->where('user_id', '=', $user_id)->orderBy('id', 'ASC')->get();
+        $products = (new Products())->getSellerProductsBySellerIdAsc($user_id);
         $all_products = [];
         foreach ($products as $product) {
             $pt = json_decode(json_encode($this->getProductInfo($product->id)->toArray()));
@@ -726,11 +743,12 @@ class ProductsController extends Controller
                 'product_name' => 'required|string',
             ]);
             if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' =>  $validate->errors()
-                ], 422);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
             $user_lat = $request->lat;
             $user_lon = $request->lon;
@@ -764,26 +782,30 @@ class ProductsController extends Controller
                     $products_data[] = $this->getProductInfo($product->id);
                 }
                 unset($pagination['data']);
-                return response()->json([
-                    'data' => $products_data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination,
-                ], 200);
+                return JsonResponseCustom::getApiResponseExtention(
+                    $products_data,
+                    true,
+                    '',
+                    'pagination',
+                     $pagination,
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -793,16 +815,8 @@ class ProductsController extends Controller
     public function searchWrtNearByStores($user_lat, $user_lon, $miles)
     {
         $radius =  3958.8;
-        $store_data = DB::table('users AS user')->selectRaw("*,
-            (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-            cos( radians(user.lat) ) *
-            cos( radians(user.lon) - radians(" . $user_lon . ") ) +
-            sin( radians(" . $user_lat . ") ) *
-            sin( radians(user.lat) ) ) )
-            AS distance")
-            ->having("distance", "<", $radius)
-            ->orderBy("distance", "ASC")
-            ->get();
+        $store_data = (new User())->nearbyUsers($user_lat, $user_lon, $radius);
+        
         foreach ($store_data as $data) {
             if ($data->distance <= $miles) {
                 $store_ids[] = $data->id;
@@ -906,25 +920,23 @@ class ProductsController extends Controller
                 'store_id' => 'required',
             ]);
             if ($validator->fails()) {
-                return response()->json([
-                    'data' => $validator->errors(),
-                    'status' => false,
-                    'message' => ""
-                ], 422);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validator->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
             if ($request->hasFile('file')) {
                 $file = $request->file('file');
-
                 // File Details
                 $filename = $file->getClientOriginalName();
                 $location = public_path('upload/csv');
                 $file->move($location, $filename);
                 $filepath = $location . "/" . $filename;
-
                 // Reading file
                 $file = fopen($filepath, "r");
                 $i = 0;
-
                 while (($filedata = fgetcsv($file, 1000, $delimiter)) !== FALSE) {
                     if ($i == 0) {
                         $i++;
@@ -935,25 +947,16 @@ class ProductsController extends Controller
                     $price = $filedata[2];
                     $qty = $filedata[3];
                     // Find product by sku, user_id, category_id and update price and quantity
-                    $product = Products::where('user_id', '=', $request->store_id)
-                        ->where('sku', '=', $sku)
-                        ->where('category_id', '=', $catgory_id)
-                        ->first();
-
+                    $product = (new Products)->getProductsByParameters($request->store_id, $sku, $catgory_id);
                     if ($product) {
                         $product->price = $price;
                         $product->save();
-
-                        $productQty = Qty::where('users_id', $request->store_id)
-                        ->where('products_id', $product->id)
-                        ->first();
-
-                        if ($productQty) {
+                        $productQty = (new Qty())->getQtybyStoreAndProductId($request->store_id, $product->id);
+                        if (!empty($productQty)) {
                             $productQty->qty = $qty;
                             $productQty->save();
                         }
                     }
-
                     $i++;
                     if ($i % $batchSize == 0) {
                         usleep(500000); // Wait for 0.5 seconds between batches to avoid overwhelming the database
@@ -961,20 +964,21 @@ class ProductsController extends Controller
                 }
 
                 fclose($file);
-
-                return response()->json([
-                    'data' => [],
-                    'status' => true,
-                    'message' =>  config('constants.DATA_UPDATED_SUCCESS'),
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    true,
+                    config('constants.DATA_UPDATED_SUCCESS'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
     /**
@@ -985,35 +989,38 @@ class ProductsController extends Controller
     public function sellerProducts($seller_id)
     { 
         try {
-            $user = User::find($seller_id);
             $data = [];
-            $products = Products::query()->where('user_id', '=', $user->id)->where('status', '=', 1)->paginate(20);
+            $products = (new products())->getSellerProductsBySellerId($seller_id);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->getProductInfo($product->id);
                 }
                 unset($pagination['data']);
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => '',
-                    'pagination' => $pagination
-                ], 200);
+                return JsonResponseCustom::getApiResponseExtention(
+                    $data,
+                    true,
+                    '',
+                    'pagination',
+                     $pagination,
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => config('constants.NO_RECORD')
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
 }
