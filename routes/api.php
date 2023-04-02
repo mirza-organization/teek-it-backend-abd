@@ -66,7 +66,7 @@ Route::group(['prefix' => 'qty'], function ($router) {
 */
 Route::group(['prefix' => 'category'], function ($router) {
     Route::post('add', 'CategoriesController@add');
-    Route::post('update/{product_id}', 'CategoriesController@update');
+    Route::post('update/{category_id}', 'CategoriesController@update');
     Route::get('all', 'CategoriesController@all');
     Route::get('view/{category_id}', 'CategoriesController@products');
     Route::get('get-stores-by-category/{category_id}', 'CategoriesController@stores');

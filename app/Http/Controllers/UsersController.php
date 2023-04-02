@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Throwable;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+use App\Services\JsonResponseCustom;
 
 class UsersController extends Controller
 {
@@ -77,56 +78,52 @@ class UsersController extends Controller
                 'lon' => 'required|numeric|between:-180,180',
             ]);
             if ($validate->fails()) {
-                return response()->json([
-                    'data' => [],
-                    'status' => false,
-                    'message' => $validate->errors()
-                ], 422);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
-            $data = [];
+            $data = []; 
             if ($request->query('lat') && $request->query('lon')) {
-                $lat = $request->query('lat');
-                $lon = $request->query('lon');
-                $users = User::where('is_active', 1)
-                    ->whereIn('role_id', [2, 5])
-                    ->orderBy('business_name', 'asc')
-                    ->get();
+                $users = User::getParentAndChildSellers();
                 foreach ($users as $user) {
-                    $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $lat, $lon);
+                    $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
                     if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
                 }
             } else {
                 // We will remove this block as soon as the iOS is able to send lat, lons
                 $data = Cache::remember('sellers', 60, function () {
-                    $users = User::where('is_active', 1)
-                        ->whereIn('role_id', [2, 5])
-                        ->orderBy('business_name', 'asc')
-                        ->get();
+                    $users = User::getParentAndChildSellers();
                     foreach ($users as $user) {
                         $data[] = $this->getSellerInfo($user);
                     }
                     return $data;
                 });
             }
-            if (count($data) === 0) {
-                return response()->json([
-                    'stores' => [],
-                    'status' => true,
-                    'message' => 'No stores found in this area.'
-                ], 200);
+            if (empty($data)) {
+                 return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    'No stores found in this area.',
+                    config('constants.HTTP_OK')
+                );
             }
-            return response()->json([
-                'data' => $data,
-                'status' => true,
-                'message' => ''
-            ], 200);
+            return JsonResponseCustom::getApiResponse(
+                $data,
+                true,
+                '',
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                false,
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
 }
