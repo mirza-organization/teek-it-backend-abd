@@ -313,35 +313,12 @@ class ProductsController extends Controller
      */
     public function getProductInfo($product_id)
     {
-        $qty = Products::with('quantity')
-            ->where('id', $product_id)
-            ->first();
-        $quantity = $qty->quantity->qty;
-        $product = Products::with('quantity')
-            ->select(['*', DB::raw("$quantity as qty")])
-            ->find($product_id);
-        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
-        $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
-        return $product;
+        return (new Products())->getProductInfo($product_id);
     }
     
     public function getProductInfoWithQty($product_id, $store_id)
     {
-        $qty = Products::with('quantity')
-            ->where('user_id', $store_id)
-            ->where('id', $product_id)
-            ->first();
-        $quantity = $qty->quantity->qty;
-        $product = Products::with('quantity')
-            ->where('user_id', $store_id)
-            ->where('id', $product_id)
-            ->select(['*', DB::raw("$quantity as qty")])
-            ->first();
-        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
-        $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
-        return $product;
+        return (new Products())->getProductInfoWithQty($product_id, $store_id);
     }
     /**
      * All products listing
@@ -351,14 +328,12 @@ class ProductsController extends Controller
     public function all()
     {
         try {
-            $products = Products::whereHas('user', function ($query) {
-                $query->where('is_active', 1);
-            })->where('status', 1)->paginate();
+            $products = (new Products())->getActiveProducts();
             $pagination = $products->toArray();
             if (!empty($products)) {
                 $products_data = [];
                 foreach ($products as $product) {
-                    $data = $this->getProductInfo($product->id);
+                    $data = (new Products())->getProductInfo($product->id);
                     $data->store = User::find($product->user_id);
                     $products_data[] = $data;
                 }
@@ -395,8 +370,7 @@ class ProductsController extends Controller
      */
     public function bulkView(Request $request)
     {
-        $ids = explode(',', $request->ids);
-        $products = Products::query()->whereIn('id', $ids)->paginate();
+        $products = (new Products())->getBulkProducts($request);
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];
@@ -470,9 +444,7 @@ class ProductsController extends Controller
      */
     public function sortByLocation(Request $request)
     {
-        $latitude = $request->get('lat');
-        $longitude = $request->get('lon');
-        $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
+        $products = (new Products())->getProductsByLocation($request);
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];

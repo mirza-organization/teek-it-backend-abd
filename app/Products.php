@@ -43,8 +43,14 @@ class Products extends Model
 
     public static function getProductInfo($product_id)
     {
-        $product = Products::with('quantity')->find($product_id);
-        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $qty = Products::with('quantity')
+            ->where('id', $product_id)
+            ->first();
+        $quantity = $qty->quantity->qty;
+        $product = Products::with('quantity')
+            ->select(['*', DB::raw("$quantity as qty")])
+            ->find($product_id);
+        $product->images = productImages::query()->where('product_id', '=', $product_id)->get();
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
@@ -122,6 +128,22 @@ class Products extends Model
             ->where('status', '=', 1)
             ->orderByDesc('id')
             ->paginate(10);
+    }
+    Public static function getActiveProducts(){
+
+        return Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })->where('status', 1)->paginate();
+    }
+    Public static function getProductsByLocation($request){
+        $latitude = $request->get('lat');
+        $longitude = $request->get('lon');
+        return Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
+    }
+    public static function getBulkProducts($request){
+        $ids = explode(',', $request->ids);
+        return Products::query()->whereIn('id', $ids)->paginate();
+
     }
 
 }
