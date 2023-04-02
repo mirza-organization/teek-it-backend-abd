@@ -92,6 +92,7 @@ class AuthController extends Controller
             $verification_code = Crypt::encrypt($User->email);
 
             $FRONTEND_URL = env('FRONTEND_URL');
+            dd($FRONTEND_URL);
             $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
 
             $html = '<html>

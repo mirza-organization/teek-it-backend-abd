@@ -25,29 +25,25 @@ class ProductsController extends Controller
      * qty column from products table
      * @version 1.0.0
      */
-    public function dropProductsTableQtyColumn()
-    {
-        try {
-            DB::statement(
-                'ALTER TABLE products DROP qty'
-            );
-            return JsonResponseCustom::getApiResponse(
-                [],
-                true,
-                'Column dropped successfully',
-                config('constants.HTTP_OKå')
-            );
-           
-        } catch (Throwable $error) {
-            report($error);
-            return JsonResponseCustom::getApiResponse(
-                [],
-                false,
-                $error,
-                config('constants.HTTP_SERVER_ERROR')
-            );
-        }
-    }
+    // public function dropProductsTableQtyColumn()
+    // {
+    //     try {
+    //         DB::statement(
+    //             'ALTER TABLE products DROP qty'
+    //         );
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Column dropped successfully'
+    //         ], 200);
+    //     } catch (Throwable $error) {
+    //         report($error);
+    //         return response()->json([
+    //             'data' => [],
+    //             'status' => false,
+    //             'message' => $error
+    //         ], 500);
+    //     }
+    // }
     /**
      * Since our qty has now it's separate migration,
      * this will help us add qty with given details to qty table
@@ -716,21 +712,6 @@ class ProductsController extends Controller
         if (is_array($json) === false) {
             $json = json_decode($json, true);
         }
-        // If a path is included, open that file for handling. Otherwise, use a temp file (for echoing CSV string)
-        // if ($csvFilePath !== false) {
-        //     $f = fopen($csvFilePath,'w+');
-        //     if ($f === false) {
-        //         die("Couldn't create the file to store the CSV, or the path is invalid. Make sure you're including the full path, INCLUDING the name of the output file (e.g. '../save/path/csvOutput.csv')");
-        //     }
-        // }
-        // else {
-        //     $boolEchoCsv = true;
-        //     if ($boolOutputFile === true) {
-        //         $boolEchoCsv = false;
-        //     }
-        //     $strTempFile = 'csvOutput' . date("U") . ".csv";
-        //     $f = fopen($strTempFile,"w+");
-        // }
         $strTempFile = public_path() . "/upload/csv/" . 'csvOutput' . date("U") . ".csv";
         $f = fopen($strTempFile, "w+");
         $csvFilePath = $strTempFile;
@@ -748,9 +729,7 @@ class ProductsController extends Controller
         // Take the file and put it to a string/file for output (if no save path was included in function arguments)
         // Delete the temp file
         // unlink($strTempFile);
-        // echo $csvFilePath;
         return response()->download($csvFilePath, null, ['Content-Type' => 'text/csv'])->deleteFileAfterSend();
-        //return response()->download($file);
     }
     /**
      * It searches all products with w.r.t all given filters

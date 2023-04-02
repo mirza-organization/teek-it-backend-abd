@@ -5,9 +5,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-12">
-                <h1 class="m-0 text-dark text-center">Admin Dashboard</h1>
-                <a class="text-site-primary text-center m-auto d-block"
-                    style="width: fit-content; font-size: 3.0em; line-height: 1;">Stores</a>
+                <h1 class="m-0 text-dark text-center">Child Sellers</h1>
                 <div class="float-right">
                     <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
                         <a class="text-white">Select All</a>

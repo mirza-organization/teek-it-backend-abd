@@ -3,13 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Auth\AuthController;
-use App\productImages;
-use App\Products;
 use App\Rattings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 use Throwable;
 
 class RattingsController extends Controller
@@ -31,7 +27,7 @@ class RattingsController extends Controller
         $ratting->user_id = $user_id;
         $ratting->product_id = $request->get('product_id');
         $ratting->ratting = $request->get('ratting');
-        //  $ratting->save();
+        $ratting->save();
         return (new ProductsController)->view($request->get('product_id'));
     }
     /**
@@ -76,7 +72,6 @@ class RattingsController extends Controller
                     'message' => config('constants.NO_RECORD')
                 ], 200);
             }
-            // return (new ProductsController)->all();
         } catch (Throwable $error) {
             report($error);
             return response()->json([

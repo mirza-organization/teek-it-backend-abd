@@ -189,11 +189,6 @@ class QtyController extends Controller
                     'message' =>  $validate->errors()
                 ], 422);
             }
-            // Qty::where($query,function($request){
-            //     $query->where('users_id', $request->user_id);
-            //     $query->where('products_id', $request->prod_id);
-            // });
-            // echo "hello"; exit;
             DB::table('qty_tests')->where('users_id', $request->store_id)
                 ->where('products_id', $request->prod_id)
                 ->update(['qty' => $request->qty]);
@@ -224,7 +219,6 @@ class QtyController extends Controller
                 // create both cURL resources
                 $ch[$times] = curl_init();
                 curl_setopt_array($ch[$times], array(
-                    // CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all-big-tbl/33/branch100',
                     CURLOPT_URL => 'https://teekitstaging.shop/api/qty/all',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
@@ -323,7 +317,6 @@ class QtyController extends Controller
                 $data = Qty::create([
                     'users_id' => $request->child_store,
                     'products_id' => $data->products_id,
-                    // 'child_store_id' => $request->child_store,
                     'qty' => $data->qty,
                 ]);
             }
