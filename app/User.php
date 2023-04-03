@@ -142,15 +142,24 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany('App\Orders');
     }
-    
+
     public static function getParentAndChildSellers()
     {
-       return User::where('is_active', 1)
-                    ->whereIn('role_id', [2, 5])
-                    ->orderBy('business_name', 'asc')
-                    ->get();
+        return User::where('is_active', 1)
+            ->whereIn('role_id', [2, 5])
+            ->orderBy('business_name', 'asc')
+            ->get();
     }
-    
+
+    public static function getParentSellers(string $search)
+    {
+        return User::where('is_active', 1)
+            ->where('business_name', 'like', '%' . $search .'%')
+            ->where('role_id', 2)
+            ->orderBy('business_name', 'asc')
+            ->paginate(9);
+    }
+
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
         $users = User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
@@ -165,7 +174,7 @@ class User extends Authenticatable implements JWTSubject
         return $users;
     }
 
-  public static function sendStoreApprovedEmail(object $user)
+    public static function sendStoreApprovedEmail(object $user)
     {
         $html = '<html>
             Hi, ' . $user->name . '<br><br>
@@ -189,4 +198,3 @@ class User extends Authenticatable implements JWTSubject
         }
     }
 }
-
