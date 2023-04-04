@@ -88,7 +88,37 @@ class User extends Authenticatable implements JWTSubject
             'roles' => $this->roles
         ];
     }
+    /**
+     * Relations
+     */
+    // Many-to-many relationship
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role', 'role_user');
+    }
 
+    public function role()
+    {
+        return $this->belongsTo('App\Role');
+    }
+    // Many-to-many relationship
+    public function seller()
+    {
+        return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
+    }
+    // Many-to-many relationship
+    public function driver()
+    {
+        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
+    }
+    // One-to-many relationship
+    public function orders()
+    {
+        return $this->hasMany('App\Orders');
+    }
+    /**
+     * Validators
+     */
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [
@@ -118,31 +148,9 @@ class User extends Authenticatable implements JWTSubject
             'address_2' => ''
         ]);
     }
-    // Many-to-many relationship
-    public function roles()
-    {
-        return $this->belongsToMany('App\Role', 'role_user');
-    }
-    public function role()
-    {
-        return $this->belongsTo('App\Role');
-    }
-    // Many-to-many relationship
-    public function seller()
-    {
-        return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
-    }
-    // Many-to-many relationship
-    public function driver()
-    {
-        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
-    }
-    // One-to-many relationship
-    public function orders()
-    {
-        return $this->hasMany('App\Orders');
-    }
-
+    /**
+     * Helpers
+     */
     public static function getParentAndChildSellers()
     {
         return User::where('is_active', 1)
@@ -153,8 +161,7 @@ class User extends Authenticatable implements JWTSubject
 
     public static function getParentSellers(string $search)
     {
-        return User::where('is_active', 1)
-            ->where('business_name', 'like', '%' . $search .'%')
+        return User::where('business_name', 'like', '%' . $search . '%')
             ->where('role_id', 2)
             ->orderBy('business_name', 'asc')
             ->paginate(9);
@@ -175,7 +182,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public static function sendStoreApprovedEmail(object $user)
-    {
+    { 
         $html = '<html>
             Hi, ' . $user->name . '<br><br>
             Thank you for registering on ' . env('APP_NAME') . '.
@@ -184,7 +191,7 @@ class User extends Authenticatable implements JWTSubject
             <a href="' . env('FRONTEND_URL') . '">Store</a> to update your store
             <br><br><br>
                      </html>';
-        $subject = env('APP_NAME') . ': Account Approved!';
+        $subject = url('/') . ': Account Approved!';
         Mail::to($user->email)
             ->send(new StoreRegisterMail($html, $subject));
     }
@@ -196,5 +203,6 @@ class User extends Authenticatable implements JWTSubject
             $user = User::findOrFail($user_id);
             static::sendStoreApprovedEmail($user);
         }
+        return true;
     }
 }
