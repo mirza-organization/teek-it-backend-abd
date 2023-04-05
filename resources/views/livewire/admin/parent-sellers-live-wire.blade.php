@@ -87,7 +87,7 @@
             </div>
         </div>
     </div> --}}
-    {{-- ************************************ Edit Employee Model ************************************ --}}
+    {{-- ************************************ Info Model ************************************ --}}
     <div wire:ignore.self class="modal fade" id="infoModel" tabindex="-1" aria-labelledby="infoModelLabel"
         aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -101,9 +101,6 @@
                     <div class="modal-body">
                         <div class="table-responsive text-nowrap">
                             <table class="table table-hover">
-                                <thead>
-
-                                </thead>
                                 <tbody class="table-border-bottom-0">
                                     <tr>
                                         <th>Seller Name</th>
@@ -119,7 +116,8 @@
                                     </tr>
                                     <tr>
                                         <th>Address</th>
-                                        <td>{{ $address_1 }}</td>
+                                        <td style="white-space: pre-line;"><?php echo wordwrap($address_1, $width = 50, $break = "\n", $cut = false); ?>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>Businee Name</th>
@@ -189,7 +187,7 @@
         </div>
     </div>
     {{-- ************************************ Delete Employee Model ************************************ --}}
-    <div wire:ignore.self class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+    {{-- <div wire:ignore.self class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
         aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -218,7 +216,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div> --}}
     <div class="row">
         <div class="col-12 col-sm-6 col-md-6">
             <h4 class="py-4 my-1">Parent Sellers</h4>
@@ -231,10 +229,9 @@
             </div>
         </div>
         <div class="col-12 col-md-1">
-            <button type="button" class="btn btn-danger my-3 py-3 w-100">
+            <button type="button" class="btn btn-danger my-3 py-3 w-100" onclick="delUsers()">
                 <i class="fas fa-trash-alt"></i>
             </button>
-
             {{-- <button type="button" class="btn btn-danger" onclick="delUsers()">
                 <a class="text-white">Delete</a>
             </button> --}}
@@ -251,10 +248,8 @@
                         <div class="card-img-overlay d-flex flex-column">
                             <div class="card-body">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" title="Select"
+                                    <input type="checkbox" class="form-check-input select-checkbox" title="Select"
                                         id="{{ $single_index->id }}">
-                                    {{-- <input type="checkbox" class="form-check-input" title="Select"
-                                        id="{{ $user->id }}"> --}}
                                     <button type="button" class="btn btn-primary" title="Show detail information"
                                         data-bs-toggle="modal" data-bs-target="#infoModel"
                                         wire:click="renderInfoModal({{ $single_index->id }})">
@@ -266,7 +261,7 @@
                                     </a>
                                 </div>
                                 {{-- <h4 class="card-title mt-0 ">
-                                    <a class="text-white" herf="#">Grace Technologies</a>
+                                    <a class="text-white" herf="#">Teek it</a>
                                 </h4> --}}
                             </div>
                             <div class="card-footer">
@@ -280,12 +275,15 @@
                                             {{ $single_index->created_at }}</small>
                                     </div>
                                     <div class="form-check form-switch mt-3">
-                                        <input type="checkbox" class="form-check-input"
-                                            value="{{ $single_index->id }}"
+                                        <input type="checkbox" class="form-check-input" value="{{ $single_index->id }}"
                                             wire:click="changeStatus({{ $single_index->id }}, {{ $single_index->is_active }})"
                                             role="switch" {{ $single_index->is_active === 1 ? 'checked' : '' }}>
                                         <label class="form-check-label">
-                                            {{ $single_index->is_active === 1 ? 'Active' : 'Blocked' }}
+                                            @if ($single_index->is_active === 1)
+                                                <b class="bg-success rounded px-2">Active</b>
+                                            @else
+                                                <b class="bg-danger rounded px-2">Blocked</b>
+                                            @endif
                                         </label>
                                     </div>
                                 </div>

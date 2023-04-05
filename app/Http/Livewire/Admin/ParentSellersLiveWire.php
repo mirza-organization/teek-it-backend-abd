@@ -12,23 +12,23 @@ class ParentSellersLiveWire extends Component
 {
     use WithPagination;
     public
-    $parent_seller_id,
-    $name,
-    $email,
-    $password,
-    $phone,
-    $address_1,
-    $business_name,
-    $lat,
-    $lon,
-    $user_img,
-    $last_login,
-    $email_verified_at,
-    $pending_withdraw,
-    $total_withdraw,
-    $is_online,
-    $application_fee,
-    $search = '';
+        $parent_seller_id,
+        $name,
+        $email,
+        $password,
+        $phone,
+        $address_1,
+        $business_name,
+        $lat,
+        $lon,
+        $user_img,
+        $last_login,
+        $email_verified_at,
+        $pending_withdraw,
+        $total_withdraw,
+        $is_online,
+        $application_fee,
+        $search = '';
 
     protected $paginationTheme = 'bootstrap';
 
@@ -46,10 +46,23 @@ class ParentSellersLiveWire extends Component
     public function resetModal()
     {
         $this->resetAllErrors();
-        $this->parent_seller_id = '';
-        $this->name = '';
-        $this->email = '';
-        $this->password = '';
+        $this->reset([
+            'name',
+            'email',
+            'password',
+            'phone',
+            'address_1',
+            'business_name',
+            'lat',
+            'lon',
+            'user_img',
+            'last_login',
+            'email_verified_at',
+            'pending_withdraw',
+            'total_withdraw',
+            'is_online',
+            'application_fee',
+        ]);
     }
 
     public function resetAllErrors()
@@ -170,7 +183,7 @@ class ParentSellersLiveWire extends Component
     }
 
     public function changeStatus($id, $is_active)
-    {  
+    {
         try {
             /* Perform some operation */
             $status = ($is_active === 1) ? 0 : 1;

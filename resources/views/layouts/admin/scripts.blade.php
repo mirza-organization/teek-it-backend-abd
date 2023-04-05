@@ -54,8 +54,7 @@
         }
 
         function delUsers() {
-            // var checkboxes = document.querySelectorAll('.select-checkbox');
-            var checkboxes = document.querySelectorAll('.form-check-input');
+            var checkboxes = document.querySelectorAll('.select-checkbox');
             var users = [];
             var x = 0;
             for (var i = 0; i < checkboxes.length; i++) {

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StoreRegisterMail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -12,7 +13,7 @@ use Validator;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable, SoftDeletes;
     // use EntrustUserTrait;
 
     /**
@@ -169,16 +170,15 @@ class User extends Authenticatable implements JWTSubject
 
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
-        $users = User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-            cos( radians(users.lat) ) *
-            cos( radians(users.lon) - radians(" . $user_lon . ") ) +
-            sin( radians(" . $user_lat . ") ) *
-            sin( radians(users.lat) ) ) )
-            AS distance")
-            ->having("distance", "<", $radius)
-            ->orderBy("distance", "ASC")
-            ->get();
-        return $users;
+       return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
+       cos( radians(users.lat) ) *
+       cos( radians(users.lon) - radians(" . $user_lon . ") ) +
+       sin( radians(" . $user_lat . ") ) *
+       sin( radians(users.lat) ) ) )
+       AS distance")
+       ->having("distance", "<", $radius)
+       ->orderBy("distance", "ASC")
+       ->get();
     }
 
     public static function sendStoreApprovedEmail(object $user)
