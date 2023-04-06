@@ -250,6 +250,7 @@
         }
 
         function submitLocation() {
+            $("#locationModel").click();
             var user_address = document.getElementById("modal_location_text").value;
             var user_lat = document.getElementById("ad_lat").value;
             var user_lon = document.getElementById("ad_long").value;
