@@ -1129,13 +1129,14 @@ class HomeController extends Controller
     public function adminUsersDel(Request $request)
     {
         if (Gate::allows('superadmin')) {
+            // dd($request->users);
             for ($i = 0; $i < count($request->users); $i++) {
-                // $user =  User::find($request->users[$i]);
-                // if($user->hasRole('seller')){
-                //     // Del Products & Orders
-                // }
-                DB::table('users')->where('id', '=', $request->users[$i])->delete();
-                DB::table('role_user')->where('user_id', '=', $request->users[$i])->delete();
+                User::findOrfail($request->users[$i])->delete();
+                // Del Products & Orders
+
+                // DB::table('users')->where('id', '=', $request->users[$i])->delete();
+                /* Obselete Code */
+                // DB::table('role_user')->where('user_id', '=', $request->users[$i])->delete();
             }
             return response("Users Deleted Successfully");
         }
