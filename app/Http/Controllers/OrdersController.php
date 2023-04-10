@@ -650,7 +650,7 @@ class OrdersController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function get_single_order($order_id)
+    public function getOrderDetails($order_id)
     {
         $temp = [];
         $order = Orders::find($order_id);

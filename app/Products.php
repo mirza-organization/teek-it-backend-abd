@@ -82,7 +82,6 @@ class Products extends Model
     public static function getSellerProductsBySellerId($sellerid)
     {
         return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
-
     }
     public static function getSellerProductsBySellerIdAsc($sellerid)
     {
