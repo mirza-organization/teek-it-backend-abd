@@ -990,7 +990,18 @@ class ProductsController extends Controller
     { 
         try {
             $data = [];
-            $products = (new products())->getSellerProductsBySellerId($seller_id);
+            $productIds = [];
+            $roleId = (new User())->getUserRole($seller_id);
+            if($roleId == '5'){
+                $productIds = (new Qty())->getChildSellerProductIds($seller_id);
+                $totalIds = count($productIds);
+                for($i=0; $i<$totalIds; $i++)
+                {
+                $products =  (new products())->getSellerProductsBySellerId($productIds[$i]);
+                }
+            }else if($roleId == '2'){
+                $products = (new products())->getSellerProductsBySellerId($seller_id);
+            }
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {

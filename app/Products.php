@@ -41,7 +41,7 @@ class Products extends Model
         ]);
     }
 
-    public static function getProductInfo($product_id)
+    public static function getProductInfo(int $product_id)
     {
         $product = Products::with('quantity')->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
@@ -50,7 +50,7 @@ class Products extends Model
         return $product;
     }
 
-    public static function getProductInfoWithQty($product_id, $store_id)
+    public static function getProductInfoWithQty(int $product_id, int $store_id)
     {
         $product = Products::with('quantity')
             ->where('user_id', $store_id)
@@ -79,16 +79,16 @@ class Products extends Model
     {
         return $this->hasMany(Qty::class);
     }
-    public static function getSellerProductsBySellerId($sellerid)
+    public static function getSellerProductsBySellerId(int $sellerid)
     {
         return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
     }
-    public static function getSellerProductsBySellerIdAsc($sellerid)
+    public static function getSellerProductsBySellerIdAsc(int $sellerid)
     {
         return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
 
     }
-    public function getProductsByParameters($store_id, $sku, $catgory_id)
+    public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
     {
         return  Products::where('user_id', '=', $store_id)
         ->where('sku', '=', $sku)
@@ -96,7 +96,7 @@ class Products extends Model
         ->first();
 
     }
-    public static function getProductWeight($product_id)
+    public static function getProductWeight(int $product_id)
     {
         $product = DB::table('products')
             ->select('weight')
@@ -105,14 +105,14 @@ class Products extends Model
         return $product[0]->weight;
 
     }
-    public static function getProductVolume($product_id){
+    public static function getProductVolume(int $product_id){
         $product = DB::table('products')
             ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
             ->where('id', $product_id)
             ->get();
         return $product[0]->volumn;
     }
-    public static function getFeaturedProducts($store_id)
+    public static function getFeaturedProducts(int $store_id)
     {
         return Products::whereHas('user', function ($query) {
             $query->where('is_active', 1);

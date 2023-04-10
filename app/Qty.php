@@ -36,4 +36,15 @@ class Qty extends Model
     public function getQtybyStoreAndProductId($store_id, $product_id){
 
     }
+    public static function getChildSellerProductIds(int $user_id)
+    {
+        if(!empty($user_id))
+        {
+            return Qty::where('users_id', $user_id)
+                    ->select('products_id')
+                    ->get();
+        }else{
+            return false;
+        }
+    }
 }
