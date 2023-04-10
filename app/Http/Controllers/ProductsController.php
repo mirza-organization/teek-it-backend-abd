@@ -999,11 +999,13 @@ class ProductsController extends Controller
                 for($i=0; $i<$totalIds; $i++)
                 { 
                 $products =  (new products())->getProductsById($productIds[$i]);
+                $pagination = $products->toArray();
                 }
             }else if($roleId == '2'){
                 $products = (new products())->getSellerProductsBySellerId($seller_id);
+                $pagination = $products->toArray();
             }
-            $pagination = $products->toArray();
+            
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->getProductInfo($product->id);
