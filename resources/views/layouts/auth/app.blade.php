@@ -40,7 +40,6 @@
                 {{-- <button class="navbar-toggler" type="button" data-toggle="collapse"
                     data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                     aria-label="Toggle navigation">
-                    <!-- <span class="fas fa-bars"></span> -->
                     <i class="fas fa-sign-in-alt"></i>
                     Login
                 </button> --}}
@@ -53,7 +52,8 @@
                                 {{ csrf_field() }}
                                 <div class="form-group">
                                     <input class="form-control mr-sm-2" type="email" required autocomplete="off"
-                                        name="email" placeholder="email" aria-label="email" value="{{ old('email') }}">
+                                        name="email" placeholder="email" aria-label="email"
+                                        value="{{ old('email') }}">
                                     <label for="checkauto">
                                         <input name="remember" id="checkauto" type="checkbox"> Keep me Logged in
                                     </label>
@@ -72,7 +72,7 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <button class="btn btn-outline-primary my-2 my-sm-0" type="submit"
-                                        style=" /* padding: 5px 25px; */ display: block; width: 100%; margin-top: 15px!important; background: #3663ae; border: 0; border-radius: 0; color: white; ">Login</button>
+                                        style="display: block; width: 100%; margin-top: 15px!important; background: #3663ae; border: 0; border-radius: 0; color: white; ">Login</button>
                                 </div>
                             </div>
                         </div>
@@ -85,14 +85,14 @@
         <div class="container">
             @include('flash::message')
             @if (session('status'))
-            <div class="alert alert-success" role="alert">
-                {{ session('status') }}
-            </div>
+                <div class="alert alert-success" role="alert">
+                    {{ session('status') }}
+                </div>
             @endif
             <div class="row mtd" style="margin-top: 20vh">
                 <div class="col-md-8">
                     <img style="max-height: 540px;margin: 0 auto;display: block;width: auto;max-width: 500px;height: 100%;width: 100%;object-fit: contain;"
-                        src="{{ asset('bike.png') }}" alt="">
+                        src="{{ asset('bike.png') }}">
                 </div>
                 <div class="col-md-4">
                     @yield('content')
@@ -158,8 +158,6 @@
                     map: map,
                     draggable: true
                 });
-
-
             }
 
             // get places auto-complete when user type in modal_location_text
@@ -181,9 +179,7 @@
                 console.log('i am dragged');
                 lat = marker.getPosition().lat();
                 long = marker.getPosition().lng();
-
                 set_lat_lng(lat, long);
-
             });
 
             function set_lat_lng(lat, lng) {
@@ -227,7 +223,6 @@
                             .address_components[2] && place.address_components[2].short_name || '')
                     ].join(' ');
                 }
-
             });
         }
         google.maps.event.addDomListener(window, 'load', initialize);
@@ -351,7 +346,6 @@
         }
 
         function checkbox() {
-            // $(function() {
             $("#chkSelect").change(function() {
                 if ($(this).is(":checked")) {
                     $("#content").show();
@@ -359,7 +353,6 @@
                     $("#content").hide();
                 }
             });
-            // });
         }
     </script>
 
@@ -370,7 +363,8 @@
     <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> --}}
      <!-- Bootstrap 5 -->
      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
     <!-- AdminLTE App -->
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
     <!-- Sweetalerts for Swal -->

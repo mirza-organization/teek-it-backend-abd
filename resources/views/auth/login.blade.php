@@ -139,7 +139,7 @@
     </div>
 </div>
 <!-- Google Map Modal - Begins -->
-<div class="modal hide fade in" id="map_modal">
+<div class="modal hide" id="map_modal">
     <div class="modal-dialog modal-lg  modal-dialog-centered">
         <div class="modal-content">
             <!-- Modal Header -->
