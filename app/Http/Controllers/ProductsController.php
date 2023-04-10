@@ -660,11 +660,11 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function updateQty($product_id, $qty, $operation)
-    {
-        if ($operation == 'subtract') {
-            $qty = (new Qty())->updateProductQty($product_id, '', $qty);       }
-    }
+    // public function updateQty($product_id, $qty, $operation)
+    // {
+    //     if ($operation == 'subtract') $qty = (new Qty())->updateProductQty($product_id, '', $qty); 
+    // }
+
     /**
      *It will export products into csv
      * @version 1.0.0
