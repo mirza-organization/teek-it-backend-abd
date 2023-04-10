@@ -205,4 +205,14 @@ class User extends Authenticatable implements JWTSubject
         }
         return true;
     }
+    public static function getUserRole(int $user_id)
+    {
+        $user = User::where('id', '=', $user_id)
+                ->select('role_id')->get(); 
+        foreach($user as $u){
+            return  $u->role_id;
+        
+        }
+        return false;   
+    }
 }

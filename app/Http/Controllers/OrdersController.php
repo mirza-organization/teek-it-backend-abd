@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\OrderItems;
 use App\Orders;
 use App\Products;
+use App\Qty;
 use App\User;
 use App\Services\TwilioSmsService;
 use App\VerificationCodes;
@@ -411,7 +412,7 @@ class OrdersController extends Controller
                 $temp['volumn'] = $product_volumn;
                 $temp['seller_id'] = $product_seller_id;
                 $grouped_seller[$product_seller_id][] = $temp;
-                (new ProductsController())->updateQty($product_id, $qty, "subtract");
+                Qty::subtractProductQty($product_seller_id, $product_id, $qty);
             }
             $count = 0;
             $order_arr = [];
@@ -461,6 +462,8 @@ class OrdersController extends Controller
                 $new_order->payment_status = $request->payment_status ?? "hidden";
                 $new_order->seller_id = $seller_id;
                 $new_order->device = $request->device ?? NULL;
+                $new_order->offloading = $request->offloading ?? NULL;
+                $new_order->offloading_charges = $request->offloading_charges ?? NULL;
                 $new_order->save();
                 $order_id = $new_order->id;
                 if ($request->type == 'delivery') {
@@ -506,7 +509,7 @@ class OrdersController extends Controller
                 $count++;
             }
             return response()->json([
-                'data' => $this->get_orders_from_ids($order_arr),
+                'data' => $this->getOrdersFromIds($order_arr),
                 'status' => true,
                 'message' => 'Order added successfully.'
             ], 200);
@@ -625,7 +628,7 @@ class OrdersController extends Controller
             $order->save();
             $count++;
         }
-        $return_data = $this->get_orders_from_ids($order_arr);
+        $return_data = $this->getOrdersFromIds($order_arr);
         return response()->json([
             'data' => $return_data,
             'status' => true,
@@ -637,11 +640,11 @@ class OrdersController extends Controller
      * @author Huzaif Haleem
      * @version 1.0.0
      */
-    public function get_orders_from_ids($ids)
+    public function getOrdersFromIds($ids)
     {
         $raw_data = [];
         foreach ($ids as $order_id) {
-            $raw_data[] = $this->get_single_order($order_id);
+            $raw_data[] = $this->getOrderDetails($order_id);
         }
         return $raw_data;
     }

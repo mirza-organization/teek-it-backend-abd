@@ -660,11 +660,11 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function updateQty($product_id, $qty, $operation)
-    {
-        if ($operation == 'subtract') {
-            $qty = (new Qty())->updateProductQty($product_id, '', $qty);       }
-    }
+    // public function updateQty($product_id, $qty, $operation)
+    // {
+    //     if ($operation == 'subtract') $qty = (new Qty())->updateProductQty($product_id, '', $qty); 
+    // }
+
     /**
      *It will export products into csv
      * @version 1.0.0
@@ -990,8 +990,22 @@ class ProductsController extends Controller
     { 
         try {
             $data = [];
-            $products = (new products())->getSellerProductsBySellerId($seller_id);
-            $pagination = $products->toArray();
+            $productIds = [];
+            $products = "";
+            $roleId = (new User())->getUserRole($seller_id);
+            if($roleId == '5'){
+                $productIds = (new Qty())->getChildSellerProductIds($seller_id);
+                $totalIds = count($productIds);
+                for($i=0; $i<$totalIds; $i++)
+                { 
+                $products =  (new products())->getProductsById($productIds[$i]);
+                $pagination = $products->toArray();
+                }
+            }else if($roleId == '2'){
+                $products = (new products())->getSellerProductsBySellerId($seller_id);
+                $pagination = $products->toArray();
+            }
+            
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->getProductInfo($product->id);
