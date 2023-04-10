@@ -991,13 +991,14 @@ class ProductsController extends Controller
         try {
             $data = [];
             $productIds = [];
+            $products = "";
             $roleId = (new User())->getUserRole($seller_id);
             if($roleId == '5'){
                 $productIds = (new Qty())->getChildSellerProductIds($seller_id);
                 $totalIds = count($productIds);
                 for($i=0; $i<$totalIds; $i++)
-                {
-                $products =  (new products())->getSellerProductsBySellerId($productIds[$i]);
+                { 
+                $products =  (new products())->getProductsById($productIds[$i]);
                 }
             }else if($roleId == '2'){
                 $products = (new products())->getSellerProductsBySellerId($seller_id);

@@ -49,6 +49,12 @@ class Products extends Model
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
+    public static function getProductsById(string $product_id)
+    {
+        $product = Products::where('id', $product_id)
+        ->where('status', '1')->get();
+        return $product;
+    }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
     {
