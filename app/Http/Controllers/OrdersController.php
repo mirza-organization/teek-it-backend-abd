@@ -650,13 +650,12 @@ class OrdersController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function get_single_order($order_id)
+    public function getOrderDetails($order_id)
     {
         $temp = [];
         $order = Orders::find($order_id);
         $temp['order'] = $order;
         $temp['order_items'] = OrderItems::query()->with('products.user')->where('order_id', '=', $order_id)->get();
-        // $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
 
