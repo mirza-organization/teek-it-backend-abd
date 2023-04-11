@@ -44,12 +44,11 @@ class Qty extends Model
             ->decrement('qty', $product_quantity);
     }
 
-    public function getQtybyStoreAndProductId($store_id, $product_id)
+    public static function getChildSellerProducts(int $user_id)
     {
-    }
-
-    public static function getChildSellerProductIds(int $user_id)
-    {
-        return Qty::where('users_id', $user_id)->paginate(20);
+        return Qty::where('qty.users_id', $user_id)
+        ->join('products as prod', 'prod.id', 'qty.products_id')
+        ->select('prod.*')
+        ->paginate(20);
     }
 }

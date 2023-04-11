@@ -42,6 +42,34 @@ class Products extends Model
         ]);
     }
 
+    public static function getProductInfo(int $product_id)
+    {
+        $product = Products::with('quantity')->find($product_id);
+        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $product->category = Categories::find($product->category_id);
+        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        return $product;
+    }
+    public static function getProductsById(object $product_id)
+    {
+        $product = Products::where('id', $product_id->products_id)
+            ->where('status', '1')
+            ->get();
+        return $product;
+    }
+
+    public static function getProductInfoWithQty(int $product_id, int $store_id)
+    {
+        $product = Products::with('quantity')
+            ->where('user_id', $store_id)
+            ->where('id', $product_id)
+            ->first();
+        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $product->category = Categories::find($product->category_id);
+        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        return $product;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -61,49 +89,25 @@ class Products extends Model
     {
         return $this->hasMany(Qty::class);
     }
-    
-    public static function getProductInfo(int $product_id)
-    {
-        $product = Products::with('quantity')->find($product_id);
-        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
-        $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
-        return $product;
-    }
 
-    public static function getProductsById(object $product)
-    {
-        return Products::where('id', $product->products_id)->where('status', '1')->paginate(20);
-    }
-
-    public static function getProductInfoWithQty(int $product_id, int $store_id)
-    {
-        $product = Products::with('quantity')
-            ->where('user_id', $store_id)
-            ->where('id', $product_id)
-            ->first();
-        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
-        $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
-        return $product;
-    }
-
-    public static function getParentSellerProductsBySellerId(int $sellerid)
+    public static function getParentSellerProducts(int $sellerid)
     {
         return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
     }
 
-    public static function getParentSellerProductsBySellerIdAsc(int $sellerid)
+    public static function getParentSellerProductsAsc(int $sellerid)
     {
-        return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+        return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+
     }
 
     public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
     {
-        return  Products::where('user_id', '=', $store_id)
+        return Products::where('user_id', '=', $store_id)
             ->where('sku', '=', $sku)
             ->where('category_id', '=', $catgory_id)
             ->first();
+
     }
 
     public static function getProductWeight(int $product_id)
@@ -113,6 +117,7 @@ class Products extends Model
             ->where('id', $product_id)
             ->get();
         return $product[0]->weight;
+
     }
 
     public static function getProductVolume(int $product_id)
@@ -134,4 +139,5 @@ class Products extends Model
             ->orderByDesc('id')
             ->paginate(10);
     }
+
 }
