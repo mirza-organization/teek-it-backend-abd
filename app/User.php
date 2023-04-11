@@ -170,19 +170,19 @@ class User extends Authenticatable implements JWTSubject
 
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
-       return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
+        return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
        cos( radians(users.lat) ) *
        cos( radians(users.lon) - radians(" . $user_lon . ") ) +
        sin( radians(" . $user_lat . ") ) *
        sin( radians(users.lat) ) ) )
        AS distance")
-       ->having("distance", "<", $radius)
-       ->orderBy("distance", "ASC")
-       ->get();
+            ->having("distance", "<", $radius)
+            ->orderBy("distance", "ASC")
+            ->get();
     }
 
     public static function sendStoreApprovedEmail(object $user)
-    { 
+    {
         $html = '<html>
             Hi, ' . $user->name . '<br><br>
             Thank you for registering on ' . env('APP_NAME') . '.
@@ -205,14 +205,10 @@ class User extends Authenticatable implements JWTSubject
         }
         return true;
     }
-    public static function getUserRole(int $user_id)
+    
+    public static function getUserRole(int $seller_id)
     {
-        $user = User::where('id', '=', $user_id)
-                ->select('role_id')->get(); 
-        foreach($user as $u){
-            return  $u->role_id;
-        
-        }
-        return false;   
+        return  User::where('id', $seller_id)
+        ->pluck('role_id');
     }
 }

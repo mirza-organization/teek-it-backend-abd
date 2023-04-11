@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Categories;
 use App\productImages;
 use App\Products;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 use Stripe\Product;
 use Throwable;
 use App\Services\JsonResponseCustom;
+
 class ProductsController extends Controller
 {
     /**
@@ -73,7 +75,7 @@ class ProductsController extends Controller
      */
     public function add(Request $request)
     {
-       
+
         $validate = Products::validator($request);
         if ($validate->fails()) {
             return JsonResponseCustom::getApiResponse(
@@ -258,7 +260,6 @@ class ProductsController extends Controller
                 config('constants.NO_RECORD'),
                 config('constants.HTTP_INVALID_ARGUMENTS')
             );
-            
         }
         $product->category_id = $request->category_id;
         $product->product_name = $request->product_name;
@@ -300,7 +301,6 @@ class ProductsController extends Controller
             config('constants.DATA_UPDATED_SUCCESS'),
             config('constants.HTTP_OK')
         );
-        
     }
     /**
      * This function return product information
@@ -321,7 +321,7 @@ class ProductsController extends Controller
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
-    
+
     public function getProductInfoWithQty($product_id, $store_id)
     {
         $qty = Products::with('quantity')
@@ -364,7 +364,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -415,7 +415,6 @@ class ProductsController extends Controller
                 config('constants.NO_RECORD'),
                 config('constants.HTTP_OK')
             );
-            
         }
     }
     /**
@@ -432,14 +431,14 @@ class ProductsController extends Controller
                 foreach ($products as $product) {
                     $products_data[] = $this->getProductInfo($product->id);
                 }
-                
+
                 unset($pagination['data']);
                 return JsonResponseCustom::getApiResponseExtention(
                     $products_data,
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -530,7 +529,6 @@ class ProductsController extends Controller
                     '',
                     config('constants.HTTP_OK')
                 );
-                
             } else {
                 return JsonResponseCustom::getApiResponse(
                     [],
@@ -577,7 +575,7 @@ class ProductsController extends Controller
     public function featuredProducts(Request $request)
     {
         try {
-            $featured_products = (new Products())->getFeaturedProducts($request->store_id); 
+            $featured_products = (new Products())->getFeaturedProducts($request->store_id);
             $pagination = $featured_products->toArray();
             if (!$featured_products->isEmpty()) {
                 $products_data = [];
@@ -592,7 +590,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -672,7 +670,7 @@ class ProductsController extends Controller
     public function exportProducts()
     {
         $user_id = Auth::id();
-        $products = (new Products())->getSellerProductsBySellerIdAsc($user_id);
+        $products = Products::getParentSellerProductsBySellerIdAsc($user_id);
         $all_products = [];
         foreach ($products as $product) {
             $pt = json_decode(json_encode($this->getProductInfo($product->id)->toArray()));
@@ -684,9 +682,7 @@ class ProductsController extends Controller
             unset($pt->updated_at);
             $temp_img = [];
             if (isset($pt->images)) {
-                foreach ($pt->images as $img) {
-                    $temp_img[] = $img->product_image;
-                }
+                foreach ($pt->images as $img) $temp_img[] = $img->product_image;
             }
             $pt->images = implode(',', $temp_img);
             $all_products[] = $pt;
@@ -787,7 +783,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -816,7 +812,7 @@ class ProductsController extends Controller
     {
         $radius =  3958.8;
         $store_data = (new User())->nearbyUsers($user_lat, $user_lon, $radius);
-        
+
         foreach ($store_data as $data) {
             if ($data->distance <= $miles) {
                 $store_ids[] = $data->id;
@@ -987,25 +983,22 @@ class ProductsController extends Controller
      * @version 1.2.0
      */
     public function sellerProducts($seller_id)
-    { 
+    {
         try {
             $data = [];
             $productIds = [];
             $products = "";
-            $roleId = (new User())->getUserRole($seller_id);
-            if($roleId == '5'){
-                $productIds = (new Qty())->getChildSellerProductIds($seller_id);
-                $totalIds = count($productIds);
-                for($i=0; $i<$totalIds; $i++)
-                { 
-                $products =  (new products())->getProductsById($productIds[$i]);
-                $pagination = $products->toArray();
+            $roleId = User::getUserRole($seller_id);
+            if ($roleId[0] == 5) {
+                $productIds = Qty::getChildSellerProductIds($seller_id);
+                for ($i = 0; $i < count($productIds); $i++) {
+                    $products =  Products::getProductsById($productIds[$i]);
+                    $pagination = $products->toArray();
                 }
-            }else if($roleId == '2'){
-                $products = (new products())->getSellerProductsBySellerId($seller_id);
+            } else if ($roleId[0] == 2) {
+                $products = Products::getParentSellerProductsBySellerId($seller_id);
                 $pagination = $products->toArray();
             }
-            
             if (!$products->isEmpty()) {
                 foreach ($products as $product) {
                     $data[] = (new ProductsController())->getProductInfo($product->id);
@@ -1016,7 +1009,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {

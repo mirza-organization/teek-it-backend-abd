@@ -8,6 +8,7 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\RattingsController;
 use Illuminate\Support\Facades\DB;
+
 class Products extends Model
 {
     use Searchable;
@@ -41,6 +42,26 @@ class Products extends Model
         ]);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function quantity()
+    {
+        return $this->hasOne(Qty::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Categories::class);
+    }
+
+    public function quantities()
+    {
+        return $this->hasMany(Qty::class);
+    }
+    
     public static function getProductInfo(int $product_id)
     {
         $product = Products::with('quantity')->find($product_id);
@@ -49,12 +70,10 @@ class Products extends Model
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
-    public static function getProductsById(object $product_id)
+
+    public static function getProductsById(object $product)
     {
-        $product = Products::where('id', $product_id->products_id)
-        ->where('status', '1')
-        ->get();
-        return $product;
+        return Products::where('id', $product->products_id)->where('status', '1')->paginate(20);
     }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
@@ -69,40 +88,24 @@ class Products extends Model
         return $product;
     }
 
-    public function user()
+    public static function getParentSellerProductsBySellerId(int $sellerid)
     {
-        return $this->belongsTo(User::class);
+        return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
     }
 
-    public function quantity()
-    {
-        return $this->hasOne(Qty::class);
-    }
-    public function category()
-    {
-        return $this->belongsTo(Categories::class);
-    }
-    public function quantities()
-    {
-        return $this->hasMany(Qty::class);
-    }
-    public static function getSellerProductsBySellerId(int $sellerid)
-    {
-        return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
-    }
-    public static function getSellerProductsBySellerIdAsc(int $sellerid)
+    public static function getParentSellerProductsBySellerIdAsc(int $sellerid)
     {
         return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
-
     }
+
     public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
     {
         return  Products::where('user_id', '=', $store_id)
-        ->where('sku', '=', $sku)
-        ->where('category_id', '=', $catgory_id)
-        ->first();
-
+            ->where('sku', '=', $sku)
+            ->where('category_id', '=', $catgory_id)
+            ->first();
     }
+
     public static function getProductWeight(int $product_id)
     {
         $product = DB::table('products')
@@ -110,15 +113,17 @@ class Products extends Model
             ->where('id', $product_id)
             ->get();
         return $product[0]->weight;
-
     }
-    public static function getProductVolume(int $product_id){
+
+    public static function getProductVolume(int $product_id)
+    {
         $product = DB::table('products')
             ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
             ->where('id', $product_id)
             ->get();
         return $product[0]->volumn;
     }
+
     public static function getFeaturedProducts(int $store_id)
     {
         return Products::whereHas('user', function ($query) {
@@ -129,5 +134,4 @@ class Products extends Model
             ->orderByDesc('id')
             ->paginate(10);
     }
-
 }
