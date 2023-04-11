@@ -206,9 +206,9 @@ class User extends Authenticatable implements JWTSubject
         return true;
     }
 
-    public static function getUserRole(int $seller_id)
+    public static function getUserRole(int $user_id)
     {
-        return  User::where('id', $seller_id)
+        return  User::where('id', $user_id)
         ->pluck('role_id');
     }
 }
