@@ -241,12 +241,12 @@
         <div class="row">
             @forelse ($data as $single_index)
                 <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
-                    <div class="card text-white card-has-bg click-col"
+                    <div class="card custom-card text-white custom-card-has-bg"
                         @if ($single_index->user_img) style="background-image:url('{{ config('constants.BUCKET') . $single_index->user_img }}');"
                         @else
                         style="background-image:url('{{ asset('/res/res/img/store_logo.png') }}');" @endif>
-                        <div class="card-img-overlay d-flex flex-column">
-                            <div class="card-body">
+                        <div class="card-img-overlay custom-card-img-overlay d-flex flex-column">
+                            <div class="card-body custom-card-body">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input select-checkbox" title="Select"
                                         id="{{ $single_index->id }}">
@@ -264,7 +264,7 @@
                                     <a class="text-white" herf="#">Teek it</a>
                                 </h4> --}}
                             </div>
-                            <div class="card-footer">
+                            <div class="card-footer custom-card-footer">
                                 <div class="media">
                                     {{-- <img class="mr-3 rounded-circle" src="{{ asset('storage/images/dummyemp.png') }}"
                                         alt="Generic placeholder image" style="max-width:50px"> --}}
