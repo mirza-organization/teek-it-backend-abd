@@ -659,7 +659,6 @@ class OrdersController extends Controller
         $order = Orders::find($order_id);
         $temp['order'] = $order;
         $temp['order_items'] = OrderItems::query()->with('products.user')->where('order_id', '=', $order_id)->get();
-        // $temp['seller'] = User::find($order->seller_id);
         return $temp;
     }
 
