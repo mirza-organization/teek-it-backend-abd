@@ -50,12 +50,6 @@ class Qty extends Model
 
     public static function getChildSellerProductIds(int $user_id)
     {
-        if (!empty($user_id)) {
-            return Qty::where('users_id', $user_id)
-                ->select('products_id')
-                ->get();
-        } else {
-            return false;
-        }
+        return Qty::where('users_id', $user_id)->paginate(20);
     }
 }
