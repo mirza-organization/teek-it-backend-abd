@@ -314,7 +314,7 @@ class QtyController extends Controller
                 ], 200);
             }
             foreach ($parent_store_data as $data) {
-                $data = Qty::create([
+                Qty::create([
                     'users_id' => $request->child_store,
                     'products_id' => $data->products_id,
                     'qty' => $data->qty,
