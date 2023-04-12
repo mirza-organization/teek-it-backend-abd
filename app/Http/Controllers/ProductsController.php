@@ -987,10 +987,10 @@ class ProductsController extends Controller
      */
 
     public function sellerProducts(Request $request)
-    { 
+    {
         try {
             $validate = Validator::make($request->all(), [
-                'seller_id' => 'sometimes|required|integer',
+                'seller_id' => 'required|integer',
             ]);
             if ($validate->fails()) {
                 return response()->json([
@@ -999,7 +999,7 @@ class ProductsController extends Controller
                     'message' => $validate->errors()
                 ], 422);
             }
-            $seller_id =$request->seller_id;
+            $seller_id = $request->seller_id;
             $data = [];
             $products = [];
             $role_id = User::getUserRole($seller_id);
