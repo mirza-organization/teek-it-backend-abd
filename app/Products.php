@@ -12,6 +12,31 @@ use Illuminate\Support\Facades\DB;
 class Products extends Model
 {
     use Searchable;
+    /**
+     * Relations
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function quantity()
+    {
+        return $this->hasOne(Qty::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Categories::class);
+    }
+
+    public function quantities()
+    {
+        return $this->hasMany(Qty::class);
+    }
+    /**
+     * Validators
+     */
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [
@@ -41,7 +66,9 @@ class Products extends Model
             'qty' => 'required|string|max:255'
         ]);
     }
-
+    /**
+     * Helpers
+     */
     public static function getProductInfo(int $product_id)
     {
         $product = Products::with('quantity')->find($product_id);
@@ -50,12 +77,12 @@ class Products extends Model
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
+    
     public static function getProductsById(object $product_id)
     {
-        $product = Products::where('id', $product_id->products_id)
-            ->where('status', '1')
-            ->get();
-        return $product;
+        return Products::where('id', $product_id->products_id)
+        ->where('status', '1')
+        ->get();
     }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
@@ -70,26 +97,6 @@ class Products extends Model
         return $product;
     }
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function quantity()
-    {
-        return $this->hasOne(Qty::class);
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(Categories::class);
-    }
-
-    public function quantities()
-    {
-        return $this->hasMany(Qty::class);
-    }
-
     public static function getParentSellerProducts(int $sellerid)
     {
         return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
@@ -98,7 +105,6 @@ class Products extends Model
     public static function getParentSellerProductsAsc(int $sellerid)
     {
         return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
-
     }
 
     public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
@@ -107,7 +113,6 @@ class Products extends Model
             ->where('sku', '=', $sku)
             ->where('category_id', '=', $catgory_id)
             ->first();
-
     }
 
     public static function getProductWeight(int $product_id)
@@ -117,7 +122,6 @@ class Products extends Model
             ->where('id', $product_id)
             ->get();
         return $product[0]->weight;
-
     }
 
     public static function getProductVolume(int $product_id)
@@ -139,5 +143,4 @@ class Products extends Model
             ->orderByDesc('id')
             ->paginate(10);
     }
-
 }

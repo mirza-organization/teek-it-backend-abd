@@ -986,19 +986,22 @@ class ProductsController extends Controller
      * @version 1.2.0
      */
 
-    public function sellerProducts($seller_id)
-    { 
-       
+    public function sellerProducts(Request $request)
+    {
         try {
-            $validator = Validator::make(['seller_id' => $seller_id], [
+            $validate = Validator::make($request->route()->parameters(), [
                 'seller_id' => 'required|integer',
             ]);
-            if ($validator->fails()) {
-                return response()->json([
-                    'message' => 'Invalid seller ID.',
-                    'errors' => $validator->errors(),
-                ], 422);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
+            $seller_id = $request->seller_id;
+
             $data = [];
             $products = [];
             $role_id = User::getUserRole($seller_id);

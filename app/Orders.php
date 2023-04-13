@@ -30,7 +30,7 @@ class Orders extends Model
         return $this->belongsTo(User::class, 'seller_id');
     }
 
-    public function fetchTransportType($order_id = null)
+    public static function fetchTransportType($order_id = null)
     {
         $transposrt_type = [];
         $product_ids = OrderItems::where('order_id', '=', $order_id)->pluck('product_id');
