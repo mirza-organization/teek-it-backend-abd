@@ -52,7 +52,7 @@ class OrdersController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
     /**
