@@ -168,7 +168,7 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::post('customer_cancel_order', [OrdersController::class, 'customerCancelOrder']);
         Route::post('update', [OrdersController::class, 'updateOrder']);
         Route::post('/estimated-time/{id}', [OrdersController::class, 'storeEstimatedTime']);
-        Route::get('/get-order-details/{id}', [OrdersController::class, 'getOrderDetails']);
+        Route::get('/get-order-details/{id}', [OrdersController::class, 'getOrderDetailsTwo']);
         Route::get('/recent_orders/{store_id}', [OrdersController::class, 'recentOrders']);
     });
 
