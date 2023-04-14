@@ -17,8 +17,12 @@ return [
     'ARCHIVED_SUCCESS' => 'Data archived successfully.',
     'UN_ARCHIVED_SUCCESS' => 'Data unarchived successfully.',
     'DELETION_SUCCESS' => 'Data deleted successfully.',
+    'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
+    'REGISTER_SUCCESS' => 'You have Registered  Successfully.',
+    'DATA_INSERTION_SUCCESS' => 'Data Inserted Successfully.',
+    'DATA_UPDATED_SUCCESS' => 'Data Updated Successfully.',
     'SUCCESS_CODE' => 1,
-    'HTTP_SUCCESS_CODE' => 200,
+
     /* Failure Contants */
     'INSERTION_FAILED' => 'Failed to insert data.',
     'UPDATION_FAILED' => 'Failed to update data.',
@@ -28,10 +32,6 @@ return [
     'INVALID_DATA' => 'You have entered invalid or too long data',
     'FAILED_CODE' => 0,
     'STATUS_CHANGING_FAILED' => 'Failed to change the activation status',
-    'HTTP_SERVER_ERROR_CODE' => 500,
-
-    'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
-    'REGISTER_SUCCESS' => 'You have Registered  Successfully.',
 
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',
@@ -42,9 +42,6 @@ return [
 
     'NO_RECORD' => 'No Record Found.',
     'NO_SELLER' => 'No seller found against this id.',
-
-    'DATA_INSERTION_SUCCESS' => 'Data Inserted Successfully.',
-    'DATA_UPDATED_SUCCESS' => 'Data Updated Successfully.',
 
     'ORDER_ASSIGNED' => 'Assigned.',
     'ORDER_UPDATED' => 'Updated.',
@@ -67,11 +64,14 @@ return [
 
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
+    'DATA_ALREADY_EXISTS' => 'Data already exists against id:- ',
+
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
     'STUART_JOBS' => 'https://api.sandbox.stuart.com/v2/jobs',
     'STUART_TOKEN' => 'https://api.sandbox.stuart.com/oauth/token',
     'ADMIN_EMAIL' => 'admin@teekit.co.uk',
 
+    'HTTP_SUCCESS_CODE' => 200,
     'HTTP_OK' => 200,
     'HTTP_SERVER_ERROR' => 500,
     'HTTP_INVALID_ARGUMETS' => 400,
