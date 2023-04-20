@@ -1,0 +1,468 @@
+<div class="content">
+    <!-- Content Header (Page header) -->
+    @if (Auth::user()->role->name == 'seller')
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-12">
+                        <div class="float-right">
+                            <button type="button" class="btn btn-warning">
+                                <a class="text-white" href="/inventory/enable_all">Enable All</a>
+                            </button>
+                            <button type="button" class="btn btn-danger">
+                                <a class="text-white" href="/inventory/disable_all" onclick="disableAll(event)">Disable
+                                    All</a>
+                            </button>
+                            <button type="button" class="btn btn-primary">
+                                <a class="text-white" href="/inventory/add">Add New</a>
+                            </button>
+                            @if (Auth::id() == 306 || Auth::id() == 365)
+                                <button type="button" class="btn btn-primary">
+                                    <a class="text-white" href="/inventory/add_bulk">Add Bulk</a>
+                                </button>
+                            @endif
+                        </div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+    @endif
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <div class="content">
+        
+        @if (Auth::user()->role->name == 'child_seller')
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="d-flex  align-items-center ">
+                        <div class=" me-auto">
+                            <h4 class="py-4 my-1">Inventory</h4>
+                        </div>
+                        <div class="ms-auto">
+                            <form action="" method="post">
+                            <div class="input-group py-4 my-2">
+                                <input type="text" wire:model.debounce.500ms="product" class="form-control py-3"
+                                    placeholder="Search here...">
+                                {{-- <button class="btn btn-primary" type="button"><i class='bx bx-search-alt'></i></button> --}}
+                            &nbsp; &nbsp;
+                                <select class="form-control" required name="category" wire:model.debounce.500ms="category" id="">
+                                    <option value="">Category*</option>
+                                    @foreach ($categories as $cat)
+                                        <option value="{{ $cat->id }}">{{ $cat->category_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="">
+                            {{-- <button type="button" class="btn btn-danger my-3 py-3 w-100" title="Delete selected data" onclick="delUsers()">
+                                <i class="fas fa-trash-alt"></i>
+                            </button> --}}
+                            &nbsp; <button class="btn btn-primary" data-bs-toggle="tooltip" title="Update Bulk"><i class="fa">&#xf021;</i></button>
+
+    
+                        </div>
+                    </form>
+                    </div>
+                 
+                </div><!-- /.container-fluid -->
+            </div>
+            
+        @endif
+        @if (Auth::user()->role->name == 'seller')
+            @if (!empty($featured_products))
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-12">
+                                <h1 class="m-0 text-dark text-center">Featured</h1>
+                            </div><!-- /.col -->
+                        </div><!-- /.row -->
+                    </div><!-- /.container-fluid -->
+                </div>
+
+                <!-- /.container-featured-products-begins -->
+                <div class="container-fluid">
+                    <div class="row">
+                        @forelse ($featured_products as $inventory)
+                            <div class="col-md-12 col-lg-6 col-xl-4 pb-4">
+                                <div class="card change-height">
+                                    <div class="card-body">
+                                        <div class="card-text">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <a href="{{ route('removeFromFeatured', ['product_id' => $inventory->id]) }}"
+                                                        title="Remove From Featured"
+                                                        class="d-block text-right float-right"><i
+                                                            class="far fa-times-circle fa-2x text-danger"></i></a>
+                                                    <a href="/inventory/edit/{{ $inventory->id }}" title="Edit"
+                                                        class="d-block text-right float-right"><img class="img-size-16"
+                                                            src="{{ asset('res/res/img/edit.png') }}"></a>
+                                                    @if ($inventory->status == 1)
+                                                        <a href="/inventory/disable/{{ $inventory->id }}"
+                                                            class=" d-block text-right float-right pr-3 text-danger"><span
+                                                                class="font-weight-bold">Disable</span> (Put Inventory
+                                                            0)</a>
+                                                    @elseif($inventory->status == 0)
+                                                        <a href="/inventory/enable/{{ $inventory->id }}"
+                                                            class=" d-block text-right float-right pr-3 text-primary"><span
+                                                                class="font-weight-bold">Enable</span></a>
+                                                    @endif
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <span class="img-container pt-30 pb-30 mb-3">
+                                                        @if (str_contains($inventory->feature_img, 'https://'))
+                                                            <img class="d-block m-auto "
+                                                                style="height: 200px;object-fit: contain"
+                                                                src="{{ asset($inventory->feature_img) }}">
+                                                        @else
+                                                            <img class="d-block m-auto "
+                                                                style="height: 200px;object-fit: contain"
+                                                                src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                                <div class="col-md-3 mt-1">
+                                                    @if ($inventory->images)
+                                                        <?php $count = 0; ?>
+                                                        @foreach ($inventory->images as $img)
+                                                            <?php if ($count == 3) {
+                                                                break;
+                                                            } ?>
+                                                            <span class="img-container mb-1">
+                                                                @if (str_contains($img->product_image, 'https://'))
+                                                                    <img class="d-block m-auto"
+                                                                        src="{{ asset($img->product_image) }}">
+                                                                @else
+                                                                    <!-- <img class="d-block m-auto" src="{{ asset('user_imgs/' . $img->product_image) }}" > -->
+                                                                    <img class="d-block m-auto"
+                                                                        src="{{ asset(config('constants.BUCKET') . $img->product_image) }}">
+                                                                @endif
+                                                            </span>
+                                                            <?php $count++; ?>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xl-6">
+                                                <div class="">
+                                                    <h4
+                                                        class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
+                                                        <a href="/inventory/edit/{{ $inventory->id }}"
+                                                            class="d-block text-site-primary">{{ $inventory->product_name }}</a>
+
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-1">
+                                                <div class="">
+                                                    <h4
+                                                        class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
+                                                        <?php
+                                            if ($inventory->colors) {
+                                                $colors = json_decode($inventory->colors, true);
+                                                foreach ($colors as $c_key => $color) :
+                                            ?>
+                                                        <span class="color-circle color-{{ $c_key }}"
+                                                            style="background: {{ $c_key }}"></span>
+                                                        <?php
+                                                endforeach;
+                                            }
+                                            ?>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-5">
+                                                <div class="">
+                                                    <h6
+                                                        class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
+                                                        <a href="#"
+                                                            class="d-block text-site-primary">SKU:{{ $inventory->sku }}</a>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="ratting pl-3">
+                                                    <?php
+                                        $rating = round($inventory->ratting['average']);
+                                        for ($i = 1; $i <= 5; $i++) :
+                                        ?>
+                                                    <span
+                                                        class="fa fa-star 
+                                    <?php if ($i <= $rating) {
+                                        echo 'checked';
+                                    } ?>">
+                                                    </span>
+                                                    <?php endfor; ?>
+                                                </div>
+                                            </div>
+                                            <!--  -->
+                                            <div class="col-md-6">
+                                                <div class="ratting pl-3 text-right text-bold">
+                                                    @if ($inventory->discount_percentage == 0.0)
+                                                        <span
+                                                            class="text-lg text-primary">£{{ $inventory->price }}</span>
+                                                    @else
+                                                        <del
+                                                            class="text-danger d-block">£{{ $inventory->price }}</del>
+                                                        <span class="text-lg text-primary">£
+                                                            <?php echo $inventory->price - ($inventory->discount_percentage / 100) * $inventory->price; ?>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                        <h1 class="text-dark">No Products Found :(</h1>
+                        @endforelse
+
+                        
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-featured-products-ends -->
+            @endif
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-12">
+                            <h1 class="m-0 text-dark text-center">Inventory</h1>
+                        </div><!-- /.col -->
+                    </div><!-- /.row -->
+                </div><!-- /.container-fluid -->
+            </div>
+            <!-- /.container-products-begins -->
+            <div class="container-fluid">
+                <div class="row">
+                    @foreach ($inventories as $inventory)
+                        <div class="col-md-12 col-lg-6 col-xl-4 pb-4">
+                            <div class="card change-height">
+                                <div class="card-body">
+                                    <a href="" class=" d-block text-right">
+                                        <div class="card-text">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <a href="{{ route('markAsFeatured', ['product_id' => $inventory->id]) }}"
+                                                        title="Mark As Featured"
+                                                        class="d-block text-right float-right"><i
+                                                            class="fas fa-star fa-2x text-warning"></i></a>
+                                                    <a href="/inventory/edit/{{ $inventory->id }}" title="Edit"
+                                                        class="d-block text-right float-right"><img
+                                                            class="img-size-16"
+                                                            src="{{ asset('res/res/img/edit.png') }}"></a>
+                                                    @if ($inventory->status == 1)
+                                                        <a href="/inventory/disable/{{ $inventory->id }}"
+                                                            class="d-block text-right float-right pr-3 text-danger"><span
+                                                                class="font-weight-bold">Disable</span> (Put Inventory
+                                                            0)</a>
+                                                    @elseif($inventory->status == 0)
+                                                        <a href="/inventory/enable/{{ $inventory->id }}"
+                                                            class="d-block text-right float-right pr-3 text-primary"><span
+                                                                class="font-weight-bold">Enable</span></a>
+                                                    @endif
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <span class="img-container pt-30 pb-30 mb-3">
+                                                        @if (str_contains($inventory->feature_img, 'https://'))
+                                                            <img class="d-block m-auto "
+                                                                style="height: 200px;object-fit: contain"
+                                                                src="{{ asset($inventory->feature_img) }}">
+                                                        @else
+                                                            <!-- <img class="d-block m-auto " style="height: 200px;object-fit: contain" src="{{ asset('user_imgs/' . $inventory->feature_img) }}" > -->
+                                                            <img class="d-block m-auto "
+                                                                style="height: 200px;object-fit: contain"
+                                                                src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                                <div class="col-md-3 mt-1">
+                                                    @if ($inventory->images)
+                                                        <?php $count = 0; ?>
+                                                        @foreach ($inventory->images as $img)
+                                                            <?php if ($count == 3) {
+                                                                break;
+                                                            } ?>
+                                                            <span class="img-container mb-1">
+                                                                @if (str_contains($img->product_image, 'https://'))
+                                                                    <img class="d-block m-auto"
+                                                                        src="{{ asset($img->product_image) }}">
+                                                                @else
+                                                                    <!-- <img class="d-block m-auto" src="{{ asset('user_imgs/' . $img->product_image) }}" > -->
+                                                                    <img class="d-block m-auto"
+                                                                        src="{{ asset(config('constants.BUCKET') . $img->product_image) }}">
+                                                                @endif
+                                                            </span>
+                                                            <?php $count++; ?>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xl-6">
+                                                <div class="">
+                                                    <h4
+                                                        class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
+                                                        <a href="/inventory/edit/{{ $inventory->id }}"
+                                                            class="d-block text-site-primary">{{ $inventory->product_name }}</a>
+                                                        <a href=""
+                                                            class="d-block text-site-primary">({{ $inventory->category->category_name }}
+                                                            )</a>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-1">
+                                                <div class="">
+                                                    <h4
+                                                        class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
+                                                        <?php
+                                            if ($inventory->colors) {
+                                                $colors = json_decode($inventory->colors, true);
+                                                foreach ($colors as $c_key => $color) :
+                                            ?>
+                                                        <span class="color-circle color-{{ $c_key }}"
+                                                            style="background: {{ $c_key }}"></span>
+                                                        <?php
+                                                endforeach;
+                                            }
+                                            ?>
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-5">
+                                                <div class="">
+                                                    <h6
+                                                        class="d-block text-left p-3 pb-0 m-0 text-site-primary text-lg">
+                                                        <a href="#"
+                                                            class="d-block text-site-primary">SKU:{{ $inventory->sku }}</a>
+                                                    </h6>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="ratting pl-3">
+                                                    <?php
+                                        $rating = round($inventory->ratting['average']);
+                                        for ($i = 1; $i <= 5; $i++) :
+                                        ?>
+                                                    <span
+                                                        class="fa fa-star 
+                                            <?php if ($i <= $rating) {
+                                                echo 'checked';
+                                            } ?>">
+                                                    </span>
+                                                    <?php endfor; ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="ratting pl-3 text-right text-bold">
+                                                    @if ($inventory->discount_percentage == 0.0)
+                                                        <span
+                                                            class="text-lg text-primary">£{{ $inventory->price }}</span>
+                                                    @else
+                                                        <del
+                                                            class="text-danger d-block">£{{ $inventory->price }}</del>
+                                                        <span class="text-lg text-primary">£
+                                                            <?php echo $inventory->price - ($inventory->discount_percentage / 100) * $inventory->price; ?>
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-md-12">
+                        {{ $inventory_p->links() }}
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-products-ends -->
+    </div>
+@elseif(Auth::user()->role->name == 'child_seller')
+
+    <table class="table">
+        <thead class="bg-light">
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Qty</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        @forelse ($inventories as $key => $inventory)
+            <tbody>
+                <tr class="bg-white">
+                    <td class="align-middle fit-content">
+                            @if (str_contains($inventory->feature_img, 'https://'))
+                                <img class="img-fluid rounded standard-img-size"
+                                    src="{{ asset($inventory->feature_img) }}">
+                            @else
+                                <img class="img-fluid rounded-pill standard-img-size " 
+                                    src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
+                            @endif
+                        
+                    </td>
+                    <td class="align-middle fit-content">
+                        <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
+                    </td>
+
+                    
+                        <td class="align-middle fit-content">
+                            <?php
+                            $q['qty'] = 0;
+                            ?>
+                            @foreach ($inventory->quantities as $quantity)
+                                {{-- Product id == $inventory->id --}}
+                                @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
+                                    <?php
+                                    $q['qty'] = $quantity->qty;
+                                    ?>
+                                @endif
+                            @endforeach
+                            <input class="form-control qtyInput" min="0" style="width:80px;" type="number"
+                                name="qty" id="qty"  value="<?php echo !empty($q['qty']) ? $q['qty'] : 0; ?>" wire:change="updateQuantity({{ $inventory->id }}, $event.target.value)" >
+                            <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
+                            {{-- The following code was unnecessary --}}
+                            {{-- <input type="hidden" id="parent_id" name="parent_id"
+                                value="{{ $inventory->user_id }}"> --}}
+                            {{-- <input type="hidden" id="qty_id" name="qty_id" value="<?php echo $q['qty_id']; ?>"> --}}
+                        </td>
+                        <td class="align-middle fit-content">
+                            <button class="btn btn-success" type="button" data-bs-toggle="tooltip" title="Update"><i class="fa">&#xf021;</i></button>
+                        </td>
+                    
+                </tr>
+            
+            @empty 
+            <tr>
+                <td colspan="4"><center><h4 class="text-dark">No Products Found :(</h4></center></td>
+            </tr>
+        @endforelse
+    </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-md-12">
+            {{ $inventory_p->links() }}
+        </div>
+    </div>
+    @endif
+    <!-- /.content -->
+
+</div>
+<style>
+    .standard-img-size{
+        height:100px;
+        margin:5px;
+
+    }
+    .fit-content{width: fit-content;}
+    </style>
