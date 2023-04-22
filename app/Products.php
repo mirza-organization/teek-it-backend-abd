@@ -97,14 +97,30 @@ class Products extends Model
         return $product;
     }
 
-    public static function getParentSellerProducts(int $sellerid)
+    public static function getParentSellerProducts(int $seller_id)
     {
-        return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->paginate(20);
     }
 
-    public static function getParentSellerProductsAsc(int $sellerid)
+    public static function getParentSellerProductsAsc(int $seller_id)
     {
-        return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+    }
+
+    public static function getChildSellerProducts(int $child_seller_id)
+    {
+            $parent_seller_id = User::find($child_seller_id)->parent_store_id;
+            $qty = Qty::where('users_id', $child_seller_id)->first();
+            if (!empty($qty)) {
+                return Products::where('user_id', $parent_seller_id)
+                ->with([
+                    'quantities' => function ($q) use ($child_seller_id) {
+                        $q->where('users_id', $child_seller_id);
+                    }
+                ]);
+            } else {
+                return Products::with('quantity')->where('user_id', $parent_seller_id);
+            }
     }
 
     public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
