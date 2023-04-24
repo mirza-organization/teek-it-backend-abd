@@ -620,7 +620,6 @@ class OrdersController extends Controller
             $order->payment_status = $request->payment_status;
             $order->order_status = $request->order_status;
             $order->transaction_id = $request->transaction_id;
-
             $order->driver_charges = $request->driver_charges;
             $order->driver_traveled_km = $request->driver_traveled_km;
             $order->save();
