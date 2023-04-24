@@ -124,7 +124,6 @@ class Products extends Model
     public static function getSellerProductsBySellerId($sellerid)
     {
         return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
-
     }
     
     public static function getSellerProductsBySellerIdAsc($sellerid)
@@ -157,7 +156,7 @@ class Products extends Model
         return $product[0]->volumn;
     }
     
-public static function getFeaturedProducts($store_id)
+    public static function getFeaturedProducts($store_id)
     {
         return Products::whereHas('user', function ($query) {
             $query->where('is_active', 1);
@@ -168,7 +167,7 @@ public static function getFeaturedProducts($store_id)
             ->paginate(10);
     }
 
-    public static function getActiveProducts(){
+ public static function getActiveProducts(){
         return Products::whereHas('user', function ($query) {
             $query->where('is_active', 1);
         })->where('status', 1)->paginate();
@@ -193,5 +192,4 @@ public static function getFeaturedProducts($store_id)
         $ids = explode(',', $request->ids);
         return Products::query()->whereIn('id', $ids)->paginate();
     }
-
 }

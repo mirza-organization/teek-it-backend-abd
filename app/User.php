@@ -142,7 +142,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany('App\Orders');
     }
-
+    
     public static function getParentAndChildSellers()
     {
        return User::where('is_active', 1)
@@ -188,4 +188,6 @@ class User extends Authenticatable implements JWTSubject
             static::sendStoreApprovedEmail($user);
         }
     }
+
 }
+
