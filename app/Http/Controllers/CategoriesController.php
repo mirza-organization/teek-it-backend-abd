@@ -118,7 +118,7 @@ class CategoriesController extends Controller
      * @version 1.9.0
      */
     public function products(Request $request)
-    {
+     {
         try {
             $validate = Validator::make($request->route()->parameters(), [
                 'category_id' => 'required|integer',
