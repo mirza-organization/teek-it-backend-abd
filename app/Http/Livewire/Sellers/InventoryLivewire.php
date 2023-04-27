@@ -19,21 +19,14 @@ class InventoryLivewire extends Component
         $category,
         $product,
         $productId,
-        $qty=[],
+        $qty = [],
         $product_id,
-        $updatedQuantity,
         $search = '';
 
-        
-    public function updateQuantity($productid)
+
+    public function updateQuantity($product_id)
     {
-        $quantity = $this->qty[$productid]; 
-        QTY::updateChildProductQty(Auth::id(), $productid, $quantity);
-    
-    
-        // Quantuty should be updated w.r.t UserID, ProductID to avoid Update all products of all stores
-        // Qty::where('products_id', $id)
-        //     ->update(['qty' => $qty]);
+        Qty::updateChildProductQty(Auth::id(), $product_id, $this->qty[$product_id]);
     }
 
     public function render()
@@ -58,7 +51,6 @@ class InventoryLivewire extends Component
             // }
             $featured = [];
             $inventory = Products::getChildSellerProducts(Auth::id());
-                
         }
         //if not child seller then this condition will run for parent store
         else {
@@ -66,15 +58,15 @@ class InventoryLivewire extends Component
             $inventory = Products::getParentSellerProductsDesc($parent_seller_id);
             // get parent seller products method should be called here 
             $featured = Products::query()->where('user_id', '=', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
-        // get featured products method should be called here 
+            // get featured products method should be called here 
         }
         //searching product by name and category
         if ($this->search) $inventory = $inventory->where('product_name', 'LIKE', "%{$this->search}%");
         if ($this->category_id) $inventory = $inventory->where('category_id', '=', $this->category_id);
-        
+
         Gate::allows('child_seller') ? $inventory = $inventory->paginate(20) : $inventory = $inventory->paginate(9);
         $inventory_p = $inventory;
-         $inventories = $inventory;
+        $inventories = $inventory;
 
         // $featured_products = [];
         // if (Gate::allows('seller')) {

@@ -168,36 +168,25 @@
                                 <td class="align-middle fit-content">
                                     <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
                                 </td>
-                               
                                 <td class="align-middle fit-content">
-
-                                    <?php $q['qty'] = 0;
-                                    ?>
-
-                                    
-                                        {{-- Product id == $inventory->id --}}
-                                        
-                                            
-                                        
-                                    @foreach ($inventory->quantities as $quantity)
-                                    @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
-
-                                    @endif
-                                    @endforeach
+                                    <?php $q['qty'] = 0; ?>
+                                    {{-- @foreach ($inventory->quantities as $quantity)
+                                        //Product id == $inventory->id
+                                        @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
+                                        @endif
+                                    @endforeach --}}
                                     <input class="form-control qtyInput" min="0" style="width:80px;"
-                                        type="number" wire:model="qty.{{$inventory->id }}" id="qty" value='123'
-                                        wire:key="{{$inventory->id }}">
-                                        
+                                        type="number" wire:model="qty.{{ $inventory->id }}" id="qty"
+                                        value='0' wire:key="{{ $inventory->id }}">
                                     <input type="hidden" id="product_id" wire:model="product_id"
-                                        value="{{$inventory->id }}">
+                                        value="{{ $inventory->id }}">
                                 </td>
                                 <td class="align-middle fit-content">
-                                    <button class="btn btn-success" type="button" data-bs-toggle="tooltip" title="Update" wire:click="updateQuantity({{ $inventory->id }})">
+                                    <button class="btn btn-success" type="button" data-bs-toggle="tooltip"
+                                        title="Update" wire:click="updateQuantity({{ $inventory->id }})">
                                         <i class="fas fa-sync"></i>
                                     </button>
-
                                 </td>
-                          
                             </tr>
                         @empty
                             <tr>
@@ -219,7 +208,6 @@
             <!-- {{ $inventories->links() }} -->
         </div>
     </div>
-
 </div>
 
 
@@ -609,10 +597,7 @@
             <!-- /.container-products-ends -->
     </div>
     @endif
-{{--  --}}
-    
+    {{--  --}}
+
     <!-- /.content -->
 </div>
-<style>
-    
-</style>
