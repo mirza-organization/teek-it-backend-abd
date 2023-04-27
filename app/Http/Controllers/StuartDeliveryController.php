@@ -36,7 +36,7 @@ class StuartDeliveryController extends Controller
     {
         try {
             $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
-            $transport_type = (new Orders())->fetchTransportType($request->order_id);
+            $transport_type = Orders::fetchTransportType($request->order_id);
             $access_token = $this->stuartAccessToken();
 
             $job = [
@@ -61,7 +61,7 @@ class StuartDeliveryController extends Controller
                             'package_type' => 'medium',
                             'package_description' => 'Package purchased from Teek it.',
                             'transport_type' => $transport_type,
-                            'client_reference' => $request->order_id,
+                            'client_reference' => ($request->custom_order_id) ? $request->custom_order_id : $request->order_id,
                             'address' => $order_details->address . ' House#' . $order_details->house_no,
                             'comment' => 'Please try to call the customer before reaching the destination.',
                             // 'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',

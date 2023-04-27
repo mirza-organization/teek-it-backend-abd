@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserAndRoleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Livewire\Admin\ParentSellersLiveWire;
+use App\Http\Livewire\Sellers\Inventorylivewire;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProductsController;
@@ -41,6 +42,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 */
 Route::prefix('inventory')->group(function () {
     Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
+   
+    Route::get('/test', InventoryLivewire::class)->name('testinventory');
+    // Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
     Route::get('/edit/{product_id}', [HomeController::class, 'inventoryEdit']);
     Route::post('/update_child_qty', [QtyController::class, 'updateChildQty'])->name('update_child_qty');
     Route::get('/add', [HomeController::class, 'inventoryAdd']);
@@ -138,7 +142,7 @@ Route::get('/users/{user_id}/status/{status}', [HomeController::class, 'changeUs
 Route::get('/users_del', [HomeController::class, 'adminUsersDel'])->name('admin.del.users');
 Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');
 Route::post('/store_info/update', [HomeController::class, 'updateStoreInfo'])->name('admin.image.update');
-Route::get('/stuart/job/creation/{order_id}', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
+Route::post('/stuart/job/creation/', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
 Route::post('/stuart/job/status', [StuartDeliveryController::class, 'stuartJobStatus'])->name('stuart.job.status');
 
 /*

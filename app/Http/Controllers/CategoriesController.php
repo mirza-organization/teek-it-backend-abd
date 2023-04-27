@@ -117,10 +117,24 @@ class CategoriesController extends Controller
      * It will get the products of a specific category 
      * @version 1.9.0
      */
-    public function products($category_id)
-    {
+    public function products(Request $request)
+     {
         try {
-            $data = Categories::getProducts($category_id);
+            $validate = Validator::make($request->route()->parameters(), [
+                'category_id' => 'required|integer',
+            ]);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
+            }
+            if ($request->store_id)
+                $data = Categories::getProductsByStoreId($request->category_id, $request->store_id);
+            else
+                $data = Categories::getProducts($request->category_id);
             if (!empty($data)) {
                 return JsonResponseCustom::getApiResponseExtention(
                     $data['data'],
@@ -137,7 +151,7 @@ class CategoriesController extends Controller
                     config('constants.NO_RECORD'),
                     'pagination',
                     [],
-                    config('contants.HTTP_SERVER_ERROR')
+                    config('constants.HTTP_SERVER_ERROR')
                 );
             }
         } catch (Throwable $error) {

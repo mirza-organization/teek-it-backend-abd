@@ -68,7 +68,7 @@ Route::prefix('qty')->group(function () {
     Route::get('product/{store_id}', [QtyController::class, 'getByStoreId']);
     Route::get('product/{store_id}/{prod_id}', [QtyController::class, 'getById']);
     Route::post('update/{prod_id}', [QtyController::class, 'updateById']);
-    // Route::post('insert_parent_qty_to_child', 'QtyController@insertParentQtyToChild');
+    Route::post('insert_parent_qty_to_child', [QtyController::class, 'insertParentQtyToChild'])->middleware('jwt.verify');
     // Route::get('multi-curl', 'QtyController@multiCURL');
     // Route::get('shifting-qty', 'QtyController@shiftQtyInProductsToQtyTable');
 });
@@ -168,7 +168,7 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::post('customer_cancel_order', [OrdersController::class, 'customerCancelOrder']);
         Route::post('update', [OrdersController::class, 'updateOrder']);
         Route::post('/estimated-time/{id}', [OrdersController::class, 'storeEstimatedTime']);
-        Route::get('/get-order-details/{id}', [OrdersController::class, 'getOrderDetails']);
+        Route::get('/get-order-details/{id}', [OrdersController::class, 'getOrderDetailsTwo']);
         Route::get('/recent_orders/{store_id}', [OrdersController::class, 'recentOrders']);
     });
 

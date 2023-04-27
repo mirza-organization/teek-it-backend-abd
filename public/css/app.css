@@ -183,3 +183,12 @@
         border-color: #80bdff;
         color: #8aa7d7 !important;
     }
+
+    .standard-img-size {
+        height: 100px;
+        margin: 5px;
+    }
+
+    .fit-content {
+        width: fit-content;
+    }

@@ -11,6 +11,9 @@
         @if (Auth::user()->role_id === 1)
             @include('layouts.admin.navbar')
             @include('layouts.admin.sidebar')
+        @elseif(Auth::user()->role_id == 2 || Auth::user()->role_id == 5 )
+            @include('layouts.shopkeeper.navbar')
+            @include('layouts.shopkeeper.sidebar')
         @endif
 
         <!-- Content Wrapper. Contains page content -->

@@ -306,19 +306,35 @@ class QtyController extends Controller
                 ], 422);
             }
             $parent_store_data = Qty::where('users_id', $request->parent_store)->get();
-            if ($parent_store_data->isEmpty()) {
+            $child_store_data = Qty::where('users_id', $request->child_store)->first();
+            if (!is_null($child_store_data)) {
+                return response()->json([
+                    'data' => [],
+                    'status' => true,
+                    'message' => config('constants.DATA_ALREADY_EXISTS') . $request->child_store
+                ], 200);
+            } elseif ($parent_store_data->isEmpty()) {
                 return response()->json([
                     'data' => [],
                     'status' => true,
                     'message' => config('constants.NO_SELLER')
                 ], 200);
             }
-            foreach ($parent_store_data as $data) {
-                $data = Qty::create([
-                    'users_id' => $request->child_store,
-                    'products_id' => $data->products_id,
-                    'qty' => $data->qty,
-                ]);
+            /**
+             * Split data into chunks of 1000 rows each
+             */
+            $chunked_data = array_chunk($parent_store_data->toArray(), 1000);
+            foreach ($chunked_data as $chunk) {
+                $data = [];
+                foreach ($chunk as $item) {
+                    $data[] = [
+                        'users_id' => $request->child_store,
+                        'products_id' => $item['products_id'],
+                        'qty' => $item['qty'],
+                        'created_at' => Carbon::now()
+                    ];
+                }
+                Qty::insert($data);
             }
             return response()->json([
                 'data' => [],

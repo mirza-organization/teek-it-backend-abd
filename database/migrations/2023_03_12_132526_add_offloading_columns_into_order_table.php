@@ -14,8 +14,8 @@ class AddOffloadingColumnsIntoOrderTable extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->tinyInteger('offloading')->nullable()->comment('0: No, 1: Yes')->after('column_name_before_offloading');
-            $table->float('offloading_charges', 10, 2)->after('offloading');
+            $table->tinyInteger('offloading')->nullable()->comment('0: No, 1: Yes')->after('service_charges');
+            $table->float('offloading_charges', 10, 2)->nullable()->after('offloading');
         });
     }
 

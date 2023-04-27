@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StoreRegisterMail;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -12,7 +13,7 @@ use Validator;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable, SoftDeletes;
     // use EntrustUserTrait;
 
     /**
@@ -88,7 +89,37 @@ class User extends Authenticatable implements JWTSubject
             'roles' => $this->roles
         ];
     }
+    /**
+     * Relations
+     */
+    // Many-to-many relationship
+    public function roles()
+    {
+        return $this->belongsToMany('App\Role', 'role_user');
+    }
 
+    public function role()
+    {
+        return $this->belongsTo('App\Role');
+    }
+    // Many-to-many relationship
+    public function seller()
+    {
+        return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
+    }
+    // Many-to-many relationship
+    public function driver()
+    {
+        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
+    }
+    // One-to-many relationship
+    public function orders()
+    {
+        return $this->hasMany('App\Orders');
+    }
+    /**
+     * Validators
+     */
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [
@@ -118,64 +149,49 @@ class User extends Authenticatable implements JWTSubject
             'address_2' => ''
         ]);
     }
-    // Many-to-many relationship
-    public function roles()
-    {
-        return $this->belongsToMany('App\Role', 'role_user');
-    }
-    public function role()
-    {
-        return $this->belongsTo('App\Role');
-    }
-    // Many-to-many relationship
-    public function seller()
-    {
-        return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
-    }
-    // Many-to-many relationship
-    public function driver()
-    {
-        return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
-    }
-    // One-to-many relationship
-    public function orders()
-    {
-        return $this->hasMany('App\Orders');
-    }
-    
+    /**
+     * Helpers
+     */
     public static function getParentAndChildSellers()
     {
-       return User::where('is_active', 1)
-                    ->whereIn('role_id', [2, 5])
-                    ->orderBy('business_name', 'asc')
-                    ->get();
+        return User::where('is_active', 1)
+            ->whereIn('role_id', [2, 5])
+            ->orderBy('business_name', 'asc')
+            ->get();
     }
-    
+
+    public static function getParentSellers(string $search)
+    {
+        return User::where('business_name', 'like', '%' . $search . '%')
+            ->where('role_id', 2)
+            ->orderBy('business_name', 'asc')
+            ->paginate(9);
+    }
+
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
-        $users = User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-            cos( radians(users.lat) ) *
-            cos( radians(users.lon) - radians(" . $user_lon . ") ) +
-            sin( radians(" . $user_lat . ") ) *
-            sin( radians(users.lat) ) ) )
-            AS distance")
+        return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
+                                cos( radians(users.lat) ) *
+                                cos( radians(users.lon) - radians(" . $user_lon . ") ) +
+                                sin( radians(" . $user_lat . ") ) *
+                                sin( radians(users.lat) ) ) )
+                                AS distance")
             ->having("distance", "<", $radius)
             ->orderBy("distance", "ASC")
             ->get();
-        return $users;
     }
 
-  public static function sendStoreApprovedEmail(object $user)
+    public static function sendStoreApprovedEmail(object $user)
     {
         $html = '<html>
             Hi, ' . $user->name . '<br><br>
             Thank you for registering on ' . env('APP_NAME') . '.
             <br>
             Your store has been approved. Please login to the
-            <a href="' . url('/') . '">Store</a> to update your store
+            <a href="' . env('FRONTEND_URL') . '">Store</a> to update your store
             <br><br><br>
                      </html>';
-        $subject = env('APP_NAME') . ': Account Approved!';
+        $subject = url('/') . ': Account Approved!';
         Mail::to($user->email)
             ->send(new StoreRegisterMail($html, $subject));
     }
@@ -187,7 +203,12 @@ class User extends Authenticatable implements JWTSubject
             $user = User::findOrFail($user_id);
             static::sendStoreApprovedEmail($user);
         }
+        return true;
     }
 
+    public static function getUserRole(int $user_id)
+    {
+        return  User::where('id', $user_id)
+            ->pluck('role_id');
+    }
 }
-

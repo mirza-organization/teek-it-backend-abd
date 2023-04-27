@@ -16,6 +16,8 @@
      <!-- Theme style - Bootstrap 4 Css-->
      <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
      <!-- Bootstrap 5 Css -->
+    
+     <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
      <link href="{{ asset('bootstrap5/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('res/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <!-- Google Font: Source Sans Pro -->
@@ -26,126 +28,10 @@
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         <!-- Navbar -->
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <div class="container">
-                <!-- Left navbar links -->
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link d-sm-block d-md-block d-lg-none " data-widget="pushmenu" href="#"
-                            role="button"><i class="fas fa-bars"></i></a>
-                    </li>
-                </ul>
-
-                <!-- SEARCH FORM -->
-                <!-- <form class="d-block w-100 ml-3">
-                    <div class="input-group input-group-sm" style=" border-bottom: 1px solid #d4d4d4; ">
-                        <div class="input-group-append">
-                            <button class="bg-transparent  btn btn-navbar" type="submit">
-                                <i class="bg-transparent fas fa-search" style="    color: #3a4b83;"></i>
-                            </button>
-                        </div>
-                        <input aria-label="Search" class="bg-transparent  form-control form-control-navbar w-100" placeholder="Search" type="search">
-                    </div>
-                </form> -->
-
-                <!-- Right navbar links -->
-                <ul class="navbar-nav ml-sm-5">
-                    <li class="nav-item d-block">
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                            @csrf
-                        </form>
-                        <a href="{{ route('logout') }}"
-                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">Logout</a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        @include('layouts.shopkeeper.navbar')
         <!-- /.navbar -->
-
         <!-- Main Sidebar Container -->
-        <aside class="main-sidebar sidebar-dark-primary" style=" overflow: initial; ">
-            <!-- Brand Logo -->
-            <a class="nav-link nav-sidebar-arrow" onclick="jQuery('.navbar-nav>.nav-item>.nav-link').click();"> <img
-                    alt="" src="{{ asset('res/res/img/arrow.png') }}"></a>
-            <a class="brand-link" href="/" style="display:block;opacity: 1">
-                <img alt="AdminLTE Logo" class="brand-image" src="{{ asset('res/res/img/logo.png') }}"
-                    style="display: block; opacity: 1">
-            </a>
-
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <!-- Sidebar user panel (optional) -->
-
-                <!-- Sidebar Menu -->
-                <nav class="mt-5">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview"
-                        role="menu">
-                        <!-- Add icons to the links using the .nav-icon class
-                         with font-awesome or any other icon font library -->
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }} " href="/">
-                                <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p class="ml-2">
-                                    Dashboard
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }} " href="/inventory">
-                                <i class="nav-icon fas fa-boxes"></i>
-                                <p class="ml-2">
-                                    Inventory
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('orders') ? 'active' : '' }}" href="/orders">
-                                <i class="nav-icon fas fa-clipboard-list"></i>
-                                <p class="ml-2">
-                                    Orders
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('withdrawals') ? 'active' : '' }}" href="/withdrawals">
-                                <i class="nav-icon fas fa-clipboard-list"></i>
-                                <p class="ml-2">
-                                    Withdrawals
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link ">
-                                <i class="nav-icon fas fa-user-secret"></i>
-                                <p>
-                                    Admin
-                                    <i class="fas fa-angle-left right"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a href="/settings/general" class="nav-link">
-                                        <i class="fas fa-gears nav-icon"></i>
-                                        <p>General Settings</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="/settings/payment" class="nav-link">
-                                        <i class="fas fa-money nav-icon"></i>
-                                        <p>Payment Settings</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
-                    </ul>
-                </nav>
-                <!-- /.sidebar-menu -->
-            </div>
-            <!-- /.sidebar -->
-        </aside>
-
+        @include('layouts.shopkeeper.sidebar')
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <div class="row">
@@ -177,8 +63,9 @@
     {{-- <!-- Bootstrap 4 -->
     <script src="{{ asset('res/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script> --}}
      <!-- Bootstrap 5 -->
-     <script src="{{ asset('bootstrap5/js/bootstrap.min.js') }}"></script>
-     <script src="{{ asset('bootstrap5/js/bootstrap.bundle.min.js') }}"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+
     <!-- AdminLTE App -->
     <script src="{{ asset('res/dist/js/adminlte.min.js') }}"></script>
 
@@ -589,6 +476,9 @@
     <script src="{{ asset('res/plugins/select2/js/select2.min.js') }}"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     @yield('scripts')
 </body>
 

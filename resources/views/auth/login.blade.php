@@ -139,13 +139,13 @@
     </div>
 </div>
 <!-- Google Map Modal - Begins -->
-<div class="modal fade" id="map_modal">
+<div class="modal hide" id="map_modal">
     <div class="modal-dialog modal-lg  modal-dialog-centered">
         <div class="modal-content">
             <!-- Modal Header -->
             <div class="modal-header">
                 <h4 class="modal-title">Add Location</h4>
-                <button type="button" class="close" data-bs-dismiss="modal">&times;</button>
+                <button type="button" id="locationModel" class="close" data-bs-dismiss="modal">&times;</button>
             </div>
             <!-- Modal body -->
             <div class="modal-body">

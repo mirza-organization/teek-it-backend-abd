@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Categories;
 use App\productImages;
 use App\Products;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Validator;
 use Stripe\Product;
 use Throwable;
 use App\Services\JsonResponseCustom;
+
 class ProductsController extends Controller
 {
     /**
@@ -73,7 +75,6 @@ class ProductsController extends Controller
      */
     public function add(Request $request)
     {
-       
         $validate = Products::validator($request);
         if ($validate->fails()) {
             return JsonResponseCustom::getApiResponse(
@@ -258,7 +259,6 @@ class ProductsController extends Controller
                 config('constants.NO_RECORD'),
                 config('constants.HTTP_INVALID_ARGUMENTS')
             );
-            
         }
         $product->category_id = $request->category_id;
         $product->product_name = $request->product_name;
@@ -300,7 +300,6 @@ class ProductsController extends Controller
             config('constants.DATA_UPDATED_SUCCESS'),
             config('constants.HTTP_OK')
         );
-        
     }
     /**
      * This function return product information
@@ -309,12 +308,40 @@ class ProductsController extends Controller
      */
     public function getProductInfo($product_id)
     {
-        return (new Products())->getProductInfo($product_id);
+        $qty = Products::with('quantity')
+            ->where('id', $product_id)
+            ->first();
+            if($qty){
+        $quantity = $qty->quantity->qty;
+        $product = Products::with('quantity')
+            ->select(['*', DB::raw("$quantity as qty")])
+            ->find($product_id);
+        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $product->category = Categories::find($product->category_id);
+        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        return $product;
+            }else
+            {
+                return $product="";
+            }
     }
-    
+
     public function getProductInfoWithQty($product_id, $store_id)
     {
-        return (new Products())->getProductInfoWithQty($product_id, $store_id);
+        $qty = Products::with('quantity')
+            ->where('user_id', $store_id)
+            ->where('id', $product_id)
+            ->first();
+        $quantity = $qty->quantity->qty;
+        $product = Products::with('quantity')
+            ->where('user_id', $store_id)
+            ->where('id', $product_id)
+            ->select(['*', DB::raw("$quantity as qty")])
+            ->first();
+        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $product->category = Categories::find($product->category_id);
+        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        return $product;
     }
     /**
      * All products listing
@@ -324,12 +351,14 @@ class ProductsController extends Controller
     public function all()
     {
         try {
-            $products = (new Products())->getActiveProducts();
+            $products = Products::whereHas('user', function ($query) {
+                $query->where('is_active', 1);
+            })->where('status', 1)->paginate();
             $pagination = $products->toArray();
             if (!empty($products)) {
                 $products_data = [];
                 foreach ($products as $product) {
-                    $data = (new Products())->getProductInfo($product->id);
+                    $data = $this->getProductInfo($product->id);
                     $data->store = User::find($product->user_id);
                     $products_data[] = $data;
                 }
@@ -339,7 +368,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -366,7 +395,8 @@ class ProductsController extends Controller
      */
     public function bulkView(Request $request)
     {
-        $products = (new Products())->getBulkProducts($request);
+        $ids = explode(',', $request->ids);
+        $products = Products::query()->whereIn('id', $ids)->paginate();
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];
@@ -389,7 +419,6 @@ class ProductsController extends Controller
                 config('constants.NO_RECORD'),
                 config('constants.HTTP_OK')
             );
-            
         }
     }
     /**
@@ -406,14 +435,14 @@ class ProductsController extends Controller
                 foreach ($products as $product) {
                     $products_data[] = $this->getProductInfo($product->id);
                 }
-                
+
                 unset($pagination['data']);
                 return JsonResponseCustom::getApiResponseExtention(
                     $products_data,
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -440,7 +469,9 @@ class ProductsController extends Controller
      */
     public function sortByLocation(Request $request)
     {
-        $products = (new Products())->getProductsByLocation($request);
+        $latitude = $request->get('lat');
+        $longitude = $request->get('lon');
+        $products = Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
         $pagination = $products->toArray();
         if (!empty($products)) {
             $products_data = [];
@@ -502,7 +533,6 @@ class ProductsController extends Controller
                     '',
                     config('constants.HTTP_OK')
                 );
-                
             } else {
                 return JsonResponseCustom::getApiResponse(
                     [],
@@ -549,7 +579,7 @@ class ProductsController extends Controller
     public function featuredProducts(Request $request)
     {
         try {
-            $featured_products = (new Products())->getFeaturedProducts($request->store_id); 
+            $featured_products = (new Products())->getFeaturedProducts($request->store_id);
             $pagination = $featured_products->toArray();
             if (!$featured_products->isEmpty()) {
                 $products_data = [];
@@ -564,7 +594,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -632,11 +662,12 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function updateQty($product_id, $qty, $operation)
-    {
-        if ($operation == 'subtract') {
-            $qty = (new Qty())->updateProductQty($product_id, '', $qty);       }
-    }
+    // public function updateQty($product_id, $qty, $operation)
+    // {
+    //     if ($operation == 'subtract') {
+    //         $qty = (new Qty())->updateProductQty($product_id, '', $qty);
+    //     }
+    // }
     /**
      *It will export products into csv
      * @version 1.0.0
@@ -644,7 +675,7 @@ class ProductsController extends Controller
     public function exportProducts()
     {
         $user_id = Auth::id();
-        $products = (new Products())->getSellerProductsBySellerIdAsc($user_id);
+        $products = Products::getParentSellerProductsAsc($user_id);
         $all_products = [];
         foreach ($products as $product) {
             $pt = json_decode(json_encode($this->getProductInfo($product->id)->toArray()));
@@ -759,7 +790,7 @@ class ProductsController extends Controller
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
@@ -788,7 +819,7 @@ class ProductsController extends Controller
     {
         $radius =  3958.8;
         $store_data = (new User())->nearbyUsers($user_lat, $user_lon, $radius);
-        
+
         foreach ($store_data as $data) {
             if ($data->distance <= $miles) {
                 $store_ids[] = $data->id;
@@ -958,23 +989,40 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function sellerProducts($seller_id)
-    { 
+
+    public function sellerProducts(Request $request)
+    {
         try {
+            $validate = Validator::make($request->route()->parameters(), [
+                'seller_id' => 'required|integer',
+            ]);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
+            }
+            $seller_id = $request->seller_id;
+
             $data = [];
-            $products = (new products())->getSellerProductsBySellerId($seller_id);
+            $products = [];
+            $role_id = User::getUserRole($seller_id);
+            if ($role_id[0] == 5)
+                $products = Qty::getChildSellerProducts($seller_id);
+            else if ($role_id[0] == 2)
+                $products = Products::getParentSellerProducts($seller_id);
             $pagination = $products->toArray();
             if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->getProductInfo($product->id);
-                }
+                foreach ($products as $product) $data[] = (new ProductsController())->getProductInfo($product->id);
                 unset($pagination['data']);
                 return JsonResponseCustom::getApiResponseExtention(
                     $data,
                     true,
                     '',
                     'pagination',
-                     $pagination,
+                    $pagination,
                     config('constants.HTTP_OK')
                 );
             } else {
