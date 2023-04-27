@@ -468,7 +468,7 @@ class OrdersController extends Controller
                         $rand_number = rand(0, time());
                         $verification_code = $verification_code . substr($rand_number, 0, 1);
                     }
-                    if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
+                    if (url()->current() == 'https://app.teekit.co.uk/api/orders/new' || url()->current() == 'https://teekitapi.com/api/orders/new') {
                         // For sending SMS notification for "New Order"
                         $sms = new TwilioSmsService();
                         $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";

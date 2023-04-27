@@ -142,7 +142,7 @@ Route::get('/users/{user_id}/status/{status}', [HomeController::class, 'changeUs
 Route::get('/users_del', [HomeController::class, 'adminUsersDel'])->name('admin.del.users');
 Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');
 Route::post('/store_info/update', [HomeController::class, 'updateStoreInfo'])->name('admin.image.update');
-Route::get('/stuart/job/creation/{order_id}', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
+Route::post('/stuart/job/creation/', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
 Route::post('/stuart/job/status', [StuartDeliveryController::class, 'stuartJobStatus'])->name('stuart.job.status');
 
 /*

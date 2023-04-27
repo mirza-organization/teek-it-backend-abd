@@ -168,25 +168,36 @@
                                 <td class="align-middle fit-content">
                                     <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
                                 </td>
+                               
                                 <td class="align-middle fit-content">
-                                    <?php $q['qty'] = 0; ?>
-                                    @foreach ($inventory->quantities as $quantity)
+
+                                    <?php $q['qty'] = 0;
+                                    ?>
+
+                                    
                                         {{-- Product id == $inventory->id --}}
-                                        @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
-                                            <?php $q['qty'] = $quantity->qty; ?>
-                                        @endif
+                                        
+                                            
+                                        
+                                    @foreach ($inventory->quantities as $quantity)
+                                    @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
+
+                                    @endif
                                     @endforeach
                                     <input class="form-control qtyInput" min="0" style="width:80px;"
-                                        type="number" name="qty" id="qty" value="<?php echo !empty($q['qty']) ? $q['qty'] : 0; ?>"
-                                        wire:change="updateQuantity({{ $inventory->id }}, $event.target.value)">
-                                    <input type="hidden" id="product_id" name="product_id"
-                                        value="{{ $inventory->id }}">
+                                        type="number" wire:model="qty.{{$inventory->id }}" id="qty" value='123'
+                                        wire:key="{{$inventory->id }}">
+                                        
+                                    <input type="hidden" id="product_id" wire:model="product_id"
+                                        value="{{$inventory->id }}">
                                 </td>
                                 <td class="align-middle fit-content">
-                                    <button class="btn btn-success" type="button" data-bs-toggle="tooltip" title="Update">
+                                    <button class="btn btn-success" type="button" data-bs-toggle="tooltip" title="Update" wire:click="updateQuantity({{ $inventory->id }})">
                                         <i class="fas fa-sync"></i>
                                     </button>
+
                                 </td>
+                          
                             </tr>
                         @empty
                             <tr>
@@ -597,75 +608,11 @@
             </div>
             <!-- /.container-products-ends -->
     </div>
-@elseif(Auth::user()->role->name == 'child_seller')
-    <table class="table">
-        <thead class="bg-light">
-            <tr>
-                <th>Image</th>
-                <th>Product Name</th>
-                <th>Qty</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($inventories as $key => $inventory)
-                <tr class="bg-white">
-                    <td class="align-middle fit-content">
-                        @if (str_contains($inventory->feature_img, 'https://'))
-                            <img class="img-fluid rounded standard-img-size"
-                                src="{{ asset($inventory->feature_img) }}">
-                        @else
-                            <img class="img-fluid rounded-pill standard-img-size "
-                                src="{{ asset(config('constants.BUCKET') . $inventory->feature_img) }}">
-                        @endif
-
-                    </td>
-                    <td class="align-middle fit-content">
-                        <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
-                    </td>
-                    <td class="align-middle fit-content">
-                        <?php $q['qty'] = 0; ?>
-                        @foreach ($inventory->quantities as $quantity)
-                            {{-- Product id == $inventory->id --}}
-                            @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
-                                <?php $q['qty'] = $quantity->qty; ?>
-                            @endif
-                        @endforeach
-                        <input class="form-control qtyInput" min="0" style="width:80px;" type="number"
-                            name="qty" id="qty" value="<?php echo !empty($q['qty']) ? $q['qty'] : 0; ?>"
-                            wire:change="updateQuantity({{ $inventory->id }}, $event.target.value)">
-                        <input type="hidden" id="product_id" name="product_id" value="{{ $inventory->id }}">
-                    </td>
-                    <td class="align-middle fit-content">
-                        <button class="btn btn-success" type="button" data-bs-toggle="tooltip" title="Update"><i
-                                class="fa">&#xf021;</i></button>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4">
-                        <h4 class="text-dark">No Products Found :(</h4>
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-    <div class="row">
-        <div class="col-md-12">
-            {{ $inventory_p->links() }}
-        </div>
-    </div>
     @endif
+{{--  --}}
+    
     <!-- /.content -->
 </div>
 <style>
-    .standard-img-size {
-        height: 100px;
-        margin: 5px;
-
-    }
-
-    .fit-content {
-        width: fit-content;
-    }
+    
 </style>

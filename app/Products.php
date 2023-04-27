@@ -107,6 +107,11 @@ class Products extends Model
         return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
     }
 
+    public static function getParentSellerProductsDesc(int $seller_id)
+    {
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->get();
+    }
+
     public static function getChildSellerProducts(int $child_seller_id)
     {
             $parent_seller_id = User::find($child_seller_id)->parent_store_id;

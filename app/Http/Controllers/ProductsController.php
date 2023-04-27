@@ -312,6 +312,7 @@ class ProductsController extends Controller
         $qty = Products::with('quantity')
             ->where('id', $product_id)
             ->first();
+            if($qty){
         $quantity = $qty->quantity->qty;
         $product = Products::with('quantity')
             ->select(['*', DB::raw("$quantity as qty")])
@@ -320,6 +321,10 @@ class ProductsController extends Controller
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
+            }else
+            {
+                return $product="";
+            }
     }
 
     public function getProductInfoWithQty($product_id, $store_id)
