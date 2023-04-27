@@ -14,8 +14,6 @@ use Validator;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable, SoftDeletes;
-    // use EntrustUserTrait;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -46,7 +44,6 @@ class User extends Authenticatable implements JWTSubject
         'role_id',
         'parent_store_id'
     ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -56,7 +53,6 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token'
     ];
-
     /**
      * The attributes that should be cast to native types.
      *
@@ -65,8 +61,6 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -76,7 +70,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->getKey();
     }
-
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
@@ -171,11 +164,11 @@ class User extends Authenticatable implements JWTSubject
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
         return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-       cos( radians(users.lat) ) *
-       cos( radians(users.lon) - radians(" . $user_lon . ") ) +
-       sin( radians(" . $user_lat . ") ) *
-       sin( radians(users.lat) ) ) )
-       AS distance")
+                                cos( radians(users.lat) ) *
+                                cos( radians(users.lon) - radians(" . $user_lon . ") ) +
+                                sin( radians(" . $user_lat . ") ) *
+                                sin( radians(users.lat) ) ) )
+                                AS distance")
             ->having("distance", "<", $radius)
             ->orderBy("distance", "ASC")
             ->get();
@@ -205,10 +198,10 @@ class User extends Authenticatable implements JWTSubject
         }
         return true;
     }
-    
+
     public static function getUserRole(int $user_id)
     {
         return  User::where('id', $user_id)
-        ->pluck('role_id');
+            ->pluck('role_id');
     }
 }
