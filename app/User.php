@@ -171,11 +171,11 @@ class User extends Authenticatable implements JWTSubject
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
         return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-       cos( radians(users.lat) ) *
-       cos( radians(users.lon) - radians(" . $user_lon . ") ) +
-       sin( radians(" . $user_lat . ") ) *
-       sin( radians(users.lat) ) ) )
-       AS distance")
+                                cos( radians(users.lat) ) *
+                                cos( radians(users.lon) - radians(" . $user_lon . ") ) +
+                                sin( radians(" . $user_lat . ") ) *
+                                sin( radians(users.lat) ) ) )
+                                AS distance")
             ->having("distance", "<", $radius)
             ->orderBy("distance", "ASC")
             ->get();
@@ -205,10 +205,10 @@ class User extends Authenticatable implements JWTSubject
         }
         return true;
     }
-    
+
     public static function getUserRole(int $user_id)
     {
         return  User::where('id', $user_id)
-        ->pluck('role_id');
+            ->pluck('role_id');
     }
 }

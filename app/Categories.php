@@ -80,6 +80,17 @@ class Categories extends Model
 
     public static function getProducts(int $category_id)
     {
+         // $storeId = \request()->store_id;
+        // if (!empty($storeId)) {
+        //     $products = Products::whereHas('user_id', function ($query) {
+        //         $query->where('is_active', 1);
+        //     })
+        //         ->where('category_id', $category_id)
+        //         ->where('user_id', $storeId)
+        //         ->where('status', 1)
+        //         ->paginate();
+        //     return $products;
+        // }
         $products = Products::where('category_id', $category_id)
             ->where('status', 1)
             ->paginate(10);
@@ -94,7 +105,7 @@ class Categories extends Model
         }
     }
 
-    public static function getProductsByStoreId(int $category_id, int $store_id)
+public static function getProductsByStoreId(int $category_id, int $store_id)
     {
         $products = Products::whereHas('user', function ($query) {
             $query->where('is_active', 1);
@@ -113,7 +124,7 @@ class Categories extends Model
             return [];
         }
     }
-
+    
     public static function stores(int $category_id)
     {
         $ids = Categories::select('users.id as store_id')

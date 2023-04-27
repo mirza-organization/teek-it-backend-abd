@@ -77,12 +77,12 @@ class Products extends Model
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
     }
-    
+
     public static function getProductsById(object $product_id)
     {
         return Products::where('id', $product_id->products_id)
-        ->where('status', '1')
-        ->get();
+            ->where('status', '1')
+            ->get();
     }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
@@ -114,18 +114,18 @@ class Products extends Model
 
     public static function getChildSellerProducts(int $child_seller_id)
     {
-            $parent_seller_id = User::find($child_seller_id)->parent_store_id;
-            $qty = Qty::where('users_id', $child_seller_id)->first();
-            if (!empty($qty)) {
-                return Products::where('user_id', $parent_seller_id)
+        $parent_seller_id = User::find($child_seller_id)->parent_store_id;
+        $qty = Qty::where('users_id', $child_seller_id)->first();
+        if (!empty($qty)) {
+            return Products::where('user_id', $parent_seller_id)
                 ->with([
                     'quantities' => function ($q) use ($child_seller_id) {
                         $q->where('users_id', $child_seller_id);
                     }
                 ]);
-            } else {
-                return Products::with('quantity')->where('user_id', $parent_seller_id);
-            }
+        } else {
+            return Products::with('quantity')->where('user_id', $parent_seller_id);
+        }
     }
 
     public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
@@ -138,17 +138,13 @@ class Products extends Model
 
     public static function getProductWeight(int $product_id)
     {
-        $product = DB::table('products')
-            ->select('weight')
-            ->where('id', $product_id)
-            ->get();
+        $product = Products::select('weight')->where('id', $product_id)->get();
         return $product[0]->weight;
     }
 
     public static function getProductVolume(int $product_id)
     {
-        $product = DB::table('products')
-            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
+        $product = Products::select(DB::raw('(products.height * products.width * products.length) as volumn'))
             ->where('id', $product_id)
             ->get();
         return $product[0]->volumn;
@@ -163,5 +159,34 @@ class Products extends Model
             ->where('status', '=', 1)
             ->orderByDesc('id')
             ->paginate(10);
+    }
+
+    public static function getActiveProducts()
+    {
+        return Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })->where('status', 1)->paginate();
+    }
+
+    public static function getProductsByLocation(object $request)
+    {
+        $latitude = $request->get('lat');
+        $longitude = $request->get('lon');
+        $products = Products::selectRaw('*, ( 6367 * acos( cos( radians(?) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(?) ) + sin( radians(?) ) * sin( radians( lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+            ->orderBy('distance')
+            ->paginate();
+        return $products;
+    }
+
+    //public static function getBulkProducts(object $request){
+    //  $latitude = $request->get('lat');
+    //$longitude = $request->get('lon');
+    //return Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
+    //}
+
+    public static function getBulkProducts($request)
+    {
+        $ids = explode(',', $request->ids);
+        return Products::query()->whereIn('id', $ids)->paginate();
     }
 }
