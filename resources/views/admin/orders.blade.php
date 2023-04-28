@@ -8,8 +8,8 @@
                     <h1 class="m-0 text-dark text-center">Orders</h1>
                     <div class="float-right">
                         <!-- <button type="button" class="btn btn-success" onclick="selectAll()">
-                                                    <a class="text-white">Select All</a>
-                                                </button> -->
+                                                            <a class="text-white">Select All</a>
+                                                        </button> -->
                         <button type="button" class="btn btn-danger" onclick="delOrders()">
                             <a class="text-white">Delete</a>
                         </button>
@@ -59,50 +59,10 @@
                                         </div>
                                     @elseif ($order->order_status == 'ready')
                                         <div>
-                                            
-                                              
-                                            <a  data-bs-toggle="modal" data-bs-target="#stuartModel{{$order->id}}"
+                                            <a data-bs-toggle="modal" data-bs-target="#stuartModel{{ $order->id }}"
                                                 class="d-block btn btn-warning float-left mx-1">Assign To Stuart</a>
                                             <a href="{{ route('mark_as_delivered', ['order_id' => $order->id]) }}"
                                                 class="d-block btn btn-success float-right">Mark As Delivered</a>
-                                                <div class="modal fade" id="stuartModel{{$order->id}}" tabindex="-1" role="dialog"
-                                                    aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <form method="post"
-                                                                action="{{ route('stuart.job.creation') }}"
-                                                                enctype="multipart/form-data">
-                                                                {{ csrf_field() }}
-                                                                <div class="modal-header">
-                                                                    <h5 class="modal-title display-center" id="exampleModalLabel">Custom Order</h5>
-                                                                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                                                        <span aria-hidden="true">×</span>
-                                                                    </button>
-                                                                </div>
-                                                                <div class="modal-body">
-                                                                    <div class="row">
-                                                                        <div class="col-md-12">
-                                                                            <div class="form-group">
-                                                                                <label for="">Order #</label>
-                                                                                <input type="text" name="customerorder_id" class="form-control"
-                                                                                    value="" required autofocus>
-                                                                                    <input type="hidden" name="order_id" class="form-control"
-                                                                                    value="{{ $order->id }}" required autofocus>
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                    </div>
-                                                                </div>
-                                                                <div class="modal-footer hidden ">
-                                                                    <button type="button" class="btn btn-secondary"
-                                                                        data-bs-dismiss="modal">Close</button>
-                                                                    <button type="submit" class="btn btn-warning">Assign
-                                                                    </button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
                                         </div>
                                     @elseif ($order->order_status == 'stuartDelivery')
                                         <div>
@@ -214,6 +174,46 @@
                                         @endforeach
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="stuartModel{{ $order->id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <form method="post" action="{{ route('stuart.job.creation') }}"
+                                    enctype="multipart/form-data">
+                                    {{ csrf_field() }}
+                                    <div class="modal-header">
+                                        <h5 class="modal-title display-center" id="exampleModalLabel">Add Custom Order Id</h5>
+                                        <button type="button" class="close" data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="">Order #</label>
+                                                    <input type="text" name="custom_order_id" placeholder="Enter custom order id or leave blank..." class="form-control"
+                                                        autofocus>
+                                                    <input type="hidden" name="order_id" class="form-control"
+                                                        value="{{ $order->id }}" required autofocus>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer hidden">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                            Close
+                                        </button>
+                                        <button type="submit" class="btn btn-warning">
+                                            Assign
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

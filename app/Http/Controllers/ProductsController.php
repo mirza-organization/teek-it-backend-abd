@@ -75,7 +75,6 @@ class ProductsController extends Controller
      */
     public function add(Request $request)
     {
-
         $validate = Products::validator($request);
         if ($validate->fails()) {
             return JsonResponseCustom::getApiResponse(

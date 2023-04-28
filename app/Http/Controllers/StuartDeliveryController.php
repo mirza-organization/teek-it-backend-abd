@@ -34,11 +34,6 @@ class StuartDeliveryController extends Controller
      */
     public function stuartJobCreation(Request $request)
     {
-        if($request->customerorder_id){
-            $orderId = $request->customerorder_id;
-        }else {
-            $orderId = $request->order_id;
-        }
         try {
             $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
             $transport_type = Orders::fetchTransportType($request->order_id);
@@ -66,7 +61,7 @@ class StuartDeliveryController extends Controller
                             'package_type' => 'medium',
                             'package_description' => 'Package purchased from Teek it.',
                             'transport_type' => $transport_type,
-                            'client_reference' => $orderId,
+                            'client_reference' => ($request->custom_order_id) ? $request->custom_order_id : $request->order_id,
                             'address' => $order_details->address . ' House#' . $order_details->house_no,
                             'comment' => 'Please try to call the customer before reaching the destination.',
                             // 'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',
