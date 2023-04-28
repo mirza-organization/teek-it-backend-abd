@@ -18,23 +18,30 @@ class InventoryLivewire extends Component
         $category_id,
         $category,
         $product,
+        
         $productId,
+        $quantity,
         $qty=[],
         $product_id,
         $updatedQuantity,
         $search = '';
 
         
-    public function updateQuantity($productid)
-    {
-        $quantity = $this->qty[$productid]; 
-        QTY::updateChildProductQty(Auth::id(), $productid, $quantity);
+        public function updateProductQuantity($productId, $quantity)
+        {
+            QTY::updateChildProductQty(Auth::id(), $productId, $this->quantity[$productId]);
+            session()->flash('success', 'Product quantity updated successfully!');
+        }
+    // public function updateQuantity($productid)
+    // {
+    //     $quantity = $this->qty[$productid]; 
+       
     
     
-        // Quantuty should be updated w.r.t UserID, ProductID to avoid Update all products of all stores
-        // Qty::where('products_id', $id)
-        //     ->update(['qty' => $qty]);
-    }
+    //     // Quantuty should be updated w.r.t UserID, ProductID to avoid Update all products of all stores
+    //     // Qty::where('products_id', $id)
+    //     //     ->update(['qty' => $qty]);
+    // }
 
     public function render()
     {
@@ -62,7 +69,11 @@ class InventoryLivewire extends Component
         }
         //if not child seller then this condition will run for parent store
         else {
+            
             $parent_seller_id = Auth::id();
+            if(empty($parent_seller)){
+                redirect('/');
+            }
             $inventory = Products::getParentSellerProductsDesc($parent_seller_id);
             // get parent seller products method should be called here 
             $featured = Products::query()->where('user_id', '=', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();

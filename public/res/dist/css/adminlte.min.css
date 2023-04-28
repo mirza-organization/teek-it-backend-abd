@@ -91,6 +91,9 @@ input:checked + .slider:before {
     font-size: 30px;
     color: #3a4b83;
 }
+svg {
+    height:15px !important;
+}
 
 /* *************************Media Queries************************* */
 @media only screen and (max-width: 425px){
