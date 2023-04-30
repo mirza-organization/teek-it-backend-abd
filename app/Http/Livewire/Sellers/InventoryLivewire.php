@@ -22,11 +22,13 @@ class InventoryLivewire extends Component
         $quantity=[],
         $product_id,
         $search = '';
+
     public function updateProductQuantity($product_id)
     {
         Qty::updateChildProductQty(Auth::id(), $product_id, $this->quantity[$product_id]);
         session()->flash('success', 'Product quasntity has been updated!');
     }
+    
     public function render()
     {
         $categories = Categories::all();
