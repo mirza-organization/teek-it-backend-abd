@@ -1,29 +1,30 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     @if (session()->has('error'))
-        <div class="bs-toast toast toast-placement-ex m-2 fade bg-danger top-0 end-0 show" role="alert"
-            aria-live="assertive" aria-atomic="true" data-delay="2000">
-            <div class="toast-header">
-                <i class="bx bx-bell me-2"></i>
-                <div class="me-auto fw-semibold">Error</div>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                {{ session()->get('error') }}
-            </div>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong>
+        {{ session()->get('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
     @endif
     @if (session()->has('success'))
-        <div class="bs-toast toast toast-placement-ex m-2 fade bg-success top-0 end-0 show " role="alert"
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong>
+        {{ session()->get('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    
+        {{-- <div class="bs-toast toast toast-placement-ex m-2 fade bg-success top-0 end-0 show" role="alert"
             aria-live="assertive" aria-atomic="true" data-delay="2000">
             <div class="toast-header">
                 <i class="bx bx-bell me-2"></i>
                 <div class="me-auto fw-semibold">Success</div>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span></button>
             </div>
             <div class="toast-body">
-                {{ session()->get('success') }}
+                
             </div>
-        </div>
+        </div> --}}
     @endif
 
     <div class="row">
@@ -84,21 +85,14 @@
                                 <td class="align-middle fit-content">
                                     <?php $q['qty'] = 0;
                                     ?>
-                                    @foreach ($inventory->quantities as $quantity)
-                                        @if ($quantity->users_id == Auth::id() && $quantity->products_id == $inventory->id)
-                                            @php  $q['qty'] = $quantity->qty;             @endphp
-                                        @endif
-                                    @endforeach
-
-
                                     <input class="form-control qtyInput" min="0" style="width:80px;"
-                                        type="number" id="Qty" value="{{ $q['qty'] }}"
-                                        wire:model.defer="quantity.{{ $inventory->id }}">
+                                        type="number" id="Qty" value="{{ $inventory->qty }}"
+                                        wire:model="quantity.{{ $inventory->id }}">
                                 </td>
                                 <td class="align-middle fit-content">
                                     <button class="btn btn-success" type="button" data-bs-toggle="tooltip"
                                         title="Update"
-                                        wire:click="updateProductQuantity('{{ $inventory->id }}', 'quantity.{{ $inventory->id }}')">
+                                        wire:click="updateProductQuantity({{ $inventory->id }})">
                                         <i class="fas fa-sync"></i>
                                     </button>
 
@@ -108,7 +102,7 @@
                         @empty
                             <tr>
                                 <td colspan="4">
-                                    <h4 class="text-dark">No Products Found :(</h4>
+                                    <h4 class="text-dark text-center p-2">No Products Found :(</h4>
                                 </td>
                             </tr>
                         @endforelse
@@ -116,7 +110,7 @@
                 </table>
                 <div class="row">
                     <div class="col-md-12">
-                        {{ $inventory_p->links() }}
+                        {{ $inventories->links() }}
                     </div>
                 </div>
             @endif
