@@ -15,16 +15,10 @@
             @include('layouts.shopkeeper.navbar')
             @include('layouts.shopkeeper.sidebar')
         @endif
-
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Livewire component will render here by default -->
-
             {{ $slot }}
-
-            {{-- <main>
-                {{ $slot }}
-            </main> --}}
         </div>
         <!-- /.content -->
     </div>

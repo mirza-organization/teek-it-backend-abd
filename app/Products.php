@@ -118,11 +118,10 @@ class Products extends Model
         $qty = Qty::where('users_id', $child_seller_id)->first();
         if (!empty($qty)) {
             return Products::where('user_id', $parent_seller_id)
-                ->with([
-                    'quantities' => function ($q) use ($child_seller_id) {
-                        $q->where('users_id', $child_seller_id);
-                    }
-                ]);
+            ->join('qty', 'products.id', '=', 'qty.products_id')
+            ->select('products.id as prod_id', 'products.user_id as parent_seller_id','products.category_id','products.product_name','products.price','products.feature_img','qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
+            ->where('qty.users_id', $child_seller_id);
+            // ->paginate(20);
         } else {
             return Products::with('quantity')->where('user_id', $parent_seller_id);
         }
@@ -172,10 +171,9 @@ class Products extends Model
     {
         $latitude = $request->get('lat');
         $longitude = $request->get('lon');
-        $products = Products::selectRaw('*, ( 6367 * acos( cos( radians(?) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(?) ) + sin( radians(?) ) * sin( radians( lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-            ->orderBy('distance')
-            ->paginate();
-        return $products;
+        return Products::selectRaw('*, ( 6367 * acos( cos( radians(?) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(?) ) + sin( radians(?) ) * sin( radians( lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+        ->orderBy('distance')
+        ->paginate();
     }
 
     //public static function getBulkProducts(object $request){

@@ -1,18 +1,18 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     @if (session()->has('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Error!</strong>
-        {{ session()->get('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong>
+            {{ session()->get('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
     @endif
     @if (session()->has('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <strong>Success!</strong>
-        {{ session()->get('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong>
+            {{ session()->get('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
         {{-- <div class="bs-toast toast toast-placement-ex m-2 fade bg-success top-0 end-0 show" role="alert"
             aria-live="assertive" aria-atomic="true" data-delay="2000">
             <div class="toast-header">
@@ -67,7 +67,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($inventories as $key => $inventory)
+                        @forelse ($data as $key => $inventory)
                             <tr class="bg-white">
                                 <td class="align-middle fit-content">
                                     @if (str_contains($inventory->feature_img, 'https://'))
@@ -81,23 +81,16 @@
                                 <td class="align-middle fit-content">
                                     <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
                                 </td>
-
                                 <td class="align-middle fit-content">
-                                    <?php $q['qty'] = 0;
-                                    ?>
-                                    <input class="form-control qtyInput" min="0" style="width:80px;"
-                                        type="number" id="Qty" value="{{ $inventory->qty }}"
-                                        wire:model="quantity.{{ $inventory->id }}">
+                                    <input type="number" class="form-control" style="width:80px;" min="0" wire:model.defer="quantity.{{ $key }}.qty">
                                 </td>
                                 <td class="align-middle fit-content">
                                     <button class="btn btn-success" type="button" data-bs-toggle="tooltip"
                                         title="Update"
-                                        wire:click="updateProductQuantity({{ $inventory->id }})">
+                                        wire:click="updateProductQuantity({{ $key }})">
                                         <i class="fas fa-sync"></i>
                                     </button>
-
                                 </td>
-
                             </tr>
                         @empty
                             <tr>
@@ -110,13 +103,10 @@
                 </table>
                 <div class="row">
                     <div class="col-md-12">
-                        {{ $inventories->links() }}
+                        {{ $data->links() }}
                     </div>
                 </div>
             @endif
-        </div>
-        <div class="row">
-            <!-- {{ $inventories->links() }} -->
         </div>
     </div>
 

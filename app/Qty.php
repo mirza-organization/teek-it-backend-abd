@@ -56,12 +56,11 @@ class Qty extends Model
             ->paginate(20);
     }
 
-    public static function updateChildProductQty(int $user_id, int $product_id, int $qty)
+    public static function updateChildProductQty(array $quantity)
     {
-        return Qty::where('users_id', $user_id)
-            ->where('products_id', $product_id)
+        return Qty::where('id', $quantity['qty_id'])
             ->update([
-                'qty' => $qty
+                'qty' => $quantity['qty']
             ]);
     }
 }
