@@ -23,8 +23,12 @@ class InventoryLivewire extends Component
         $product_id,
         $quantity=[],
         $search = '';
+
     protected $paginationTheme = 'bootstrap';
    
+
+
+
     public function updateProductQuantity($product_id)
     {
         try {
@@ -41,7 +45,6 @@ class InventoryLivewire extends Component
             session()->flash('error', $error);
         }
     }
-
     public function render()
     {
         $categories = Categories::all();

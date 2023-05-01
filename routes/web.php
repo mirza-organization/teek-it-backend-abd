@@ -3,7 +3,7 @@
 use App\Http\Controllers\Admin\UserAndRoleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Livewire\Admin\ParentSellersLiveWire;
-use App\Http\Livewire\Sellers\Inventorylivewire;
+use App\Http\Livewire\Sellers\InventoryLivewire;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProductsController;
