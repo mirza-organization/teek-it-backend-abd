@@ -1,3 +1,4 @@
+
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
 
@@ -59,25 +60,9 @@ a:hover {
 		transform: scale(1.2,1.2) rotate(5deg);
 }
 
-.section-products #product-1 .part-1::before {
-    background: url("https://i.ibb.co/L8Nrb7p/1.jpg") no-repeat center;
+.section-products #productItem .part-1::before {
     background-size: cover;
 		transition: all 0.3s;
-}
-
-.section-products #product-2 .part-1::before {
-    background: url("https://i.ibb.co/cLnZjnS/2.jpg") no-repeat center;
-    background-size: cover;
-}
-
-.section-products #product-3 .part-1::before {
-    background: url("https://i.ibb.co/L8Nrb7p/1.jpg") no-repeat center;
-    background-size: cover;
-}
-
-.section-products #product-4 .part-1::before {
-    background: url("https://i.ibb.co/cLnZjnS/2.jpg") no-repeat center;
-    background-size: cover;
 }
 
 .section-products .single-product .part-1 .discount,
@@ -232,150 +217,44 @@ a:hover {
             <section class="section-products">
                 <div class="container">
                         <div class="row">
+                            @forelse ($data as $key => $inventory)
+                            {{-- {{dd($inventory)}} --}}
                                 <!-- Single Product -->
                                 <div class="col-md-6 col-lg-4 col-xl-3  ">
-                                        <div id="product-1" class="single-product bg-white">
-                                                <div class="part-1">
+                                        <div id="productItem" class="single-product bg-white" >
+                                                <div class="part-1" style=" background:url('{{asset(config('constants.BUCKET') .$inventory->feature_img)}}') no-repeat center; ">
+                                                    {{-- <span class="discount">15% off</span>
+                                                    <span class="new">new</span> --}}
                                                         <ul>
-                                                                <li><a href="#" ><i class="fa fa-ban"></i></a></li>
+                                                            @if ($inventory->status == 1)
+                                                            <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->prod_id }}', 0)"   ><i class="fa fa-ban"></i></button></li>
+                                                        @elseif($inventory->status == 0)
+                                                        <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->prod_id }}', 1)"   ><i class="fa fa-toggle-on"></i></button></li>
+                                                        @endif
+                                                                
                                                                 <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
+                                                                <li><button class="bg-white border-0 p-2" wire:click="markAsFeatured({{ $inventory->prod_id }})" ><i class="fa fa-star"></i></button></li>
+                                                                
                                                         </ul>
                                                 </div>
                                                 <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-old-price">SKU</h4>
-                                                        <h4 class="product-price">$49.99</h4>
+                                                        <h3 class="product-title">{{$inventory->product_name}}</h3>
+                                                        {{-- <h4 class="product-old-price">SKU</h4> --}}
+                                                        <h4 class="product-price">${{$inventory->price}}</h4>
                                                 </div>
                                         </div>
                                 </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3 ">
-                                        <div id="product-2" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <span class="discount">15% off</span>
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3 ">
-                                        <div id="product-3" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-old-price">SKU: 22424</h4>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3">
-                                        <div id="product-4" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <span class="new">new</span>
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3 ">
-                                        <div id="product-1" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-old-price">SKU: 22424</h4>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3">
-                                        <div id="product-2" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <span class="discount">15% off</span>
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3">
-                                        <div id="product-3" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-edit"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-old-price">SKU: 22424</h4>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
-                                <!-- Single Product -->
-                                <div class="col-md-6 col-lg-4 col-xl-3">
-                                        <div id="product-4" class="single-product bg-white">
-                                                <div class="part-1">
-                                                        <span class="new">new</span>
-                                                        <ul>
-                                                                <li><a href="#"><i class="fa fa-ban"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-star"></i></a></li>
-                                                                <li><a href="#"><i class="fa fa-toggle-on"></i></a></li>
-                                                        </ul>
-                                                </div>
-                                                <div class="part-2 px-2">
-                                                        <h3 class="product-title">Here Product Title</h3>
-                                                        <h4 class="product-price">$49.99</h4>
-                                                </div>
-                                        </div>
-                                </div>
+                                @empty
+                                
+                                        <h4 class="text-dark text-center p-2">No Products Found :(</h4>
+                                    
+                            @endforelse
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                {{ $data->links() }}
+                            </div>
                         </div>
                 </div>
         </section>

@@ -109,7 +109,7 @@ class Products extends Model
 
     public static function getParentSellerProductsDesc(int $seller_id)
     {
-        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->get();
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->paginate(9);
     }
 
     public static function getChildSellerProducts(int $child_seller_id)
@@ -120,10 +120,11 @@ class Products extends Model
             return Products::where('user_id', $parent_seller_id)
             ->join('qty', 'products.id', '=', 'qty.products_id')
             ->select('products.id as prod_id', 'products.user_id as parent_seller_id','products.category_id','products.product_name','products.price','products.feature_img','qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
-            ->where('qty.users_id', $child_seller_id);
-            // ->paginate(20);
+            ->where('qty.users_id', $child_seller_id)->paginate(20);
+        
         } else {
-            return Products::with('quantity')->where('user_id', $parent_seller_id);
+            return Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
+
         }
     }
 

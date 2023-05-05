@@ -2,7 +2,7 @@
 @section('content')
     <div class="content">
         <!-- Content Header (Page header) -->
-        @if (Auth::user()->role->name == 'seller')
+        @if(Auth::user()->role->name == 'seller')
             <div class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
