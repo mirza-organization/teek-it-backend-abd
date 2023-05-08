@@ -27,7 +27,66 @@ class InventoryLivewire extends Component
         $search = '';
 
     protected $paginationTheme = 'bootstrap';
-
+    public function toggleAllProducts($status)
+    {
+        try {
+            /* Perform some operation */
+            $updated = Products::toggleAllProducts($status);
+            /* Operation finished */
+            sleep(1);
+            if ($updated) {
+                if($status == 0){
+                    session()->flash('success', 'All products disabled successfully!');
+                }else{
+                session()->flash('success', 'All products enabled successfully!');
+                }
+            } else {
+                session()->flash('error', 'Products cannot be disabled!');
+            }
+        } catch (Exception $error) {
+            session()->flash('error', $error);
+        }
+    }
+    public function toggleProduct($id, $status)
+    {
+        try {
+            /* Perform some operation */
+            $updated = Products::toggleProduct($id, $status);
+            /* Operation finished */
+            sleep(1);
+            if ($updated) {
+                if($status == 0){
+                    session()->flash('success', 'Product disabled successfully!');
+                }else{
+                session()->flash('success', 'Product enabled successfully!');
+                }
+            } else {
+                session()->flash('error', 'Product cannot be disabled!');
+            }
+        } catch (Exception $error) {
+            session()->flash('error', $error);
+        }
+    }
+    public function markAsFeatured($id, $status)
+    {
+        try {
+            /* Perform some operation */
+            $updated = Products::markAsFeatured($id, $status);
+            /* Operation finished */
+            sleep(1);
+            if ($updated) {
+                if($status == 0){
+                    session()->flash('success', 'Unmark as featured successfully!');
+                }else{
+                session()->flash('success', 'Mark as featured successfully!');
+                }
+            } else {
+                session()->flash('error', 'Product cannot be marked as featured!');
+            }
+        } catch (Exception $error) {
+            session()->flash('error', $error);
+        }
+    }
     public function updateProductQuantity($index)
     {
         try {
@@ -63,11 +122,7 @@ class InventoryLivewire extends Component
         $categories = Categories::all();
         if (Gate::allows('seller')) {
             $parent_seller_id = Auth::id();
-            if (empty($parent_seller)) {
-                redirect('/');
-            }
-            
-            $data = Products::where('user_id', '=', $parent_seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->paginate(9);
+            $data = Products::where('user_id', '=', $parent_seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->paginate(12);
             $featured = Products::whereHas('user', function ($query) {
                 $query->where('is_active', 1);
                 })->where('user_id', '=', $parent_seller_id)
@@ -78,6 +133,8 @@ class InventoryLivewire extends Component
             foreach ($featured as $in) {
                 $featured_products[] = Products::getProductInfo($in->id);
             }
+            if ($this->search) $data = Products::where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
+        if ($this->category_id) $data = Products::where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
         } elseif (Gate::allows('child_seller')) {
             $parent_seller_id = User::find(Auth::id())->parent_store_id;
         $qty = Qty::where('users_id', Auth::id())->first();
@@ -91,10 +148,11 @@ class InventoryLivewire extends Component
             $data =  Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
 
         }
-        if ($this->search) $data = $data->where('product_name', 'LIKE', "%{$this->search}%")->paginate(9);
-        if ($this->category_id) $data = $data->where('category_id', '=', $this->category_id)->paginate(9);
+        if ($this->search) $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', $parent_seller_id)->paginate(9);
+        if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
             // $data = Products::getChildSellerProducts(Auth::id());
         }
+        
         
         $this->quantity = $this->populateQuantityArray($data);
         

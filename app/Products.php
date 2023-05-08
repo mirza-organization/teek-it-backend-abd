@@ -8,7 +8,7 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\RattingsController;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Auth;
 class Products extends Model
 {
     use Searchable;
@@ -187,5 +187,28 @@ class Products extends Model
     {
         $ids = explode(',', $request->ids);
         return Products::query()->whereIn('id', $ids)->paginate();
+    }
+    public static function markAsFeatured($id, $status){
+
+        return Products::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->update([
+                'featured' => $status
+            ]);
+    }
+    public static function toggleProduct($id, $status){
+
+        return Products::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->update([
+                'status' => $status
+            ]);
+    }
+    public static function toggleAllProducts($status){
+
+        return Products::where('user_id', Auth::id())
+            ->update([
+                'status' => $status
+            ]);
     }
 }
