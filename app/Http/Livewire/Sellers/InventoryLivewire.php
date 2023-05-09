@@ -133,8 +133,8 @@ class InventoryLivewire extends Component
             foreach ($featured as $in) {
                 $featured_products[] = Products::getProductInfo($in->id);
             }
-            if ($this->search) $data = Products::where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
-        if ($this->category_id) $data = Products::where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
+            if ($this->search) $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
+        if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
         } elseif (Gate::allows('child_seller')) {
             $parent_seller_id = User::find(Auth::id())->parent_store_id;
         $qty = Qty::where('users_id', Auth::id())->first();
@@ -148,8 +148,8 @@ class InventoryLivewire extends Component
             $data =  Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
 
         }
-        if ($this->search) $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', $parent_seller_id)->paginate(9);
-        if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
+        if ($this->search) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', $parent_seller_id)->paginate(9);
+        if ($this->category_id) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
             // $data = Products::getChildSellerProducts(Auth::id());
         }
         

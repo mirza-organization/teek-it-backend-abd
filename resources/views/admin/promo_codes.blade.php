@@ -278,9 +278,10 @@
                                                 <td>{{ $promo_code->order_number }}</td>
                                                 <td>{{ $promo_code->expiry_dt }}</td>
                                                 <td>
-                                                    <a data-bs-toggle="modal"
-                                                        data-bs-targret="#promo_codeModal{{ $promo_code->id }}"
-                                                        class="btn btn-primary btn-xs">Edit Promo Code</a>
+                                                    <a href="" data-bs-toggle="modal" data-bs-target="#promo_codeModal{{ $promo_code->id }}"
+                            class="mx-1 d-block text-right float-right btn btn-primary">Edit Promo
+                            Code</a>
+                                                   
                                                 </td>
                                             </tr>
                                         @endforeach

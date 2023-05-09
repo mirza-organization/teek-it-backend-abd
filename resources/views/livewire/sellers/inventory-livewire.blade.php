@@ -302,10 +302,10 @@ a:hover {
                                                         <span class="new">new</span> --}}
                                                             <ul>
                                                                 @if ($inventory->status == 1)
-                                                                <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->prod_id }}', 0)"   ><i class="fa fa-ban"></i></button></li>
-                                                            @elseif($inventory->status == 0)
-                                                            <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->prod_id }}', 1)"   ><i class="fa fa-toggle-on"></i></button></li>
-                                                            @endif
+                                            <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->id }}', 0)"   ><i class="fa fa-ban"></i></button></li>
+                                        @elseif($inventory->status == 0)
+                                        <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->id }}', 1)"   ><i class="fa fa-toggle-on"></i></button></li>
+                                        @endif
                                                                     
                                                                     <li><a href="/inventory/edit/{{ $inventory->id }}"><i class="fa fa-edit"></i></a></li>
                                                                     <li><button class="bg-white border-0 p-2" wire:click="markAsFeatured('{{ $inventory->id }}', '1')" ><i class="fa fa-star"></i></button></li>
@@ -316,6 +316,25 @@ a:hover {
                                                         
                                                             <h3 class="product-title">{{$inventory->product_name}}</h3>
                                                             <h4 class="product-price">SKU: {{$inventory->sku}}</h4> 
+                                                            <div class="col-md-6">
+                                                                <div class="ratting pl-3">
+                                                                    <?php
+                                                                    if(!empty($inventory->ratting['average']))
+                                                                    {
+                                                        $rating = round($inventory->ratting['average']);
+                                                        for ($i = 1; $i <= 5; $i++) :
+                                                        ?>
+                                                                    <span
+                                                                        class="fa fa-star 
+                                                            <?php if ($i <= $rating) {
+                                                                echo 'checked';
+                                                            } ?>">
+                                                                    </span>
+                                                                    <?php endfor; 
+                                                                    }
+                                                                    ?>
+                                                                </div>
+                                                            </div>
                                         <h5 class="product-price">${{$inventory->price}}</h5>
                                                     </div>
                                             </div>

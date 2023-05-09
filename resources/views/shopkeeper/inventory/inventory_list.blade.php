@@ -74,7 +74,7 @@
                     </button>
                 </div>
             @endif
-            @if (Auth::user()->role->name == 'seller')
+            @if (Auth::user()->role->name == 'seller') 
                 @if (!empty($featured_products))
                     <div class="content-header">
                         <div class="container-fluid">
@@ -239,7 +239,7 @@
                 </div>
                 <!-- /.container-products-begins -->
                
-               
+              
                
                
                
