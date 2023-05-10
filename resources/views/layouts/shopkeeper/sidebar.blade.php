@@ -67,6 +67,12 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
+                            <a href="{{route('usergeneral')}}" class="nav-link">
+                                <i class="fas fa-gears nav-icon"></i>
+                                <p>User General Settings</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="/settings/general" class="nav-link">
                                 <i class="fas fa-gears nav-icon"></i>
                                 <p>General Settings</p>

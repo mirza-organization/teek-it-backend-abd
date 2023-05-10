@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\QtyController;
 use App\Http\Controllers\StuartDeliveryController;
+use App\Http\Livewire\Sellers\Settings\UserGeneralSettings;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,7 @@ Route::prefix('inventory')->group(function () {
 Route::prefix('settings')->group(function () {
     Route::post('/user_info/update', [HomeController::class, 'userInfoUpdate'])->name('admin.userinfo.update');
     Route::get('/general', [HomeController::class, 'generalSettings']);
+    Route::get('/usergeneral', UserGeneralSettings::class)->name('usergeneral');;
     Route::get('/payment', [HomeController::class, 'paymentSettings']);
     Route::post('/payment/update', [HomeController::class, 'paymentSettingsUpdate'])->name('payment_settings_update');
     Route::post('/user_img/update', [HomeController::class, 'userImgUpdate'])->name('user_img_update');
