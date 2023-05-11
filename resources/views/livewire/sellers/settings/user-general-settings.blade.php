@@ -5,9 +5,13 @@
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-sm-12">
-                        <h1 class="m-0 text-dark text-center">General Settings</h1>
-                    </div><!-- /.col -->
+                    <div class="col-12 col-sm-6 col-md-4">
+                       
+                        
+                       
+                        <h4 class="py-2 my-1">General Settings</h4>
+                        
+                    </div>
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
         </div>
@@ -19,7 +23,7 @@
                 <div class="row">
     
                     <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
-                        <h4 class="text-left text-primary">Store Image</h4>
+                        {{-- <h4 class="text-left text-primary">Store Image</h4> --}}
                         <div class="card">
                             <div class="card-body-custom">
                                 <div class=" d-block text-right">
@@ -38,14 +42,141 @@
                                                                 <label><img class="img img-fluid img-thumbnail"
                                                                         src="{{config('constants.BUCKET') . auth()->user()->user_img}}"
                                                                         alt="No Image Uploaded"></label>
+                                                                        <label></label>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-4">
+                                                        <div class="col-md-8 ">
                                                             <div class="form-group">
-                                                                <label><input type="file" accept="image/*" name="user_img"
-                                                                        required></label>
+                                                                <table class="w-100">
+                                                                   
+                                                                    <tr>
+                                                                    
+                                                                        <td><label><input type="text" name="name" class="form-control w-100" placeholder="Name" disabled /></label></td>
+                                                                    </tr>
+                                                                    
+                                                                    <tr>
+                                                                       
+                                                                        <td><label><input type="text" name="email" class="form-control w-100" placeholder="Email" disabled/></label></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        
+                                                                        <td><label><input type="text" name="name" class="form-control w-100" placeholder="Business Name" disabled/></label></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        
+                                                                        <td><label><input type="text" name="name" class="form-control w-100" placeholder="Phone" disabled/></label></td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        
+                                                                        <td><label><input type="text" name="name" class="form-control w-100" placeholder="Company Name" disabled/></label></td>
+                                                                    </tr>
+                                                                    
+                                                                </table>
+                                                                
                                                             </div>
                                                         </div>
+                                                        <div class="row d-flex justify-content-center mt-2">
+                                                            <div class="col-md-4">
+                                                                <div class="">
+                                                                    <div class="text-center">
+                                                                        
+                                                                        <button
+                                                                            style="background: #ffcf42;color:black;font-weight: 600"
+                                                                            class="pl-5 pr-8 pr-5 pb-2 border-0 btn btn-secondary rounded-pill"
+                                                                            data-bs-toggle="modal"
+                                                data-bs-target="#editUserModal{{ $user->id }}"
+                                                onclick="event.preventDefault();">&nbsp;Edit&nbsp;</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                        <div class="row d-flex justify-content-center my-2">
+                                                        <div class="col-md-12">
+                                                            <form action="{{route('payment_settings_update')}}" method="POST"
+                                                                enctype="multipart/form-data">
+                                                                {{csrf_field()}}
+                
+                                                                <div class="row form-inline">
+                                                                    <div class="col-md-7">
+                                                                        <div class="form-group">
+                                                                            <label data-bs-toggle="modal" data-target="#map_modal">Set
+                                                                                Location: &emsp; <i
+                                                                                    class="fa fa-map-marker text-danger"></i>
+                                                                                {{substr($address, 0, 15) . '...'}}</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-5">
+                                                                        <div class="form-group">
+                                                                            <label data-bs-toggle="modal" data-bs-target="#map_modal">Use
+                                                                                Current Location: &emsp; <i
+                                                                                    class="fa fa-map-marked text-primary"></i></label>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <form action="{{route('password_update')}}" method="POST">
+                                                                {{csrf_field()}}
+                                                                <div class="row form-inline justify-content-center">
+                                                                <div class="col-md-4">
+                                                                    &nbsp;
+                                                                </div>
+                                                                    <div class="col-md-8 justify-content-center">
+                                                                        <div class="form-group">
+                                                                            <input type="password" class="form-control w-100"
+                                                                                name="old_password" placeholder="Old Password" required
+                                                                                id="old_password" minlength="8" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        &nbsp;
+                                                                    </div>
+                                                                    <div class="col-md-8">
+                                                                        <div class="form-group">
+                                                                            <input type="password" class="form-control w-100"
+                                                                                name="new_password" placeholder="New Password" required
+                                                                                id="new_password" minlength="8" disabled>
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                   
+                                                            
+                                                            
+                                                                            <div class="row my-2">
+                                                                                <label class="col-md-4">
+                                                                                Export Details
+                                                                                </label>
+                                                                                <div class="col-md-8">
+                                                                                    <div class="row form-inline">
+                                                                                        <div class="col-md-8">
+                                                                                            <div class="form-group">
+                                                                                                {{-- <label >Browse Data: &emsp;</label>--}}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="col-md-4">
+                                                                                            <div class="">
+                                                                                                <div class="text-center">
+                                                                                                    <a href="{{route('exportProducts')}}"
+                                                                                                        style="background: #3a4b83;color:white;font-weight: 600"
+                                                                                                        class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
+                                                                                                        type="submit">Export</a>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                        
+                                                                                </div>
+                                                                            </div>
+                                                                        
+                                                        <div class="row d-flex justify-content-center mt-4">
                                                         <div class="col-md-4">
                                                             <div class="">
                                                                 <div class="text-center">
@@ -56,6 +187,7 @@
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                        </div>
                                                     </div>
                                                 </form>
                                             </div>
@@ -72,167 +204,101 @@
                 <!-- /.row -->
     
             </div><!-- /.container-fluid -->
+            <div class="modal fade" id="editUserModal{{ $user->id }}" tabindex="-1" role="dialog"
+                aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <form id="user_info" onsubmit="return false" enctype="multipart/form-data">
+                            {{ csrf_field() }}
+                            <div class="modal-header">
+                                <h5 class="modal-title display-center" id="exampleModalLabel">
+                                    <h5 class="modal-title" id="exampleModalLabel">
+                                        Update User Info
+                                    </h5>
+                                </h5>
+                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
     
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
-                        <h4 class="text-left text-primary">Location</h4>
-                        <div class="card">
-                            <div class="card-body-custom">
-                                <div class=" d-block text-right">
-                                    <div class="card-text">
-                                        <div class="row">
-                                            <div class="col-md-12">
-    
-                                            </div>
-                                            <div class="col-md-12">
-                                                <form action="{{route('payment_settings_update')}}" method="POST"
-                                                    enctype="multipart/form-data">
-                                                    {{csrf_field()}}
-    
-                                                    <div class="row form-inline">
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label data-bs-toggle="modal" data-target="#map_modal">Set
-                                                                    Location: &emsp; <i
-                                                                        class="fa fa-map-marker text-danger"></i>
-                                                                    {{substr($address, 0, 15) . '...'}}</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <label data-bs-toggle="modal" data-bs-target="#map_modal">Use
-                                                                    Current Location: &emsp; <i
-                                                                        class="fa fa-map-marked text-primary"></i></label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="">
-                                                                <div class="text-center">
-                                                                    <button
-                                                                        style="background: #ffcf42;color:black;font-weight: 600"
-                                                                        class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
-                                                                        onclick="document.getElementById('update_location').click();"
-                                                                        type="button">Update</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                    <input type="hidden" id="id" class="form-control" value="{{ $user->id }}">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="">Name</label>
+                                            <input type="text" name="name" id="name"
+                                                class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}"
+                                                value="{{ $user->name }}">
+                                            @if ($errors->has('name'))
+                                                <span class="invalid-feedback" role="alert">
+                                                    <strong>{{ $errors->first('name') }}</strong>
+                                                </span>
+                                            @endif
+                                            <p id="name" class="text-danger name error"></p>
                                         </div>
                                     </div>
-    
-    
-                                </div>
-                            </div>
-                        </div>
-    
-                    </div>
-                </div>
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
-    
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
-                        <h4 class="text-left text-primary">Update Password</h4>
-                        <div class="card">
-                            <div class="card-body-custom">
-                                <div class=" d-block text-right">
-                                    <div class="card-text">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <form action="{{route('password_update')}}" method="POST">
-                                                    {{csrf_field()}}
-                                                    <div class="row form-inline">
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <input type="password" class="form-control"
-                                                                    name="old_password" placeholder="Old Password" required
-                                                                    id="old_password" minlength="8">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="form-group">
-                                                                <input type="password" class="form-control"
-                                                                    name="new_password" placeholder="New Password" required
-                                                                    id="new_password" minlength="8">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="">
-                                                                <div class="text-center">
-                                                                    <button
-                                                                        style="background: #ffcf42;color:black;font-weight: 600"
-                                                                        class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
-                                                                        type="submit">Update</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="">Business Name</label>
+                                            <input type="text" name="business_name" id="business_name"
+                                                class="form-control" value="{{ $user->business_name }}">
+                                            <p id="business_name" class="text-danger business_name error"></p>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="">Phone</label>
+                                            <div class="row ">
+                                                <span class="input-group-text">+44</span>
+                                                <div class="col-md-8">
+                                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                                        value="{{ $user->phone }}">
+                                                    <p id="phone" class="text-danger phone error"></p>
     
-    
-                                </div>
-                            </div>
-                        </div>
-    
-                    </div>
-                </div>
-                <!-- /.row -->
-            </div><!-- /.container-fluid -->
-    
-            <!-- /.container-fluid -->
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
-                        <h4 class="text-left text-primary">Export Products</h4>
-                        <div class="card">
-                            <div class="card-body-custom">
-                                <div class=" d-block text-right">
-                                    <div class="card-text">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="row form-inline">
-                                                    <div class="col-md-8">
-                                                        <div class="form-group">
-                                                            {{-- <label >Browse Data: &emsp;</label>--}}
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4">
-                                                        <div class="">
-                                                            <div class="text-center">
-                                                                <a href="{{route('exportProducts')}}"
-                                                                    style="background: #3a4b83;color:white;font-weight: 600"
-                                                                    class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
-                                                                    type="submit">Export</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 </div>
-    
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="">Business Phone</label>
+                                            <div class="row ">
+                                                <span class="input-group-text">+44</span>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="business_phone"
+                                                        name="business_phone" value="{{ $user->business_phone }}">
+                                                </div>
+                                            </div>
+                                            <p id="business_phone" class="text-danger business_phone error"></p>
     
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-    
+                            <div class="modal-footer hidden ">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" id="user_info_update" onclick="userInfoUpdate()"
+                                    class="btn btn-primary">Save
+                                    changes</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <!-- /.row -->
-    
-            </div><!-- /.container-fluid -->
-    
+            </div>
             <div class="container-fluid">
                 <div class="row">
+                    <div class="col-12 col-sm-6 col-md-4">
+                       
+                        
+                       
+                        <h4 class=" py-2 my-1">Update Store Hours</h4>
+                        
+                    </div>
                     <div class="offset-md-2 col-md-8 pl-4 pr-4 pb-4">
-                        <h4 class="text-left text-primary">Update Store Hours</h4>
+                       
                         <div class="card">
                             <div class="card-body-custom">
                                 <div class=" d-block text-right">
@@ -265,6 +331,7 @@
                                                         </div>
                                                     </div>
                                                     <?php
+                                                    if(!empty($business_hours)){
                                                     $bh = json_decode($business_hours, true);
                                                     $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
                                                     for ($i = 0; $i < count($days); $i++) {
@@ -306,9 +373,10 @@
                                                     <!-- Day & Time Sect End -->
                                                     <?php
                                                     }
+                                                }
                                                     ?>
     
-                                                    <div class="col-md-12 text-center">
+                                                    <div class="col-md-12 text-center my-2">
                                                         <button style="background: #ffcf42;color:black;font-weight: 600"
                                                             class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
                                                             type="submit">{{__('Update')}}</button>

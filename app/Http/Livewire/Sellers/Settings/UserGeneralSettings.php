@@ -13,7 +13,7 @@ class UserGeneralSettings extends Component
         $business_hours = $user->business_hours;
         $address = $user->address_1;
         $business_location = $user->business_location;
-        return view('livewire.sellers.settings.user-general-settings', compact('business_hours', 'address', 'business_location'));
+        return view('livewire.sellers.settings.user-general-settings', compact('business_hours', 'address', 'business_location', 'user'));
         
     }
 }
