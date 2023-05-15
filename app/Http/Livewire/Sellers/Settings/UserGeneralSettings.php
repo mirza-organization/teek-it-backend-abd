@@ -38,11 +38,7 @@ class UserGeneralSettings extends Component
         }
     }
 
-    public function getUserInfo()
-    {
-    }
-
-    public function render()
+    public function setUserInfo()
     {
         $user = User::find(Auth::id());
         $this->name = $user->name;
@@ -52,6 +48,12 @@ class UserGeneralSettings extends Component
         $this->business_phone = $user->business_phone;
         $this->phone = $user->phone;
         $this->l_name = $user->l_name;
+        return $user;
+    }
+
+    public function render()
+    {
+        $user = $this->setUserInfo();
         $business_hours = $user->business_hours;
         $address = $user->address_1;
         $business_location = $user->business_location;
