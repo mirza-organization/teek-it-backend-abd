@@ -6,7 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Exception;
-
+use Illuminate\Support\Facades\Hash;
 class UserGeneralSettings extends Component
 {
     public
@@ -19,7 +19,34 @@ class UserGeneralSettings extends Component
         $old_password,
         $new_password,
         $search = '';
-        
+        public function rules()
+        {
+            return [
+                'old_password' => 'required|min:8',
+                'new_password' => 'required|min:8'
+            ];
+        }
+        public function passwordUpdate()
+        {
+        try {
+            $old_password = $this->old_password;
+            $new_password = $this->new_password;
+            $user = User::find(Auth::id());
+            if (Hash::check($old_password, $user->password)) {
+                $user->password = Hash::make($new_password);
+               $updated = $user->save();
+            sleep(1);
+            if ($updated) {
+                session()->flash('success', 'Your password has been updated successfully.');
+            } else {
+                session()->flash('error','Your old password is incorrect.');
+            }
+        }
+        }catch (Exception $error) {
+            session()->flash('error', $error);
+        }
+            
+        }
     public function update()
     {
         try {
@@ -48,6 +75,7 @@ class UserGeneralSettings extends Component
         $this->business_phone = $user->business_phone;
         $this->phone = $user->phone;
         $this->l_name = $user->l_name;
+        
         return $user;
     }
 

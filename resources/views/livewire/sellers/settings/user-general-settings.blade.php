@@ -111,12 +111,12 @@
                                                                 <div class="">
                                                                     <div class="text-center">
 
-                                                                        <button
+                                                                        <a
                                                                             style="background: #ffcf42;color:black;font-weight: 600"
                                                                             class="pl-5 pr-8 pr-5 pb-2 border-0 btn btn-secondary rounded-pill"
                                                                             data-bs-toggle="modal"
                                                                             data-bs-target="#editUserModal{{ $user->id }}"
-                                                                            onclick="event.preventDefault();">&nbsp;Edit&nbsp;</button>
+                                                                            onclick="event.preventDefault();">&nbsp;Edit&nbsp;</a>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -128,25 +128,27 @@
                                                                     {{ csrf_field() }}
 
                                                                     <div class="row form-inline">
-                                                                        <div class="col-md-7">
+                                                                        {{-- <div class="col-md-7">
                                                                             <div class="form-group">
-                                                                                <label data-bs-toggle="modal"
-                                                                                    data-target="#map_modal">Set
-                                                                                    Location: &emsp; <i
+                                                                                {{-- <label data-bs-toggle="modal"
+                                                                                    data-target="#map_modal"> <i
                                                                                         class="fa fa-map-marker text-danger"></i>
-                                                                                    {{ substr($address, 0, 15) . '...' }}</label>
-                                                                            </div>
+                                                                                    {{ substr($address, 0, 15) . '...' }}</label> --}}
+                                                                            {{-- </div>
+                                                                        </div> --}}
+                                                                        <div class="col-md-4 ">
+                                                                            <label >Set Location &nbsp;</label>
+                                                                            
                                                                         </div>
-                                                                        <div class="col-md-5">
-                                                                            <div class="form-group">
-                                                                                <label data-bs-toggle="modal"
-                                                                                    data-bs-target="#map_modal">Use
-                                                                                    Current Location: &emsp; <i
-                                                                                        class="fa fa-map-marked text-primary"></i></label>
-                                                                            </div>
+                                                                        <div class="col-md-8">
+                                                                            <div class="form-group ">
+                                                                                <i
+                                                                                   class="fa fa-map-marked text-primary" data-bs-toggle="modal"
+                                                                                   data-bs-target="#map_modal"></i>
+                                                                       </div>
                                                                         </div>
-
                                                                     </div>
+                                                                   
                                                                 </form>
                                                             </div>
                                                         </div>
@@ -165,8 +167,8 @@
                                                                                     class="form-control w-100"
                                                                                     wire:model="old_password"
                                                                                     placeholder="Old Password" required
-                                                                                    id="old_password" minlength="8"
-                                                                                    disabled>
+                                                                                    wire:model.defer="old_password" minlength="8"
+                                                                                    >
                                                                             </div>
                                                                         </div>
                                                                         <div class="col-md-4">
@@ -178,8 +180,8 @@
                                                                                     class="form-control w-100"
                                                                                     wire:model="new_password"
                                                                                     placeholder="New Password" required
-                                                                                    id="new_password" minlength="8"
-                                                                                    disabled>
+                                                                                    wire:model.defer="new_password" minlength="8"
+                                                                                    >
                                                                             </div>
                                                                         </div>
 
@@ -218,7 +220,7 @@
                                                                         <button
                                                                             style="background: #ffcf42;color:black;font-weight: 600"
                                                                             class="pl-5 pr-5 pt-2 pb-2 border-0 btn btn-secondary rounded-pill"
-                                                                            type="submit">Update</button>
+                                                                            wire:click="passwordUpdate" type="submit">Update</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -247,7 +249,7 @@
                                     Update User Info
                                 </h5>
                             </h5>
-                            <button type="button" class="close" aria-label="Close">
+                            <button type="button" class="close" aria-label="Close" data-bs-dismiss="modal">
                                 <span aria-hidden="true">×</span>
                             </button>
                         </div>
