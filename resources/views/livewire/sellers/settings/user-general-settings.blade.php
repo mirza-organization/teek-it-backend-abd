@@ -316,7 +316,7 @@
                             <div class="modal-footer hidden ">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 <button type="button" id="user_info_update" wire:click="update"
-                                    class="btn btn-primary">Save
+                                    class="btn btn-primary" data-bs-dismiss="modal">Save
                                     changes</button>
                             </div>
                         
