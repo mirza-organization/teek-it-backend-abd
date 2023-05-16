@@ -53,12 +53,7 @@ class AuthController extends Controller
                 $response = array('data' => $validate->messages(), 'status' => false, 'message' => config('constants.VALIDATION_ERROR'));
                 return response()->json($response, 400);
             }
-            //$role = Role::where('name', $request->get('role'))->first();
-            if ($request->get('role') == 'buyer')
-                $is_active = 1;
-            else
-                $is_active = 0;
-
+            //$role = Role::where('name', $request->get('role'))->first();  
             $User = User::create([
                 'name' => $request->name,
                 'l_name' => $request->l_name,
@@ -71,7 +66,7 @@ class AuthController extends Controller
                 'lon' => json_decode($request->business_location)->lon,
                 'seller_id' => $request->seller_id,
                 'postcode' => $request->postal_code,
-                'is_active' => $is_active,
+                'is_active' => ($request->get('role') == 'buyer') ? 1 : 0,
                 'role_id' => 3,
                 // 'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
                 'referral_code' => Str::uuid(),
