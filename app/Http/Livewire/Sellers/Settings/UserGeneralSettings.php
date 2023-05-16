@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Livewire\Sellers\Settings;
-
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -37,15 +36,14 @@ class UserGeneralSettings extends Component
                $updated = $user->save();
             sleep(1);
             if ($updated) {
-                session()->flash('success', 'Your password has been updated successfully.');
+                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
             } else {
-                session()->flash('error','Your old password is incorrect.');
+                session()->flash('error',config('constants.UPDATION_FAILED'));
             }
         }
         }catch (Exception $error) {
             session()->flash('error', $error);
         }
-            
         }
     public function update()
     {
@@ -56,15 +54,14 @@ class UserGeneralSettings extends Component
             /* Operation finished */
             sleep(1);
             if ($updated) {
-                session()->flash('success', 'User settings updated successfully!');
+                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
             } else {
-                session()->flash('error', 'User settings cannot be updated!');
+                session()->flash('error', config('constants.UPDATION_FAILED'));
             }
         } catch (Exception $error) {
             session()->flash('error', $error);
         }
     }
-
     public function setUserInfo()
     {
         $user = User::find(Auth::id());
@@ -78,7 +75,6 @@ class UserGeneralSettings extends Component
         
         return $user;
     }
-
     public function render()
     {
         $user = $this->setUserInfo();

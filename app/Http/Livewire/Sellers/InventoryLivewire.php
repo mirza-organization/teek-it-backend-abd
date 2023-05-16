@@ -36,12 +36,12 @@ class InventoryLivewire extends Component
             sleep(1);
             if ($updated) {
                 if($status == 0){
-                    session()->flash('success', 'All products disabled successfully!');
+                    session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }else{
-                session()->flash('success', 'All products enabled successfully!');
+                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }
             } else {
-                session()->flash('error', 'Products cannot be disabled!');
+                session()->flash('error', config('constants.UPDATION_FAILED'));
             }
         } catch (Exception $error) {
             session()->flash('error', $error);
@@ -56,12 +56,12 @@ class InventoryLivewire extends Component
             sleep(1);
             if ($updated) {
                 if($status == 0){
-                    session()->flash('success', 'Product disabled successfully!');
+                    session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }else{
-                session()->flash('success', 'Product enabled successfully!');
+                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }
             } else {
-                session()->flash('error', 'Product cannot be disabled!');
+                session()->flash('error', config('constants.UPDATION_FAILED'));
             }
         } catch (Exception $error) {
             session()->flash('error', $error);
@@ -76,12 +76,12 @@ class InventoryLivewire extends Component
             sleep(1);
             if ($updated) {
                 if($status == 0){
-                    session()->flash('success', 'Unmark as featured successfully!');
+                    session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }else{
-                session()->flash('success', 'Mark as featured successfully!');
+                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }
             } else {
-                session()->flash('error', 'Product cannot be marked as featured!');
+                session()->flash('error', config('constants.UPDATION_FAILED'));
             }
         } catch (Exception $error) {
             session()->flash('error', $error);
@@ -95,9 +95,9 @@ class InventoryLivewire extends Component
             /* Operation finished */
             sleep(1);
             if ($updated) {
-                session()->flash('success', 'Data updated successfully!');
+                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
             } else {
-                session()->flash('error', 'Data not updated!');
+                session()->flash('error', config('constants.UPDATION_FAILED'));
             }
         } catch (Exception $error) {
             session()->flash('error', $error);
