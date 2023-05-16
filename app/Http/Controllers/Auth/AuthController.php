@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Crypt;
 use JWTAuth;
 use Jenssegers\Agent\Agent;
 use App\Models\JwtToken;
+use App\Services\JsonResponseCustom;
 use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Throwable;
 
 class AuthController extends Controller
@@ -52,11 +54,11 @@ class AuthController extends Controller
                 return response()->json($response, 400);
             }
             //$role = Role::where('name', $request->get('role'))->first();
-            if ($request->get('role') == 'buyer') {
+            if ($request->get('role') == 'buyer')
                 $is_active = 1;
-            } else {
+            else
                 $is_active = 0;
-            }
+
             $User = User::create([
                 'name' => $request->name,
                 'l_name' => $request->l_name,
@@ -71,30 +73,18 @@ class AuthController extends Controller
                 'postcode' => $request->postal_code,
                 'is_active' => $is_active,
                 'role_id' => 3,
-                'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
+                // 'vehicle_type' => $request->has('vehicle_type') ? $request->vehicle_type : null
+                'referral_code' => Str::uuid(),
             ]);
             if ($User) {
                 if ($request->hasFile('user_img')) {
-                    $file = $request->file('user_img');
-                    $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
-                    Storage::disk('spaces')->put($filename, File::get($file));
-                    if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
-                        info("file is store successfully : " . $filename);
-                    } else {
-                        info("file is not found :- " . $filename);
-                    }
-                    $User->user_img = $filename;
+                    $User->user_img = User::uploadImg($request);
                     $User->save();
                 }
             }
 
             // $User->roles()->sync($role->id);
-            $verification_code = Crypt::encrypt($User->email);
-
-            $FRONTEND_URL = env('FRONTEND_URL');
-            dd($FRONTEND_URL);
-            $account_verification_link = $FRONTEND_URL . '/auth/verify?token=' . $verification_code;
-
+            $account_verification_link = url('/') . '/auth/verify?token=' . Crypt::encrypt($User->email);
             $html = '<html>
             Congratulations ' . $User->name . '!<br><br>
             You have successfully registered on ' . env('APP_NAME') . '.
@@ -158,9 +148,10 @@ class AuthController extends Controller
         $validate = Validator::make($request->all(), [
             'token' => 'required'
         ]);
-        if ($validate->fails()) {
-            echo "Validation error";
-            return;
+        if ($validate->fails()) { {
+                echo "Validation error";
+                return;
+            }
             return response()->json([
                 'data' => [],
                 'status' => false,
@@ -252,11 +243,7 @@ class AuthController extends Controller
     public function me()
     {
         $user = JWTAuth::user();
-
         $user = User::find($user->id);
-
-        $url = URL::to('/');
-        $imagePath = $user['user_img'];
         $data_info = array(
             'id' => $user->id,
             'name' => $user->name,
@@ -437,7 +424,7 @@ class AuthController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $validate->messages()
-            ], 400);
+            ], 422);
         }
         $user = JWTAuth::user();
         $User = User::find($user->id);
@@ -555,38 +542,19 @@ class AuthController extends Controller
         }
     }
     /**
-     * Get delivery boy info w.r.t delivery boy 'id'
+     * Get user details w.r.t 'id'
      * @author Mirza Abdullah Izhar
-     * @version 1.3.0
+     * @version 1.4.0
      */
-    public function getDeliveryBoyInfo($delivery_boy_info)
+    public function getUserDetails($user_id)
     {
-        $user = User::find($delivery_boy_info);
-        if (!$user) {
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => 'User not found.'
-            ], 404);
-        }
-        $data_info = array(
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'business_name' => $user->business_name,
-            'business_location' => $user->business_location,
-            'address_1' => $user->address_1,
-            'pending_withdraw' => $user->pending_withdraw,
-            'total_withdraw' => $user->total_withdraw,
-            'is_online' => $user->is_online,
-            'roles' => $user->roles->pluck('name'),
-            'user_img' => $user->user_img
+        $data = User::getUserInfo($user_id);
+        return JsonResponseCustom::getApiResponse(
+            (empty($data)) ? [] : $data,
+            (empty($data)) ? false : true,
+            (empty($data)) ? config('constants.NO_RECORD') : '',
+            (empty($data)) ? config('constants.HTTP_UNPROCESSABLE_REQUEST') : config('constants.HTTP_OK')
         );
-        return response()->json([
-            'data' => $data_info,
-            'status' => true,
-            'message' => ''
-        ], 200);
     }
     /**
      * Listing of all SECRET KEYS
@@ -815,7 +783,7 @@ class AuthController extends Controller
     //     $results = json_decode(file_get_contents($url), true);  
     //     $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
     //     $distanceInMiles = (double)$meters[0] * 0.000621;
-        
+
     //     $durationInSeconds = explode(' ', $results['rows'][0]['elements'][0]['duration']['value']);
     //     $durationInMinutes = round((int)$durationInSeconds[0] / 60); 
     //     return ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];

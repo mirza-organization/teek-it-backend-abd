@@ -35,12 +35,12 @@ Route::get('/', function () {
 | Registration, confirmations and verification
 |--------------------------------------------------------------------------
 */
-Route::post('password/email', [ForgotPasswordController::class, 'getResetToken']);
-Route::post('password/reset', [ResetPasswordController::class, 'reset']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('auth/verify', [AuthController::class, 'verify']);
 Route::post('auth/register_google', [AuthController::class, 'registerGoogle']);
 Route::post('auth/login_google', [AuthController::class, 'loginGoogle']);
+Route::post('password/email', [ForgotPasswordController::class, 'getResetToken']);
+Route::post('password/reset', [ResetPasswordController::class, 'reset']);
 /*
 |--------------------------------------------------------------------------
 | Authentication API Routes
@@ -55,7 +55,7 @@ Route::prefix('auth')->group(function () {
     Route::post('updateStatus', [AuthController::class, 'updateStatus']);
     Route::get('me', [AuthController::class, 'me']);
     Route::get('delivery_boys', [AuthController::class, 'deliveryBoys']);
-    Route::get('get_user/{user_id}', [AuthController::class, 'getDeliveryBoyInfo']);
+    Route::get('get_user/{user_id}', [AuthController::class, 'getUserDetails']);
     Route::post('user/delete', [AuthController::class, 'deleteUser']);
 });
 /*

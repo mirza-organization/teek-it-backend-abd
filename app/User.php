@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Validator;
 
 class User extends Authenticatable implements JWTSubject
@@ -42,7 +44,8 @@ class User extends Authenticatable implements JWTSubject
         'lat',
         'lon',
         'role_id',
-        'parent_store_id'
+        'parent_store_id',
+        'referral_code'
     ];
     /**
      * The attributes that should be hidden for arrays.
@@ -145,6 +148,19 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Helpers
      */
+    public static function uploadImg(object $request)
+    {
+        $file = $request->file('user_img');
+        $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+        Storage::disk('spaces')->put($filename, File::get($file));
+        if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+            info("file is store successfully : " . $filename);
+        } else {
+            info("file is not found :- " . $filename);
+        }
+        return $filename;
+    }
+
     public static function getParentAndChildSellers()
     {
         return User::where('is_active', 1)
@@ -203,5 +219,29 @@ class User extends Authenticatable implements JWTSubject
     {
         return  User::where('id', $user_id)
             ->pluck('role_id');
+    }
+
+    public static function getUserInfo(int $user_id)
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            return array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'business_name' => $user->business_name,
+                'business_location' => $user->business_location,
+                'address_1' => $user->address_1,
+                'pending_withdraw' => $user->pending_withdraw,
+                'total_withdraw' => $user->total_withdraw,
+                'is_online' => $user->is_online,
+                'roles' => $user->role()->pluck('name'),
+                'user_img' => $user->user_img,
+                'referral_code' => $user->referral_code,
+                'referral_useable' => $user->referral_useable
+            );
+        } else {
+            return null;
+        }
     }
 }
