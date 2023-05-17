@@ -21,4 +21,11 @@ class JsonResponseCustom
             $extra_key => $extra_key_data   
         ], $http_code);
     }
+    public static function getWebResponse($message, $status){
+        if($status){
+        flash($message)->success();
+        }else if(empty($status)){
+            flash($message)->error();
+        }
+    }
 }

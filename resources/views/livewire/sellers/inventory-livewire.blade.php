@@ -233,21 +233,21 @@ a:hover {
             @foreach ($featured_products as $key => $inventory)
             
                 <!-- Single Product -->
-                <div class="col-md-6 col-lg-4 col-xl-3  ">
-                        <div id="productItem" class="single-product bg-white" >
+                <div class="col-md-6 col-lg-4 col-xl-3 p-2 ">
+                        <div id="productItem" class="single-product bg-white p-2" >
                                 <div class="part-1" style=" background:url('{{asset($inventory->feature_img)}}') no-repeat center; ">
                                     {{-- <span class="discount">15% off</span>
                                     <span class="new">new</span> --}}
                                         <ul>
                                             @if ($inventory->status == 1)
-                                            <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->id }}', 0)"   ><i class="fa fa-ban"></i></button></li>
+                                            <li><a wire:click="toggleProduct('{{ $inventory->id }}', 0)"  title="Enable Product" ><i class="fa fa-ban"></i></a></li>
                                         @elseif($inventory->status == 0)
-                                        <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->id }}', 1)"   ><i class="fa fa-toggle-on"></i></button></li>
+                                        <li><a  wire:click="toggleProduct('{{ $inventory->id }}', 1)"  title="Disable Product" ><i class="fa fa-toggle-on"></i></a></li>
                                         @endif
                                                 
-                                                <li><a href="/inventory/edit/{{ $inventory->id }}"><i class="fa fa-edit"></i></a></li>
-                                                <li><button class="bg-white border-0 p-2" wire:click="markAsFeatured('{{ $inventory->id }}', '0')" >
-                                                    <i class="fa fa-undo" aria-hidden="true"></i>
+                                                <li><a href="/inventory/edit/{{ $inventory->id }}" title="Edit Product"><i class="fa fa-edit"></i></a></li>
+                                                <li><a wire:click="markAsFeatured('{{ $inventory->id }}', '0')"  title="Unmark as Featured">
+                                                    <i class="fa fa-undo" aria-hidden="true"></i></a>
                                                 </li>
                                                 
                                         </ul>
@@ -255,7 +255,8 @@ a:hover {
                                 <div class="part-2 px-2">
                                         
                                         <div class="col">
-                                            <h2 class="product-title">{{$inventory->product_name}}</h2>
+                                            <h2 class="product-title" style="color:#3a4b83;">{{$inventory->product_name}}</h2>
+                                            <h5 class="rating">{{$inventory->category['category_name']}}</h5>
                                             <div class="ratting">
                                                 <?php
                                             $rating = round($inventory->ratting['average']);
@@ -295,26 +296,27 @@ a:hover {
                                 @forelse ($data as $key => $inventory)
                                 {{-- {{dd($inventory)}} --}}
                                     <!-- Single Product -->
-                                    <div class="col-md-6 col-lg-4 col-xl-3  ">
-                                            <div id="productItem" class="single-product bg-white" >
+                                    <div class="col-md-6 col-lg-4 col-xl-3 p-2 ">
+                                            <div id="productItem" class="single-product bg-white p-2" >
                                                     <div class="part-1" style=" background:url('{{asset($inventory->feature_img)}}') no-repeat center; ">
                                                         {{-- <span class="discount">15% off</span>
                                                         <span class="new">new</span> --}}
                                                             <ul>
                                                                 @if ($inventory->status == 1)
-                                            <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->id }}', 0)"   ><i class="fa fa-ban"></i></button></li>
+                                            <li><a wire:click="toggleProduct('{{ $inventory->id }}', 0)"  title="Enable Product" ><i class="fa fa-ban"></i></a></li>
                                         @elseif($inventory->status == 0)
-                                        <li><button class="bg-white border-0 p-2" wire:click="toggleProduct('{{ $inventory->id }}', 1)"   ><i class="fa fa-toggle-on"></i></button></li>
+                                        <li><a wire:click="toggleProduct('{{ $inventory->id }}', 1)"  title="Disable Product" ><i class="fa fa-toggle-on"></i></a></li>
                                         @endif
                                                                     
-                                                                    <li><a href="/inventory/edit/{{ $inventory->id }}"><i class="fa fa-edit"></i></a></li>
-                                                                    <li><button class="bg-white border-0 p-2" wire:click="markAsFeatured('{{ $inventory->id }}', '1')" ><i class="fa fa-star"></i></button></li>
+                                                                    <li><a href="/inventory/edit/{{ $inventory->id }}" title="Edit Product"><i class="fa fa-edit"></i></a></li>
+                                                                    <li><a wire:click="markAsFeatured('{{ $inventory->id }}', '1')" title="Mark as Featured"><i class="fa fa-star"></i></a></li>
                                                                     
                                                             </ul>
                                                     </div>
                                                     <div class="part-2 px-2">
                                                         
-                                                            <h3 class="product-title">{{$inventory->product_name}}</h3>
+                                                            <h3 class="product-title" style="color:#3a4b83;">{{$inventory->product_name}}</h3>
+                                                            <h5 class="rating">{{$inventory->category}}</h5>
                                                             <h4 class="product-price">SKU: {{$inventory->sku}}</h4> 
                                                             <div class="col-md-6">
                                                                 <div class="ratting pl-3">

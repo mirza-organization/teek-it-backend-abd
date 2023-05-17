@@ -22,7 +22,9 @@ return [
     'DATA_INSERTION_SUCCESS' => 'Data Inserted Successfully.',
     'DATA_UPDATED_SUCCESS' => 'Data Updated Successfully.',
     'SUCCESS_CODE' => 1,
-
+    'STUART_DELIVERY_SUCCESS' => 'Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button',
+    'COMPLETED' => 'Completed',
+   
     /* Failure Contants */
     'INSERTION_FAILED' => 'Failed to insert data.',
     'UPDATION_FAILED' => 'Failed to update data.',

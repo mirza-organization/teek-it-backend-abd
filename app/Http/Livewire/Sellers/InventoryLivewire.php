@@ -122,13 +122,18 @@ class InventoryLivewire extends Component
         $categories = Categories::all();
         if (Gate::allows('seller')) {
             $parent_seller_id = Auth::id();
-            $data = Products::where('user_id', '=', $parent_seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->paginate(12);
-            $featured = Products::whereHas('user', function ($query) {
+            $data = Products::join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.*','categories.category_name as category')
+            ->where('products.user_id', '=', $parent_seller_id)
+            ->where('products.status', '=', 1)->orderBy('products.id', 'Desc')->paginate(12);
+            $featured = Products::join('categories', 'products.category_id', '=', 'categories.id')
+            ->select('products.*','categories.category_name as category')
+            ->whereHas('user', function ($query) {
                 $query->where('is_active', 1);
-                })->where('user_id', '=', $parent_seller_id)
-                ->where('featured', '=', 1)
-                ->where('status', '=', 1)
-                ->orderByDesc('id')
+                })->where('products.user_id', '=', $parent_seller_id)
+                ->where('products.featured', '=', 1)
+                ->where('products.status', '=', 1)
+                ->orderByDesc('products.id')
                 ->paginate(10);
             foreach ($featured as $in) {
                 $featured_products[] = Products::getProductInfo($in->id);
@@ -141,6 +146,7 @@ class InventoryLivewire extends Component
         if (!empty($qty)) {
             $data = Products::where('user_id', $parent_seller_id)
             ->join('qty', 'products.id', '=', 'qty.products_id')
+
             ->select('products.id as prod_id', 'products.user_id as parent_seller_id','products.category_id','products.product_name','products.price','products.feature_img','qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
             ->where('qty.users_id', Auth::id())->paginate(20);
         
