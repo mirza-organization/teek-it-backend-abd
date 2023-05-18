@@ -4,7 +4,6 @@
 <link rel="icon" href="{{ asset('res/res/img/logo.png') }}" type="image/svg+xml" />
 <!-- CSRF Token -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
 <title>{{ config('app.name', 'Laravel') }}</title>
 <!-- Fonts -->
 <link rel="dns-prefetch" href="//fonts.gstatic.com">

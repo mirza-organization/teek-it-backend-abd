@@ -301,7 +301,7 @@
             scrollbar: true
         });
     </script>
-    
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script>
@@ -309,20 +309,17 @@
         /**
          * This AJAX call will run automatically
          * on each page load & after its completion
-         * it will trigger my_order_count() function
+         * it will trigger myOrderCount() function
          */
         $.ajax({
             url: "/my_order_count",
-            // type: "POST",
-            // data: "urut=" + $(".urut").val(),
             success: function(data) {
                 total_orders = data;
-                my_order_count();
-                // $("#result").html(data);
+                myOrderCount();
             }
         });
 
-        function my_order_count() {
+        function myOrderCount() {
             $.ajax({
                 url: "/my_order_count",
                 success: function(new_orders) {
@@ -344,7 +341,7 @@
                             }, 1000);
                     }
                     total_orders = new_orders.total_orders;
-                    setTimeout(my_order_count, 2000);
+                    setTimeout(myOrderCount, 2000);
                 }
             });
         }
@@ -450,6 +447,7 @@
          * Code for business hours form
          */
         $('#business_hours_modal').modal('show');
+
         function closed(day) {
             let listOfClasses = document.getElementById("time[" + day + "][open]").className;
             if (listOfClasses.search("disabled-input-field") < 0) {

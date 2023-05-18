@@ -328,11 +328,7 @@
                                     class="btn btn-primary" data-bs-dismiss="modal">Save
                                     changes</button>
                             </div>
-                        
-
                         </div>
-                       
-
                     </div>
                 </div>
             </div>
@@ -518,13 +514,10 @@
                                             <button id="update_location" type="submit"
                                                 class="d-no mt-3 btn btn-submit btn-block btn-outline-primary">Submit</button>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
                     </div>
                 </form>
 

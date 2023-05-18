@@ -79,7 +79,6 @@ class StuartDeliveryController extends Controller
                 ]
             ];
             $response = Http::withToken($access_token)->post('' . config("constants.STUART_JOBS") . '', $job);
-
             $data = $response->json();
             if ($data && !isset($data['error'])) {
                 $data = StuartDelivery::create([
@@ -89,27 +88,20 @@ class StuartDeliveryController extends Controller
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'stuartDelivery'
                 ]);
-                JsonResponseCustom::getWebResponse(
-                    config('constants.STUART_DELIVERY_SUCCESS'), true
-                    );
+                JsonResponseCustom::getWebResponse(config('constants.STUART_DELIVERY_SUCCESS'), true);
                 return Redirect::back();
             } else {
                 $message = $data['message'];
                 if($data['error'] == 'JOB_DISTANCE_NOT_ALLOWED') $message = $message . " " . $transport_type;
-                JsonResponseCustom::getWebResponse(
-                    $message, false
-                    );
+                JsonResponseCustom::getWebResponse($message, false);
                 return Redirect::back();
             }
         } catch (Throwable $error) {
             report($error);
-            JsonResponseCustom::getWebResponse(
-                $data['message'], false
-                );
+            JsonResponseCustom::getWebResponse($data['message'], false);
             return Redirect::back();
         }
     }
-
     /**
      * It will check the current status of a Stuart job
      * @author Mirza Abdullah Izhar
@@ -132,7 +124,6 @@ class StuartDeliveryController extends Controller
                     config('constants.COMPLETED'),
                     config('constants.HTTP_OK')
                 );
-                
             } else {
                 return JsonResponseCustom::getApiResponse(
                     $data,

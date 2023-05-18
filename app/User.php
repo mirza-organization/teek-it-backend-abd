@@ -88,7 +88,6 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Relations
      */
-    // Many-to-many relationship
     public function roles()
     {
         return $this->belongsToMany('App\Role', 'role_user');
@@ -98,17 +97,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo('App\Role');
     }
-    // Many-to-many relationship
+
     public function seller()
     {
         return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
     }
-    // Many-to-many relationship
+
     public function driver()
     {
         return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
     }
-    // One-to-many relationship
+    
     public function orders()
     {
         return $this->hasMany('App\Orders');
@@ -217,8 +216,7 @@ class User extends Authenticatable implements JWTSubject
 
     public static function getUserRole(int $user_id)
     {
-        return  User::where('id', $user_id)
-            ->pluck('role_id');
+        return  User::where('id', $user_id)->pluck('role_id');
     }
 
     public static function getUserInfo(int $user_id)

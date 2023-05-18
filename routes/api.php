@@ -14,6 +14,7 @@ use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\RattingsController;
+use App\Http\Controllers\ReferralCodeRelationController;
 use App\Http\Controllers\WithdrawalRequestsController;
 use Illuminate\Support\Facades\Route;
 /*
@@ -187,6 +188,10 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::post('/validate', [PromoCodesController::class, 'promocodesValidate']);
         Route::post('/fetch_promocode_info', [PromoCodesController::class, 'fetchPromocodeInfo']);
         Route::get('/all', [PromoCodesController::class, 'allPromocodes']);
+    });
+
+    Route::prefix('referral')->group(function () {
+        Route::post('/validate', [ReferralCodeRelationController::class, 'validateReferral']);
     });
 
     Route::get('keys', [AuthController::class, 'keys']);
