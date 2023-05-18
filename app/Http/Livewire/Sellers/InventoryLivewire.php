@@ -122,17 +122,13 @@ class InventoryLivewire extends Component
         $categories = Categories::all();
         if (Gate::allows('seller')) {
             $parent_seller_id = Auth::id();
-            $data = Products::join('categories', 'products.category_id', '=', 'categories.id')
-            ->select('products.*','categories.category_name as category')
-            ->where('products.user_id', '=', $parent_seller_id)
-            ->where('products.status', '=', 1)->orderBy('products.id', 'Desc')->paginate(12);
-            $featured = Products::join('categories', 'products.category_id', '=', 'categories.id')
-            ->select('products.*','categories.category_name as category')
-            ->whereHas('user', function ($query) {
+            $data = Products::where('products.user_id', '=', $parent_seller_id)
+            ->where('products.featured', '=', 0)
+            ->orderBy('products.id', 'Desc')->paginate(12);
+            $featured = Products::whereHas('user', function ($query) {
                 $query->where('is_active', 1);
                 })->where('products.user_id', '=', $parent_seller_id)
                 ->where('products.featured', '=', 1)
-                ->where('products.status', '=', 1)
                 ->orderByDesc('products.id')
                 ->paginate(10);
             foreach ($featured as $in) {
@@ -158,10 +154,7 @@ class InventoryLivewire extends Component
         if ($this->category_id) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
             // $data = Products::getChildSellerProducts(Auth::id());
         }
-        
-        
         $this->quantity = $this->populateQuantityArray($data);
-        
         return view('livewire.sellers.inventory-livewire', ['data' => $data, 'categories' => $categories, 'featured_products'=>$featured_products]);
     }
 }

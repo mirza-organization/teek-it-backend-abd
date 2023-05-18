@@ -178,7 +178,7 @@ a:hover {
 
     <div class="row">
         <div class="col-12 col-sm-6 col-md-4">
-            <h4 class="py-4 my-1">Inventory</h4>
+            <h4 class="py-4 my-1">Inventorye</h4>
         </div>
         <div class="col-12 col-sm-6 col-md-8 ">
             <div class="row">

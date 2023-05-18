@@ -1,3 +1,6 @@
+@php
+    use Illuminate\Support\Str;
+@endphp
 <div class="container-xxl flex-grow-1 container-p-y">
     @if (session()->has('error'))
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -178,16 +181,30 @@ a:hover {
     transform: translateY(-50%);
 }
         </style>
+        <script>
+            function disableAll(ev) {
+                ev.preventDefault();
+                var urlToRedirect = ev.currentTarget.getAttribute(
+                    'href'
+                ); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
+                Swal.fire({
+                    title: 'Warning!',
+                    text: 'Are you sure you want to disable all the products of your store?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes'
+                }).then((result) => {
+                    if (result.isConfirmed)
+                        $("#DisableAll").click();
+                    });
+            }
+        </script>
     
     <div class="container-xxl flex-grow-1 container-p-y">
     
         <div class="row">
             <div class="col-12 col-sm-6 col-md-4">
-                @if(count($featured_products) > 1)
-                <h4 class="py-4 my-1">All Products</h4>
-                @else
-                <h4 class="py-4 my-1">Inventory</h4>
-                @endif
+                &nbsp;
             </div>
             <div class="col-12 col-sm-6 col-md-8 ">
                 <div class="row">
@@ -207,9 +224,9 @@ a:hover {
                         <button type="button" class="btn btn-warning my-4 p-1 w-100 mx-1 rounded" wire:click="toggleAllProducts(1)" title="Enable All">
                             <i class="fa fa-toggle-on"></i>
                         </button>
-                        <button type="button" class="btn btn-danger my-4 p-1 w-100 mx-1" wire:click="toggleAllProducts(0)" title="Disable All">
+                        <a type="button" class="btn btn-danger text-white py-3 my-4 p-1 w-100 mx-1"  onclick="disableAll(event)" title="Disable All">
                             <i class="fas fa-ban"></i>
-                        </button>
+                        </a>
                         <a type="button"  href="/inventory/add" class="btn btn-primary my-4 py-3 w-100 mx-1 px-0 " title="Add New">
                             <i class="fas fa-plus"></i>
                         </a>
@@ -234,7 +251,7 @@ a:hover {
             
                 <!-- Single Product -->
                 <div class="col-md-6 col-lg-4 col-xl-3 p-2 ">
-                        <div id="productItem" class="single-product bg-white p-2" >
+                        <div id="productItem" class="single-product bg-white p-2" @if ($inventory->status == 1) style="background:#ccc !important;" @endif >
                                 <div class="part-1" style=" background:url('{{asset($inventory->feature_img)}}') no-repeat center; ">
                                     {{-- <span class="discount">15% off</span>
                                     <span class="new">new</span> --}}
@@ -255,7 +272,7 @@ a:hover {
                                 <div class="part-2 px-2">
                                         
                                         <div class="col">
-                                            <h2 class="product-title" style="color:#3a4b83;">{{$inventory->product_name}}</h2>
+                                            <h2 class="product-title" style="color:#3a4b83;" title="{{$inventory->product_name}}">{{ Str::limit($inventory->product_name, 19) }}</h2>
                                             <h5 class="rating">{{$inventory->category['category_name']}}</h5>
                                             <div class="ratting">
                                                 <?php
@@ -287,18 +304,15 @@ a:hover {
                         
                             <div class="row">
                                 <div class="col-lg-12 col-sm-12 col-md-12">
-                                    @if(count($featured_products) > 1)
+                                    
                 <h4 class="py-4 my-1">Inventory</h4>
-                @else
-                
-                @endif
-                                </div>
+                       </div>
                                 @forelse ($data as $key => $inventory)
                                 {{-- {{dd($inventory)}} --}}
                                     <!-- Single Product -->
-                                    <div class="col-md-6 col-lg-4 col-xl-3 p-2 ">
-                                            <div id="productItem" class="single-product bg-white p-2" >
-                                                    <div class="part-1" style=" background:url('{{asset($inventory->feature_img)}}') no-repeat center; ">
+                                    <div class="col-md-6 col-lg-4 col-xl-3 p-2  ">
+                                            <div id="productItem" class="single-product bg-white p-2 rounded" @if ($inventory->status == 1) style="background:#ccc !important;" @endif>
+                                                    <div class="part-1 rounded" style=" background:url('{{asset($inventory->feature_img)}}') no-repeat center; ">
                                                         {{-- <span class="discount">15% off</span>
                                                         <span class="new">new</span> --}}
                                                             <ul>
@@ -315,8 +329,9 @@ a:hover {
                                                     </div>
                                                     <div class="part-2 px-2">
                                                         
-                                                            <h3 class="product-title" style="color:#3a4b83;">{{$inventory->product_name}}</h3>
-                                                            <h5 class="rating">{{$inventory->category}}</h5>
+                                                        <h3 class="product-title" style="color:#3a4b83;" title="{{$inventory->product_name}}">{{ Str::limit($inventory->product_name, 19) }}</h3>
+
+                                                            <h5 class="rating">{{$inventory->category['category_name']}}</h5>
                                                             <h4 class="product-price">SKU: {{$inventory->sku}}</h4> 
                                                             <div class="col-md-6">
                                                                 <div class="ratting pl-3">
@@ -450,4 +465,7 @@ a:hover {
         </div>
     </div>
 @endif
+<button type="button" id="DisableAll" wire:click="toggleAllProducts(0)" style="display:none; "></button>
 </div>
+
+

@@ -392,8 +392,12 @@
                                                                 <input type="text"
                                                                     name="time[{{ $days[$i] }}][open]"
                                                                     id="time[{{ $days[$i] }}][open]"
-                                                                    value="<?php echo isset($bh['time'][$days[$i]]['open']) ? $bh['time'][$days[$i]]['open'] : ''; ?>"
-                                                                    class="stimepicker form-control <?php echo isset($bh['time'][$days[$i]]['closed']) ? 'disabled-input-field' : ''; ?>"
+                                                                    value="<?php
+                                                                    if(!isset($bh['time'][$days[$i]]['closed'])){
+                                                                    echo $bh['time'][$days[$i]]['open']; 
+                                                                    }
+                                                                    ?>"
+                                                                    class="stimepicker form-control" <?php echo isset($bh['time'][$days[$i]]['closed']) ? 'disabled' : ''; ?>
                                                                     <?php echo isset($bh['time'][$days[$i]]['closed']) ? '' : 'required'; ?>>
                                                             </div>
                                                         </div>
@@ -402,8 +406,12 @@
                                                                 <input type="text"
                                                                     name="time[{{ $days[$i] }}][close]"
                                                                     id="time[{{ $days[$i] }}][close]"
-                                                                    value="<?php echo isset($bh['time'][$days[$i]]['close']) ? $bh['time'][$days[$i]]['close'] : ''; ?>"
-                                                                    class="etimepicker form-control <?php echo isset($bh['time'][$days[$i]]['closed']) ? 'disabled-input-field' : ''; ?>"
+                                                                    value="<?php
+                                                                    if(!isset($bh['time'][$days[$i]]['closed'])){
+                                                                        echo $bh['time'][$days[$i]]['close']; 
+                                                                        }
+                                                                     ?>"
+                                                                    class="etimepicker form-control" <?php echo isset($bh['time'][$days[$i]]['closed']) ? 'disabled' : ''; ?>
                                                                     <?php echo isset($bh['time'][$days[$i]]['closed']) ? '' : 'required'; ?>>
                                                             </div>
                                                         </div>
