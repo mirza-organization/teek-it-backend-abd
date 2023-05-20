@@ -13,12 +13,6 @@ use Throwable;
 class ReferralCodeRelationController extends Controller
 {
     /**
-     * 1) Validate the given referral from the users model.
-     * 2) Check that the friend who is using this referral have not placed any order yet.
-     * 3) Check from the ReferralCodeRelation model that either this friend is using this referral for the 1st time.
-     */
-
-    /**
      * @version 1.0.0
      */
     public function validateReferral(Request $request)
@@ -76,25 +70,10 @@ class ReferralCodeRelationController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );
         }
     }
-    // if ($is_verified) {
-    //     // dd(ReferralCodeRelation::usingReferalFirstTime($referral_verified->id, $request->user_id));
-    //     $using_referral_first_time = ReferralCodeRelation::usingReferalFirstTime($is_verified->id, $request->user_id);
-    //     if ($using_referral_first_time) {
-    //         if (Orders::checkTotalOrders($request->user_id) === 0) {
-    //             dd('Yes, He can use the referral');
-    //         } else {
-    //             dd('he cannot use the referral');
-    //         }
-    //     } else {
-    //         dd('Not your first order');
-    //     }
-    // } else {
-    //     dd('Not a valid Referral code');
-    // }
 }
