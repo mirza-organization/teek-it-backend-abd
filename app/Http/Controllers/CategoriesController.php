@@ -151,7 +151,7 @@ class CategoriesController extends Controller
                     config('constants.NO_RECORD'),
                     'pagination',
                     [],
-                    config('constants.HTTP_SERVER_ERROR')
+                    config('constants.HTTP_OK')
                 );
             }
         } catch (Throwable $error) {

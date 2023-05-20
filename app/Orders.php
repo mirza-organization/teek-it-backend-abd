@@ -62,7 +62,8 @@ class Orders extends Model
             return "bike";
     }
 
-    public static function checkTotalOrders(int $user_id){
-
+    public static function checkTotalOrders(int $user_id)
+    {
+        return Orders::where('user_id', $user_id)->count();
     }
 }

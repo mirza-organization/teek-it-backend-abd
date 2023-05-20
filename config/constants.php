@@ -22,8 +22,10 @@ return [
     'DATA_INSERTION_SUCCESS' => 'Data Inserted Successfully.',
     'DATA_UPDATED_SUCCESS' => 'Data Updated Successfully.',
     'SUCCESS_CODE' => 1,
+    'TRUE_STATUS' => true,
     'STUART_DELIVERY_SUCCESS' => 'Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button',
     'COMPLETED' => 'Completed',
+    'VALID_REFERRAL' => 'Valid referral code.',
    
     /* Failure Contants */
     'INSERTION_FAILED' => 'Failed to insert data.',
@@ -31,9 +33,13 @@ return [
     'ARCHIVED_FAILED' => 'Failed to archive data.',
     'UN_ARCHIVED_FAILED' => 'Failed to unarchive data.',
     'DELETION_FAILED' => 'Failed to delete data.',
-    'INVALID_DATA' => 'You have entered invalid or too long data',
+    'INVALID_DATA' => 'You have entered invalid or too long data.',
     'FAILED_CODE' => 0,
-    'STATUS_CHANGING_FAILED' => 'Failed to change the activation status',
+    'FALSE_STATUS' => false,
+    'STATUS_CHANGING_FAILED' => 'Failed to change the activation status.',
+    'INVALID_REFERRAL' => 'Invalid referral code.',
+    'REFERRAL_CAN_BE_USED_ONCE' => 'Same referral code can be used only once.',
+    'REFERRALS_ARE_ONLY_FOR_FIRST_ORDER' => 'Sorry, you can only use a referral before placing your first order.',
 
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',

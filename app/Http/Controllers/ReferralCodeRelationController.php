@@ -8,6 +8,7 @@ use App\Services\JsonResponseCustom;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class ReferralCodeRelationController extends Controller
 {
@@ -22,20 +23,78 @@ class ReferralCodeRelationController extends Controller
      */
     public function validateReferral(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            'user_id' => 'required|int',
-            'referral_code' => 'required|uuid'
-        ]);
-        if ($validate->fails()) {
+        try {
+            $validate = Validator::make($request->all(), [
+                'user_id' => 'required|int',
+                'referral_code' => 'required|uuid'
+            ]);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.FALSE_STATUS'),
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
+            }
+            $is_verified = User::verifyReferralCode($request->referral_code);
+            if (!$is_verified) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.FALSE_STATUS'),
+                    config('constants.INVALID_REFERRAL'),
+                    config('constants.HTTP_OK')
+                );
+            }
+
+            $using_referral_first_time = ReferralCodeRelation::usingReferalFirstTime($is_verified->id, $request->user_id);
+            if (!$using_referral_first_time) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.FALSE_STATUS'),
+                    config('constants.REFERRAL_CAN_BE_USED_ONCE'),
+                    config('constants.HTTP_OK')
+                );
+            }
+
+            if (Orders::checkTotalOrders($request->user_id) === 0) {
+                ReferralCodeRelation::insertReferralRelation($is_verified->id, $request->user_id);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.TRUE_STATUS'),
+                    config('constants.VALID_REFERRAL'),
+                    config('constants.HTTP_OK')
+                );
+            } else {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.FALSE_STATUS'),
+                    config('constants.REFERRALS_ARE_ONLY_FOR_FIRST_ORDER'),
+                    config('constants.HTTP_OK')
+                );
+            }
+        } catch (Throwable $error) {
+            report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
                 false,
-                $validate->errors(),
-                config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
             );
         }
-        User::verifyReferralCode();
-        ReferralCodeRelation::usingReferalFirstTime();
-        Orders::checkTotalOrders(1);
     }
+    // if ($is_verified) {
+    //     // dd(ReferralCodeRelation::usingReferalFirstTime($referral_verified->id, $request->user_id));
+    //     $using_referral_first_time = ReferralCodeRelation::usingReferalFirstTime($is_verified->id, $request->user_id);
+    //     if ($using_referral_first_time) {
+    //         if (Orders::checkTotalOrders($request->user_id) === 0) {
+    //             dd('Yes, He can use the referral');
+    //         } else {
+    //             dd('he cannot use the referral');
+    //         }
+    //     } else {
+    //         dd('Not your first order');
+    //     }
+    // } else {
+    //     dd('Not a valid Referral code');
+    // }
 }

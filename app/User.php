@@ -107,7 +107,7 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
     }
-    
+
     public function orders()
     {
         return $this->hasMany('App\Orders');
@@ -241,5 +241,11 @@ class User extends Authenticatable implements JWTSubject
         } else {
             return null;
         }
+    }
+
+    public static function verifyReferralCode(string $referral_code)
+    {
+        $data = User::where('referral_code', $referral_code)->first();
+        return (is_null($data)) ? false :  $data;
     }
 }
