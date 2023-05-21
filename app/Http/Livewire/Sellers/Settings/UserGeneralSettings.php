@@ -75,6 +75,29 @@ class UserGeneralSettings extends Component
         
         return $user;
     }
+    public function timeUpdate(Request $request)
+    {
+        try {
+        $time = $request->time;
+        foreach ($time as $key => $value) {
+            if (!in_array("on", $time[$key]))
+                $time[$key] += ["closed" => null];
+        }
+        $data['time'] = $time;
+        $data['submitted'] = "yes";
+        $user = User::find(Auth::id());
+        $user->business_hours = json_encode($data);
+        $check = $user->save();
+        if($check){
+        sleep(1);
+        session()->flash('success', 'Business Hours Updated');
+        }else{
+        session()->flash('error', 'Business Hours not Updated');
+        }
+    }catch(Exception $error) {
+        session()->flash('error', $error);
+    }
+    }
     public function render()
     {
         $user = $this->setUserInfo();

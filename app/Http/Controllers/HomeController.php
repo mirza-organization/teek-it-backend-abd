@@ -547,7 +547,8 @@ class HomeController extends Controller
         $user = User::find(Auth::id());
         $user->business_hours = json_encode($data);
         $user->save();
-        flash('Business Hours Updated');
+        sleep(1);
+        flash('success', 'Business Hours Updated');
         return redirect()->back();
     }
     /**
