@@ -548,7 +548,7 @@ class HomeController extends Controller
         $user->business_hours = json_encode($data);
         $user->save();
         sleep(1);
-        flash('success', 'Business Hours Updated');
+        session()->flash('success', 'Business Hours Updated');
         return redirect()->back();
     }
     /**
