@@ -88,17 +88,17 @@ class StuartDeliveryController extends Controller
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'stuartDelivery'
                 ]);
-                JsonResponseCustom::getWebResponse(config('constants.STUART_DELIVERY_SUCCESS'), true);
+                JsonResponseCustom::getWebResponse(config('constants.STUART_DELIVERY_SUCCESS'), config('constants.TRUE_STATUS'));
                 return Redirect::back();
             } else {
                 $message = $data['message'];
                 if($data['error'] == 'JOB_DISTANCE_NOT_ALLOWED') $message = $message . " " . $transport_type;
-                JsonResponseCustom::getWebResponse($message, false);
+                JsonResponseCustom::getWebResponse($message, config('constants.FALSE_STATUS'));
                 return Redirect::back();
             }
         } catch (Throwable $error) {
             report($error);
-            JsonResponseCustom::getWebResponse($data['message'], false);
+            JsonResponseCustom::getWebResponse($data['message'], config('constants.FALSE_STATUS'));
             return Redirect::back();
         }
     }
@@ -120,14 +120,14 @@ class StuartDeliveryController extends Controller
                 ]);
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    true,
+                    config('constants.TRUE_STATUS'),
                     config('constants.COMPLETED'),
                     config('constants.HTTP_OK')
                 );
             } else {
                 return JsonResponseCustom::getApiResponse(
                     $data,
-                    true,
+                    config('constants.TRUE_STATUS'),
                     '',
                     config('constants.HTTP_OK')
                 );
@@ -136,7 +136,7 @@ class StuartDeliveryController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );
