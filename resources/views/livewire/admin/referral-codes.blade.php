@@ -19,8 +19,8 @@
         <div class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-                    <div class="col-12 col-sm-6 col-md-4">
-                        <h4 class="py-2 my-1">Referral Codes</h4>
+                    <div class="col-lg-12 col-sm-12 col-md-12">
+                        <h4 class="py-4 my-1">Referrals</h4>
                     </div>
                 </div><!-- /.row -->
             </div><!-- /.container-fluid -->
@@ -30,11 +30,9 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-
-{{-- 
-
+                    {{-- 
                     <!-- modal start -->
-                    @if(!empty($promo_codes))
+                    @if (!empty($promo_codes))
                     @foreach ($promo_codes as $promo_code)
                         <div class="modal fade" id="promo_codeModal{{ $promo_code->id }}" tabindex="-1" role="dialog"
                             aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
@@ -271,31 +269,26 @@
                             <div class="col-md-12">
                                 <table class="table  table-hover table-responsive-sm border-bottom">
                                     <thead>
-
                                         <tr class="bg-primary text-white">
-                                            
-                                            <th scope="col">Username</th>
-                                            <th scope="col">Referral Code</th>
-                                        </tr>
-                                        {{-- <tr class="bg-primary text-white">
                                             <th scope="col">#</th>
-                                            <th></th>
-                                            <th scope="col">Promo Code</th>
-                                            <th scope="col">Discount</th>
-                                            <th scope="col">Order#</th>
-                                            <th scope="col">Expiry Date</th>
-                                            <th scope="col">Options</th>
-                                        </tr> --}}
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Referral Code</th>
+                                            <th scope="col">Created At</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($referral_codes as $rc)
-                                    <tr>
-                                        <td>{{ $rc->f.' '.$rc->l}}</td>
-                                        <td>{{ $rc->referral_code}}</td>
-                                    </tr>
-                                    @endforeach
-{{--                                         
-                                        @if(!empty($promo_code))
+                                        @foreach ($data as $single_index)
+                                            <tr>
+                                                <td>{{ $loop->iteration }}</td>
+                                                <td>{{ $single_index->name . ' ' . $single_index->l_name }}</td>
+                                                <td>{{ $single_index->email }}</td>
+                                                <td>{{ $single_index->referral_code }}</td>
+                                                <td>{{ $single_index->created_at }}</td>
+                                            </tr>
+                                        @endforeach
+                                        {{--                                         
+                                        @if (!empty($promo_code))
                                         @foreach ($promo_codes as $promo_code)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
@@ -322,17 +315,11 @@
                                         @endif --}}
                                     </tbody>
                                 </table>
-                                @if(!empty($promo_codes))
-                                <div class="d-flex justify-content-center" style="padding-top: 10px;">
-                                    {{ $promo_codes->links() }}
-                                </div>
-                                @endif
                                 <div class="row">
                                     <div class="col-md-12">
-                                        {{ $referral_codes->links() }}
+                                        {{ $data->links() }}
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>

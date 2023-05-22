@@ -35,10 +35,10 @@ class InventoryLivewire extends Component
             /* Operation finished */
             sleep(1);
             if ($updated) {
-                if($status == 0){
+                if ($status == 0) {
                     session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
-                }else{
-                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
+                } else {
+                    session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }
             } else {
                 session()->flash('error', config('constants.UPDATION_FAILED'));
@@ -55,10 +55,10 @@ class InventoryLivewire extends Component
             /* Operation finished */
             sleep(1);
             if ($updated) {
-                if($status == 0){
+                if ($status == 0) {
                     session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
-                }else{
-                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
+                } else {
+                    session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }
             } else {
                 session()->flash('error', config('constants.UPDATION_FAILED'));
@@ -75,10 +75,10 @@ class InventoryLivewire extends Component
             /* Operation finished */
             sleep(1);
             if ($updated) {
-                if($status == 0){
+                if ($status == 0) {
                     session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
-                }else{
-                session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
+                } else {
+                    session()->flash('success', config('constants.DATA_UPDATED_SUCCESS'));
                 }
             } else {
                 session()->flash('error', config('constants.UPDATION_FAILED'));
@@ -104,8 +104,9 @@ class InventoryLivewire extends Component
         }
     }
 
-    public function populateQuantityArray($data){
-       return $data->map(function ($product) {
+    public function populateQuantityArray($data)
+    {
+        return $data->map(function ($product) {
             return [
                 'prod_id' => $product->prod_id,
                 'parent_seller_id' => $product->parent_seller_id,
@@ -118,46 +119,43 @@ class InventoryLivewire extends Component
 
     public function render()
     {
-       $featured_products[]="";
+        $featured_products[] = "";
         $categories = Categories::all();
         if (Gate::allows('seller')) {
             $parent_seller_id = Auth::id();
             $data = Products::where('products.user_id', '=', $parent_seller_id)
-            ->where('products.featured', '=', 0)
-            ->orderBy('products.id', 'Desc')->paginate(12);
+                ->where('products.featured', '=', 0)
+                ->orderBy('products.id', 'Desc')->paginate(12);
             $featured = Products::whereHas('user', function ($query) {
                 $query->where('is_active', 1);
-                })->where('products.user_id', '=', $parent_seller_id)
+            })->where('products.user_id', '=', $parent_seller_id)
                 ->where('products.featured', '=', 1)
                 ->orderByDesc('products.id')
                 ->paginate(10);
             foreach ($featured as $in) {
                 $featured_products[] = Products::getProductInfo($in->id);
             }
-            if($this->search && $this->category_id) 
-            {$data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
-        }else if ($this->search) 
-        { $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
-    }else if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
+            if ($this->search && $this->category_id) {
+                $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
+            } else if ($this->search) {
+                $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
+            } else if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
         } elseif (Gate::allows('child_seller')) {
             $parent_seller_id = User::find(Auth::id())->parent_store_id;
-        $qty = Qty::where('users_id', Auth::id())->first();
-        if (!empty($qty)) {
-            $data = Products::where('user_id', $parent_seller_id)
-            ->join('qty', 'products.id', '=', 'qty.products_id')
-
-            ->select('products.id as prod_id', 'products.user_id as parent_seller_id','products.category_id','products.product_name','products.price','products.feature_img','qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
-            ->where('qty.users_id', Auth::id())->paginate(20);
-        
-        } else {
-            $data =  Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
-
-        }
-        if ($this->search) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', $parent_seller_id)->paginate(9);
-        if ($this->category_id) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
+            $qty = Qty::where('users_id', Auth::id())->first();
+            if (!empty($qty)) {
+                $data = Products::where('user_id', $parent_seller_id)
+                    ->join('qty', 'products.id', '=', 'qty.products_id')
+                    ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
+                    ->where('qty.users_id', Auth::id())->paginate(20);
+            } else {
+                $data =  Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
+            }
+            if ($this->search) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', $parent_seller_id)->paginate(9);
+            if ($this->category_id) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
             // $data = Products::getChildSellerProducts(Auth::id());
         }
         $this->quantity = $this->populateQuantityArray($data);
-        return view('livewire.sellers.inventory-livewire', ['data' => $data, 'categories' => $categories, 'featured_products'=>$featured_products]);
+        return view('livewire.sellers.inventory-livewire', ['data' => $data, 'categories' => $categories, 'featured_products' => $featured_products]);
     }
 }

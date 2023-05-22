@@ -248,4 +248,16 @@ class User extends Authenticatable implements JWTSubject
         $data = User::where('referral_code', $referral_code)->first();
         return (is_null($data)) ? false :  $data;
     }
+
+    public static function changeReferralStatus(int $status, int $user_id)
+    {
+        return User::where('id', $user_id)->update([
+            'referral_useable' => $status
+        ]);
+    }
+
+    public static function getUsersWithReferralCode()
+    {
+        return User::whereNotNull('referral_code')->paginate(10);
+    }
 }
