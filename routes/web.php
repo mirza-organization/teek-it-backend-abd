@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\UserAndRoleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Livewire\Admin\ParentSellersLiveWire;
+use App\Http\Livewire\Admin\ReferralCodes;
 use App\Http\Livewire\Sellers\InventoryLivewire;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationsController;
@@ -116,6 +117,7 @@ Route::get('auth/verify', [AuthController::class, 'verify']);
 Route::get('/notification/home', [NotificationsController::class, 'notificationHome'])->name('admin.notification.home');
 Route::post('/notification/send', [NotificationsController::class, 'notificationSend'])->name('admin.notification.send');
 Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
+Route::get('/admin/referral/code', ReferralCodes::class)->name('admin.referralcode');
 Route::get('/admin/sellers/parent', [HomeController::class, 'adminParentSellers'])->name('admin.sellers.parent');
 Route::get('/admin/sellers/child', [HomeController::class, 'adminChildSellers'])->name('admin.sellers.child');
 Route::get('/customers', [HomeController::class, 'adminCustomers'])->name('admin.customers');

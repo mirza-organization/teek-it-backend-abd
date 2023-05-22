@@ -134,8 +134,11 @@ class InventoryLivewire extends Component
             foreach ($featured as $in) {
                 $featured_products[] = Products::getProductInfo($in->id);
             }
-            if ($this->search) $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
-        if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
+            if($this->search && $this->category_id) 
+            {$data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
+        }else if ($this->search) 
+        { $data = Products::with('quantity')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', Auth::id())->paginate(12);
+    }else if ($this->category_id) $data = Products::with('quantity')->where('category_id', '=', $this->category_id)->where('user_id', Auth::id())->paginate(12);
         } elseif (Gate::allows('child_seller')) {
             $parent_seller_id = User::find(Auth::id())->parent_store_id;
         $qty = Qty::where('users_id', Auth::id())->first();

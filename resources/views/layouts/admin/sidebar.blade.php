@@ -43,6 +43,14 @@
                         </p>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="{{route('admin.referralcode')}}" class="nav-link @if (request()->is('admin/test/sellers/parent')) active @endif">
+                        <i class="nav-icon fas fa-qrcode"></i>
+                        <p class="ml-2">
+                            Promo Codes T
+                        </p>
+                    </a>
+                </li>
                 <li class="nav-item has-treeview">
                     <a href="#" class="nav-link ">
                         <i class="nav-icon fas fa-store-alt"></i>

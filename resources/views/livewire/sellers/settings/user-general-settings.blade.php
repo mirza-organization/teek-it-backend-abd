@@ -53,6 +53,11 @@
                                                                         alt="No Image Uploaded">
                                                                 </label>
                                                             </div>
+                                                            <div class="form-group">
+                                                            <label>
+                                                            <input type="file" accept="image/*" name="user_img"
+                                                             style="font-size:13px; " wire:model="image" accept="image/*" wire:change="updateImage" required></label>
+                                                        </div>
                                                         </div>
                                                         <div class="col-md-8 ">
                                                             <div class="form-group">
@@ -142,8 +147,9 @@
                                                                         </div>
                                                                         <div class="col-md-8">
                                                                             <div class="form-group ">
+                                                                            
                                                                                 <i
-                                                                                   class="fa fa-map-marked text-primary" data-bs-toggle="modal"
+                                                                                   class="fa fa-map-marker text-primary" data-bs-toggle="modal"
                                                                                    data-bs-target="#map_modal"></i>
                                                                        </div>
                                                                         </div>

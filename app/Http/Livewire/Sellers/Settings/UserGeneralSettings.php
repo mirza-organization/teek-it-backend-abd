@@ -6,8 +6,12 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Exception;
 use Illuminate\Support\Facades\Hash;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+
 class UserGeneralSettings extends Component
 {
+    use WithFileUploads;
     public
         $name,
         $l_name,
@@ -17,6 +21,7 @@ class UserGeneralSettings extends Component
         $phone,
         $old_password,
         $new_password,
+        $image,
         $search = '';
         public function rules()
         {
@@ -24,6 +29,34 @@ class UserGeneralSettings extends Component
                 'old_password' => 'required|min:8',
                 'new_password' => 'required|min:8'
             ];
+        }
+        
+    public function updateImage()
+    {
+        try{
+        $user = User::find(auth()->id());
+        $filename = auth()->user()->name;
+        if ($this->image) {
+            // Generate a unique file name
+            $filename = uniqid($user->id . '_' . $user->name . '_') . '.' . $this->image->getClientOriginalExtension();
+            // Store the file in the designated storage disk
+            Storage::disk('spaces')->put($filename, $this->image->get());
+            // Check if the file was successfully stored
+            if (Storage::disk('spaces')->exists($filename)) {
+                info("File is stored successfully: " . $filename);
+            } else {
+                info("File is not found: " . $filename);
+            }
+        }
+        // Update the user's user_img attribute
+        $user->user_img = $filename;
+        $user->save();
+        sleep(1);
+        // Show a success message
+        session()->flash('success', 'Image updated successfully.');
+        }catch (Exception $error) {
+        session()->flash('error', $error);
+        }
         }
         public function passwordUpdate()
         {
@@ -75,31 +108,11 @@ class UserGeneralSettings extends Component
         
         return $user;
     }
-    public function timeUpdate(Request $request)
-    {
-        try {
-        $time = $request->time;
-        foreach ($time as $key => $value) {
-            if (!in_array("on", $time[$key]))
-                $time[$key] += ["closed" => null];
-        }
-        $data['time'] = $time;
-        $data['submitted'] = "yes";
-        $user = User::find(Auth::id());
-        $user->business_hours = json_encode($data);
-        $check = $user->save();
-        if($check){
-        sleep(1);
-        session()->flash('success', 'Business Hours Updated');
-        }else{
-        session()->flash('error', 'Business Hours not Updated');
-        }
-    }catch(Exception $error) {
-        session()->flash('error', $error);
-    }
-    }
+
     public function render()
     {
+        $User = User::find(Auth::id());
+        $this->image = $User->user_img;
         $user = $this->setUserInfo();
         $business_hours = $user->business_hours;
         $address = $user->address_1;
