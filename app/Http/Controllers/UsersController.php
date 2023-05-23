@@ -25,6 +25,8 @@ class UsersController extends Controller
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
         $results = json_decode(file_get_contents($url), true);
+        dd($results);
+        exit;
         $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
         $distanceInMiles = (float)$meters[0] * 0.000621;
 
