@@ -251,11 +251,15 @@ class User extends Authenticatable implements JWTSubject
         return (is_null($data)) ? false :  $data;
     }
 
-    public static function changeReferralStatus(int $status, int $user_id)
+    public static function updateWalletAndStatus(int $status, float $bonus, int $user_id)
     {
-        return User::where('id', $user_id)->update([
-            'referral_useable' => $status
-        ]);
+        $user = User::find($user_id);
+        if ($user) {
+            $user->pending_withdraw += $bonus;
+            $user->referral_useable = $status;
+            $user->save();
+        }
+        return $user;
     }
 
     public static function getUsersWithReferralCode()

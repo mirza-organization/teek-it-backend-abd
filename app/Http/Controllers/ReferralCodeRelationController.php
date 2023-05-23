@@ -52,9 +52,9 @@ class ReferralCodeRelationController extends Controller
 
             if (Orders::checkTotalOrders($request->user_id) === 0) {
                 ReferralCodeRelation::insertReferralRelation($is_verified->id, $request->user_id);
-                User::changeReferralStatus(1, $is_verified->id);
+                User::updateWalletAndStatus(1, 10.00, $is_verified->id);
                 return JsonResponseCustom::getApiResponse(
-                    ['discount' => 10],
+                    ['discount' => 10.00],
                     config('constants.TRUE_STATUS'),
                     config('constants.VALID_REFERRAL'),
                     config('constants.HTTP_OK')

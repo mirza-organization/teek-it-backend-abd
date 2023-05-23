@@ -22,7 +22,7 @@ class CategoriesController extends Controller
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     $validate->errors(),
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
@@ -30,7 +30,7 @@ class CategoriesController extends Controller
             $category = Categories::add($request);
             return JsonResponseCustom::getApiResponse(
                 $category,
-                true,
+                config('constants.TRUE_STATUS'),
                 config('constants.DATA_INSERTION_SUCCESS'),
                 config('constants.HTTP_OK')
             );
@@ -38,7 +38,7 @@ class CategoriesController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );
@@ -55,7 +55,7 @@ class CategoriesController extends Controller
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     $validate->messages(),
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
@@ -63,7 +63,7 @@ class CategoriesController extends Controller
             $category = Categories::updateCategory($request, $category_id);
             return JsonResponseCustom::getApiResponse(
                 $category,
-                true,
+                config('constants.TRUE_STATUS'),
                 config('constants.DATA_UPDATED_SUCCESS'),
                 config('constants.HTTP_OK')
             );
@@ -71,7 +71,7 @@ class CategoriesController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );
@@ -91,14 +91,14 @@ class CategoriesController extends Controller
             if (!empty($data)) {
                 return JsonResponseCustom::getApiResponse(
                     $data,
-                    true,
+                    config('constants.TRUE_STATUS'),
                     '',
                     config('constants.HTTP_OK')
                 );
             } else {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     config('constants.NO_RECORD'),
                     config('constants.HTTP_OK')
                 );
@@ -107,7 +107,7 @@ class CategoriesController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );
@@ -126,7 +126,7 @@ class CategoriesController extends Controller
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     $validate->errors(),
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
@@ -138,7 +138,7 @@ class CategoriesController extends Controller
             if (!empty($data)) {
                 return JsonResponseCustom::getApiResponseExtention(
                     $data['data'],
-                    true,
+                    config('constants.TRUE_STATUS'),
                     '',
                     'pagination',
                     $data['pagination'],
@@ -147,7 +147,7 @@ class CategoriesController extends Controller
             } else {
                 return JsonResponseCustom::getApiResponseExtention(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     config('constants.NO_RECORD'),
                     'pagination',
                     [],
@@ -158,7 +158,7 @@ class CategoriesController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );
@@ -178,7 +178,7 @@ class CategoriesController extends Controller
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     $validate->errors(),
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
@@ -194,14 +194,14 @@ class CategoriesController extends Controller
             if (!empty($data)) {
                 return JsonResponseCustom::getApiResponse(
                     $data,
-                    true,
+                    config('constants.TRUE_STATUS'),
                     '',
                     config('constants.HTTP_OK')
                 );
             } else {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     config('constants.NO_RECORD'),
                     config('constants.HTTP_OK')
                 );
@@ -210,7 +210,7 @@ class CategoriesController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );

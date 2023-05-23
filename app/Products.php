@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\RattingsController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+
 class Products extends Model
 {
     use Searchable;
@@ -118,13 +119,11 @@ class Products extends Model
         $qty = Qty::where('users_id', $child_seller_id)->first();
         if (!empty($qty)) {
             return Products::where('user_id', $parent_seller_id)
-            ->join('qty', 'products.id', '=', 'qty.products_id')
-            ->select('products.id as prod_id', 'products.user_id as parent_seller_id','products.category_id','products.product_name','products.price','products.feature_img','qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
-            ->where('qty.users_id', $child_seller_id)->paginate(20);
-        
+                ->join('qty', 'products.id', '=', 'qty.products_id')
+                ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
+                ->where('qty.users_id', $child_seller_id)->paginate(20);
         } else {
             return Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
-
         }
     }
 
@@ -173,39 +172,36 @@ class Products extends Model
         $latitude = $request->get('lat');
         $longitude = $request->get('lon');
         return Products::selectRaw('*, ( 6367 * acos( cos( radians(?) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(?) ) + sin( radians(?) ) * sin( radians( lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
-        ->orderBy('distance')
-        ->paginate();
+            ->orderBy('distance')
+            ->paginate();
     }
-
-    //public static function getBulkProducts(object $request){
-    //  $latitude = $request->get('lat');
-    //$longitude = $request->get('lon');
-    //return Products::select(DB::raw('*, ( 6367 * acos( cos( radians(' . $latitude . ') ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(' . $longitude . ') ) + sin( radians(' . $latitude . ') ) * sin( radians( lat ) ) ) ) AS distance'))->paginate()->sortBy('distance');
-    //}
 
     public static function getBulkProducts($request)
     {
         $ids = explode(',', $request->ids);
         return Products::query()->whereIn('id', $ids)->paginate();
     }
-    public static function markAsFeatured($id, $status){
 
+    public static function markAsFeatured($id, $status)
+    {
         return Products::where('id', $id)
             ->where('user_id', Auth::id())
             ->update([
                 'featured' => $status
             ]);
     }
-    public static function toggleProduct($id, $status){
 
+    public static function toggleProduct($id, $status)
+    {
         return Products::where('id', $id)
             ->where('user_id', Auth::id())
             ->update([
                 'status' => $status
             ]);
     }
-    public static function toggleAllProducts($status){
 
+    public static function toggleAllProducts($status)
+    {
         return Products::where('user_id', Auth::id())
             ->update([
                 'status' => $status
