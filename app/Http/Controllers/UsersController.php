@@ -25,8 +25,6 @@ class UsersController extends Controller
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
 
         $results = json_decode(file_get_contents($url), true);
-        dd($results);
-        exit;
         $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
         $distanceInMiles = (float)$meters[0] * 0.000621;
 
@@ -40,11 +38,11 @@ class UsersController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 2.1.0
      */
-    public function getSellerInfo($seller_info, $map_api_result = null)
+    public function getSellerInfo(Object $seller_info, array $map_api_result = null)
     {
         $user = $seller_info;
         if (!$user) return null;
-        $data_info = array(
+        $data = array(
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
@@ -60,10 +58,10 @@ class UsersController extends Controller
             'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers']
         );
         if (!is_null($map_api_result)) {
-            $data_info['distance'] = $map_api_result['distance'];
-            $data_info['duration'] = $map_api_result['duration'];
+            $data['distance'] = $map_api_result['distance'];
+            $data['duration'] = $map_api_result['duration'];
         }
-        return $data_info;
+        return $data;
     }
     /**
      * Listing of all Sellers/Stores within 5 miles
@@ -88,12 +86,10 @@ class UsersController extends Controller
                 );
             }
             $data = [];
-            if ($request->query('lat') && $request->query('lon')) {
-                $users = User::getParentAndChildSellers();
-                foreach ($users as $user) {
-                    $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
-                    if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
-                }
+            $users = User::getParentAndChildSellers();
+            foreach ($users as $user) {
+                $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
+                if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
             }
             if (empty($data)) {
                 return JsonResponseCustom::getApiResponse(
