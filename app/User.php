@@ -163,6 +163,8 @@ class User extends Authenticatable implements JWTSubject
     public static function getParentAndChildSellers()
     {
         return User::where('is_active', 1)
+            ->whereNotNull('lat')
+            ->whereNotNull('lon')
             ->whereIn('role_id', [2, 5])
             ->orderBy('business_name', 'asc')
             ->get();

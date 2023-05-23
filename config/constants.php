@@ -50,6 +50,7 @@ return [
 
     'NO_RECORD' => 'No Record Found.',
     'NO_SELLER' => 'No seller found against this id.',
+    'NO_STORES_FOUND' => 'No stores found in this area.',
 
     'ORDER_ASSIGNED' => 'Assigned.',
     'ORDER_UPDATED' => 'Updated.',
