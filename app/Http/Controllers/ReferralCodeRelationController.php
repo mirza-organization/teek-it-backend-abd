@@ -8,12 +8,13 @@ use App\Services\JsonResponseCustom;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Throwable;
 
 class ReferralCodeRelationController extends Controller
 {
     /**
-     * @version 1.0.0
+     * @version 1.1.0
      */
     public function validateReferral(Request $request)
     {
@@ -52,7 +53,7 @@ class ReferralCodeRelationController extends Controller
 
             if (Orders::checkTotalOrders($request->user_id) === 0) {
                 ReferralCodeRelation::insertReferralRelation($is_verified->id, $request->user_id);
-                User::updateWalletAndStatus(1, 10.00, $is_verified->id);
+                User::updateWalletAndStatus(1, 10.00, $request->user_id);
                 return JsonResponseCustom::getApiResponse(
                     ['discount' => 10.00],
                     config('constants.TRUE_STATUS'),
@@ -67,6 +68,33 @@ class ReferralCodeRelationController extends Controller
                     config('constants.HTTP_OK')
                 );
             }
+        } catch (Throwable $error) {
+            report($error);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.FALSE_STATUS'),
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
+        }
+    }
+    /**
+     * @version 1.0.0
+     */
+    public function insertReferrals()
+    {
+        try {
+            foreach (User::getBuyers() as $buyer) {
+                $buyer_obj = User::find($buyer->id);
+                $buyer_obj->referral_code = Str::uuid();
+                $buyer_obj->save();
+            }
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.TRUE_STATUS'),
+                config('constants.INSERTION_SUCCESS'),
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(

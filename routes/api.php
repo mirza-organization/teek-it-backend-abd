@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\RattingsController;
 use App\Http\Controllers\ReferralCodeRelationController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WithdrawalRequestsController;
 use Illuminate\Support\Facades\Route;
 /*
@@ -192,6 +193,11 @@ Route::middleware(['jwt.verify'])->group(function () {
 
     Route::prefix('referral')->group(function () {
         Route::post('/validate', [ReferralCodeRelationController::class, 'validateReferral']);
+        Route::get('/insert', [ReferralCodeRelationController::class, 'insertReferrals']);
+    });
+
+    Route::prefix('wallet')->group(function(){
+        Route::post('/update', [WalletController::class, 'update']);
     });
 
     Route::get('keys', [AuthController::class, 'keys']);

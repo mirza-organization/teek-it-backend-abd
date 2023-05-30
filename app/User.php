@@ -170,7 +170,7 @@ class User extends Authenticatable implements JWTSubject
             ->get();
     }
 
-    public static function getParentSellers(string $search)
+    public static function getParentSellers(string $search = '')
     {
         return User::where('business_name', 'like', '%' . $search . '%')
             ->where('role_id', 2)
@@ -262,8 +262,22 @@ class User extends Authenticatable implements JWTSubject
         return $user;
     }
 
-    public static function getUsersWithReferralCode()
+    public static function getBuyers(string $search = '')
+    {
+        return User::where('role_id', 3)
+            ->where('name', 'like', '%' .  $search . '%')
+            ->orderByDesc('created_at')
+            ->get();
+        // ->paginate(9);
+    }
+
+    public static function getBuyersWithReferralCode()
     {
         return User::whereNotNull('referral_code')->paginate(10);
+    }
+
+    public static function updateWallet(int $user_id, float $amount)
+    {
+        return User::where('id', $user_id)->update(['pending_withdraw' => $amount]);
     }
 }

@@ -15,7 +15,7 @@ class ReferralCodes extends Component
 
     public function render()
     {
-        $data = User::getUsersWithReferralCode();
+        $data = User::getBuyersWithReferralCode();
         return view('livewire.admin.referral-codes', compact('data'));
     }
 }

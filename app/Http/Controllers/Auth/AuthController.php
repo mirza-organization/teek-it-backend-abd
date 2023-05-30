@@ -43,7 +43,7 @@ class AuthController extends Controller
     /**
      * Register For Mobile App
      * @author Huzaifa Haleem
-     * @version 1.1.0
+     * @version 1.9.0
      */
     public function register(Request $request)
     {
