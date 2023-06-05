@@ -238,7 +238,7 @@ class User extends Authenticatable implements JWTSubject
                 'roles' => $user->role()->pluck('name'),
                 'user_img' => $user->user_img,
                 'referral_code' => $user->referral_code,
-                'referral_useable' => $user->referral_useable
+                // 'referral_useable' => $user->referral_useable
             );
         } else {
             return null;

@@ -105,4 +105,69 @@ class ReferralCodeRelationController extends Controller
             );
         }
     }
+
+    public function fetchReferralRelationDetails(int $user_id)
+    {
+        try {
+            $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($user_id);
+            if ($referral_reltaion_details->isEmpty()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.FALSE_STATUS'),
+                    config('constants.NO_RECORD'),
+                    config('constants.HTTP_OK')
+                );
+            }
+            $data = User::getUserInfo($referral_reltaion_details[0]->referredByUser->id);
+            $data['referral_useable'] = $referral_reltaion_details[0]->referral_useable;
+            $data['referral_relation_id'] = $referral_reltaion_details[0]->id;
+            return JsonResponseCustom::getApiResponse(
+                $data,
+                config('constants.TRUE_STATUS'),
+                '',
+                config('constants.HTTP_OK')
+            );
+        } catch (Throwable $error) {
+            report($error);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.FALSE_STATUS'),
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
+        }
+    }
+
+    public function updateReferralStatus(Request $request)
+    {
+        try {
+            $validate = Validator::make($request->all(), [
+                'referral_relation_id' => 'required|int',
+                'referral_useable' => 'required|int'
+            ]);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.FALSE_STATUS'),
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
+            }
+            $updated = ReferralCodeRelation::updateReferralRelationStatus($request->referral_relation_id, $request->referral_useable);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                ($updated) ? config('constants.TRUE_SATUS') : config('constants.FALSE_STATUS'),
+                ($updated) ? config('constants.UPDATION_SUCCESS') : config('constants.UPDATION_FAILED'),
+                config('constants.HTTP_OK')
+            );
+        } catch (Throwable $error) {
+            report($error);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.FALSE_STATUS'),
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
+        }
+    }
 }

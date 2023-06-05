@@ -19,6 +19,9 @@ class CreateReferralCodeRelationsTable extends Migration
             $table->unsignedBigInteger('user_id');          
             // $table->foreign('referred_by')->references('id')->on('users')->onDelete('cascade');  
             // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->tinyInteger('referral_useable')
+            ->default(1)
+            ->comment('0: Referral cannot be used by the user, 1: Can be used by the user');
             $table->timestamps();
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +13,16 @@ class ReferralCodeRelation extends Model
         'referred_by',
         'user_id'
     ];
-
+    /**
+     * Relations
+     */
+    public function referredByUser()
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+    /**
+     * Helpers
+     */
     public static function usingReferalFirstTime(int $referred_by, int $user_id)
     {
         $data = ReferralCodeRelation::where('referred_by', $referred_by)->where('user_id', $user_id)->first();
@@ -25,5 +35,15 @@ class ReferralCodeRelation extends Model
             'referred_by' => $referred_by,
             'user_id'   => $user_id
         ]);
+    }
+
+    public static function getReferralRelationDetails(int $user_id)
+    {
+        return ReferralCodeRelation::with('referredByUser')->where('user_id', $user_id)->get();
+    }
+
+    public static function updateReferralRelationStatus(int $referral_relation_id, int $referral_useable)
+    {
+        return ReferralCodeRelation::where('id', $referral_relation_id)->update(['referral_useable' => $referral_useable]);
     }
 }
