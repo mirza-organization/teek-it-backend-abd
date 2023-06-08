@@ -142,8 +142,10 @@ class ReferralCodeRelationController extends Controller
     {
         try {
             $validate = Validator::make($request->all(), [
-                'referral_relation_id' => 'required|int',
-                'referral_useable' => 'required|int'
+                'referral_relation_id' => 'required|integer',
+                'referral_useable' => 'required|integer',
+                'user_id' => 'required|integer',
+                'amount' => 'required|numeric'
             ]);
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
@@ -154,9 +156,16 @@ class ReferralCodeRelationController extends Controller
                 );
             }
             $updated = ReferralCodeRelation::updateReferralRelationStatus($request->referral_relation_id, $request->referral_useable);
+            // dd($request->referral_useable);
+            if($updated == 1 && $request->referral_useable == 0) {
+                // Update wallet of the referred by user of referral relationship
+                $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($request->user_id);
+                // dd($referral_reltaion_details[0]->referredByUser->id);
+                User::updateWallet($referral_reltaion_details[0]->referredByUser->id, $request->amount);
+            }
             return JsonResponseCustom::getApiResponse(
                 [],
-                ($updated) ? config('constants.TRUE_SATUS') : config('constants.FALSE_STATUS'),
+                ($updated) ? config('constants.TRUE_STATUS') : config('constants.FALSE_STATUS'),
                 ($updated) ? config('constants.UPDATION_SUCCESS') : config('constants.UPDATION_FAILED'),
                 config('constants.HTTP_OK')
             );
