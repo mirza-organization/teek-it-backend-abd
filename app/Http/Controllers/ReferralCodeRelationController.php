@@ -13,6 +13,9 @@ use Throwable;
 
 class ReferralCodeRelationController extends Controller
 {
+    /**
+     * The amount which will be rewarded after applying a valid referral code
+     */
     private $amount = 10.00;
     /**
      * @version 1.1.0
@@ -146,7 +149,6 @@ class ReferralCodeRelationController extends Controller
     public function updateReferralStatus(Request $request)
     {
         try {
-            // dd($this->amount);
             $validate = Validator::make($request->all(), [
                 'referral_relation_id' => 'required|integer',
                 'referral_useable' => 'required|integer'
