@@ -37,9 +37,9 @@ class ReferralCodeRelation extends Model
         ]);
     }
 
-    public static function getReferralRelationDetails(int $user_id)
+    public static function getReferralRelationDetails(int $referral_relation_id)
     {
-        return ReferralCodeRelation::with('referredByUser')->where('user_id', $user_id)->get();
+        return ReferralCodeRelation::with('referredByUser')->where('id', $referral_relation_id)->get();
     }
 
     public static function updateReferralRelationStatus(int $referral_relation_id, int $referral_useable)

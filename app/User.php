@@ -256,10 +256,15 @@ class User extends Authenticatable implements JWTSubject
         $user = User::find($user_id);
         if ($user) {
             $user->pending_withdraw += $bonus;
-            $user->referral_useable = $status;
+            // $user->referral_useable = $status;
             $user->save();
         }
         return $user;
+    }
+
+    public static function updateWallet(int $user_id, float $amount)
+    {
+        return User::where('id', $user_id)->increment('pending_withdraw' , $amount);
     }
 
     public static function getBuyers(string $search = '')
@@ -274,10 +279,5 @@ class User extends Authenticatable implements JWTSubject
     public static function getBuyersWithReferralCode()
     {
         return User::whereNotNull('referral_code')->paginate(10);
-    }
-
-    public static function updateWallet(int $user_id, float $amount)
-    {
-        return User::where('id', $user_id)->update(['pending_withdraw' => $amount]);
     }
 }

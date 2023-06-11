@@ -13,6 +13,7 @@ use Throwable;
 
 class ReferralCodeRelationController extends Controller
 {
+    private $amount = 10.00;
     /**
      * @version 1.1.0
      */
@@ -53,9 +54,9 @@ class ReferralCodeRelationController extends Controller
 
             if (Orders::checkTotalOrders($request->user_id) === 0) {
                 ReferralCodeRelation::insertReferralRelation($is_verified->id, $request->user_id);
-                User::updateWalletAndStatus(1, 10.00, $request->user_id);
+                User::updateWalletAndStatus(1, $this->amount, $request->user_id);
                 return JsonResponseCustom::getApiResponse(
-                    ['discount' => 10.00],
+                    ['discount' => $this->amount],
                     config('constants.TRUE_STATUS'),
                     config('constants.VALID_REFERRAL'),
                     config('constants.HTTP_OK')
@@ -105,7 +106,9 @@ class ReferralCodeRelationController extends Controller
             );
         }
     }
-
+    /**
+     * @version 1.0.0
+     */
     public function fetchReferralRelationDetails(int $user_id)
     {
         try {
@@ -137,15 +140,16 @@ class ReferralCodeRelationController extends Controller
             );
         }
     }
-
+    /**
+     * @version 1.0.0
+     */
     public function updateReferralStatus(Request $request)
     {
         try {
+            // dd($this->amount);
             $validate = Validator::make($request->all(), [
                 'referral_relation_id' => 'required|integer',
-                'referral_useable' => 'required|integer',
-                'user_id' => 'required|integer',
-                'amount' => 'required|numeric'
+                'referral_useable' => 'required|integer'
             ]);
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
@@ -156,12 +160,10 @@ class ReferralCodeRelationController extends Controller
                 );
             }
             $updated = ReferralCodeRelation::updateReferralRelationStatus($request->referral_relation_id, $request->referral_useable);
-            // dd($request->referral_useable);
-            if($updated == 1 && $request->referral_useable == 0) {
+            if ($updated == 1 && $request->referral_useable == 0) {
                 // Update wallet of the referred by user of referral relationship
-                $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($request->user_id);
-                // dd($referral_reltaion_details[0]->referredByUser->id);
-                User::updateWallet($referral_reltaion_details[0]->referredByUser->id, $request->amount);
+                $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($request->referral_relation_id);
+                User::updateWallet($referral_reltaion_details[0]->referredByUser->id, $this->amount);
             }
             return JsonResponseCustom::getApiResponse(
                 [],
