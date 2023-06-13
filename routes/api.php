@@ -14,6 +14,8 @@ use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\RattingsController;
+use App\Http\Controllers\ReferralCodeRelationController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WithdrawalRequestsController;
 use Illuminate\Support\Facades\Route;
 /*
@@ -35,12 +37,12 @@ Route::get('/', function () {
 | Registration, confirmations and verification
 |--------------------------------------------------------------------------
 */
-Route::post('password/email', [ForgotPasswordController::class, 'getResetToken']);
-Route::post('password/reset', [ResetPasswordController::class, 'reset']);
 Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('auth/verify', [AuthController::class, 'verify']);
 Route::post('auth/register_google', [AuthController::class, 'registerGoogle']);
 Route::post('auth/login_google', [AuthController::class, 'loginGoogle']);
+Route::post('password/email', [ForgotPasswordController::class, 'getResetToken']);
+Route::post('password/reset', [ResetPasswordController::class, 'reset']);
 /*
 |--------------------------------------------------------------------------
 | Authentication API Routes
@@ -55,7 +57,7 @@ Route::prefix('auth')->group(function () {
     Route::post('updateStatus', [AuthController::class, 'updateStatus']);
     Route::get('me', [AuthController::class, 'me']);
     Route::get('delivery_boys', [AuthController::class, 'deliveryBoys']);
-    Route::get('get_user/{user_id}', [AuthController::class, 'getDeliveryBoyInfo']);
+    Route::get('get_user/{user_id}', [AuthController::class, 'getUserDetails']);
     Route::post('user/delete', [AuthController::class, 'deleteUser']);
 });
 /*
@@ -68,7 +70,7 @@ Route::prefix('qty')->group(function () {
     Route::get('product/{store_id}', [QtyController::class, 'getByStoreId']);
     Route::get('product/{store_id}/{prod_id}', [QtyController::class, 'getById']);
     Route::post('update/{prod_id}', [QtyController::class, 'updateById']);
-    // Route::post('insert_parent_qty_to_child', 'QtyController@insertParentQtyToChild');
+    Route::post('insert_parent_qty_to_child', [QtyController::class, 'insertParentQtyToChild'])->middleware('jwt.verify');
     // Route::get('multi-curl', 'QtyController@multiCURL');
     // Route::get('shifting-qty', 'QtyController@shiftQtyInProductsToQtyTable');
 });
@@ -168,7 +170,7 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::post('customer_cancel_order', [OrdersController::class, 'customerCancelOrder']);
         Route::post('update', [OrdersController::class, 'updateOrder']);
         Route::post('/estimated-time/{id}', [OrdersController::class, 'storeEstimatedTime']);
-        Route::get('/get-order-details/{id}', [OrdersController::class, 'getOrderDetails']);
+        Route::get('/get-order-details/{id}', [OrdersController::class, 'getOrderDetailsTwo']);
         Route::get('/recent_orders/{store_id}', [OrdersController::class, 'recentOrders']);
     });
 
@@ -187,6 +189,17 @@ Route::middleware(['jwt.verify'])->group(function () {
         Route::post('/validate', [PromoCodesController::class, 'promocodesValidate']);
         Route::post('/fetch_promocode_info', [PromoCodesController::class, 'fetchPromocodeInfo']);
         Route::get('/all', [PromoCodesController::class, 'allPromocodes']);
+    });
+
+    Route::prefix('referral')->group(function () {
+        Route::post('/validate', [ReferralCodeRelationController::class, 'validateReferral']);
+        Route::get('/insert', [ReferralCodeRelationController::class, 'insertReferrals']);
+        Route::get('/details_by_id/{user_id}', [ReferralCodeRelationController::class, 'fetchReferralRelationDetails']);
+        Route::post('/update/referral_usable/status', [ReferralCodeRelationController::class, 'updateReferralStatus']);
+    });
+
+    Route::prefix('wallet')->group(function(){
+        Route::post('/update', [WalletController::class, 'update']);
     });
 
     Route::get('keys', [AuthController::class, 'keys']);

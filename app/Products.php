@@ -8,10 +8,36 @@ use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use App\Http\Controllers\RattingsController;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class Products extends Model
 {
     use Searchable;
+    /**
+     * Relations
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function quantity()
+    {
+        return $this->hasOne(Qty::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Categories::class);
+    }
+
+    public function quantities()
+    {
+        return $this->hasMany(Qty::class);
+    }
+    /**
+     * Validators
+     */
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [
@@ -41,27 +67,9 @@ class Products extends Model
             'qty' => 'required|string|max:255'
         ]);
     }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function quantity()
-    {
-        return $this->hasOne(Qty::class);
-    }
-
-    public function category()
-    {
-        return $this->belongsTo(Categories::class);
-    }
-
-    public function quantities()
-    {
-        return $this->hasMany(Qty::class);
-    }
-    
+    /**
+     * Helpers
+     */
     public static function getProductInfo(int $product_id)
     {
         $product = Products::with('quantity')->find($product_id);
@@ -71,9 +79,11 @@ class Products extends Model
         return $product;
     }
 
-    public static function getProductsById(object $product)
+    public static function getProductsById(object $product_id)
     {
-        return Products::where('id', $product->products_id)->where('status', '1')->paginate(20);
+        return Products::where('id', $product_id->products_id)
+            ->where('status', '1')
+            ->get();
     }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
@@ -88,19 +98,38 @@ class Products extends Model
         return $product;
     }
 
-    public static function getParentSellerProductsBySellerId(int $sellerid)
+    public static function getParentSellerProducts(int $seller_id)
     {
-        return Products::where('user_id', '=', $sellerid)->where('status', '=', 1)->paginate(20);
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->paginate(20);
     }
 
-    public static function getParentSellerProductsBySellerIdAsc(int $sellerid)
+    public static function getParentSellerProductsAsc(int $seller_id)
     {
-        return Products::query()->where('user_id', '=', $sellerid)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+    }
+
+    public static function getParentSellerProductsDesc(int $seller_id)
+    {
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->paginate(9);
+    }
+
+    public static function getChildSellerProducts(int $child_seller_id)
+    {
+        $parent_seller_id = User::find($child_seller_id)->parent_store_id;
+        $qty = Qty::where('users_id', $child_seller_id)->first();
+        if (!empty($qty)) {
+            return Products::where('user_id', $parent_seller_id)
+                ->join('qty', 'products.id', '=', 'qty.products_id')
+                ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
+                ->where('qty.users_id', $child_seller_id)->paginate(20);
+        } else {
+            return Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
+        }
     }
 
     public function getProductsByParameters(int $store_id, string $sku, int $catgory_id)
     {
-        return  Products::where('user_id', '=', $store_id)
+        return Products::where('user_id', '=', $store_id)
             ->where('sku', '=', $sku)
             ->where('category_id', '=', $catgory_id)
             ->first();
@@ -108,17 +137,13 @@ class Products extends Model
 
     public static function getProductWeight(int $product_id)
     {
-        $product = DB::table('products')
-            ->select('weight')
-            ->where('id', $product_id)
-            ->get();
+        $product = Products::select('weight')->where('id', $product_id)->get();
         return $product[0]->weight;
     }
 
     public static function getProductVolume(int $product_id)
     {
-        $product = DB::table('products')
-            ->select(DB::raw('(products.height * products.width * products.length) as volumn'))
+        $product = Products::select(DB::raw('(products.height * products.width * products.length) as volumn'))
             ->where('id', $product_id)
             ->get();
         return $product[0]->volumn;
@@ -133,5 +158,53 @@ class Products extends Model
             ->where('status', '=', 1)
             ->orderByDesc('id')
             ->paginate(10);
+    }
+
+    public static function getActiveProducts()
+    {
+        return Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })->where('status', 1)->paginate();
+    }
+
+    public static function getProductsByLocation(object $request)
+    {
+        $latitude = $request->get('lat');
+        $longitude = $request->get('lon');
+        return Products::selectRaw('*, ( 6367 * acos( cos( radians(?) ) * cos( radians( lat ) ) * cos( radians( lon ) - radians(?) ) + sin( radians(?) ) * sin( radians( lat ) ) ) ) AS distance', [$latitude, $longitude, $latitude])
+            ->orderBy('distance')
+            ->paginate();
+    }
+
+    public static function getBulkProducts($request)
+    {
+        $ids = explode(',', $request->ids);
+        return Products::query()->whereIn('id', $ids)->paginate();
+    }
+
+    public static function markAsFeatured($id, $status)
+    {
+        return Products::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->update([
+                'featured' => $status
+            ]);
+    }
+
+    public static function toggleProduct($id, $status)
+    {
+        return Products::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->update([
+                'status' => $status
+            ]);
+    }
+
+    public static function toggleAllProducts($status)
+    {
+        return Products::where('user_id', Auth::id())
+            ->update([
+                'status' => $status
+            ]);
     }
 }

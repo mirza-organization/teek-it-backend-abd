@@ -25,17 +25,13 @@ class OrdersController extends Controller
     public function index(Request $request)
     {
         try {
-            $orders = Orders::query()->select('id')->where('user_id', '=', Auth::id())->orderByDesc('id');
-            if (!empty($request->order_status)) {
-                $orders = $orders->where('order_status', '=', $request->order_status);
-            }
+            $orders = Orders::select('id')->where('user_id', '=', Auth::id())->orderByDesc('id');
+            if (!empty($request->order_status)) $orders = $orders->where('order_status', '=', $request->order_status);
             $orders = $orders->paginate(20);
             $pagination = $orders->toArray();
             if (!$orders->isEmpty()) {
                 $order_data = [];
-                foreach ($orders as $order) {
-                    $order_data[] = $this->get_single_order($order->id);
-                }
+                foreach ($orders as $order) $order_data[] = $this->getOrderDetails($order->id);
                 unset($pagination['data']);
                 return response()->json([
                     'data' => $order_data,
@@ -56,7 +52,7 @@ class OrdersController extends Controller
                 'data' => [],
                 'status' => false,
                 'message' => $error
-            ], 200);
+            ], 500);
         }
     }
     /**
@@ -216,7 +212,7 @@ class OrdersController extends Controller
         if (!$orders->isEmpty()) {
             $order_data = [];
             foreach ($orders as $order) {
-                $order_data[] = $this->get_single_order($order->id);
+                $order_data[] = $this->getOrderDetails($order->id);
             }
             unset($pagination['data']);
             return response()->json([
@@ -249,7 +245,7 @@ class OrdersController extends Controller
         if (!$orders->isEmpty()) {
             $order_data = [];
             foreach ($orders as $order) {
-                $order_data[] = $this->get_single_order($order->id);
+                $order_data[] = $this->getOrderDetails($order->id);
             }
             unset($pagination['data']);
             return response()->json([
@@ -472,7 +468,7 @@ class OrdersController extends Controller
                         $rand_number = rand(0, time());
                         $verification_code = $verification_code . substr($rand_number, 0, 1);
                     }
-                    if (url()->current() != 'https://teekitstaging.shop/api/orders/new' && url()->current() != 'http://127.0.0.1:8000/api/orders/new') {
+                    if (url()->current() == 'https://app.teekit.co.uk/api/orders/new' || url()->current() == 'https://teekitapi.com/api/orders/new') {
                         // For sending SMS notification for "New Order"
                         $sms = new TwilioSmsService();
                         $message_for_admin = "A new order #" . $order_id . " has been received. Please check TeekIt's platform, or SignIn here now:https://app.teekit.co.uk/login";
@@ -661,7 +657,59 @@ class OrdersController extends Controller
         $temp['order_items'] = OrderItems::query()->with('products.user')->where('order_id', '=', $order_id)->get();
         return $temp;
     }
-
+    /**
+     * It will get order details via
+     * given id
+     * @version 1.0.0
+     */
+    public function getOrderDetailsTwo(Request $request)
+    {
+        try {
+            $validate = Validator::make($request->route()->parameters(), [
+                'id' => 'required|integer'
+            ]);
+            if ($validate->fails()) {
+                return response()->json([
+                    'data' => [],
+                    'status' => false,
+                    'message' => $validate->errors()
+                ], 422);
+            }
+            if (!Orders::where('id', $request->id)->exists()) {
+                return response()->json([
+                    'date' => [],
+                    'status' => false,
+                    'message' => config('constants.NO_RECORD')
+                ], 200);
+            }
+            $order = Orders::with(['user', 'delivery_boy', 'store', 'order_items', 'order_items.products'])
+                ->where('id', $request->id)->first();
+            return response()->json([
+                'data' => $order,
+                'status' => true,
+                'message' => ""
+            ], 200);
+        } catch (Throwable $error) {
+            report($error);
+            return response()->json([
+                'data' => [],
+                'status' => false,
+                'message' => $error
+            ], 500);
+        }
+    }
+    /**
+     * It will store the estimated time
+     * Of an order provided via id
+     * @version 1.0.0
+     */
+    public function storeEstimatedTime($id)
+    {
+        $order = Orders::findOrFail($id);
+        $order->estimated_time = request()->estimated_time;
+        $order->save();
+        return $order->toArray();
+    }
     // public function getDistanceBetweenPoints($destination_lat, $destination_lon, $origin_lat, $origin_lon)
     // {
     //     $destination_address = $destination_lat . ',' . $destination_lon;
@@ -683,7 +731,7 @@ class OrdersController extends Controller
     {
         // $address1 = $latitude1 . ',' . $longitude1;
         // $address2 = $latitude2 . ',' . $longitude2;
-       
+
         // $url = "https://maps.googleapis.com/maps/api/directions/json?origin=" . urlencode($address1) . "&destination=" . urlencode($address2) . "&transit_routing_preference=fewer_transfers&key=AIzaSyBFDmGYlVksc--o1jpEXf9jVQrhwmGPxkM";
 
         $destination_address = $destination_lat . ',' . $destination_lon;
@@ -700,10 +748,10 @@ class OrdersController extends Controller
         $results = json_decode(file_get_contents($url), true);
         $meters = $results['rows'][0]['elements'][0]['distance']['value'];
         $distanceInMiles = $meters * 0.000621;
-        
+
         // $miles = (int)$distanceString[0] * 0.621371;
         // return $miles > 1 ? $miles : 1;
-        return (double) $distanceInMiles;
+        return (float) $distanceInMiles;
     }
 
     /**

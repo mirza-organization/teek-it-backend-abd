@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Throwable;
+use App\Services\JsonResponseCustom;
 
 class StuartDeliveryController extends Controller
 {
@@ -36,7 +37,7 @@ class StuartDeliveryController extends Controller
     {
         try {
             $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
-            $transport_type = (new Orders())->fetchTransportType($request->order_id);
+            $transport_type = Orders::fetchTransportType($request->order_id);
             $access_token = $this->stuartAccessToken();
 
             $job = [
@@ -61,7 +62,7 @@ class StuartDeliveryController extends Controller
                             'package_type' => 'medium',
                             'package_description' => 'Package purchased from Teek it.',
                             'transport_type' => $transport_type,
-                            'client_reference' => $request->order_id,
+                            'client_reference' => ($request->custom_order_id) ? $request->custom_order_id : $request->order_id,
                             'address' => $order_details->address . ' House#' . $order_details->house_no,
                             'comment' => 'Please try to call the customer before reaching the destination.',
                             // 'end_customer_time_window_start' => '2021-12-12T11:00:00.000+02:00',
@@ -87,21 +88,20 @@ class StuartDeliveryController extends Controller
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'stuartDelivery'
                 ]);
-                flash('Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button')->success();
+                JsonResponseCustom::getWebResponse(config('constants.STUART_DELIVERY_SUCCESS'), config('constants.TRUE_STATUS'));
                 return Redirect::back();
             } else {
                 $message = $data['message'];
                 if($data['error'] == 'JOB_DISTANCE_NOT_ALLOWED') $message = $message . " " . $transport_type;
-                flash($message)->error();
+                JsonResponseCustom::getWebResponse($message, config('constants.FALSE_STATUS'));
                 return Redirect::back();
             }
         } catch (Throwable $error) {
             report($error);
-            flash($data['message'])->error();
+            JsonResponseCustom::getWebResponse($data['message'], config('constants.FALSE_STATUS'));
             return Redirect::back();
         }
     }
-
     /**
      * It will check the current status of a Stuart job
      * @author Mirza Abdullah Izhar
@@ -118,25 +118,28 @@ class StuartDeliveryController extends Controller
                 Orders::where('id', $request->order_id)->update([
                     'order_status' => 'complete'
                 ]);
-                return response()->json([
-                    'data' => [],
-                    'status' => true,
-                    'message' => 'completed'
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    config('constants.TRUE_STATUS'),
+                    config('constants.COMPLETED'),
+                    config('constants.HTTP_OK')
+                );
             } else {
-                return response()->json([
-                    'data' => $data,
-                    'status' => true,
-                    'message' => ''
-                ], 200);
+                return JsonResponseCustom::getApiResponse(
+                    $data,
+                    config('constants.TRUE_STATUS'),
+                    '',
+                    config('constants.HTTP_OK')
+                );
             }
         } catch (Throwable $error) {
             report($error);
-            return response()->json([
-                'data' => [],
-                'status' => false,
-                'message' => $error
-            ], 500);
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.FALSE_STATUS'),
+                $error,
+                config('constants.HTTP_SERVER_ERROR')
+            );
         }
     }
 }

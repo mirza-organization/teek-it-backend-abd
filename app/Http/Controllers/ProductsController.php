@@ -75,7 +75,6 @@ class ProductsController extends Controller
      */
     public function add(Request $request)
     {
-
         $validate = Products::validator($request);
         if ($validate->fails()) {
             return JsonResponseCustom::getApiResponse(
@@ -312,6 +311,7 @@ class ProductsController extends Controller
         $qty = Products::with('quantity')
             ->where('id', $product_id)
             ->first();
+            if($qty){
         $quantity = $qty->quantity->qty;
         $product = Products::with('quantity')
             ->select(['*', DB::raw("$quantity as qty")])
@@ -320,6 +320,10 @@ class ProductsController extends Controller
         $product->category = Categories::find($product->category_id);
         $product->ratting = (new RattingsController())->get_ratting($product_id);
         return $product;
+            }else
+            {
+                return $product="";
+            }
     }
 
     public function getProductInfoWithQty($product_id, $store_id)
@@ -660,9 +664,10 @@ class ProductsController extends Controller
      */
     // public function updateQty($product_id, $qty, $operation)
     // {
-    //     if ($operation == 'subtract') $qty = (new Qty())->updateProductQty($product_id, '', $qty); 
+    //     if ($operation == 'subtract') {
+    //         $qty = (new Qty())->updateProductQty($product_id, '', $qty);
+    //     }
     // }
-
     /**
      *It will export products into csv
      * @version 1.0.0
@@ -670,7 +675,7 @@ class ProductsController extends Controller
     public function exportProducts()
     {
         $user_id = Auth::id();
-        $products = Products::getParentSellerProductsBySellerIdAsc($user_id);
+        $products = Products::getParentSellerProductsAsc($user_id);
         $all_products = [];
         foreach ($products as $product) {
             $pt = json_decode(json_encode($this->getProductInfo($product->id)->toArray()));
@@ -982,27 +987,32 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-    public function sellerProducts($seller_id)
+    public function sellerProducts(Request $request)
     {
         try {
-            $data = [];
-            $productIds = [];
-            $products = "";
-            $roleId = User::getUserRole($seller_id);
-            if ($roleId[0] == 5) {
-                $productIds = Qty::getChildSellerProductIds($seller_id);
-                for ($i = 0; $i < count($productIds); $i++) {
-                    $products =  Products::getProductsById($productIds[$i]);
-                    $pagination = $products->toArray();
-                }
-            } else if ($roleId[0] == 2) {
-                $products = Products::getParentSellerProductsBySellerId($seller_id);
-                $pagination = $products->toArray();
+            $validate = Validator::make($request->route()->parameters(), [
+                'seller_id' => 'required|integer',
+            ]);
+            if ($validate->fails()) {
+                return JsonResponseCustom::getApiResponse(
+                    [],
+                    false,
+                    $validate->errors(),
+                    config('constants.HTTP_UNPROCESSABLE_REQUEST')
+                );
             }
+            $seller_id = $request->seller_id;
+            $data = [];
+            $products = [];
+            $role_id = User::getUserRole($seller_id);
+            if ($role_id[0] == 5)
+                $products = Qty::getChildSellerProducts($seller_id);
+            else if ($role_id[0] == 2)
+                $products = Products::getParentSellerProducts($seller_id);
+            $pagination = $products->toArray();
+
             if (!$products->isEmpty()) {
-                foreach ($products as $product) {
-                    $data[] = (new ProductsController())->getProductInfo($product->id);
-                }
+                foreach ($products as $product) $data[] = (new ProductsController())->getProductInfo($product->id);
                 unset($pagination['data']);
                 return JsonResponseCustom::getApiResponseExtention(
                     $data,

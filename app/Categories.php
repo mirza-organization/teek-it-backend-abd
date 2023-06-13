@@ -12,6 +12,16 @@ use App\Products;
 
 class Categories extends Model
 {
+    /**
+     * Relations
+     */
+    public function products()
+    {
+        return $this->hasMany(Products::class, 'category_id', 'id');
+    }
+    /**
+     * Validators
+     */
     public static function validator(Request $request)
     {
         return Validator::make($request->all(), [
@@ -19,12 +29,9 @@ class Categories extends Model
             'category_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     }
-
-    public function products()
-    {
-        return $this->hasMany(Products::class, 'category_id', 'id');
-    }
-
+    /**
+     * Helpers
+     */
     public static function uploadImg(object $request, string $category_name)
     {
         $file = $request->file('category_image');
@@ -92,6 +99,26 @@ class Categories extends Model
         //     return $products;
         // }
         $products = Products::where('category_id', $category_id)
+            ->where('status', 1)
+            ->paginate(10);
+        $pagination = $products->toArray();
+        if (!$products->isEmpty()) {
+            $products_data = [];
+            foreach ($products as $product) $products_data[] = (new ProductsController())->getProductInfo($product->id);
+            unset($pagination['data']);
+            return ['data' => $products_data, 'pagination' => $pagination];
+        } else {
+            return [];
+        }
+    }
+
+    public static function getProductsByStoreId(int $category_id, int $store_id)
+    {
+        $products = Products::whereHas('user', function ($query) {
+            $query->where('is_active', 1);
+        })
+            ->where('category_id', $category_id)
+            ->where('user_id', $store_id)
             ->where('status', 1)
             ->paginate(10);
         $pagination = $products->toArray();

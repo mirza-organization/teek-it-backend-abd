@@ -232,9 +232,7 @@
             <button type="button" class="btn btn-danger my-3 py-3 w-100" title="Delete selected data" onclick="delUsers()">
                 <i class="fas fa-trash-alt"></i>
             </button>
-            {{-- <button type="button" class="btn btn-danger" onclick="delUsers()">
-                <a class="text-white">Delete</a>
-            </button> --}}
+            
         </div>
     </div>
     <div class="container">

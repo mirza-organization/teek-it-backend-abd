@@ -3,12 +3,13 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Twilio\Rest\Serverless\V1\Service\FunctionContext;
 
 class Orders extends Model
 {
     protected $fillable = ['*'];
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * Relations
      */
     public function order_items()
     {
@@ -29,8 +30,10 @@ class Orders extends Model
     {
         return $this->belongsTo(User::class, 'seller_id');
     }
-
-    public function fetchTransportType($order_id = null)
+    /**
+     * Helpers
+     */
+    public static function fetchTransportType(int $order_id = null)
     {
         $transposrt_type = [];
         $product_ids = OrderItems::where('order_id', '=', $order_id)->pluck('product_id');
@@ -57,5 +60,10 @@ class Orders extends Model
             return "car";
         elseif (in_array("bike", $transposrt_type))
             return "bike";
+    }
+
+    public static function checkTotalOrders(int $user_id)
+    {
+        return Orders::where('user_id', $user_id)->count();
     }
 }

@@ -17,21 +17,29 @@ return [
     'ARCHIVED_SUCCESS' => 'Data archived successfully.',
     'UN_ARCHIVED_SUCCESS' => 'Data unarchived successfully.',
     'DELETION_SUCCESS' => 'Data deleted successfully.',
+    'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
+    'REGISTER_SUCCESS' => 'You have Registered  Successfully.',
+    'DATA_INSERTION_SUCCESS' => 'Data Inserted Successfully.',
+    'DATA_UPDATED_SUCCESS' => 'Data Updated Successfully.',
     'SUCCESS_CODE' => 1,
-    'HTTP_SUCCESS_CODE' => 200,
+    'TRUE_STATUS' => true,
+    'STUART_DELIVERY_SUCCESS' => 'Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button',
+    'COMPLETED' => 'Completed',
+    'VALID_REFERRAL' => 'Valid referral code.',
+   
     /* Failure Contants */
     'INSERTION_FAILED' => 'Failed to insert data.',
     'UPDATION_FAILED' => 'Failed to update data.',
     'ARCHIVED_FAILED' => 'Failed to archive data.',
     'UN_ARCHIVED_FAILED' => 'Failed to unarchive data.',
     'DELETION_FAILED' => 'Failed to delete data.',
-    'INVALID_DATA' => 'You have entered invalid or too long data',
+    'INVALID_DATA' => 'You have entered invalid or too long data.',
     'FAILED_CODE' => 0,
-    'STATUS_CHANGING_FAILED' => 'Failed to change the activation status',
-    'HTTP_SERVER_ERROR_CODE' => 500,
-
-    'LOGIN_SUCCESS' => 'You have Logged in Successfully.',
-    'REGISTER_SUCCESS' => 'You have Registered  Successfully.',
+    'FALSE_STATUS' => false,
+    'STATUS_CHANGING_FAILED' => 'Failed to change the activation status.',
+    'INVALID_REFERRAL' => 'Invalid referral code.',
+    'REFERRAL_CAN_BE_USED_ONCE' => 'Same referral code can be used only once.',
+    'REFERRALS_ARE_ONLY_FOR_FIRST_ORDER' => 'Sorry, you can only use a referral before placing your first order.',
 
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',
@@ -42,9 +50,7 @@ return [
 
     'NO_RECORD' => 'No Record Found.',
     'NO_SELLER' => 'No seller found against this id.',
-
-    'DATA_INSERTION_SUCCESS' => 'Data Inserted Successfully.',
-    'DATA_UPDATED_SUCCESS' => 'Data Updated Successfully.',
+    'NO_STORES_FOUND' => 'No stores found in this area.',
 
     'ORDER_ASSIGNED' => 'Assigned.',
     'ORDER_UPDATED' => 'Updated.',
@@ -67,11 +73,14 @@ return [
 
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
+    'DATA_ALREADY_EXISTS' => 'Data already exists against id:- ',
+
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
     'STUART_JOBS' => 'https://api.sandbox.stuart.com/v2/jobs',
     'STUART_TOKEN' => 'https://api.sandbox.stuart.com/oauth/token',
     'ADMIN_EMAIL' => 'admin@teekit.co.uk',
 
+    'HTTP_SUCCESS_CODE' => 200,
     'HTTP_OK' => 200,
     'HTTP_SERVER_ERROR' => 500,
     'HTTP_INVALID_ARGUMETS' => 400,

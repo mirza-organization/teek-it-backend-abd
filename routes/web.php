@@ -3,12 +3,15 @@
 use App\Http\Controllers\Admin\UserAndRoleController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Livewire\Admin\ParentSellersLiveWire;
+use App\Http\Livewire\Admin\ReferralCodes;
+use App\Http\Livewire\Sellers\InventoryLivewire;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\QtyController;
 use App\Http\Controllers\StuartDeliveryController;
+use App\Http\Livewire\Sellers\Settings\UserGeneralSettings;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -41,6 +44,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 */
 Route::prefix('inventory')->group(function () {
     Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
+   
+    Route::get('/test', InventoryLivewire::class)->name('testinventory');
+    // Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
     Route::get('/edit/{product_id}', [HomeController::class, 'inventoryEdit']);
     Route::post('/update_child_qty', [QtyController::class, 'updateChildQty'])->name('update_child_qty');
     Route::get('/add', [HomeController::class, 'inventoryAdd']);
@@ -63,6 +69,7 @@ Route::prefix('inventory')->group(function () {
 Route::prefix('settings')->group(function () {
     Route::post('/user_info/update', [HomeController::class, 'userInfoUpdate'])->name('admin.userinfo.update');
     Route::get('/general', [HomeController::class, 'generalSettings']);
+    Route::get('/usergeneral', UserGeneralSettings::class)->name('usergeneral');;
     Route::get('/payment', [HomeController::class, 'paymentSettings']);
     Route::post('/payment/update', [HomeController::class, 'paymentSettingsUpdate'])->name('payment_settings_update');
     Route::post('/user_img/update', [HomeController::class, 'userImgUpdate'])->name('user_img_update');
@@ -110,6 +117,7 @@ Route::get('auth/verify', [AuthController::class, 'verify']);
 Route::get('/notification/home', [NotificationsController::class, 'notificationHome'])->name('admin.notification.home');
 Route::post('/notification/send', [NotificationsController::class, 'notificationSend'])->name('admin.notification.send');
 Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
+Route::get('/admin/referralcodes', ReferralCodes::class)->name('admin.referralcodes');
 Route::get('/admin/sellers/parent', [HomeController::class, 'adminParentSellers'])->name('admin.sellers.parent');
 Route::get('/admin/sellers/child', [HomeController::class, 'adminChildSellers'])->name('admin.sellers.child');
 Route::get('/customers', [HomeController::class, 'adminCustomers'])->name('admin.customers');
@@ -138,7 +146,7 @@ Route::get('/users/{user_id}/status/{status}', [HomeController::class, 'changeUs
 Route::get('/users_del', [HomeController::class, 'adminUsersDel'])->name('admin.del.users');
 Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');
 Route::post('/store_info/update', [HomeController::class, 'updateStoreInfo'])->name('admin.image.update');
-Route::get('/stuart/job/creation/{order_id}', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
+Route::post('/stuart/job/creation/', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
 Route::post('/stuart/job/status', [StuartDeliveryController::class, 'stuartJobStatus'])->name('stuart.job.status');
 
 /*

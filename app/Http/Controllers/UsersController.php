@@ -38,11 +38,11 @@ class UsersController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 2.1.0
      */
-    public function getSellerInfo($seller_info, $result = null)
+    public function getSellerInfo(Object $seller_info, array $map_api_result = null)
     {
         $user = $seller_info;
         if (!$user) return null;
-        $data_info = array(
+        $data = array(
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
@@ -57,11 +57,11 @@ class UsersController extends Controller
             'is_online' => $user->is_online,
             'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers']
         );
-        if (!is_null($result)) {
-            $data_info['distance'] = $result['distance'];
-            $data_info['duration'] = $result['duration'];
+        if (!is_null($map_api_result)) {
+            $data['distance'] = $map_api_result['distance'];
+            $data['duration'] = $map_api_result['duration'];
         }
-        return $data_info;
+        return $data;
     }
     /**
      * Listing of all Sellers/Stores within 5 miles
@@ -80,39 +80,28 @@ class UsersController extends Controller
             if ($validate->fails()) {
                 return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
+                    config('constants.FALSE_STATUS'),
                     $validate->errors(),
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
             }
-            $data = []; 
-            if ($request->query('lat') && $request->query('lon')) {
-                $users = User::getParentAndChildSellers();
-                foreach ($users as $user) {
-                    $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
-                    if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
-                }
-            } else {
-                // We will remove this block as soon as the iOS is able to send lat, lons
-                $data = Cache::remember('sellers', 60, function () {
-                    $users = User::getParentAndChildSellers();
-                    foreach ($users as $user) {
-                        $data[] = $this->getSellerInfo($user);
-                    }
-                    return $data;
-                });
+            $data = [];
+            $users = User::getParentAndChildSellers();
+            foreach ($users as $user) {
+                $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
+                if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
             }
             if (empty($data)) {
-                 return JsonResponseCustom::getApiResponse(
+                return JsonResponseCustom::getApiResponse(
                     [],
-                    false,
-                    'No stores found in this area.',
+                    config('constants.FALSE_STATUS'),
+                    config('constants.NO_STORES_FOUND'),
                     config('constants.HTTP_OK')
                 );
             }
             return JsonResponseCustom::getApiResponse(
                 $data,
-                true,
+                config('constants.TRUE_STATUS'),
                 '',
                 config('constants.HTTP_OK')
             );
@@ -120,7 +109,7 @@ class UsersController extends Controller
             report($error);
             return JsonResponseCustom::getApiResponse(
                 [],
-                false,
+                config('constants.FALSE_STATUS'),
                 $error,
                 config('constants.HTTP_SERVER_ERROR')
             );

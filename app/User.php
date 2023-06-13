@@ -9,13 +9,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 use Validator;
 
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable, SoftDeletes;
-    // use EntrustUserTrait;
-
     /**
      * The attributes that are mass assignable.
      *
@@ -44,9 +44,9 @@ class User extends Authenticatable implements JWTSubject
         'lat',
         'lon',
         'role_id',
-        'parent_store_id'
+        'parent_store_id',
+        'referral_code'
     ];
-
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -56,7 +56,6 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token'
     ];
-
     /**
      * The attributes that should be cast to native types.
      *
@@ -65,8 +64,6 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -76,7 +73,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->getKey();
     }
-
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
@@ -92,7 +88,6 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Relations
      */
-    // Many-to-many relationship
     public function roles()
     {
         return $this->belongsToMany('App\Role', 'role_user');
@@ -102,17 +97,17 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo('App\Role');
     }
-    // Many-to-many relationship
+
     public function seller()
     {
         return $this->belongsToMany('App\Role', 'role_user')->wherePivot('role_id', 2);
     }
-    // Many-to-many relationship
+
     public function driver()
     {
         return $this->belongsToMany('App\Models\Role', 'role_user')->where('name', 'delivery_boy');
     }
-    // One-to-many relationship
+
     public function orders()
     {
         return $this->hasMany('App\Orders');
@@ -152,15 +147,30 @@ class User extends Authenticatable implements JWTSubject
     /**
      * Helpers
      */
+    public static function uploadImg(object $request)
+    {
+        $file = $request->file('user_img');
+        $filename = uniqid($request->name . '_') . "." . $file->getClientOriginalExtension(); //create unique file name...
+        Storage::disk('spaces')->put($filename, File::get($file));
+        if (Storage::disk('spaces')->exists($filename)) {  // check file exists in directory or not
+            info("file is store successfully : " . $filename);
+        } else {
+            info("file is not found :- " . $filename);
+        }
+        return $filename;
+    }
+
     public static function getParentAndChildSellers()
     {
         return User::where('is_active', 1)
+            ->whereNotNull('lat')
+            ->whereNotNull('lon')
             ->whereIn('role_id', [2, 5])
             ->orderBy('business_name', 'asc')
             ->get();
     }
 
-    public static function getParentSellers(string $search)
+    public static function getParentSellers(string $search = '')
     {
         return User::where('business_name', 'like', '%' . $search . '%')
             ->where('role_id', 2)
@@ -171,11 +181,11 @@ class User extends Authenticatable implements JWTSubject
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
         return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
-       cos( radians(users.lat) ) *
-       cos( radians(users.lon) - radians(" . $user_lon . ") ) +
-       sin( radians(" . $user_lat . ") ) *
-       sin( radians(users.lat) ) ) )
-       AS distance")
+                                cos( radians(users.lat) ) *
+                                cos( radians(users.lon) - radians(" . $user_lon . ") ) +
+                                sin( radians(" . $user_lat . ") ) *
+                                sin( radians(users.lat) ) ) )
+                                AS distance")
             ->having("distance", "<", $radius)
             ->orderBy("distance", "ASC")
             ->get();
@@ -205,10 +215,69 @@ class User extends Authenticatable implements JWTSubject
         }
         return true;
     }
-    
-    public static function getUserRole(int $seller_id)
+
+    public static function getUserRole(int $user_id)
     {
-        return  User::where('id', $seller_id)
-        ->pluck('role_id');
+        return  User::where('id', $user_id)->pluck('role_id');
+    }
+
+    public static function getUserInfo(int $user_id)
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            return array(
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'business_name' => $user->business_name,
+                'business_location' => $user->business_location,
+                'address_1' => $user->address_1,
+                'pending_withdraw' => $user->pending_withdraw,
+                'total_withdraw' => $user->total_withdraw,
+                'is_online' => $user->is_online,
+                'roles' => $user->role()->pluck('name'),
+                'user_img' => $user->user_img,
+                'referral_code' => $user->referral_code,
+                // 'referral_useable' => $user->referral_useable
+            );
+        } else {
+            return null;
+        }
+    }
+
+    public static function verifyReferralCode(string $referral_code)
+    {
+        $data = User::where('referral_code', $referral_code)->first();
+        return (is_null($data)) ? false :  $data;
+    }
+
+    public static function updateWalletAndStatus(int $status, float $bonus, int $user_id)
+    {
+        $user = User::find($user_id);
+        if ($user) {
+            $user->pending_withdraw += $bonus;
+            // $user->referral_useable = $status;
+            $user->save();
+        }
+        return $user;
+    }
+
+    public static function updateWallet(int $user_id, float $amount)
+    {
+        return User::where('id', $user_id)->increment('pending_withdraw' , $amount);
+    }
+
+    public static function getBuyers(string $search = '')
+    {
+        return User::where('role_id', 3)
+            ->where('name', 'like', '%' .  $search . '%')
+            ->orderByDesc('created_at')
+            ->get();
+        // ->paginate(9);
+    }
+
+    public static function getBuyersWithReferralCode()
+    {
+        return User::whereNotNull('referral_code')->paginate(10);
     }
 }

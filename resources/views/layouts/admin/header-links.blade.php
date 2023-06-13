@@ -4,11 +4,10 @@
 <link rel="icon" href="{{ asset('res/res/img/logo.png') }}" type="image/svg+xml" />
 <!-- CSRF Token -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
-
 <title>{{ config('app.name', 'Laravel') }}</title>
 <!-- Fonts -->
 <link rel="dns-prefetch" href="//fonts.gstatic.com">
-<!-- Font Awesome Icons -->
+<!-- Font Awesome Icons - 5.13.0 -->
 <link href="{{ asset('res/plugins/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
 <!-- Theme style - Bootstrap 4 CSS -->
 <link href="{{ asset('res/dist/css/adminlte.min.css') }}" rel="stylesheet">
