@@ -687,9 +687,7 @@ class ProductsController extends Controller
             unset($pt->updated_at);
             $temp_img = [];
             if (isset($pt->images)) {
-                foreach ($pt->images as $img) {
-                    $temp_img[] = $img->product_image;
-                }
+                foreach ($pt->images as $img) $temp_img[] = $img->product_image;
             }
             $pt->images = implode(',', $temp_img);
             $all_products[] = $pt;
@@ -989,7 +987,6 @@ class ProductsController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 1.2.0
      */
-
     public function sellerProducts(Request $request)
     {
         try {
@@ -1005,7 +1002,6 @@ class ProductsController extends Controller
                 );
             }
             $seller_id = $request->seller_id;
-
             $data = [];
             $products = [];
             $role_id = User::getUserRole($seller_id);
@@ -1014,6 +1010,7 @@ class ProductsController extends Controller
             else if ($role_id[0] == 2)
                 $products = Products::getParentSellerProducts($seller_id);
             $pagination = $products->toArray();
+
             if (!$products->isEmpty()) {
                 foreach ($products as $product) $data[] = (new ProductsController())->getProductInfo($product->id);
                 unset($pagination['data']);
