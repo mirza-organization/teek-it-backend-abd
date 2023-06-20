@@ -9,24 +9,71 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Throwable;
 use App\Services\JsonResponseCustom;
+use Illuminate\Support\Carbon;
 
 class StuartDeliveryController extends Controller
 {
     /**
-     * It will get a fresh token for hitting Stuart API's
+     * It will get a fresh token for hitting Stuart delivery API
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function stuartAccessToken()
+    public function stuartSandboxAccessToken()
     {
-        $stuart_auth = Http::asForm()->post('' . config("constants.STUART_TOKEN") . '', [
-            'client_id' => config('app.STUART_SANDBOX_CLIENT_ID'),
-            'client_secret' => config('app.STUART_SANDBOX_CLIENT_SECRET'),
+        $stuart_auth = Http::asForm()->post('' . config("constants.STUART_SANDBOX_TOKEN_URL") . '', [
+            'client_id' => config('constants.STUART_SANDBOX_CLIENT_ID'),
+            'client_secret' => config('constants.STUART_SANDBOX_CLIENT_SECRET'),
             'grant_type' => 'client_credentials',
             'scope' => 'api'
         ]);
         $stuart_auth = $stuart_auth->json();
         return $stuart_auth['access_token'];
+    }
+    /**
+     * @version 1.0.0
+     */
+    public function stuartProductionAccessToken()
+    {
+        $stuart_auth = Http::asForm()->post('' . config("constants.STUART_PRODUCTION_TOKEN_URL") . '', [
+            'client_id' => config('app.STUART_PRODUCTION_CLIENT_ID'),
+            'client_secret' => config('app.STUART_PRODUCTION_CLIENT_SECRET'),
+            'grant_type' => 'client_credentials',
+            'scope' => 'api'
+        ]);
+        $stuart_auth = $stuart_auth->json();
+        return $stuart_auth['access_token'];
+    }
+    /**
+     * @version 1.0.0
+     */
+    public function stuartSandboxJobCreation(string $access_token, array $job)
+    {
+        $response = Http::withToken($access_token)->post('' . config("constants.STUART_SANDBOX_JOBS_URL") . '', $job);
+        return $response->json();
+    }
+    /**
+     * @version 1.0.0
+     */
+    public function stuartProductionJobCreation(string $access_token, array $job)
+    {
+        $response = Http::withToken($access_token)->post('' . config("constants.STUART_PRODUCTION_JOBS_URL") . '', $job);
+        return $response->json();
+    }
+    /**
+     * @version 1.0.0
+     */
+    public function stuartSandboxJobStatus(string $access_token, array $job_id)
+    {
+        $response = Http::withToken($access_token)->patch('' . config("constants.STUART_SANDBOX_JOBS_URL") . '/' . $job_id);
+        return $response->json();
+    }
+    /**
+     * @version 1.0.0
+     */
+    public function stuartProductionJobStatus(string $access_token, array $job_id)
+    {
+        $response = Http::withToken($access_token)->patch('' . config("constants.STUART_PRODUCTION_JOBS_URL") . '/' . $job_id);
+        return $response->json();
     }
     /**
      * Creates a stuart delivery job
@@ -38,11 +85,11 @@ class StuartDeliveryController extends Controller
         try {
             $order_details = Orders::with('store')->where('id', '=', $request->order_id)->first();
             $transport_type = Orders::fetchTransportType($request->order_id);
-            $access_token = $this->stuartAccessToken();
+            $access_token = (url('/') == 'https://app.teekit.co.uk') ? $this->stuartProductionAccessToken() : $this->stuartSandboxAccessToken();
 
             $job = [
                 'job' => [
-                    // 'pickup_at' => Carbon::now()->addMinutes(10),
+                    'pickup_at' => Carbon::now()->addMinutes(10),
                     'assignment_code' => $request->order_id,
                     'pickups' => [
                         [
@@ -78,8 +125,8 @@ class StuartDeliveryController extends Controller
                     ]
                 ]
             ];
-            $response = Http::withToken($access_token)->post('' . config("constants.STUART_JOBS") . '', $job);
-            $data = $response->json();
+
+            $data = (url('/') == 'https://app.teekit.co.uk') ? $this->stuartProductionJobCreation($access_token, $job) : $this->stuartSandboxJobCreation($access_token, $job);
             if ($data && !isset($data['error'])) {
                 $data = StuartDelivery::create([
                     'order_id' => $request->order_id,
@@ -92,7 +139,7 @@ class StuartDeliveryController extends Controller
                 return Redirect::back();
             } else {
                 $message = $data['message'];
-                if($data['error'] == 'JOB_DISTANCE_NOT_ALLOWED') $message = $message . " " . $transport_type;
+                if ($data['error'] == 'JOB_DISTANCE_NOT_ALLOWED') $message = $message . " " . $transport_type;
                 JsonResponseCustom::getWebResponse($message, config('constants.FALSE_STATUS'));
                 return Redirect::back();
             }
@@ -110,28 +157,25 @@ class StuartDeliveryController extends Controller
     public function stuartJobStatus(Request $request)
     {
         try {
-            $data = StuartDelivery::select('job_id')->where('order_id', $request->order_id)->first();
-            $access_token = $this->stuartAccessToken();
-            $response = Http::withToken($access_token)->patch('' . config("constants.STUART_JOBS") . '/' . $data->job_id);
-            $data = $response->json();
+            $stuart_delivery = StuartDelivery::select('job_id')->where('order_id', $request->order_id)->first();
+            $access_token = (url('/') == 'https://app.teekit.co.uk') ? $this->stuartProductionAccessToken() : $this->stuartSandboxAccessToken();
+            $data = (url('/') == 'https://app.teekit.co.uk') ? $this->stuartProductionJobStatus($access_token, $stuart_delivery->job_id) : $this->stuartSandboxJobStatus($access_token, $stuart_delivery->job_id);
+
             if ($data['status'] == 'finished') {
-                Orders::where('id', $request->order_id)->update([
-                    'order_status' => 'complete'
-                ]);
+                Orders::updateOrderStatus($request->order_id, 'complete');
                 return JsonResponseCustom::getApiResponse(
                     [],
                     config('constants.TRUE_STATUS'),
                     config('constants.COMPLETED'),
                     config('constants.HTTP_OK')
                 );
-            } else {
-                return JsonResponseCustom::getApiResponse(
-                    $data,
-                    config('constants.TRUE_STATUS'),
-                    '',
-                    config('constants.HTTP_OK')
-                );
             }
+            return JsonResponseCustom::getApiResponse(
+                $data,
+                config('constants.TRUE_STATUS'),
+                '',
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(

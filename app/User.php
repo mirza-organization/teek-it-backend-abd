@@ -240,9 +240,8 @@ class User extends Authenticatable implements JWTSubject
                 'referral_code' => $user->referral_code,
                 // 'referral_useable' => $user->referral_useable
             );
-        } else {
-            return null;
-        }
+        } 
+        return null;
     }
 
     public static function verifyReferralCode(string $referral_code)

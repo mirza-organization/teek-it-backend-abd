@@ -66,4 +66,11 @@ class Orders extends Model
     {
         return Orders::where('user_id', $user_id)->count();
     }
+
+    public static function updateOrderStatus(int $id, string $status)
+    {
+        return Orders::where('id', $id)->update([
+            'order_status' => $status
+        ]);
+    }
 }

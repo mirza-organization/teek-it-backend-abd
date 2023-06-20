@@ -144,14 +144,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Stuart Sandbox Cridentials Key
-    |--------------------------------------------------------------------------
-    */
-    'STUART_SANDBOX_CLIENT_ID' => '7faa9066d638cb94b61f18040355f59ffd124cd94b5444f1ee992d1e3e594a19',
-    'STUART_SANDBOX_CLIENT_SECRET' => '9db9dac8282818a4000a75c996fbcb470f8d67835ff26ee442abf4b496ae534b',
-
-    /*
-    |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
     |
@@ -162,7 +154,6 @@ return [
     */
 
     'providers' => [
-
         /*
          * Laravel Framework Service Providers...
          */
@@ -188,7 +179,6 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-
         /*
          * Package Service Providers...
          */
@@ -201,7 +191,6 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         //  Zizaco\Entrust\EntrustServiceProvider::class,
         // Barryvdh\Cors\ServiceProvider::class,
@@ -221,7 +210,6 @@ return [
     */
 
     'aliases' => [
-
         'App' => Illuminate\Support\Facades\App::class,
         'Arr' => Illuminate\Support\Arr::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
@@ -257,14 +245,11 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-
         //'Entrust'   => Zizaco\Entrust\EntrustFacade::class,
         'JWTAuth'   => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
-        'Agent' => Jenssegers\Agent\Facades\Agent::class,
-
-
+        'Agent' => Jenssegers\Agent\Facades\Agent::class
     ],
 
 ];

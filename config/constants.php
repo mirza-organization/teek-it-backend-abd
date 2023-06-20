@@ -76,8 +76,25 @@ return [
     'DATA_ALREADY_EXISTS' => 'Data already exists against id:- ',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
-    'STUART_JOBS' => 'https://api.sandbox.stuart.com/v2/jobs',
-    'STUART_TOKEN' => 'https://api.sandbox.stuart.com/oauth/token',
+    /*
+    |--------------------------------------------------------------------------
+    | Stuart Sandbox Cridentials Key
+    |--------------------------------------------------------------------------
+    */
+    'STUART_SANDBOX_CLIENT_ID' => '7faa9066d638cb94b61f18040355f59ffd124cd94b5444f1ee992d1e3e594a19',
+    'STUART_SANDBOX_CLIENT_SECRET' => '9db9dac8282818a4000a75c996fbcb470f8d67835ff26ee442abf4b496ae534b',
+    'STUART_SANDBOX_JOBS_URL' => 'https://api.sandbox.stuart.com/v2/jobs',
+    'STUART_SANDBOX_TOKEN_URL' => 'https://api.sandbox.stuart.com/oauth/token',
+    /*
+    |--------------------------------------------------------------------------
+    | Stuart Production Cridentials Key
+    |--------------------------------------------------------------------------
+    */
+    'STUART_PRODUCTION_CLIENT_ID' => '75f7341f983c842b6a4847707a1a03d4413687e7223c3f51be34359c2fa9e505',
+    'STUART_PRODUCTION_CLIENT_SECRET' => '0144e8a9978851e7005a5a3ef53cba22dc1b6102f49c7add5bb22dedf74c9ba2',
+    'STUART_PRODUCTION_JOBS_URL' => 'https://api.stuart.com/v2/jobs',
+    'STUART_PRODUCTION_TOKEN_URL' => 'https://api.stuart.com/oauth/token',
+
     'ADMIN_EMAIL' => 'admin@teekit.co.uk',
 
     'HTTP_SUCCESS_CODE' => 200,
