@@ -318,7 +318,7 @@ class ProductsController extends Controller
             ->find($product_id);
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        $product->ratting = (new RattingsController())->getRatting($product_id);
         return $product;
             }else
             {
@@ -340,7 +340,7 @@ class ProductsController extends Controller
             ->first();
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        $product->ratting = (new RattingsController())->getRatting($product_id);
         return $product;
     }
     /**

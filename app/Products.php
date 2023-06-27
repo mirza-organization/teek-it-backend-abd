@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 class Products extends Model
 {
     use Searchable;
+
+    protected $fillable = ['*'];
     /**
      * Relations
      */
@@ -29,6 +31,16 @@ class Products extends Model
     public function category()
     {
         return $this->belongsTo(Categories::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(productImages::class);
+    }
+
+    public function rattings()
+    {
+        return $this->hasMany(Rattings::class, 'product_id');
     }
 
     public function quantities()
@@ -73,9 +85,9 @@ class Products extends Model
     public static function getProductInfo(int $product_id)
     {
         $product = Products::with('quantity')->find($product_id);
-        $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
+        $product->images = productImages::where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        $product->ratting = (new RattingsController())->getRatting($product_id);
         return $product;
     }
 
@@ -94,7 +106,7 @@ class Products extends Model
             ->first();
         $product->images = productImages::query()->where('product_id', '=', $product->id)->get();
         $product->category = Categories::find($product->category_id);
-        $product->ratting = (new RattingsController())->get_ratting($product_id);
+        $product->ratting = (new RattingsController())->getRatting($product_id);
         return $product;
     }
 
@@ -103,14 +115,23 @@ class Products extends Model
         return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->paginate(20);
     }
 
+    // public static function getParentSellerNonFeaturedProducts(int $seller_id)
+    // {
+    //     return Products::where('user_id', '=', $seller_id)->where('featured', '=', 0)->where('status', '=', 1)->orderByDesc('id')->paginate(12);
+    // }
+
     public static function getParentSellerProductsAsc(int $seller_id)
     {
-        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Asc')->get();
+        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderByAsc('id')->get();
     }
 
-    public static function getParentSellerProductsDesc(int $seller_id)
+    public static function getParentSellerProductsDescForView(int $seller_id)
     {
-        return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderBy('id', 'Desc')->paginate(9);
+        return Products::with('category', 'rattings')
+            ->where('user_id', '=', $seller_id)
+            ->where('status', '=', 1)
+            ->orderByDesc('id')
+            ->paginate(12);
     }
 
     public static function getChildSellerProducts(int $child_seller_id)
@@ -158,6 +179,11 @@ class Products extends Model
             ->where('status', '=', 1)
             ->orderByDesc('id')
             ->paginate(10);
+    }
+
+    public static function getFeaturedProductsForView(int $seller_id)
+    {
+        return Products::where('user_id', '=', $seller_id)->where('featured', '=', 1)->where('status', '=', 1)->get();
     }
 
     public static function getActiveProducts()

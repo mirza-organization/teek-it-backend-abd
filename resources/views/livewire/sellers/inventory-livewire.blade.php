@@ -16,15 +16,14 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-    @if (Auth::user()->role->name == 'seller')
 
-        <style>
+    {{-- <style>
             @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
 
-            /* body {
-    font-family: "Poppins", sans-serif;
-    color: #444444;
-} */
+            body {
+                font-family: "Poppins", sans-serif;
+                color: #444444;
+            }
 
             a,
             a:hover {
@@ -180,26 +179,8 @@
                 background-color: #444444;
                 transform: translateY(-50%);
             }
-        </style>
-        <script>
-            function disableAll(ev) {
-                ev.preventDefault();
-                var urlToRedirect = ev.currentTarget.getAttribute(
-                    'href'
-                ); //use currentTarget because the click may be on the nested i tag and not a tag causing the href to be empty
-                Swal.fire({
-                    title: 'Warning!',
-                    text: 'Are you sure you want to disable all the products of your store?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Yes'
-                }).then((result) => {
-                    if (result.isConfirmed)
-                        $("#DisableAll").click();
-                });
-            }
-        </script>
-
+        </style> --}}
+    @if (Auth::user()->role->name == 'seller')
         <div class="container-xxl flex-grow-1 container-p-y">
             <div class="row">
                 <div class="col-12 col-sm-6 col-md-4">
@@ -243,13 +224,13 @@
 
             <section class="section-products">
                 <div class="container">
-                    @php unset($featured_products[0]); @endphp
+                    {{-- Featured Products - Begins --}}
                     @if (count($featured_products) > 0)
                         <div class="row">
                             <div class="col-lg-12 col-sm-12 col-md-12">
                                 <h4 class="py-4 my-1">Featured</h4>
                             </div>
-                            @foreach ($featured_products as $key => $inventory)
+                            @foreach ($featured_products as $inventory)
                                 <!-- Single Product -->
                                 <div class="col-md-6 col-lg-4 col-xl-3 p-2 ">
                                     <div id="productItem" class="single-product bg-white p-2"
@@ -289,20 +270,22 @@
                                             <div class="col">
                                                 <h2 class="product-title" style="color:#3a4b83;"
                                                     title="{{ $inventory->product_name }}">
-                                                    {{ Str::limit($inventory->product_name, 25) }}</h2>
-                                                <h5 class="rating">{{ $inventory->category['category_name'] }}</h5>
-                                                <div class="ratting">
-                                                    <?php
-                                                    $rating = round($inventory->ratting['average']);
-                                                    for ($i = 1; $i <= 5; $i++) :
-                                                    ?>
-                                                    <span class="fa fa-star <?php if ($i <= $rating) {
-                                                        echo 'checked';
-                                                    } ?>"></span>
-                                                    <?php endfor; ?>
+                                                    {{ Str::limit($inventory->product_name, 25) }}
+                                                </h2>
+                                                <h5>{{ $inventory->category->category_name }}</h5>
+                                                <h4>SKU: {{ $inventory->sku }}</h4>
+                                                <div>
+                                                    <?php $rattings = app\Rattings::getRatting($inventory->id); ?>
+                                                    @if (!empty($rattings['average']))
+                                                        <?php $star = round($rattings['average']); ?>
+                                                        @for ($i = 1; $i <= 5; $i++)
+                                                            <span
+                                                                class="fa fa-star @if ($i <= $star) checked @endif">
+                                                            </span>
+                                                        @endfor
+                                                    @endif
                                                 </div>
-                                                <h4 class="product-price">SKU: {{ $inventory->sku }}</h4>
-                                                <h5 class="product-price">${{ $inventory->price }}</h5>
+                                                <h5>${{ $inventory->price }}</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -310,6 +293,7 @@
                             @endforeach
                         </div>
                     @endif
+                    {{-- Featured Products - Ends --}}
 
                     <div class="row">
                         <div class="col-lg-12 col-sm-12 col-md-12">
@@ -323,7 +307,7 @@
                                     <div class="part-1 rounded"
                                         style=" background:url('{{ asset($inventory->feature_img) }}') no-repeat center; ">
                                         {{-- <span class="discount">15% off</span>
-                                                        <span class="new">new</span> --}}
+                                               <span class="new">new</span> --}}
                                         <ul>
                                             @if ($inventory->status == 0)
                                                 <li>
@@ -358,27 +342,22 @@
                                             title="{{ $inventory->product_name }}">
                                             {{ Str::limit($inventory->product_name, 25) }}
                                         </h3>
-                                        <h5 class="rating">{{ $inventory->category['category_name'] }}</h5>
-                                        <h4 class="product-price">SKU: {{ $inventory->sku }}</h4>
+                                        <h5 class="rating">{{ $inventory->category->category_name }}</h5>
+                                        <h4>SKU: {{ $inventory->sku }}</h4>
                                         <div class="col-md-6">
                                             <div class="ratting pl-3">
-                                                <?php
-                                                if(!empty($inventory->ratting['average']))
-                                                { $rating = round($inventory->ratting['average']);
-                                                for ($i = 1; $i <= 5; $i++) :
-                                                ?>
-                                                <span
-                                                    class="fa fa-star 
-                                                <?php if ($i <= $rating) {
-                                                    echo 'checked';
-                                                } ?>">
-                                                </span>
-                                                <?php endfor; 
-                                                }
-                                                ?>
+                                                <?php $rattings = app\Rattings::getRatting($inventory->id); ?>
+                                                @if (!empty($rattings['average']))
+                                                    <?php $star = round($rattings['average']); ?>
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <span
+                                                            class="fa fa-star @if ($i <= $star) checked @endif">
+                                                        </span>
+                                                    @endfor
+                                                @endif
                                             </div>
                                         </div>
-                                        <h5 class="product-price">${{ $inventory->price }}</h5>
+                                        <h5>${{ $inventory->price }}</h5>
                                     </div>
                                 </div>
                             </div>
@@ -394,7 +373,6 @@
                 </div>
             </section>
         </div>
-
     @elseif (Auth::user()->role->name == 'child_seller')
         <div class="row">
             <div class="col-12 col-sm-3 col-md-4 col-lg-6">

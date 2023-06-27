@@ -1,4 +1,4 @@
-{{-- <meta charset="utf-8">
+<meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1" name="viewport">
 <meta content="ie=edge" http-equiv="x-ua-compatible">
 <link rel="icon" href="{{ asset('res/res/img/logo.png') }}" type="image/svg+xml" />
@@ -18,4 +18,4 @@
 <link href="{{asset('css/custom-styles.css')}}" rel="stylesheet">
 <!-- Google Font: Source Sans Pro -->
 <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
-@yield('links') --}}
+{{-- @yield('links') --}}
