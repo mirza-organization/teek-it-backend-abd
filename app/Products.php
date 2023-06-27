@@ -125,11 +125,15 @@ class Products extends Model
         return Products::where('user_id', '=', $seller_id)->where('status', '=', 1)->orderByAsc('id')->get();
     }
 
-    public static function getParentSellerProductsDescForView(int $seller_id)
+    public static function getParentSellerProductsDescForView(int $seller_id, string $search = '', int $category_id = null)
     {
         return Products::with('category', 'rattings')
             ->where('user_id', '=', $seller_id)
+            ->where('product_name', 'LIKE', "%{$search}%")
             ->where('status', '=', 1)
+            ->when($category_id, function ($query, $category_id) {
+                return $query->where('category_id', '=', $category_id);
+            })
             ->orderByDesc('id')
             ->paginate(12);
     }
