@@ -24,6 +24,7 @@ class InventoryLivewire extends Component
         $product_id,
         $quantity = [],
         $inventories,
+        $disabled,
         $search = '';
 
     protected $paginationTheme = 'bootstrap';
@@ -137,6 +138,7 @@ class InventoryLivewire extends Component
     {
         $categories = Categories::allCategories();
         if (Gate::allows('seller')) {
+            $this->category_id = ($this->category_id == 0) ? null : $this->category_id;
             $data = Products::getParentSellerProductsDescForView(auth()->id(), $this->search, $this->category_id);
             $featured = $this->getFeaturedProducts($data);
         } elseif (Gate::allows('child_seller')) {

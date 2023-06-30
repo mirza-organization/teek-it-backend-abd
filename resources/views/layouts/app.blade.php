@@ -4,6 +4,7 @@
 <head>
     {{-- @include('layouts.admin.header-links') --}}
     @include('layouts.header-links')
+    @livewireStyles
 </head>
 
 <body class="hold-transition sidebar-mini">

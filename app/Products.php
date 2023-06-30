@@ -130,7 +130,6 @@ class Products extends Model
         return Products::with('category', 'rattings')
             ->where('user_id', '=', $seller_id)
             ->where('product_name', 'LIKE', "%{$search}%")
-            ->where('status', '=', 1)
             ->when($category_id, function ($query, $category_id) {
                 return $query->where('category_id', '=', $category_id);
             })

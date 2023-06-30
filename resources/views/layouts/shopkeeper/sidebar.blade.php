@@ -26,18 +26,10 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->is('inventory') ? 'active' : '' }} " href="/inventory">
-                        <i class="nav-icon fas fa-boxes"></i>
-                        <p class="ml-2">
-                            Inventory
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('testinventory')}}" class="nav-link @if (request()->is('inventory/test')) active @endif">
+                    <a href="{{route('inventory')}}" class="nav-link @if (request()->is('inventory/')) active @endif">
                         <i class="nav-icon fa fa-truck"></i>
                         <p class="ml-2">
-                            Test Inventory
+                            Inventory
                         </p>
                     </a>
                 </li>

@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-sm-12 col-md-3 py-4 my-2">
                             <select class="form-control" wire:model.debounce.500ms="category_id">
-                                <option value="">Select category</option>
+                                <option value="0">Select category</option>
                                 @foreach ($categories as $cat)
                                     <option value="{{ $cat->id }}">{{ $cat->category_name }}</option>
                                 @endforeach
@@ -39,13 +39,26 @@
                         </div>
                         <div class="col-md-6 d-flex ">
                             <button type="button" class="btn btn-warning my-4 p-1 w-100 mx-1 rounded"
-                                wire:click="toggleAllProducts(1)" title="Enable All">
-                                <i class="fa fa-toggle-on"></i>
+                                wire:click="toggleAllProducts(1)" wire:target="toggleAllProducts(1)"
+                                wire:loading.class="btn-dark" wire:loading.class.remove="btn-warning"
+                                wire:loading.attr="disabled" title="Enable All">
+                                <span class="fa fa-toggle-on" wire:target="toggleAllProducts(1)"
+                                    wire:loading.remove></span>
+                                <span wire:target="toggleAllProducts(1)" wire:loading>
+                                    <span class="spinner-border spinner-border-sm text-light" role="status"
+                                        aria-hidden="true"></span>
+                                </span>
                             </button>
-                            <a type="button" class="btn btn-danger text-white py-3 my-4 p-1 w-100 mx-1"
-                                onclick="disableAll(event)" title="Disable All">
-                                <i class="fas fa-ban"></i>
-                            </a>
+                            <button type="button" class="btn btn-danger text-white py-3 my-4 p-1 w-100 mx-1"
+                                wire:click="toggleAllProducts(0)" wire:target="toggleAllProducts(0)"
+                                wire:loading.class="btn-dark" wire:loading.class.remove="btn-danger"
+                                wire:loading.attr="disabled" title="Disable All">
+                                <i class="fas fa-ban" wire:target="toggleAllProducts(0)" wire:loading.remove></i>
+                                <span wire:target="toggleAllProducts(0)" wire:loading>
+                                    <span class="spinner-border spinner-border-sm text-light" role="status"
+                                        aria-hidden="true"></span>
+                                </span>
+                            </button>
                             <a type="button" href="/inventory/add" class="btn btn-primary my-4 py-3 w-100 mx-1 px-0 "
                                 title="Add New">
                                 <i class="fas fa-plus"></i>
@@ -70,43 +83,69 @@
                             @foreach ($featured_products as $inventory)
                                 <!-- Single Product -->
                                 <div class="col-md-6 col-lg-4 col-xl-3 p-2 ">
-                                    <div id="productItem" class="single-product bg-white p-2"
-                                        @if ($inventory->status == 0) style="background:#ccc !important;" @endif>
+                                    <div id="productItem"
+                                        class="single-product bg-white p-2 rounded @if ($inventory->status == 0) disabled-product @endif">
                                         <div class="part-1"
                                             style="background:url('{{ asset($inventory->feature_img) }}') no-repeat center; ">
                                             <ul>
                                                 @if ($inventory->status == 0)
                                                     <li>
                                                         <a wire:click="toggleProduct('{{ $inventory->id }}', 1)"
-                                                            title="Enable Product">
-                                                            <i class="fa fa-toggle-on"></i>
+                                                            wire:target="toggleProduct('{{ $inventory->id }}', 1)"
+                                                            wire:loading.attr="disabled" title="Enable Product">
+                                                            <span class="fa fa-toggle-on"
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 1)"
+                                                                wire:loading.remove></span>
+                                                            <span wire:target="toggleProduct('{{ $inventory->id }}', 1)"
+                                                                wire:loading>
+                                                                <span class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                            </span>
                                                         </a>
                                                     </li>
                                                 @elseif($inventory->status == 1)
                                                     <li>
                                                         <a wire:click="toggleProduct('{{ $inventory->id }}', 0)"
-                                                            title="Disable Product">
-                                                            <i class="fa fa-ban"></i>
+                                                            wire:target="toggleProduct('{{ $inventory->id }}', 0)"
+                                                            wire:loading.attr="disabled" title="Disable Product">
+                                                            <span class="fa fa-ban"
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 0)"
+                                                                wire:loading.remove></span>
+                                                            <span
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 0)"
+                                                                wire:loading>
+                                                                <span class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                            </span>
                                                         </a>
                                                     </li>
                                                 @endif
                                                 <li>
-                                                    <a href="/inventory/edit/{{ $inventory->id }}" title="Edit Product">
+                                                    <a href="/inventory/edit/{{ $inventory->id }}"
+                                                        title="Edit Product">
                                                         <i class="fa fa-edit"></i>
                                                     </a>
                                                 </li>
                                                 <li>
                                                     <a wire:click="markAsFeatured('{{ $inventory->id }}', '0')"
-                                                        title="Undo Featured">
-                                                        <i class="fa fa-undo" aria-hidden="true"></i>
+                                                        wire:target="markAsFeatured('{{ $inventory->id }}', '0')"
+                                                        wire:loading.attr="disabled" title="Undo Featured">
+                                                        <span class="fa fa-undo"
+                                                            wire:target="markAsFeatured('{{ $inventory->id }}', '0')"
+                                                            wire:loading.remove></span>
+                                                        <span
+                                                            wire:target="markAsFeatured('{{ $inventory->id }}', '0')"
+                                                            wire:loading>
+                                                            <span class="spinner-border spinner-border-sm"
+                                                                role="status" aria-hidden="true"></span>
+                                                        </span>
                                                     </a>
                                                 </li>
                                             </ul>
                                         </div>
                                         <div class="part-2 px-2">
                                             <div class="col">
-                                                <h2 class="product-title" style="color:#3a4b83;"
-                                                    title="{{ $inventory->product_name }}">
+                                                <h2 class="product-title" title="{{ $inventory->product_name }}">
                                                     {{ Str::limit($inventory->product_name, 25) }}
                                                 </h2>
                                                 <h5>{{ $inventory->category->category_name }}</h5>
@@ -138,66 +177,95 @@
                         </div>
                         @forelse ($data as $key => $inventory)
                             <!-- Single Product -->
-                            <div class="col-md-6 col-lg-4 col-xl-3 p-2  ">
-                                <div id="productItem" class="single-product bg-white p-2 rounded"
-                                    @if ($inventory->status == 0) style="background:#ccc !important;" @endif>
-                                    <div class="part-1 rounded"
-                                        style=" background:url('{{ asset($inventory->feature_img) }}') no-repeat center; ">
-                                        {{-- <span class="discount">15% off</span>
+                            @if ($inventory->featured === 0)
+                                <div class="col-md-6 col-lg-4 col-xl-3 p-2  ">
+                                    <div id="productItem"
+                                        class="single-product bg-white p-2 rounded @if ($inventory->status == 0) disabled-product @endif">
+                                        <div class="part-1"
+                                            style=" background:url('{{ asset($inventory->feature_img) }}') no-repeat center; ">
+                                            {{-- <span class="discount">15% off</span>
                                                <span class="new">new</span> --}}
-                                        <ul>
-                                            @if ($inventory->status == 0)
-                                                <li>
-                                                    <a wire:click="toggleProduct('{{ $inventory->id }}', 1)"
-                                                        title="Enable Product">
-                                                        <i class="fa fa-toggle-on"></i>
-                                                    </a>
-                                                </li>
-                                            @elseif($inventory->status == 1)
-                                                <li>
-                                                    <a wire:click="toggleProduct('{{ $inventory->id }}', 0)"
-                                                        title="Disable Product">
-                                                        <i class="fa fa-ban"></i>
-                                                    </a>
-                                                </li>
-                                            @endif
-                                            <li>
-                                                <a href="/inventory/edit/{{ $inventory->id }}" title="Edit Product">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a wire:click="markAsFeatured('{{ $inventory->id }}', '1')"
-                                                    title="Mark as Featured">
-                                                    <i class="fa fa-star"></i>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <div class="part-2 px-2">
-                                        <h3 class="product-title" style="color:#3a4b83;"
-                                            title="{{ $inventory->product_name }}">
-                                            {{ Str::limit($inventory->product_name, 25) }}
-                                        </h3>
-                                        <h5 class="rating">{{ $inventory->category->category_name }}</h5>
-                                        <h4>SKU: {{ $inventory->sku }}</h4>
-                                        <div class="col-md-6">
-                                            <div class="ratting pl-3">
-                                                <?php $rattings = app\Rattings::getRatting($inventory->id); ?>
-                                                @if (!empty($rattings['average']))
-                                                    <?php $star = round($rattings['average']); ?>
-                                                    @for ($i = 1; $i <= 5; $i++)
-                                                        <span
-                                                            class="fa fa-star @if ($i <= $star) checked @endif">
-                                                        </span>
-                                                    @endfor
+                                            <ul>
+                                                @if ($inventory->status == 0)
+                                                    <li>
+                                                        <a wire:click="toggleProduct('{{ $inventory->id }}', 1)"
+                                                            wire:target="toggleProduct('{{ $inventory->id }}', 1)"
+                                                            wire:loading.attr="disabled" title="Enable Product">
+                                                            <span class="fa fa-toggle-on"
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 1)"
+                                                                wire:loading.remove></span>
+                                                            <span
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 1)"
+                                                                wire:loading>
+                                                                <span class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                @elseif($inventory->status == 1)
+                                                    <li>
+                                                        <a wire:click="toggleProduct('{{ $inventory->id }}', 0)"
+                                                            wire:target="toggleProduct('{{ $inventory->id }}', 0)"
+                                                            wire:loading.attr="disabled" title="Disable Product">
+                                                            <span class="fa fa-ban"
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 0)"
+                                                                wire:loading.remove></span>
+                                                            <span
+                                                                wire:target="toggleProduct('{{ $inventory->id }}', 0)"
+                                                                wire:loading>
+                                                                <span class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                            </span>
+                                                        </a>
+                                                    </li>
                                                 @endif
-                                            </div>
+                                                <li>
+                                                    <a href="/inventory/edit/{{ $inventory->id }}"
+                                                        title="Edit Product">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a wire:click="markAsFeatured('{{ $inventory->id }}', '1')"
+                                                        wire:target="markAsFeatured('{{ $inventory->id }}', '1')"
+                                                        wire:loading.attr="disabled" title="Mark as Featured">
+                                                        <span class="fa fa-star"
+                                                            wire:target="markAsFeatured('{{ $inventory->id }}', '1')"
+                                                            wire:loading.remove></span>
+                                                        <span
+                                                            wire:target="markAsFeatured('{{ $inventory->id }}', '1')"
+                                                            wire:loading>
+                                                            <span class="spinner-border spinner-border-sm"
+                                                                role="status" aria-hidden="true"></span>
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </div>
-                                        <h5>${{ $inventory->price }}</h5>
+                                        <div class="part-2 px-2">
+                                            <h3 class="product-title" title="{{ $inventory->product_name }}">
+                                                {{ Str::limit($inventory->product_name, 25) }}
+                                            </h3>
+                                            <h5 class="rating">{{ $inventory->category->category_name }}</h5>
+                                            <h4>SKU: {{ $inventory->sku }}</h4>
+                                            <div class="col-md-6">
+                                                <div class="ratting pl-3">
+                                                    <?php $rattings = app\Rattings::getRatting($inventory->id); ?>
+                                                    @if (!empty($rattings['average']))
+                                                        <?php $star = round($rattings['average']); ?>
+                                                        @for ($i = 1; $i <= 5; $i++)
+                                                            <span
+                                                                class="fa fa-star @if ($i <= $star) checked @endif">
+                                                            </span>
+                                                        @endfor
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <h5>${{ $inventory->price }}</h5>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         @empty
                             <h4 class="text-dark text-center p-2">No Products Found :(</h4>
                         @endforelse

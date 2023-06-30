@@ -47,10 +47,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 |--------------------------------------------------------------------------
 */
 Route::prefix('inventory')->group(function () {
-    Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
+    // Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
     
     Route::middleware('auth')->group(function () {
-        Route::get('/test', InventoryLivewire::class)->name('testinventory');
+        Route::get('/', InventoryLivewire::class)->name('inventory');
     });
 
     // Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');

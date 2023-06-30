@@ -84,55 +84,55 @@ class HomeController extends Controller
      * It will show the inventory
      * @version 1.1.0
      */
-    public function inventory(Request $request)
-    {
-        if (Gate::allows('seller') || Gate::allows('child_seller')) {
-            if (Gate::allows('child_seller')) {
-                $child_seller_id = Auth::id();
-                $qty = Qty::where('users_id', $child_seller_id)->first();
-                $child_seller = User::where('id', $child_seller_id)->first();
-                $parent_seller_id = $child_seller->parent_store_id;
-                $featured = Products::query()->where('user_id', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
-                if (!empty($qty)) {
-                    $inventory = Products::where('user_id', $parent_seller_id)
-                        ->with([
-                            'quantities' => function ($q) use ($child_seller_id) {
-                                $q->where('users_id', $child_seller_id);
-                            }
-                        ]);
-                } else {
-                    $inventory = Products::with('quantity')->where('user_id', $parent_seller_id);
-                }
-            }
-            //if not child seller then this condition will run for parent store
-            else {
-                $parent_seller_id = Auth::id();
-                $inventory = Products::query()->where('user_id', '=', $parent_seller_id)->orderBy('id', 'DESC');
-                $featured = Products::query()->where('user_id', '=', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
-            }
-            //searching product by name and category
-            if ($request->search) $inventory = $inventory->where('product_name', 'LIKE', "%{$request->search}%");
-            if ($request->category) $inventory = $inventory->where('category_id', '=', $request->category);
-            $categories = Categories::all();
-            Gate::allows('child_seller') ? $inventory = $inventory->paginate(20) : $inventory = $inventory->paginate(9);
-            $inventory_p = $inventory;
-            $inventories = $inventory;
-            $featured_products = [];
-            if (Gate::allows('seller')) {
-                $featured_products = [];
-                $inventories = [];
-                foreach ($inventory as $in) {
-                    $inventories[] = Products::getProductInfo($in->id);
-                }
-            }
-            foreach ($featured as $in) {
-                $featured_products[] = Products::getProductInfo($in->id);
-            }
-            return view('shopkeeper.inventory.list', compact('inventories', 'featured_products', 'inventory_p', 'categories'));
-        } else {
-            abort(404);
-        }
-    }
+    // public function inventory(Request $request)
+    // {
+    //     if (Gate::allows('seller') || Gate::allows('child_seller')) {
+    //         if (Gate::allows('child_seller')) {
+    //             $child_seller_id = Auth::id();
+    //             $qty = Qty::where('users_id', $child_seller_id)->first();
+    //             $child_seller = User::where('id', $child_seller_id)->first();
+    //             $parent_seller_id = $child_seller->parent_store_id;
+    //             $featured = Products::query()->where('user_id', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+    //             if (!empty($qty)) {
+    //                 $inventory = Products::where('user_id', $parent_seller_id)
+    //                     ->with([
+    //                         'quantities' => function ($q) use ($child_seller_id) {
+    //                             $q->where('users_id', $child_seller_id);
+    //                         }
+    //                     ]);
+    //             } else {
+    //                 $inventory = Products::with('quantity')->where('user_id', $parent_seller_id);
+    //             }
+    //         }
+    //         //if not child seller then this condition will run for parent store
+    //         else {
+    //             $parent_seller_id = Auth::id();
+    //             $inventory = Products::query()->where('user_id', '=', $parent_seller_id)->orderBy('id', 'DESC');
+    //             $featured = Products::query()->where('user_id', '=', $parent_seller_id)->where('featured', '=', 1)->orderBy('id', 'DESC')->get();
+    //         }
+    //         //searching product by name and category
+    //         if ($request->search) $inventory = $inventory->where('product_name', 'LIKE', "%{$request->search}%");
+    //         if ($request->category) $inventory = $inventory->where('category_id', '=', $request->category);
+    //         $categories = Categories::all();
+    //         Gate::allows('child_seller') ? $inventory = $inventory->paginate(20) : $inventory = $inventory->paginate(9);
+    //         $inventory_p = $inventory;
+    //         $inventories = $inventory;
+    //         $featured_products = [];
+    //         if (Gate::allows('seller')) {
+    //             $featured_products = [];
+    //             $inventories = [];
+    //             foreach ($inventory as $in) {
+    //                 $inventories[] = Products::getProductInfo($in->id);
+    //             }
+    //         }
+    //         foreach ($featured as $in) {
+    //             $featured_products[] = Products::getProductInfo($in->id);
+    //         }
+    //         return view('shopkeeper.inventory.list', compact('inventories', 'featured_products', 'inventory_p', 'categories'));
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
     /**
      * It will redirect us to
      * edit inventory page

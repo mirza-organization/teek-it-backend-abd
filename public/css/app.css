@@ -213,7 +213,7 @@ a:hover {
 }
 
 .section-products {
-    padding: 80px 0 54px;
+    padding: 0 0 54px 0;
 }
 
 .section-products .header {
@@ -336,6 +336,7 @@ a:hover {
 
 .section-products .single-product .part-2 .product-title {
     font-size: 1rem;
+    color: #3a4b83;
 }
 
 .section-products .single-product .part-2 h4 {
@@ -359,6 +360,10 @@ a:hover {
     height: 1px;
     background-color: #444444;
     transform: translateY(-50%);
+}
+
+.disabled-product {
+    background: #ccc !important;
 }
 
 /* Login Form CSS */
