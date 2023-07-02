@@ -375,8 +375,7 @@ class AuthController extends Controller
      */
     public function get_user($user_id)
     {
-        $data_info = (new UsersController())->getSellerInfo(User::find($user_id));
-        return $data_info;
+        return (new UsersController())->getSellerInfo(User::find($user_id));
     }
 
     protected function authenticated($request, $user, $token)

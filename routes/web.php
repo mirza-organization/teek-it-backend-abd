@@ -26,7 +26,11 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| For Adding Authentication On All Of The Following Routes
+| For Adding Default Authentication Routes:-
+|   * Registering a new user Route::post('/register', 'Auth\RegisterController@register');
+|   * Authenticating a user Route::post('/login', 'Auth\LoginController@login');
+|   * Resetting a user's password Route::post('/password/reset', 'Auth\ResetPasswordController@reset')
+|   * Confirming a user's email address 'Auth\VerificationController'
 |--------------------------------------------------------------------------
 */
 
@@ -43,9 +47,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 |--------------------------------------------------------------------------
 */
 Route::prefix('inventory')->group(function () {
-    Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
-   
-    Route::get('/test', InventoryLivewire::class)->name('testinventory');
+    // Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
+    
+    Route::middleware('auth')->group(function () {
+        Route::get('/', InventoryLivewire::class)->name('inventory');
+    });
+
     // Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
     Route::get('/edit/{product_id}', [HomeController::class, 'inventoryEdit']);
     Route::post('/update_child_qty', [QtyController::class, 'updateChildQty'])->name('update_child_qty');

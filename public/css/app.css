@@ -198,8 +198,13 @@ select.form-control {
     width: fit-content;
 }
 
-/* Inventory CSS data */
+/* Inventory CSS */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
+
+/* body {
+    font-family: "Poppins", sans-serif;
+    color: #444444;
+} */
 
 a,
 a:hover {
@@ -208,7 +213,7 @@ a:hover {
 }
 
 .section-products {
-    padding: 80px 0 54px;
+    padding: 0 0 54px 0;
 }
 
 .section-products .header {
@@ -331,6 +336,7 @@ a:hover {
 
 .section-products .single-product .part-2 .product-title {
     font-size: 1rem;
+    color: #3a4b83;
 }
 
 .section-products .single-product .part-2 h4 {
@@ -354,4 +360,54 @@ a:hover {
     height: 1px;
     background-color: #444444;
     transform: translateY(-50%);
+}
+
+.disabled-product {
+    background: #ccc !important;
+}
+
+/* Login Form CSS */
+.login-btn {
+    display: block;
+    width: 100%;
+    margin-top: 15px !important;
+    background: #3663ae;
+    border: 0;
+    border-radius: 0;
+    color: white;
+}
+
+/* SignUp Form CSS */
+input.signup-input-fields {
+    border: 0;
+    border-bottom: 1px solid;
+    border-radius: 0;
+    color: #8aa7d7;
+    border-color: #4a7ed6;
+    padding-left: 3px;
+    background: transparent;
+    background-color: transparent !important;
+}
+
+input.signup-input-fields::placeholder {
+    color: white;
+}
+
+.signup-input-fields:focus {
+    color: #495057;
+    background-color: transparent;
+    border-color: #80bdff;
+    color: #8aa7d7 !important;
+}
+
+.signup-btn {
+    padding: 5px 25px;
+    display: block;
+    width: 100%;
+    background: #ffec00;
+    border: 0;
+    border-radius: 0;
+    color: #000100;
+    font-weight: 600;
+    border: 0;
 }

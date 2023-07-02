@@ -2,7 +2,9 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
-    @include('layouts.admin.header-links')
+    {{-- @include('layouts.admin.header-links') --}}
+    @include('layouts.header-links')
+    @livewireStyles
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -23,7 +25,7 @@
         <!-- /.content -->
     </div>
 <!-- /.content-wrapper -->
-    @include('layouts.admin.scripts')
+    @include('layouts.scripts')
     @livewireScripts
 </body>
 

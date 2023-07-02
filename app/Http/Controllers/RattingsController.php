@@ -85,9 +85,11 @@ class RattingsController extends Controller
      *It will fetch rating via product id    
      * @version 1.0.0
      */
-    public function get_ratting($product_id)
+    // Note:
+    // This is a duplicate function so we have to remove it in the future
+    public function getRatting($product_id)
     {
-        $raw_ratting = Rattings::query()->where('product_id', '=', $product_id);
+        $raw_ratting = Rattings::where('product_id', '=', $product_id);
         $average = $raw_ratting->avg('ratting');
         $all_raw = $raw_ratting->get();
         $all = [];
