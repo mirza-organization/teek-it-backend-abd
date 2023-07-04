@@ -17,11 +17,11 @@
         </div>
     @endif
 
-    <div class="row border border-danger">
-        {{-- <div class="col-12 col-sm-6 col-md-4 border border-danger">
+    <div class="row">
+        {{-- <div class="col-12 col-sm-6 col-md-4 ">
             &nbsp;
         </div> --}}
-        <div class="col-12 border border-danger">
+        <div class="col-12">
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-4 py-4 my-2">
                     <input type="text" wire:model.debounce.500ms="search" class="form-control py-3"
