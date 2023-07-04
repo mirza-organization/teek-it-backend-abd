@@ -58,6 +58,7 @@ class Qty extends Model
 
     public static function updateChildProductQty(array $quantity)
     {
+        dd($quantity);
         return Qty::where('id', $quantity['qty_id'])
             ->update([
                 'qty' => $quantity['qty']
