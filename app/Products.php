@@ -152,6 +152,18 @@ class Products extends Model
                 })
                 ->paginate(20);
         } else {
+            // return [
+            //     'data' => Products::join('qty', 'products.id', '=', 'qty.products_id')
+            //         ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.qty')
+            //         ->where('products.product_name', 'LIKE', "%{$search}%")
+            //         ->where('products.user_id', $parent_seller_id)
+            //         ->where('qty.users_id', $parent_seller_id)
+            //         ->when($category_id, function ($query, $category_id) {
+            //             return $query->where('category_id', '=', $category_id);
+            //         })
+            //         ->paginate(20),
+            //     'owner' => 'parent'
+            // ];
             return Products::join('qty', 'products.id', '=', 'qty.products_id')
                 ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.qty')
                 ->where('products.product_name', 'LIKE', "%{$search}%")

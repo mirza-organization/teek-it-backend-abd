@@ -22,6 +22,7 @@ class InventoryLivewire extends Component
         $product_id,
         $quantity = [],
         $inventories,
+        $owner,
         $search = '';
 
     protected $paginationTheme = 'bootstrap';
@@ -106,16 +107,15 @@ class InventoryLivewire extends Component
         }
     }
 
-    public function populateQuantityArray($data)
+    public function populateQuantityArray(object $data)
     {
         return $data->map(function ($product) {
-            // dd($product);
             return [
                 'prod_id' => $product->prod_id,
                 'parent_seller_id' => $product->parent_seller_id,
-                'child_seller_id' => $product->child_seller_id,
-                'qty_id' => $product->qty_id,
-                'qty' => $product->qty,
+                'child_seller_id' => ($product->child_seller_id === null) ? auth()->id() : $product->child_seller_id,
+                'qty_id' => ($product->child_seller_id === null) ? 0 : $product->qty_id,
+                'qty' => ($product->child_seller_id === null) ? 0 : $product->qty
             ];
         });
     }
@@ -146,8 +146,13 @@ class InventoryLivewire extends Component
             2nd after entering the Qty for each product a child store can see his own entered Qty 
              */
             $data = Products::getChildSellerProductsForView(auth()->id(), $this->search, $this->category_id);
+            // $data = $returned_array['data'];
+            // $this->owner = $returned_array['owner'];
             // dd($data);
-            // $this->quantity = $this->populateQuantityArray($data);
+            
+            // $this->quantity = $this->populateQuantityArray($data, $this->owner);
+            $this->quantity = $this->populateQuantityArray($data);
+            // dd($this->quantity);
         }
         return view('livewire.sellers.inventory-livewire', ['data' => $data, 'categories' => $categories, 'featured_products' => $featured]);
     }

@@ -58,10 +58,20 @@ class Qty extends Model
 
     public static function updateChildProductQty(array $quantity)
     {
-        dd($quantity);
-        return Qty::where('id', $quantity['qty_id'])
-            ->update([
-                'qty' => $quantity['qty']
-            ]);
+        // dd($quantity);
+        // We have to use updateOrInsert() here
+        return Qty::updateOrCreate(
+            ['users_id' => $quantity['child_seller_id'], 'products_id' => $quantity['prod_id']],
+            ['qty' => $quantity['qty']]
+        );
+        // return Qty::where('id', $quantity['qty_id'])
+        //     ->update([
+        //         'qty' => $quantity['qty']
+        //     ]);
+
+        //     $flight = Flight::updateOrCreate(
+        //         ['departure' => 'Oakland', 'destination' => 'San Diego'],
+        //         ['price' => 99, 'discounted' => 1]
+        //     );
     }
 }

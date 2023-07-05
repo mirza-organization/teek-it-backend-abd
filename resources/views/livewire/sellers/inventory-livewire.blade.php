@@ -37,7 +37,9 @@
                 </div>
                 <div class="col-12 col-sm-12 col-md-5 d-flex">
                     @if (Auth::user()->role->name == 'child_seller')
-                        <button type="button" class="btn btn-primary col-12 col-sm-12 col-md-3 my-4 p-1 w-100 mx-1 rounded" title="Update bulk">
+                        <button type="button"
+                            class="btn btn-primary col-12 col-sm-12 col-md-3 my-4 p-1 w-100 mx-1 rounded"
+                            title="Update bulk">
                             <i class="fas fa-angle-double-up"></i>
                         </button>
                     @else
@@ -393,6 +395,13 @@
                                         <p class="fw-normal mb-1">{{ $inventory->product_name }}</p>
                                     </td>
                                     <td class="align-middle fit-content">
+                                        {{-- {{ $inventory->qty }} --}}
+                                        {{-- {{ $this->owner }}
+                                        @if ($this->owner === 'parent')
+                                            <input type="number" class="form-control" style="width:80px;"
+                                                min="0" wire:model.defer="quantity.{{ $key }}.qty">
+                                        @else
+                                        @endif --}}
                                         <input type="number" class="form-control" style="width:80px;"
                                             min="0" wire:model.defer="quantity.{{ $key }}.qty">
                                     </td>
