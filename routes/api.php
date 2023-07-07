@@ -193,7 +193,7 @@ Route::middleware(['jwt.verify'])->group(function () {
 
     Route::prefix('referral')->group(function () {
         Route::post('/validate', [ReferralCodeRelationController::class, 'validateReferral']);
-        Route::get('/insert', [ReferralCodeRelationController::class, 'insertReferrals']);
+        // Route::get('/insert', [ReferralCodeRelationController::class, 'insertReferrals']);
         Route::get('/details_by_id/{user_id}', [ReferralCodeRelationController::class, 'fetchReferralRelationDetails']);
         Route::post('/update/referral_usable/status', [ReferralCodeRelationController::class, 'updateReferralStatus']);
     });

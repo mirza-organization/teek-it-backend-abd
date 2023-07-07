@@ -45,7 +45,7 @@ class ReferralCodeRelationController extends Controller
                 );
             }
 
-            $using_referral_first_time = ReferralCodeRelation::usingReferalFirstTime($is_verified->id, $request->user_id);
+            $using_referral_first_time = ReferralCodeRelation::usingReferalFirstTime($request->user_id);
             if (!$using_referral_first_time) {
                 return JsonResponseCustom::getApiResponse(
                     [],

@@ -38,7 +38,7 @@ return [
     'FALSE_STATUS' => false,
     'STATUS_CHANGING_FAILED' => 'Failed to change the activation status.',
     'INVALID_REFERRAL' => 'Invalid referral code.',
-    'REFERRAL_CAN_BE_USED_ONCE' => 'Same referral code can be used only once.',
+    'REFERRAL_CAN_BE_USED_ONCE' => 'Referral code can be used only once.',
     'REFERRALS_ARE_ONLY_FOR_FIRST_ORDER' => 'Sorry, you can only use a referral before placing your first order.',
 
     'VALIDATION_ERROR' => 'Validation Error.',

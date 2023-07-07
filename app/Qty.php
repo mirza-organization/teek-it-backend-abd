@@ -68,10 +68,5 @@ class Qty extends Model
         //     ->update([
         //         'qty' => $quantity['qty']
         //     ]);
-
-        //     $flight = Flight::updateOrCreate(
-        //         ['departure' => 'Oakland', 'destination' => 'San Diego'],
-        //         ['price' => 99, 'discounted' => 1]
-        //     );
     }
 }
