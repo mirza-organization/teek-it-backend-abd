@@ -620,43 +620,40 @@ class ProductsController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function getProductPrice($product_id)
-    {
-        $product = Products::find($product_id);
-        if ($product->discount_percentage > 0) {
-            return $product->discount_percentage * 1.2;
-        }
-        return $product->price * 1.2;
-    }
+    // public function getProductPrice($product_id)
+    // {
+    //     $product = Products::find($product_id);
+    //     if ($product->discount_percentage > 0) return $product->discount_percentage * 1.2;
+    //     return $product->price * 1.2;
+    // }
     /**
      * It find's the volumn of the given product
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function getProductVolumn($product_id)
-    {
-        $product = (new Products())->getProductVolume($product_id);
-        return $product;
-    }
+    // public function getProductVolumn($product_id)
+    // {
+    //     $product = (new Products())->getProductVolume($product_id);
+    //     return $product;
+    // }
     /**
      * It find's the weight of the given product
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function getProductWeight($product_id)
-    {
-        $weight = (new Products())->getProductWeight($product_id);
-        return $weight;
-    }
+    // public function getProductWeight($product_id)
+    // {
+    //     return Products::getProductWeight($product_id);
+    // }
     /**
      * It find's the seller_id of the given product
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function getProductSellerID($product_id)
-    {
-        return Products::find($product_id)->user_id;
-    }
+    // public function getProductSellerID($product_id)
+    // {
+    //     return Products::find($product_id)->user_id;
+    // }
     /**
      * Subtracts or Add qty
      * @author Mirza Abdullah Izhar

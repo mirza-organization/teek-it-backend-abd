@@ -15,10 +15,10 @@ class AddReferralColumnsIntoUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->text('referral_code')->nullable()->after('temp_code');
-            $table->tinyInteger('referral_useable')
-            ->default(0)
-            ->comment('0: Cannot be used by the user, 1: Can be used by the user')
-            ->after('referral_code');
+            // $table->tinyInteger('referral_useable')
+            // ->default(0)
+            // ->comment('0: Cannot be used by the user, 1: Can be used by the user')
+            // ->after('referral_code');
         });
     }
 
@@ -31,7 +31,7 @@ class AddReferralColumnsIntoUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('referral_code');
-            $table->dropColumn('referral_useable');
+            // $table->dropColumn('referral_useable');
         });
     }
 }

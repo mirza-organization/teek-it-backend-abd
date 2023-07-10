@@ -91,11 +91,11 @@ class Products extends Model
         return $product;
     }
 
-    public static function getProductsById(object $product_id)
+    public static function getOnlyProductDetailsById(int $product_id)
     {
-        return Products::where('id', $product_id->products_id)
+        return Products::where('id', $product_id)
             ->where('status', '1')
-            ->get();
+            ->first();
     }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
@@ -196,6 +196,13 @@ class Products extends Model
             ->where('id', $product_id)
             ->get();
         return $product[0]->volumn;
+    }
+
+    public static function getProductPrice(int $product_id)
+    {
+        $product = Products::find($product_id);
+        if ($product->discount_percentage > 0) return $product->discount_percentage * 1.2;
+        return $product->price * 1.2;
     }
 
     public static function getFeaturedProducts(int $store_id)

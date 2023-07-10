@@ -57,7 +57,7 @@ class ReferralCodeRelationController extends Controller
 
             if (Orders::checkTotalOrders($request->user_id) === 0) {
                 ReferralCodeRelation::insertReferralRelation($is_verified->id, $request->user_id);
-                User::updateWalletAndStatus(1, $this->amount, $request->user_id);
+                User::addIntoWallet($request->user_id, $this->amount);
                 return JsonResponseCustom::getApiResponse(
                     ['discount' => $this->amount],
                     config('constants.TRUE_STATUS'),
@@ -112,10 +112,10 @@ class ReferralCodeRelationController extends Controller
     /**
      * @version 1.0.0
      */
-    public function fetchReferralRelationDetails(int $user_id)
+    public function fetchReferralRelationDetails(int $referral_relation_id)
     {
         try {
-            $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($user_id);
+            $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($referral_relation_id);
             if ($referral_reltaion_details->isEmpty()) {
                 return JsonResponseCustom::getApiResponse(
                     [],
