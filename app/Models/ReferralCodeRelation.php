@@ -23,9 +23,9 @@ class ReferralCodeRelation extends Model
     /**
      * Helpers
      */
-    public static function usingReferalFirstTime(int $referred_by, int $user_id)
+    public static function usingReferalFirstTime(int $user_id)
     {
-        $data = ReferralCodeRelation::where('referred_by', $referred_by)->where('user_id', $user_id)->first();
+        $data = ReferralCodeRelation::where('user_id', $user_id)->first();
         return (is_null($data)) ? true :  false;
     }
 

@@ -392,28 +392,31 @@ class OrdersController extends Controller
             }
             $grouped_seller = [];
             foreach ($request->items as $item) {
-                $product_id = $item['product_id'];
-                $qty = $item['qty'];
-                $user_choice = $item['user_choice'];
-                $product_price = (new ProductsController())->getProductPrice($product_id);
-                $product_seller_id = (new ProductsController())->getProductSellerID($product_id);
-                $product_volumn = (new ProductsController())->getProductVolumn($product_id);
-                $product_weight = (new ProductsController())->getProductWeight($product_id);
+                // $product_id = $item['product_id'];
+                // $qty = $item['qty'];
+                // $user_choice = $item['user_choice'];
+                // $product_price = (new ProductsController())->getProductPrice($item['product_id']);
+                // $product_seller_id = (new ProductsController())->getProductSellerID($item['product_id']);
+                // $product_volumn = (new ProductsController())->getProductVolumn($item['product_id']);
+                // $product_weight = (new ProductsController())->getProductWeight($item['product_id']);
                 $temp = [];
-                $temp['qty'] = $qty;
-                $temp['user_choice'] = $user_choice;
-                $temp['product_id'] = $product_id;
-                $temp['price'] = $product_price;
-                $temp['weight'] = $product_weight;
-                $temp['volumn'] = $product_volumn;
-                $temp['seller_id'] = $product_seller_id;
-                $grouped_seller[$product_seller_id][] = $temp;
-                Qty::subtractProductQty($product_seller_id, $product_id, $qty);
+                $temp['product_id'] = $item['product_id'];
+                $temp['qty'] = $item['qty'];
+                $temp['user_choice'] = $item['user_choice'];
+                $temp['price'] = Products::getProductPrice($item['product_id']);
+                $product = Products::getOnlyProductDetailsById($item['product_id']); 
+                $temp['seller_id'] = $product->user_id;
+                $temp['volumn'] = $product->height * $product->width * $product->length;
+                $temp['weight'] = $product->weight;
+                $grouped_seller[$temp['seller_id']][] = $temp;
+                // Qty::subtractProductQty($product_seller_id, $product_id, $qty);
+                Qty::subtractProductQty($temp['seller_id'], $item['product_id'], $item['qty']);
             }
+            // dd($grouped_seller);
             $count = 0;
             $order_arr = [];
+            $user_id = auth()->id();
             foreach ($grouped_seller as $seller_id => $order) {
-                $user_id = Auth::id();
                 $total_weight = 0;
                 $total_volumn = 0;
                 $order_total = 0;
@@ -424,10 +427,15 @@ class OrdersController extends Controller
                     $total_items = $total_items + $order_item['qty'];
                     $order_total = $order_total + ($order_item['price'] * $order_item['qty']);
                 }
-                $seller = User::find($seller_id);
-                $seller_money = $seller->pending_withdraw;
-                $seller->pending_withdraw = $order_total + $seller_money;
-                $seller->save();
+                $seller = User::getUserByID($seller_id);
+                /* 
+                * Adding amount into seller wallet 
+                */
+                User::addIntoWallet($seller_id, $order_total);
+                // $seller_money = $seller->pending_withdraw;
+                // $seller->pending_withdraw = $order_total + $seller_money;
+                // $seller->save();
+                // dd($order_total);
                 if ($request->type == 'delivery') {
                     $customer_lat = $request->lat;
                     $customer_lon = $request->lon;
@@ -504,6 +512,7 @@ class OrdersController extends Controller
                 }
                 $count++;
             }
+            if($request->wallet_flag == 1) User::deductFromWallet($user_id, $request->wallet_deduction_amount);
             return response()->json([
                 'data' => $this->getOrdersFromIds($order_arr),
                 'status' => true,

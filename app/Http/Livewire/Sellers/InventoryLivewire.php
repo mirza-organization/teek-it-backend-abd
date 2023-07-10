@@ -8,10 +8,8 @@ use App\Products;
 use App\Qty;
 use App\User;
 use Exception;
-use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 use App\Categories;
-use Illuminate\Contracts\Auth\Access\Gate as AccessGate;
 use Livewire\WithPagination;
 
 class InventoryLivewire extends Component
@@ -24,7 +22,7 @@ class InventoryLivewire extends Component
         $product_id,
         $quantity = [],
         $inventories,
-        $disabled,
+        $owner,
         $search = '';
 
     protected $paginationTheme = 'bootstrap';
@@ -109,15 +107,15 @@ class InventoryLivewire extends Component
         }
     }
 
-    public function populateQuantityArray($data)
+    public function populateQuantityArray(object $data)
     {
         return $data->map(function ($product) {
             return [
                 'prod_id' => $product->prod_id,
                 'parent_seller_id' => $product->parent_seller_id,
-                'qty_id' => $product->qty_id,
-                'child_seller_id' => $product->child_seller_id,
-                'qty' => $product->qty,
+                'child_seller_id' => ($product->child_seller_id === null) ? auth()->id() : $product->child_seller_id,
+                'qty_id' => ($product->child_seller_id === null) ? 0 : $product->qty_id,
+                'qty' => ($product->child_seller_id === null) ? 0 : $product->qty
             ];
         });
     }
@@ -125,7 +123,7 @@ class InventoryLivewire extends Component
     public function getFeaturedProducts(object $products)
     {
         $data = [];
-        foreach($products as $product) if($product->featured === 1) array_push($data, $product);
+        foreach ($products as $product) if ($product->featured === 1) array_push($data, $product);
         return $data;
     }
 
@@ -137,28 +135,25 @@ class InventoryLivewire extends Component
     public function render()
     {
         $categories = Categories::allCategories();
+        $this->category_id = ($this->category_id == 0) ? null : $this->category_id;
         if (Gate::allows('seller')) {
-            $this->category_id = ($this->category_id == 0) ? null : $this->category_id;
             $data = Products::getParentSellerProductsDescForView(auth()->id(), $this->search, $this->category_id);
             $featured = $this->getFeaturedProducts($data);
         } elseif (Gate::allows('child_seller')) {
-            $parent_seller_id = User::find(Auth::id())->parent_store_id;
-            $qty = Qty::where('users_id', Auth::id())->first();
-            if (!empty($qty)) {
-                $data = Products::where('user_id', $parent_seller_id)
-                    ->join('qty', 'products.id', '=', 'qty.products_id')
-                    ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
-                    ->where('qty.users_id', Auth::id())->paginate(20);
-            } else {
-                $data =  Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
-            }
-
-            if ($this->search) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('product_name', 'LIKE', "%{$this->search}%")->where('user_id', $parent_seller_id)->paginate(9);
-            if ($this->category_id) $data = Products::join('qty', 'products.id', '=', 'qty.products_id')->where('category_id', '=', $this->category_id)->where('user_id', $parent_seller_id)->paginate(9);
-            // $data = Products::getChildSellerProducts(Auth::id());
+            $featured = [];
+            /*
+            1st scenario when a child store will come he will have parent products with "0" Qty
+            2nd after entering the Qty for each product a child store can see his own entered Qty 
+             */
+            $data = Products::getChildSellerProductsForView(auth()->id(), $this->search, $this->category_id);
+            // $data = $returned_array['data'];
+            // $this->owner = $returned_array['owner'];
+            // dd($data);
+            
+            // $this->quantity = $this->populateQuantityArray($data, $this->owner);
+            $this->quantity = $this->populateQuantityArray($data);
+            // dd($this->quantity);
         }
-
-        // $this->quantity = $this->populateQuantityArray($data);
         return view('livewire.sellers.inventory-livewire', ['data' => $data, 'categories' => $categories, 'featured_products' => $featured]);
     }
 }

@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StoreRegisterMail;
+use App\Models\ReferralCodeRelation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -111,6 +112,11 @@ class User extends Authenticatable implements JWTSubject
     public function orders()
     {
         return $this->hasMany('App\Orders');
+    }
+
+    public function referralRelations()
+    {
+        return $this->hasOne(ReferralCodeRelation::class, 'user_id');
     }
     /**
      * Validators
@@ -223,7 +229,7 @@ class User extends Authenticatable implements JWTSubject
 
     public static function getUserInfo(int $user_id)
     {
-        $user = User::find($user_id);
+        $user = User::with('referralRelations')->where('id', $user_id)->first();
         if ($user) {
             return array(
                 'id' => $user->id,
@@ -238,9 +244,9 @@ class User extends Authenticatable implements JWTSubject
                 'roles' => $user->role()->pluck('name'),
                 'user_img' => $user->user_img,
                 'referral_code' => $user->referral_code,
-                // 'referral_useable' => $user->referral_useable
+                'referral_relation_details' => [$user->referralRelations]
             );
-        } 
+        }
         return null;
     }
 
@@ -250,20 +256,25 @@ class User extends Authenticatable implements JWTSubject
         return (is_null($data)) ? false :  $data;
     }
 
-    public static function updateWalletAndStatus(int $status, float $bonus, int $user_id)
+    // public static function updateWalletAndStatus(int $status, float $bonus, int $user_id)
+    // {
+    //     $user = User::find($user_id);
+    //     if ($user) {
+    //         $user->pending_withdraw += $bonus;
+    //         // $user->referral_useable = $status;
+    //         $user->save();
+    //     }
+    //     return $user;
+    // }
+
+    public static function addIntoWallet(int $user_id, float $amount)
     {
-        $user = User::find($user_id);
-        if ($user) {
-            $user->pending_withdraw += $bonus;
-            // $user->referral_useable = $status;
-            $user->save();
-        }
-        return $user;
+        return User::where('id', $user_id)->increment('pending_withdraw', $amount);
     }
 
-    public static function updateWallet(int $user_id, float $amount)
+    public static function deductFromWallet(int $user_id, float $amount)
     {
-        return User::where('id', $user_id)->increment('pending_withdraw' , $amount);
+        return User::where('id', $user_id)->decrement('pending_withdraw', $amount);
     }
 
     public static function getBuyers(string $search = '')
@@ -278,5 +289,10 @@ class User extends Authenticatable implements JWTSubject
     public static function getBuyersWithReferralCode()
     {
         return User::whereNotNull('referral_code')->paginate(10);
+    }
+
+    public static function getUserByID(int $user_id)
+    {
+        return User::find($user_id);
     }
 }

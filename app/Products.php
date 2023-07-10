@@ -91,11 +91,11 @@ class Products extends Model
         return $product;
     }
 
-    public static function getProductsById(object $product_id)
+    public static function getOnlyProductDetailsById(int $product_id)
     {
-        return Products::where('id', $product_id->products_id)
+        return Products::where('id', $product_id)
             ->where('status', '1')
-            ->get();
+            ->first();
     }
 
     public static function getProductInfoWithQty(int $product_id, int $store_id)
@@ -128,8 +128,8 @@ class Products extends Model
     public static function getParentSellerProductsDescForView(int $seller_id, string $search = '', int $category_id = null)
     {
         return Products::with('category', 'rattings')
-            ->where('user_id', '=', $seller_id)
             ->where('product_name', 'LIKE', "%{$search}%")
+            ->where('user_id', '=', $seller_id)
             ->when($category_id, function ($query, $category_id) {
                 return $query->where('category_id', '=', $category_id);
             })
@@ -137,17 +137,42 @@ class Products extends Model
             ->paginate(12);
     }
 
-    public static function getChildSellerProducts(int $child_seller_id)
+    public static function getChildSellerProductsForView(int $child_seller_id, string $search = '', int $category_id = null)
     {
         $parent_seller_id = User::find($child_seller_id)->parent_store_id;
         $qty = Qty::where('users_id', $child_seller_id)->first();
         if (!empty($qty)) {
-            return Products::where('user_id', $parent_seller_id)
-                ->join('qty', 'products.id', '=', 'qty.products_id')
+            return Products::join('qty', 'products.id', '=', 'qty.products_id')
                 ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.users_id as child_seller_id', 'qty.qty')
-                ->where('qty.users_id', $child_seller_id)->paginate(20);
+                ->where('products.product_name', 'LIKE', "%{$search}%")
+                ->where('products.user_id', $parent_seller_id)
+                ->where('qty.users_id', $child_seller_id)
+                ->when($category_id, function ($query, $category_id) {
+                    return $query->where('category_id', '=', $category_id);
+                })
+                ->paginate(20);
         } else {
-            return Products::with('quantity')->where('user_id', $parent_seller_id)->paginate(20);
+            // return [
+            //     'data' => Products::join('qty', 'products.id', '=', 'qty.products_id')
+            //         ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.qty')
+            //         ->where('products.product_name', 'LIKE', "%{$search}%")
+            //         ->where('products.user_id', $parent_seller_id)
+            //         ->where('qty.users_id', $parent_seller_id)
+            //         ->when($category_id, function ($query, $category_id) {
+            //             return $query->where('category_id', '=', $category_id);
+            //         })
+            //         ->paginate(20),
+            //     'owner' => 'parent'
+            // ];
+            return Products::join('qty', 'products.id', '=', 'qty.products_id')
+                ->select('products.id as prod_id', 'products.user_id as parent_seller_id', 'products.category_id', 'products.product_name', 'products.price', 'products.feature_img', 'qty.id as qty_id', 'qty.qty')
+                ->where('products.product_name', 'LIKE', "%{$search}%")
+                ->where('products.user_id', $parent_seller_id)
+                ->where('qty.users_id', $parent_seller_id)
+                ->when($category_id, function ($query, $category_id) {
+                    return $query->where('category_id', '=', $category_id);
+                })
+                ->paginate(20);
         }
     }
 
@@ -173,6 +198,13 @@ class Products extends Model
         return $product[0]->volumn;
     }
 
+    public static function getProductPrice(int $product_id)
+    {
+        $product = Products::find($product_id);
+        if ($product->discount_percentage > 0) return $product->discount_percentage * 1.2;
+        return $product->price * 1.2;
+    }
+
     public static function getFeaturedProducts(int $store_id)
     {
         return Products::whereHas('user', function ($query) {
@@ -182,11 +214,6 @@ class Products extends Model
             ->where('status', '=', 1)
             ->orderByDesc('id')
             ->paginate(10);
-    }
-
-    public static function getFeaturedProductsForView(int $seller_id)
-    {
-        return Products::where('user_id', '=', $seller_id)->where('featured', '=', 1)->where('status', '=', 1)->get();
     }
 
     public static function getActiveProducts()

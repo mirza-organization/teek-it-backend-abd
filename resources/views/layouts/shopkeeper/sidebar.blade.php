@@ -26,7 +26,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{route('inventory')}}" class="nav-link @if (request()->is('inventory/')) active @endif">
+                    <a class="nav-link @if (request()->is('inventory')) active @endif" href="{{route('inventory')}}">
                         <i class="nav-icon fa fa-truck"></i>
                         <p class="ml-2">
                             Inventory
