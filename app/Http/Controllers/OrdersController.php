@@ -409,10 +409,8 @@ class OrdersController extends Controller
                 $temp['volumn'] = $product->height * $product->width * $product->length;
                 $temp['weight'] = $product->weight;
                 $grouped_seller[$temp['seller_id']][] = $temp;
-                // Qty::subtractProductQty($product_seller_id, $product_id, $qty);
                 Qty::subtractProductQty($temp['seller_id'], $item['product_id'], $item['qty']);
             }
-            // dd($grouped_seller);
             $count = 0;
             $order_arr = [];
             $user_id = auth()->id();

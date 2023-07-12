@@ -11,6 +11,7 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\QtyController;
 use App\Http\Controllers\StuartDeliveryController;
+use App\Http\Livewire\Admin\ChildSellersLivewire;
 use App\Http\Livewire\Sellers\Settings\UserGeneralSettings;
 use Illuminate\Support\Facades\Route;
 /*
@@ -123,10 +124,10 @@ Route::get('auth/verify', [AuthController::class, 'verify']);
 */
 Route::get('/notification/home', [NotificationsController::class, 'notificationHome'])->name('admin.notification.home');
 Route::post('/notification/send', [NotificationsController::class, 'notificationSend'])->name('admin.notification.send');
-Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
 Route::get('/admin/referralcodes', ReferralCodes::class)->name('admin.referralcodes');
-Route::get('/admin/sellers/parent', [HomeController::class, 'adminParentSellers'])->name('admin.sellers.parent');
-Route::get('/admin/sellers/child', [HomeController::class, 'adminChildSellers'])->name('admin.sellers.child');
+// Route::get('/admin/sellers/parent', [HomeController::class, 'adminParentSellers'])->name('admin.sellers.parent');
+Route::get('/admin/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.parent');
+Route::get('/admin/sellers/child', ChildSellersLivewire::class)->name('admin.sellers.child');
 Route::get('/customers', [HomeController::class, 'adminCustomers'])->name('admin.customers');
 Route::get('/drivers', [HomeController::class, 'adminDrivers'])->name('admin.drivers');
 Route::get('/promocodes/home', [PromoCodesController::class, 'promocodesHome'])->name('admin.promocodes.home');

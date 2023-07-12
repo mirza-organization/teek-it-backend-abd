@@ -184,6 +184,14 @@ class User extends Authenticatable implements JWTSubject
             ->paginate(9);
     }
 
+    public static function getChildSellers(string $search = '')
+    {
+        return User::where('business_name', 'like', '%' . $search . '%')
+            ->where('role_id', 5)
+            ->orderBy('business_name', 'asc')
+            ->paginate(9);
+    }
+
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
         return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *

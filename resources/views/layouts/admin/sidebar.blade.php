@@ -63,19 +63,19 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('admin.sellers.test.parent') }}"
-                                  class="nav-link @if (request()->is('admin/test/sellers/parent')) active @endif">
-                                  <i class="fas fa-gears nav-icon"></i>
-                                  <p>Test Parent</p>
-                              </a>
-                          </li>
-                          <li class="nav-item">
                               <a href="{{ route('admin.sellers.parent') }}"
                                   class="nav-link @if (request()->is('admin/sellers/parent')) active @endif">
                                   <i class="fas fa-gears nav-icon"></i>
                                   <p>Parent</p>
                               </a>
                           </li>
+                          {{-- <li class="nav-item">
+                              <a href="{{ route('admin.sellers.parent') }}"
+                                  class="nav-link @if (request()->is('admin/sellers/parent')) active @endif">
+                                  <i class="fas fa-gears nav-icon"></i>
+                                  <p>Parent</p>
+                              </a>
+                          </li> --}}
                           <li class="nav-item">
                               <a href="{{ route('admin.sellers.child') }}"
                                   class="nav-link @if (request()->is('admin/sellers/child')) active @endif">
