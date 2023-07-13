@@ -192,6 +192,33 @@ class User extends Authenticatable implements JWTSubject
             ->paginate(9);
     }
 
+    public static function getCustomers(string $search = '')
+    {
+        return User::where('name', 'like', '%' .  $search . '%')
+            ->where('role_id', 3)
+            ->orderByDesc('created_at')
+            ->paginate(9);
+    }
+
+    // This function will be removed once we have inserted referrals against all customers on our production
+    public static function getBuyers(string $search = '')
+    {
+        return User::where('name', 'like', '%' .  $search . '%')
+            ->where('role_id', 3)
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    public static function getBuyersWithReferralCode()
+    {
+        return User::whereNotNull('referral_code')->paginate(10);
+    }
+
+    public static function getUserByID(int $user_id)
+    {
+        return User::find($user_id);
+    }
+
     public function nearbyUsers($user_lat, $user_lon, $radius)
     {
         return User::selectRaw("*, (  3961 * acos( cos( radians(" . $user_lat . ") ) *
@@ -211,8 +238,8 @@ class User extends Authenticatable implements JWTSubject
             Hi, ' . $user->name . '<br><br>
             Thank you for registering on ' . env('APP_NAME') . '.
             <br>
-            Your store has been approved. Please login to the
-            <a href="' . env('FRONTEND_URL') . '">Store</a> to update your store
+            Your store has been approved. Please login to your
+            <a href="' . url('/') . '">Store</a> to manage it.
             <br><br><br>
                      </html>';
         $subject = url('/') . ': Account Approved!';
@@ -228,6 +255,11 @@ class User extends Authenticatable implements JWTSubject
             static::sendStoreApprovedEmail($user);
         }
         return true;
+    }
+
+    public static function activeOrBlockCustomer(int $user_id, int $status)
+    {
+        return User::where('id', '=', $user_id)->update(['is_active' => $status]);
     }
 
     public static function getUserRole(int $user_id)
@@ -283,24 +315,5 @@ class User extends Authenticatable implements JWTSubject
     public static function deductFromWallet(int $user_id, float $amount)
     {
         return User::where('id', $user_id)->decrement('pending_withdraw', $amount);
-    }
-
-    public static function getBuyers(string $search = '')
-    {
-        return User::where('role_id', 3)
-            ->where('name', 'like', '%' .  $search . '%')
-            ->orderByDesc('created_at')
-            ->get();
-        // ->paginate(9);
-    }
-
-    public static function getBuyersWithReferralCode()
-    {
-        return User::whereNotNull('referral_code')->paginate(10);
-    }
-
-    public static function getUserByID(int $user_id)
-    {
-        return User::find($user_id);
     }
 }

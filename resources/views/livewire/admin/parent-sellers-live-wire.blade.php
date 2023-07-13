@@ -74,7 +74,7 @@
                                         <td>
                                             <img src=@if ($user_img) "{{ config('constants.BUCKET') . $user_img }}"
                                             @else
-                                            "{{ asset('/res/res/img/store_logo.png') }}" @endif
+                                            "{{ asset('/icons/store_logo.png') }}" @endif
                                                 width="150px">
                                         </td>
                                     </tr>
@@ -131,7 +131,6 @@
             <button type="button" class="btn btn-danger my-3 py-3 w-100" title="Delete selected data" onclick="delUsers()">
                 <i class="fas fa-trash-alt"></i>
             </button>
-            
         </div>
     </div>
     <div class="container">
@@ -141,7 +140,7 @@
                     <div class="card custom-card text-white custom-card-has-bg"
                         @if ($single_index->user_img) style="background-image:url('{{ config('constants.BUCKET') . $single_index->user_img }}');"
                         @else
-                        style="background-image:url('{{ asset('/res/res/img/store_logo.png') }}');" @endif>
+                        style="background-image:url('{{ asset('/icons/store_logo.png') }}');" @endif>
                         <div class="card-img-overlay custom-card-img-overlay d-flex flex-column">
                             <div class="card-body custom-card-body">
                                 <div class="form-check">

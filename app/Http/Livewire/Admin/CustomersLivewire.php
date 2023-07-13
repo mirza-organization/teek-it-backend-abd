@@ -7,16 +7,15 @@ use Exception;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class ChildSellersLivewire extends Component
+class CustomersLivewire extends Component
 {
     use WithPagination;
     public
-        $child_seller_id,
         $name,
+        $l_name,
         $email,
         $phone,
         $address_1,
-        $business_name,
         $lat,
         $lon,
         $user_img,
@@ -35,10 +34,10 @@ class ChildSellersLivewire extends Component
         $this->resetAllErrors();
         $this->reset([
             'name',
+            'l_name',
             'email',
             'phone',
             'address_1',
-            'business_name',
             'lat',
             'lon',
             'user_img',
@@ -61,10 +60,10 @@ class ChildSellersLivewire extends Component
     {
         $data = User::getUserByID($id);
         $this->name = $data->name;
+        $this->l_name = $data->l_name;
         $this->email = $data->email;
         $this->phone = $data->phone;
         $this->address_1 = $data->address_1;
-        $this->business_name = $data->business_name;
         $this->lat = $data->lat;
         $this->lon = $data->lon;
         $this->user_img = $data->user_img;
@@ -81,7 +80,7 @@ class ChildSellersLivewire extends Component
         try {
             /* Perform some operation */
             $status = ($is_active === 1) ? 0 : 1;
-            $status_cahnged = User::activeOrBlockStore($id, $status);
+            $status_cahnged = User::activeOrBlockCustomer($id, $status);
             /* Operation finished */
             if ($status_cahnged) {
                 $this->resetPage();
@@ -101,7 +100,7 @@ class ChildSellersLivewire extends Component
 
     public function render()
     {
-        $data = User::getChildSellers($this->search);
-        return view('livewire.admin.child-sellers-livewire', compact('data'));
+        $data = User::getCustomers($this->search);
+        return view('livewire.admin.customers-livewire', compact('data'));
     }
 }

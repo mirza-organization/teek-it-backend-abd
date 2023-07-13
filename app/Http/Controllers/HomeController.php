@@ -1162,19 +1162,19 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function adminCustomers(Request $request)
-    {
-        if (Gate::allows('superadmin')) {
-            $users = User::where('role_id', 3)->orderByDesc('created_at');
-            if ($request->search) {
-                $users = $users->where('name', 'LIKE', $request->search);
-            }
-            $users = $users->paginate(9);
-            return view('admin.customers', compact('users'));
-        } else {
-            abort(404);
-        }
-    }
+    // public function adminCustomers(Request $request)
+    // {
+    //     if (Gate::allows('superadmin')) {
+    //         $users = User::where('role_id', 3)->orderByDesc('created_at');
+    //         if ($request->search) {
+    //             $users = $users->where('name', 'LIKE', $request->search);
+    //         }
+    //         $users = $users->paginate(9);
+    //         return view('admin.customers', compact('users'));
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
     /**
      * Render drivers listing view for admin
      * @author Huzaifa Haleem
