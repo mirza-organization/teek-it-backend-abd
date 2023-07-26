@@ -20,6 +20,7 @@ use App\VerificationCodes;
 use App\WithdrawalRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
@@ -1025,6 +1026,7 @@ class HomeController extends Controller
             $category->category_image = $filename;
         }
         $category->save();
+        Cache::forget('allCategories');
         flash('Added')->success();
         return Redirect::back();
     }

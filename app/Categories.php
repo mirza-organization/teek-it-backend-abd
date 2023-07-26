@@ -72,11 +72,11 @@ class Categories extends Model
 
     public static function getAllCategoriesByStoreId(int $store_id)
     {
-        $categories_data = Products::leftJoin('categories', 'products.category_id', '=', 'categories.id')
-            ->where('user_id', $store_id)
-            ->select('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
-            ->groupBy('products.category_id', 'categories.category_name', 'categories.category_image', 'categories.created_at', 'categories.updated_at')
-            ->get();
+        $categories_data = Categories::select('id as category_id', 'category_name', 'category_image', 'created_at', 'updated_at')
+            ->whereHas('products', function ($query) use ($store_id) {
+                $query->where('user_id', $store_id);
+            })->get();
+
         return ($categories_data->isEmpty()) ? [] : $categories_data;
     }
 
@@ -134,16 +134,36 @@ class Categories extends Model
 
     public static function stores(int $category_id)
     {
-        $ids = Categories::select('users.id as store_id')
+        // $ids = Categories::select('users.id as store_id')
+        //     ->distinct()
+        //     ->join('products', 'categories.id', '=', 'products.category_id')
+        //     ->join('users', 'products.user_id', '=', 'users.id')
+        //     ->join('qty', 'products.id', '=', 'qty.products_id')
+        //     ->where('qty', '>', 0) //Products Should Be In Stock
+        //     ->where('products.status', '=', 1) //Products Should Be Live
+        //     ->where('users.is_active', '=', 1) //Seller Should Be Active
+        //     ->where('categories.id', '=', $category_id)
+        //     ->pluck('store_id');
+        // return User::whereIn('id', $ids)->get();
+
+        // Get IDs of both parent and child stores from the Qty table
+        $store_ids = Qty::select('users_id')
             ->distinct()
-            ->join('products', 'categories.id', '=', 'products.category_id')
-            ->join('users', 'products.user_id', '=', 'users.id')
-            ->join('qty', 'products.id', '=', 'qty.products_id')
-            ->where('qty', '>', 0) //Products Should Be In Stock
-            ->where('products.status', '=', 1) //Products Should Be Live
-            ->where('users.is_active', '=', 1) //Seller Should Be Active
-            ->where('categories.id', '=', $category_id)
-            ->pluck('store_id');
-        return User::whereIn('id', $ids)->get();
+            ->join('products', 'qty.products_id', '=', 'products.id')
+            ->where('qty', '>', 0) // Products Should Be In Stock
+            ->where('products.status', '=', 1) // Products Should Be Live
+            ->where('qty.category_id', '=', $category_id)
+            ->pluck('users_id');
+        // dd($store_ids);
+        
+        // Get active parent and child stores that have products in the specified category
+        $stores = User::whereIn('id', $store_ids)
+            ->where('is_active', '=', 1) // Seller Should Be Active
+            // ->whereHas('products', function ($query) use ($category_id) {
+            //     $query->where('category_id', $category_id);
+            // })
+            ->get();
+
+        return $stores;
     }
 }
