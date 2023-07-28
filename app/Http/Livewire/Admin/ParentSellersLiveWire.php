@@ -37,10 +37,10 @@ class ParentSellersLiveWire extends Component
     //     'password' => 'required|min:8'
     // ];
 
-    public function updated($property_name)
-    {
-        $this->validateOnly($property_name);
-    }
+    // public function updated($property_name)
+    // {
+    //     $this->validateOnly($property_name);
+    // }
 
     public function resetModal()
     {
