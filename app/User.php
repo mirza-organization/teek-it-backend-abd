@@ -118,6 +118,12 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(ReferralCodeRelation::class, 'user_id');
     }
+
+    public function products()
+    {
+        return $this->hasMany(Products::class);
+    }
+
     /**
      * Validators
      */
@@ -173,7 +179,7 @@ class User extends Authenticatable implements JWTSubject
             ->whereNotNull('lon')
             ->whereIn('role_id', [2, 5])
             ->orderBy('business_name', 'asc')
-            ->get();
+            ->paginate(10);
     }
 
     public static function getParentSellers(string $search = '')

@@ -54,9 +54,6 @@ class UsersController extends Controller
 
                 $durationInSeconds = explode(' ', $element['duration']['value']);
                 $durationInMinutes = round((int)$durationInSeconds[0] / 60);
-
-                // dd($destinations['users'][$key]->id);
-                // dd($this->getSellerInfo($destinations['users'][$key]));
                 if ($distanceInMiles <= $miles)
                 {
                     $distanceData = [
@@ -66,14 +63,9 @@ class UsersController extends Controller
                     ];
                     $user_data[] = $this->getSellerInfo($destinations['users'][$key], $distanceData);
                 }
-                
-                // if ($distanceInMiles <= $miles) $destinations['users'][$key]['store_distance'] = ['distance' => $distanceInMiles, 'duration' => $durationInMinutes];
             }
         }
-
         return $user_data;
-        // return $distanceData;
-        // return $destinations;
     }
 
 
@@ -130,50 +122,31 @@ class UsersController extends Controller
                 );
             }
             $data = [];
-            $originCoordinates = [];
-            $destinationCoordinates = [];
             $destination_data = [];
-
             $destination_users_data = [];
             $destination_users_coordinates = [];
-            // $data = User::chunk(10, function ($users) {
-            //     return $users[0];
-            // });
-            // dd($data);
+            // dd(Cache::flush());
             $users = Cache::remember('sellers', now()->addDay(), function () {
                 return User::getParentAndChildSellers();
             });
+            // dd($users);
+            $pagination = $users->toArray();
+            unset($pagination['data']);
 
-            $chunkSize = 25;
-            $totalUsers = $users->count();
-            $remainingUsers = $totalUsers;
+            $chunk_size = 25;
+            $total_users = $users->count();
+            $remaining_users = $total_users;
             $offset = 0;
             $inner_loop_index = 0;
-            while ($remainingUsers > 0) {
+            while ($remaining_users > 0) {
                 // The min() function will return the minimum value of both variables 
-                $current_chunk_size = min($chunkSize, $remainingUsers);
+                $current_chunk_size = min($chunk_size, $remaining_users);
                 // $offset === index number of the array, $current_chunk_size === size limit of the returned slice
-                $currentUsers = $users->slice($offset, $current_chunk_size);
-                $users_to_loop = count($currentUsers);
-                // dd($currentUsers);
-
-                // Perform your logic on $currentUsers here
-                // foreach ($currentUsers as $user) {
-                //     // Your code logic for each user
-                //     for ($i = 0; $i < 25; $i++) {
-                //         // dd($users[$i]->lat);
-                //         // $originCoordinates[] = $request->query('lat') . ',' . $request->query('lon');
-                //         $destinationCoordinates[] = $users[$i]->lat . ',' . $users[$i]->lon;
-                //     }
-                // }
+                $current_users = $users->slice($offset, $current_chunk_size);
+                $users_to_loop = count($current_users);
                 while ($users_to_loop > 0) {
-                    // $destination_data[] = [
-                    //     'user' => $currentUsers[$inner_loop_index],
-                    //     'destination_coordinates' => $currentUsers[$inner_loop_index]->lat . ',' . $currentUsers[$inner_loop_index]->lon,
-                    // ];
-                    $destination_users_data[] = $currentUsers[$inner_loop_index];
-                    $destination_users_coordinates[] = $currentUsers[$inner_loop_index]->lat . ',' . $currentUsers[$inner_loop_index]->lon;
-                    // $destinationCoordinates[] = $currentUsers[$inner_loop_users]->lat . ',' . $currentUsers[$inner_loop_users]->lon;
+                    $destination_users_data[] = $current_users[$inner_loop_index];
+                    $destination_users_coordinates[] = $current_users[$inner_loop_index]->lat . ',' . $current_users[$inner_loop_index]->lon;
                     ++$inner_loop_index;
                     --$users_to_loop;
                 }
@@ -182,13 +155,11 @@ class UsersController extends Controller
 
                 $temp = $this->getDistanceForMultipleDestinations($request->query('lat'), $request->query('lon'), $destination_data, 5);
                 if(!empty($temp)) $data = $temp;
-                // dd($data);
                 $offset += $current_chunk_size;
-                $remainingUsers -= $current_chunk_size;
+                $remaining_users -= $current_chunk_size;
                 $inner_loop_index = $offset;
             }
 
-            // foreach($data as $single_index) $data[] = $single_index
             if (empty($data)) {
                 return JsonResponseCustom::getApiResponse(
                     [],
@@ -197,25 +168,15 @@ class UsersController extends Controller
                     config('constants.HTTP_OK')
                 );
             }
-            return JsonResponseCustom::getApiResponse(
+
+            return JsonResponseCustom::getApiResponseExtention(
                 $data,
                 config('constants.TRUE_STATUS'),
                 '',
+                'pagination',
+                $pagination,
                 config('constants.HTTP_OK')
             );
-
-            // $origins = [
-            //     'lat' => $request->query('lat'),
-            //     'lon' => $request->query('lon')
-            // ];
-
-            // foreach ($users as $user) {
-            //     $destinationCoordinates[] = $user->lat . ',' . $user->lon;
-            // }
-
-            // for ($i = 0; $i < 25; $i++) $destinationCoordinates[] = $users[$i]->lat . ',' . $users[$i]->lon;
-
-            // dd($destinationCoordinates);
             // foreach ($users as $user) {
             //     // dd($user);
             //     // $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
@@ -223,21 +184,6 @@ class UsersController extends Controller
             //     dd($result);
             //     if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
             // }
-
-            // if (empty($data)) {
-            //     return JsonResponseCustom::getApiResponse(
-            //         [],
-            //         config('constants.FALSE_STATUS'),
-            //         config('constants.NO_STORES_FOUND'),
-            //         config('constants.HTTP_OK')
-            //     );
-            // }
-            // return JsonResponseCustom::getApiResponse(
-            //     $data,
-            //     config('constants.TRUE_STATUS'),
-            //     '',
-            //     config('constants.HTTP_OK')
-            // );
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(

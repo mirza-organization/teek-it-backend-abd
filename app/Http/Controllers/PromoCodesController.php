@@ -301,7 +301,7 @@ class PromoCodesController extends Controller
                     'message' => $validatedData->errors()
                 ], 422);
             }
-            $promocodes_count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
+            $promocodes_count = PromoCodes::where('promo_code', '=', $request->promo_code)->count();
             if ($promocodes_count == 1) {
                 $expiry_dt = PromoCodes::where('promo_code', '=', $request->promo_code)->pluck('expiry_dt')->first();
                 $current_date = date('Y-m-d');
@@ -312,7 +312,7 @@ class PromoCodesController extends Controller
                         'message' =>  config('constants.EXPIRED_PROMOCODE')
                     ], 200);
                 } else {
-                    $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
+                    $promo_codes = PromoCodes::where('promo_code', '=', $request->promo_code)->get();
                     if (empty($promo_codes[0]->store_id)) $promo_codes[0]->store_id = NULL;
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
@@ -321,7 +321,7 @@ class PromoCodesController extends Controller
                      * Promo code is only valid for a specific order#
                      */
                     if (!empty($promo_codes[0]->order_number)) {
-                        $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
+                        $user_orders_count = Orders::where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
                             $data[0]['promo_code'] = $promo_codes[0];
                             $data[1]['promo_codes_usage_limit'] = PromoCodesUsageLimit::promoCodeTotalUsedByUser($request->user_id, $promo_codes[0]->id);

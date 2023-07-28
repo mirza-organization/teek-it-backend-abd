@@ -84,7 +84,6 @@ Route::prefix('category')->group(function () {
     Route::post('update/{product_id}', [CategoriesController::class, 'update']);
     Route::get('all', [CategoriesController::class, 'all']);
     Route::get('view/{category_id}', [CategoriesController::class, 'products']);
-    // This API Is not showing products for child stores
     Route::get('get-stores-by-category/{category_id}', [CategoriesController::class, 'stores']);
 });
 /*

@@ -201,14 +201,13 @@ class CategoriesController extends Controller
                     '',
                     config('constants.HTTP_OK')
                 );
-            } else {
-                return JsonResponseCustom::getApiResponse(
-                    [],
-                    config('constants.FALSE_STATUS'),
-                    config('constants.NO_RECORD'),
-                    config('constants.HTTP_OK')
-                );
-            }
+            } 
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.FALSE_STATUS'),
+                config('constants.NO_RECORD'),
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(
