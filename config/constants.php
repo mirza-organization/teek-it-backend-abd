@@ -11,7 +11,7 @@ return [
     |
     */
 
-    /* Success Contants */
+    /* Success Constants */
     'INSERTION_SUCCESS' => 'Data inserted successfully.',
     'UPDATION_SUCCESS' => 'Data updated successfully.',
     'ARCHIVED_SUCCESS' => 'Data archived successfully.',
@@ -26,8 +26,9 @@ return [
     'STUART_DELIVERY_SUCCESS' => 'Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button',
     'COMPLETED' => 'Completed',
     'VALID_REFERRAL' => 'Valid referral code.',
+    'CACHE_REMOVED_SUCCESSFULLY' => 'All Cached data of your App has been removed successfully.',
    
-    /* Failure Contants */
+    /* Failure Constants */
     'INSERTION_FAILED' => 'Failed to insert data.',
     'UPDATION_FAILED' => 'Failed to update data.',
     'ARCHIVED_FAILED' => 'Failed to archive data.',
@@ -74,6 +75,8 @@ return [
     'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
 
     'DATA_ALREADY_EXISTS' => 'Data already exists against id:- ',
+
+    'CACHE_REMOVED_FAILED' => 'Sorry due to some issue your cahce can not be removed.',
 
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
     /*

@@ -17,6 +17,7 @@ use App\Http\Controllers\RattingsController;
 use App\Http\Controllers\ReferralCodeRelationController;
 use App\Http\Controllers\WalletController;
 use App\Http\Controllers\WithdrawalRequestsController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 /*
 |--------------------------------------------------------------------------
@@ -266,6 +267,14 @@ Route::get('generate_hash', function () {
         'data' => Hash::make($_REQUEST['password']),
         'status' => true,
         'message' => ''
+    ], 200);
+});
+
+Route::get('cache/remove', function () {
+    return response()->json([
+        'data' => [],
+        'status' => true,
+        'message' => (Cache::flush()) ? config('constants.CACHE_REMOVED_SUCCESSFULLY') : config('constants.CACHE_REMOVED_FAILED')
     ], 200);
 });
 
