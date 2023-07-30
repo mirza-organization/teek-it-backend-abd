@@ -375,7 +375,7 @@ class AuthController extends Controller
      */
     public function get_user($user_id)
     {
-        return (new UsersController())->getSellerInfo(User::find($user_id));
+        return UsersController::getSellerInfo(User::find($user_id));
     }
 
     protected function authenticated($request, $user, $token)
@@ -517,9 +517,7 @@ class AuthController extends Controller
             $users = User::query()->where('seller_id', '=', Auth::id())->get();
             $data = [];
             foreach ($users as $user) {
-                if (Gate::allows('delivery_boy')) {
-                    $data[] = (new UsersController())->getSellerInfo($user);
-                }
+                if (Gate::allows('delivery_boy')) $data[] = UsersController::getSellerInfo($user);
             }
             return response()->json([
                 'data' => $data,

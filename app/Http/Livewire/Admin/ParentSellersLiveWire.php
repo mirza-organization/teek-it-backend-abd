@@ -15,7 +15,6 @@ class ParentSellersLiveWire extends Component
         $parent_seller_id,
         $name,
         $email,
-        $password,
         $phone,
         $address_1,
         $business_name,
@@ -32,16 +31,16 @@ class ParentSellersLiveWire extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    protected $rules = [
-        'name' => 'required|string|regex:/^[A-Za-z\s]+$/',
-        'email' => 'required|email',
-        'password' => 'required|min:8'
-    ];
+    // protected $rules = [
+    //     'name' => 'required|string|regex:/^[A-Za-z\s]+$/',
+    //     'email' => 'required|email',
+    //     'password' => 'required|min:8'
+    // ];
 
-    public function updated($property_name)
-    {
-        $this->validateOnly($property_name);
-    }
+    // public function updated($property_name)
+    // {
+    //     $this->validateOnly($property_name);
+    // }
 
     public function resetModal()
     {
@@ -49,7 +48,6 @@ class ParentSellersLiveWire extends Component
         $this->reset([
             'name',
             'email',
-            'password',
             'phone',
             'address_1',
             'business_name',
@@ -77,7 +75,6 @@ class ParentSellersLiveWire extends Component
         if ($data) {
             $this->name = $data->name;
             $this->email = $data->email;
-            $this->password = $data->password;
             $this->phone = $data->phone;
             $this->address_1 = $data->address_1;
             $this->business_name = $data->business_name;
@@ -95,80 +92,80 @@ class ParentSellersLiveWire extends Component
         }
     }
 
-    public function renderDeleteModal($id)
-    {
-        $this->parent_seller_id = $id;
-    }
+    // public function renderDeleteModal($id)
+    // {
+    //     $this->parent_seller_id = $id;
+    // }
 
-    public function add()
-    {
-        $this->validate();
-        try {
-            /* Perform some operation */
-            $inserted = User::create([
-                'name' => $this->name,
-                'email' => $this->email,
-                'password' => $this->password
-            ]);
-            /* Operation finished */
-            $this->resetModal();
-            sleep(1);
-            $this->dispatchBrowserEvent('close-modal', ['id' => 'addModal']);
-            if ($inserted) {
-                session()->flash('success', config('messages.INSERTION_SUCCESS'));
-            } else {
-                session()->flash('error', config('messages.INSERTION_FAILED'));
-            }
-        } catch (Exception $error) {
-            report($error);
-            session()->flash('error', config('messages.INVALID_DATA'));
-        }
-    }
+    // public function add()
+    // {
+    //     $this->validate();
+    //     try {
+    //         /* Perform some operation */
+    //         $inserted = User::create([
+    //             'name' => $this->name,
+    //             'email' => $this->email,
+    //             'password' => $this->password
+    //         ]);
+    //         /* Operation finished */
+    //         $this->resetModal();
+    //         sleep(1);
+    //         $this->dispatchBrowserEvent('close-modal', ['id' => 'addModal']);
+    //         if ($inserted) {
+    //             session()->flash('success', config('messages.INSERTION_SUCCESS'));
+    //         } else {
+    //             session()->flash('error', config('messages.INSERTION_FAILED'));
+    //         }
+    //     } catch (Exception $error) {
+    //         report($error);
+    //         session()->flash('error', config('messages.INVALID_DATA'));
+    //     }
+    // }
 
-    public function edit()
-    {
-        $this->validate();
-        try {
-            /* Perform some operation */
-            $updated = User::where('id', '=', $this->parent_seller_id)
-                ->update([
-                    'name' => $this->name,
-                    'email' => $this->email,
-                    'password' => Hash::make($this->password),
-                ]);
-            /* Operation finished */
-            $this->resetModal();
-            sleep(1);
-            $this->dispatchBrowserEvent('close-modal', ['id' => 'editModal']);
-            if ($updated) {
-                session()->flash('success', config('messages.UPDATION_SUCCESS'));
-            } else {
-                session()->flash('error', config('messages.UPDATION_FAILED'));
-            }
-        } catch (Exception $error) {
-            report($error);
-            session()->flash('error', config('messages.INVALID_DATA'));
-        }
-    }
+    // public function edit()
+    // {
+    //     $this->validate();
+    //     try {
+    //         /* Perform some operation */
+    //         $updated = User::where('id', '=', $this->parent_seller_id)
+    //             ->update([
+    //                 'name' => $this->name,
+    //                 'email' => $this->email,
+    //                 'password' => Hash::make($this->password),
+    //             ]);
+    //         /* Operation finished */
+    //         $this->resetModal();
+    //         sleep(1);
+    //         $this->dispatchBrowserEvent('close-modal', ['id' => 'editModal']);
+    //         if ($updated) {
+    //             session()->flash('success', config('messages.UPDATION_SUCCESS'));
+    //         } else {
+    //             session()->flash('error', config('messages.UPDATION_FAILED'));
+    //         }
+    //     } catch (Exception $error) {
+    //         report($error);
+    //         session()->flash('error', config('messages.INVALID_DATA'));
+    //     }
+    // }
 
-    public function destroy()
-    {
-        try {
-            /* Perform some operation */
-            $deleted = User::delEmployee($this->parent_seller_id);
-            /* Operation finished */
-            sleep(1);
-            $this->dispatchBrowserEvent('close-modal', ['id' => 'deleteModal']);
-            if ($deleted) {
-                session()->flash('success', config('messages.DELETION_SUCCESS'));
-            } else {
-                session()->flash('error', config('messages.DELETION_FAILED'));
-            }
-        } catch (Exception $error) {
-            report($error);
-            session()->flash('error', config('messages.INVALID_DATA'));
-        }
-    }
+    // public function destroy()
+    // {
+    //     try {
+    //         /* Perform some operation */
+    //         $deleted = User::delEmployee($this->parent_seller_id);
+    //         /* Operation finished */
+    //         sleep(1);
+    //         $this->dispatchBrowserEvent('close-modal', ['id' => 'deleteModal']);
+    //         if ($deleted) {
+    //             session()->flash('success', config('messages.DELETION_SUCCESS'));
+    //         } else {
+    //             session()->flash('error', config('messages.DELETION_FAILED'));
+    //         }
+    //     } catch (Exception $error) {
+    //         report($error);
+    //         session()->flash('error', config('messages.INVALID_DATA'));
+    //     }
+    // }
     /**
      * The sole purpose of this function is to resolve the double-click problem
      * Which occurs while using wire:model.lazy directive
@@ -177,10 +174,10 @@ class ParentSellersLiveWire extends Component
      * The given form action manually
      * @author Muhammad Abdullah Mirza
      */
-    public function submitForm($form_name)
-    {
-        $this->$form_name();
-    }
+    // public function submitForm($form_name)
+    // {
+    //     $this->$form_name();
+    // }
 
     public function changeStatus($id, $is_active)
     {

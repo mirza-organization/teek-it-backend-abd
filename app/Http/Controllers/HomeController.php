@@ -20,6 +20,7 @@ use App\VerificationCodes;
 use App\WithdrawalRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
@@ -1025,6 +1026,7 @@ class HomeController extends Controller
             $category->category_image = $filename;
         }
         $category->save();
+        Cache::forget('allCategories');
         flash('Added')->success();
         return Redirect::back();
     }
@@ -1090,38 +1092,38 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.1.0
      */
-    public function adminParentSellers(Request $request)
-    {
-        if (Gate::allows('superadmin')) {
-            $users = User::query()->where('role_id', 2);
-            if ($request->search) {
-                $users = $users->where('business_name', 'LIKE', $request->search);
-            }
-            $users = $users->paginate(9);
-            return view('admin.parent_sellers', compact('users'));
-        } else {
-            abort(404);
-        }
-    }
+    // public function adminParentSellers(Request $request)
+    // {
+    //     if (Gate::allows('superadmin')) {
+    //         $users = User::query()->where('role_id', 2);
+    //         if ($request->search) {
+    //             $users = $users->where('business_name', 'LIKE', $request->search);
+    //         }
+    //         $users = $users->paginate(9);
+    //         return view('admin.parent_sellers', compact('users'));
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
 
     /**
      * Render child sellers list view for admin
      * @author Mirza Abdullah Izhar
      * @version 1.0.0
      */
-    public function adminChildSellers(Request $request)
-    {
-        if (Gate::allows('superadmin')) {
-            $users = User::query()->where('role_id', 5);
-            if ($request->search) {
-                $users = $users->where('business_name', 'LIKE', $request->search);
-            }
-            $users = $users->paginate(9);
-            return view('admin.child_sellers', compact('users'));
-        } else {
-            abort(404);
-        }
-    }
+    // public function adminChildSellers(Request $request)
+    // {
+    //     if (Gate::allows('superadmin')) {
+    //         $users = User::query()->where('role_id', 5);
+    //         if ($request->search) {
+    //             $users = $users->where('business_name', 'LIKE', $request->search);
+    //         }
+    //         $users = $users->paginate(9);
+    //         return view('admin.child_sellers', compact('users'));
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
     /**
      * Delete selected users
      * @author Mirza Abdullah Izhar
@@ -1162,19 +1164,19 @@ class HomeController extends Controller
      * @author Huzaifa Haleem
      * @version 1.0.0
      */
-    public function adminCustomers(Request $request)
-    {
-        if (Gate::allows('superadmin')) {
-            $users = User::where('role_id', 3)->orderByDesc('created_at');
-            if ($request->search) {
-                $users = $users->where('name', 'LIKE', $request->search);
-            }
-            $users = $users->paginate(9);
-            return view('admin.customers', compact('users'));
-        } else {
-            abort(404);
-        }
-    }
+    // public function adminCustomers(Request $request)
+    // {
+    //     if (Gate::allows('superadmin')) {
+    //         $users = User::where('role_id', 3)->orderByDesc('created_at');
+    //         if ($request->search) {
+    //             $users = $users->where('name', 'LIKE', $request->search);
+    //         }
+    //         $users = $users->paginate(9);
+    //         return view('admin.customers', compact('users'));
+    //     } else {
+    //         abort(404);
+    //     }
+    // }
     /**
      * Render drivers listing view for admin
      * @author Huzaifa Haleem

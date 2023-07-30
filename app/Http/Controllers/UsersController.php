@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GoogleMap;
 use App\User;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -19,11 +20,11 @@ class UsersController extends Controller
      */
     public function getDistanceBetweenPoints($destination_lat, $destination_lon, $origin_lat, $origin_lon)
     {
-        $destination_address = $destination_lat . ',' . $destination_lon;
         $origing_address = $origin_lat . ',' . $origin_lon;
+        $destination_address = $destination_lat . ',' . $destination_lon;
         /* Rameesha's URL */
         $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=" . urlencode($origing_address) . "&destinations=" . urlencode($destination_address) . "&mode=driving&key=AIzaSyD_7jrpEkUDW7pxLBm91Z0K-U9Q5gK-10U";
-
+        // dd($url);
         $results = json_decode(file_get_contents($url), true);
         $meters = explode(' ', $results['rows'][0]['elements'][0]['distance']['value']);
         $distanceInMiles = (float)$meters[0] * 0.000621;
@@ -38,26 +39,25 @@ class UsersController extends Controller
      * @author Mirza Abdullah Izhar
      * @version 2.1.0
      */
-    public function getSellerInfo(Object $seller_info, array $map_api_result = null)
+    public static function getSellerInfo(Object $seller_info, array $map_api_result = null)
     {
-        $user = $seller_info;
-        if (!$user) return null;
+        if (!$seller_info) return null;
         $data = array(
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'address_1' => $user->address_1,
-            'business_name' => $user->business_name,
-            'business_location' => $user->business_location,
-            'business_hours' => $user->business_hours,
-            'user_img' => $user->user_img,
-            'pending_withdraw' => $user->pending_withdraw,
-            'total_withdraw' => $user->total_withdraw,
-            'parent_store_id' => $user->parent_store_id,
-            'is_online' => $user->is_online,
-            'roles' => ($user->role_id == 2) ? ['sellers'] : ['child_sellers']
+            'id' => $seller_info->id,
+            'name' => $seller_info->name,
+            'email' => $seller_info->email,
+            'address_1' => $seller_info->address_1,
+            'business_name' => $seller_info->business_name,
+            'business_location' => $seller_info->business_location,
+            'business_hours' => $seller_info->business_hours,
+            'user_img' => $seller_info->user_img,
+            'pending_withdraw' => $seller_info->pending_withdraw,
+            'total_withdraw' => $seller_info->total_withdraw,
+            'parent_store_id' => $seller_info->parent_store_id,
+            'is_online' => $seller_info->is_online,
+            'roles' => ($seller_info->role_id == 2) ? ['sellers'] : ['child_sellers']
         );
-        if (!is_null($map_api_result)) {
+        if (!empty($map_api_result)) {
             $data['distance'] = $map_api_result['distance'];
             $data['duration'] = $map_api_result['duration'];
         }
@@ -85,12 +85,13 @@ class UsersController extends Controller
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
             }
-            $data = [];
-            $users = User::getParentAndChildSellers();
-            foreach ($users as $user) {
-                $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
-                if ($result['distance'] <= 5) $data[] = $this->getSellerInfo($user, $result);
-            }
+            $users = Cache::remember('sellers', now()->addDay(), function () {
+                return User::getParentAndChildSellers();
+            });
+            $pagination = $users->toArray();
+            unset($pagination['data']);
+            
+            $data = GoogleMap::findDistanceByMakingChunks($request, $users, 25);
             if (empty($data)) {
                 return JsonResponseCustom::getApiResponse(
                     [],
@@ -99,12 +100,22 @@ class UsersController extends Controller
                     config('constants.HTTP_OK')
                 );
             }
-            return JsonResponseCustom::getApiResponse(
+
+            return JsonResponseCustom::getApiResponseExtention(
                 $data,
                 config('constants.TRUE_STATUS'),
                 '',
+                'pagination',
+                $pagination,
                 config('constants.HTTP_OK')
             );
+            // foreach ($users as $user) {
+            //     // dd($user);
+            //     // $result = $this->getDistanceBetweenPoints($user->lat, $user->lon, $request->query('lat'), $request->query('lon'));
+            //     $result = $this->getDistanceForMultipleDestinations($request->query('lat'), $request->query('lon'), $destinationCoordinates);
+            //     dd($result);
+            //     if ($result['distance'] <= 5) $data[] = self::getSellerInfo($user, $result);
+            // }
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(

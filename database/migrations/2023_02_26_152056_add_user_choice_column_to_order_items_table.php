@@ -26,7 +26,7 @@ class AddUserChoiceColumnToOrderItemsTable extends Migration
     public function down()
     {
         Schema::table('order_items', function (Blueprint $table) {
-            //
+            $table->dropColumn('user_choice');
         });
     }
 }

@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\PromoCodesController;
 use App\Http\Controllers\QtyController;
 use App\Http\Controllers\StuartDeliveryController;
+use App\Http\Livewire\Admin\ChildSellersLivewire;
+use App\Http\Livewire\Admin\CustomersLivewire;
 use App\Http\Livewire\Sellers\Settings\UserGeneralSettings;
 use Illuminate\Support\Facades\Route;
 /*
@@ -48,7 +50,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 */
 Route::prefix('inventory')->group(function () {
     // Route::get('/', [HomeController::class, 'inventory'])->name('inventory');
-    
+
     Route::middleware('auth')->group(function () {
         Route::get('/', InventoryLivewire::class)->name('inventory');
     });
@@ -121,13 +123,18 @@ Route::get('auth/verify', [AuthController::class, 'verify']);
 | Admin Routes
 |--------------------------------------------------------------------------
 */
+Route::prefix('admin')->group(function () {
+    Route::get('/referralcodes', ReferralCodes::class)->name('admin.referralcodes');
+    Route::get('/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.parent');
+    Route::get('/sellers/child', ChildSellersLivewire::class)->name('admin.sellers.child');
+    Route::get('/customers', CustomersLivewire::class)->name('admin.customers');
+});
 Route::get('/notification/home', [NotificationsController::class, 'notificationHome'])->name('admin.notification.home');
 Route::post('/notification/send', [NotificationsController::class, 'notificationSend'])->name('admin.notification.send');
-Route::get('/admin/test/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.test.parent');
-Route::get('/admin/referralcodes', ReferralCodes::class)->name('admin.referralcodes');
-Route::get('/admin/sellers/parent', [HomeController::class, 'adminParentSellers'])->name('admin.sellers.parent');
-Route::get('/admin/sellers/child', [HomeController::class, 'adminChildSellers'])->name('admin.sellers.child');
-Route::get('/customers', [HomeController::class, 'adminCustomers'])->name('admin.customers');
+
+// Route::get('/admin/sellers/parent', [HomeController::class, 'adminParentSellers'])->name('admin.sellers.parent');
+// Route::get('/customers', [HomeController::class, 'adminCustomers'])->name('admin.customers');
+
 Route::get('/drivers', [HomeController::class, 'adminDrivers'])->name('admin.drivers');
 Route::get('/promocodes/home', [PromoCodesController::class, 'promocodesHome'])->name('admin.promocodes.home');
 Route::post('/promocodes/add', [PromoCodesController::class, 'promocodesAdd'])->name('admin.promocodes.add');

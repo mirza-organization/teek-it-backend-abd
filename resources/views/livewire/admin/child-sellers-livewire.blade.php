@@ -1,7 +1,6 @@
 <div class="container-xxl flex-grow-1 container-p-y">
     @if (session()->has('error'))
-        <div class="bs-toast toast toast-placement-ex m-2 fade bg-danger top-0 end-0 show" role="alert"
-            aria-live="assertive" aria-atomic="true" data-delay="2000">
+        <div class="bs-toast toast toast-placement-ex m-2 fade bg-danger top-0 end-0 show" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
             <div class="toast-header">
                 <i class="bx bx-bell me-2"></i>
                 <div class="me-auto fw-semibold">Error</div>
@@ -13,8 +12,7 @@
         </div>
     @endif
     @if (session()->has('success'))
-        <div class="bs-toast toast toast-placement-ex m-2 fade bg-success top-0 end-0 show" role="alert"
-            aria-live="assertive" aria-atomic="true" data-delay="2000">
+        <div class="bs-toast toast toast-placement-ex m-2 fade bg-success top-0 end-0 show" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
             <div class="toast-header">
                 <i class="bx bx-bell me-2"></i>
                 <div class="me-auto fw-semibold">Success</div>
@@ -26,14 +24,12 @@
         </div>
     @endif
     {{-- ************************************ Info Model ************************************ --}}
-    <div wire:ignore.self class="modal fade" id="infoModel" tabindex="-1" aria-labelledby="infoModelLabel"
-        aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="infoModel" tabindex="-1" aria-labelledby="infoModelLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="infoModelLabel">Seller Information</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        wire:click="resetModal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" wire:click="resetModal"></button>
                 </div>
                 <form>
                     <div class="modal-body">
@@ -74,8 +70,7 @@
                                         <td>
                                             <img src=@if ($user_img) "{{ config('constants.BUCKET') . $user_img }}"
                                             @else
-                                            "{{ asset('/icons/store_logo.png') }}" @endif
-                                                width="150px">
+                                            "{{ asset('/icons/store_logo.png') }}" @endif width="150px">
                                         </td>
                                     </tr>
                                     <tr>
@@ -107,8 +102,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
-                            wire:click="resetModal">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" wire:click="resetModal">
                             Close
                         </button>
                     </div>
@@ -118,12 +112,11 @@
     </div>
     <div class="row">
         <div class="col-12 col-sm-6 col-md-5 col-xl-6">
-            <h4 class="py-4 my-1">Parent Sellers</h4>
+            <h4 class="py-4 my-1">Child Sellers</h4>
         </div>
         <div class="col-12 col-sm-6 col-md-5 col-xl-5">
             <div class="input-group py-4 my-2">
-                <input type="text" wire:model.debounce.500ms="search" class="form-control py-3"
-                    placeholder="Search here...">
+                <input type="text" wire:model.debounce.500ms="search" class="form-control py-3" placeholder="Search here...">
                 {{-- <button class="btn btn-primary" type="button"><i class='bx bx-search-alt'></i></button> --}}
             </div>
         </div>
@@ -137,31 +130,24 @@
         <div class="row">
             @forelse ($data as $single_index)
                 <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4 mb-4">
-                    <div class="card custom-card text-white custom-card-has-bg"
-                        @if ($single_index->user_img) style="background-image:url('{{ config('constants.BUCKET') . $single_index->user_img }}');"
+                    <div class="card custom-card text-white custom-card-has-bg" @if ($single_index->user_img) style="background-image:url('{{ config('constants.BUCKET') . $single_index->user_img }}');"
                         @else
                         style="background-image:url('{{ asset('/icons/store_logo.png') }}');" @endif>
                         <div class="card-img-overlay custom-card-img-overlay d-flex flex-column">
                             <div class="card-body custom-card-body">
                                 <div class="form-check">
-                                    <input type="checkbox" class="form-check-input select-checkbox" title="Select"
-                                        id="{{ $single_index->id }}">
-                                    <button type="button" class="btn btn-primary" title="Show detail information"
-                                        data-bs-toggle="modal" data-bs-target="#infoModel"
-                                        wire:click="renderInfoModal({{ $single_index->id }})">
+                                    <input type="checkbox" class="form-check-input select-checkbox" title="Select" id="{{ $single_index->id }}">
+                                    <button type="button" class="btn btn-primary" title="Show detail information" data-bs-toggle="modal" data-bs-target="#infoModel" wire:click="renderInfoModal({{ $single_index->id }})">
                                         <i class="fas fa-info-circle"></i>
                                     </button>
-                                    <a href="{{ route('admin.orders', ['store_id' => $single_index->id]) }}"
-                                        class="btn btn-dark" title="Show orders">
+                                    <a href="{{ route('admin.orders', ['store_id' => $single_index->id]) }}" class="btn btn-dark" title="Show orders">
                                         <i class="fas fa-luggage-cart"></i>
                                     </a>
                                 </div>
                             </div>
                             <div class="card-footer custom-card-footer">
                                 <div class="form-check form-switch mt-3">
-                                    <input type="checkbox" class="form-check-input" value="{{ $single_index->id }}"
-                                        wire:click="changeStatus({{ $single_index->id }}, {{ $single_index->is_active }})"
-                                        role="switch" {{ $single_index->is_active === 1 ? 'checked' : '' }}>
+                                    <input type="checkbox" class="form-check-input" value="{{ $single_index->id }}" wire:click="changeStatus({{ $single_index->id }}, {{ $single_index->is_active }})" role="switch" {{ $single_index->is_active === 1 ? 'checked' : '' }}>
                                     <label class="form-check-label">
                                         @if ($single_index->is_active === 1)
                                             <b class="bg-success rounded px-2">Active</b>

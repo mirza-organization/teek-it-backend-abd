@@ -152,7 +152,6 @@ class InventoryLivewire extends Component
             
             // $this->quantity = $this->populateQuantityArray($data, $this->owner);
             $this->quantity = $this->populateQuantityArray($data);
-            // dd($this->quantity);
         }
         return view('livewire.sellers.inventory-livewire', ['data' => $data, 'categories' => $categories, 'featured_products' => $featured]);
     }

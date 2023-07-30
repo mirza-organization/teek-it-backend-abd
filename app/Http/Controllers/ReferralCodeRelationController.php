@@ -165,7 +165,7 @@ class ReferralCodeRelationController extends Controller
             if ($updated == 1 && $request->referral_useable == 0) {
                 // Update wallet of the referred by user of referral relationship
                 $referral_reltaion_details = ReferralCodeRelation::getReferralRelationDetails($request->referral_relation_id);
-                User::updateWallet($referral_reltaion_details[0]->referredByUser->id, $this->amount);
+                User::addIntoWallet($referral_reltaion_details[0]->referredByUser->id, $this->amount);
             }
             return JsonResponseCustom::getApiResponse(
                 [],

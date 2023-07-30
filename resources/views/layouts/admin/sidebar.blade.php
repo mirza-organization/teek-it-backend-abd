@@ -5,16 +5,14 @@
           <img src="{{ asset('res/res/img/arrow.png') }}">
       </a>
       <a class="brand-link" href="/" style="display:block;opacity: 1">
-          <img alt="Teek it - Logo" class="brand-image" src="{{ asset('res/res/img/logo.png') }}"
-              style="display: block; opacity: 1">
+          <img alt="Teek it - Logo" class="brand-image" src="{{ asset('res/res/img/logo.png') }}" style="display: block; opacity: 1">
       </a>
 
       <!-- Sidebar -->
       <div class="sidebar">
           <!-- Sidebar Menu -->
           <nav class="mt-5">
-              <ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview"
-                  role="menu">
+              <ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview" role="menu">
                   <!-- Add icons to the links using the .nav-icon class
                  with font-awesome or any other icon font library -->
                   <li class="nav-item">
@@ -26,8 +24,7 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link {{ request()->is('notification/home') ? 'active' : '' }}"
-                          href="/notification/home">
+                      <a class="nav-link {{ request()->is('notification/home') ? 'active' : '' }}" href="/notification/home">
                           <i class="nav-icon fas fa-bell"></i>
                           <p class="ml-2">
                               Notifications
@@ -35,8 +32,7 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link {{ request()->is('promocodes/home') ? 'active' : '' }}"
-                          href="/promocodes/home">
+                      <a class="nav-link {{ request()->is('promocodes/home') ? 'active' : '' }}" href="/promocodes/home">
                           <i class="nav-icon fas fa-qrcode"></i>
                           <p class="ml-2">
                               Promo Codes
@@ -44,10 +40,8 @@
                       </a>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link {{ request()->is('/admin/referralcodes') ? 'active' : '' }}"
-                          href="{{ route('admin.referralcodes') }}">
+                      <a class="nav-link {{ request()->is('/admin/referralcodes') ? 'active' : '' }}" href="{{ route('admin.referralcodes') }}">
                           <i class="nav-icon fas fa-share-alt-square"></i>
-                          {{-- <i class="fas fa-share-alt-square"></i> --}}
                           <p class="ml-2">
                               Referrals
                           </p>
@@ -56,29 +50,27 @@
                   <li class="nav-item has-treeview">
                       <a href="#" class="nav-link ">
                           <i class="nav-icon fas fa-store-alt"></i>
-                          <p>
+                          <p class="ml-2">
                               Sellers
                               <i class="fas fa-angle-left right"></i>
                           </p>
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('admin.sellers.test.parent') }}"
-                                  class="nav-link @if (request()->is('admin/test/sellers/parent')) active @endif">
+                              <a href="{{ route('admin.sellers.parent') }}" class="nav-link @if (request()->is('admin/sellers/parent')) active @endif">
                                   <i class="fas fa-gears nav-icon"></i>
-                                  <p>Test Parent</p>
+                                  <p>Parent</p>
                               </a>
                           </li>
-                          <li class="nav-item">
+                          {{-- <li class="nav-item">
                               <a href="{{ route('admin.sellers.parent') }}"
                                   class="nav-link @if (request()->is('admin/sellers/parent')) active @endif">
                                   <i class="fas fa-gears nav-icon"></i>
                                   <p>Parent</p>
                               </a>
-                          </li>
+                          </li> --}}
                           <li class="nav-item">
-                              <a href="{{ route('admin.sellers.child') }}"
-                                  class="nav-link @if (request()->is('admin/sellers/child')) active @endif">
+                              <a href="{{ route('admin.sellers.child') }}" class="nav-link @if (request()->is('admin/sellers/child')) active @endif">
                                   <i class="fas fa-gears nav-icon"></i>
                                   <p>Child</p>
                               </a>
@@ -86,11 +78,9 @@
                       </ul>
                   </li>
                   <li class="nav-item">
-                      <a class="nav-link  {{ request()->is('customers') ? 'active' : '' }}" href="/customers">
+                      <a href="{{ route('admin.customers') }}" class="nav-link  @if (request()->is('admin/customers')) active @endif">
                           <i class="nav-icon fas fa-users-cog"></i>
-                          <p class="ml-2">
-                              Customers
-                          </p>
+                          <p class="ml-2"> Customers </p>
                       </a>
                   </li>
                   <li class="nav-item">
@@ -117,30 +107,26 @@
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="/aorders/verified"
-                                  class="nav-link @if (request()->is('aorders/verified')) active @endif">
+                              <a href="/aorders/verified" class="nav-link @if (request()->is('aorders/verified')) active @endif">
                                   <i class="fas fa-gears nav-icon"></i>
                                   <p>Verified</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="/aorders/unverified"
-                                  class="nav-link @if (request()->is('aorders/unverified')) active @endif">
+                              <a href="/aorders/unverified" class="nav-link @if (request()->is('aorders/unverified')) active @endif">
                                   <i class="fas fa-gears nav-icon"></i>
                                   <p>Unverified</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="/complete-orders"
-                                  class="nav-link @if (request()->is('complete-orders')) active @endif">
+                              <a href="/complete-orders" class="nav-link @if (request()->is('complete-orders')) active @endif">
                                   <i class="fas fa-money nav-icon"></i>
                                   <p>Completed</p>
                               </a>
                           </li>
                       </ul>
                   </li>
-                  <li
-                      class="nav-item has-treeview {{ request()->is('withdrawals-drivers') || request()->is('withdrawals') ? 'active' : '' }}">
+                  <li class="nav-item has-treeview {{ request()->is('withdrawals-drivers') || request()->is('withdrawals') ? 'active' : '' }}">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-money-bill-wave"></i>
                           <p>

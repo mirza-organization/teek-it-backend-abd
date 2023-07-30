@@ -11,7 +11,7 @@ return [
     |
     */
 
-    /* Success Contants */
+    /* Success Constants */
     'INSERTION_SUCCESS' => 'Data inserted successfully.',
     'UPDATION_SUCCESS' => 'Data updated successfully.',
     'ARCHIVED_SUCCESS' => 'Data archived successfully.',
@@ -26,8 +26,14 @@ return [
     'STUART_DELIVERY_SUCCESS' => 'Stuart Delivery Has Been Initiated Successfully, You Can Please Check The Status By Clicking The "Check Status" Button',
     'COMPLETED' => 'Completed',
     'VALID_REFERRAL' => 'Valid referral code.',
-   
-    /* Failure Contants */
+    'ORDER_ASSIGNED' => 'Assigned.',
+    'ORDER_UPDATED' => 'Updated.',
+    'VALID_PROMOCODE' => 'You have entered a valid promo code.',
+    'BANK_DETAILS_UPDATED' => 'Bank Account details are successfully updated.',
+    'VERIFICATION_SUCCESS' => 'Verification Successful.',
+    'CACHE_REMOVED_SUCCESSFULLY' => 'All Cached data of your App has been removed successfully.',
+    'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
+    /* Failure Constants */
     'INSERTION_FAILED' => 'Failed to insert data.',
     'UPDATION_FAILED' => 'Failed to update data.',
     'ARCHIVED_FAILED' => 'Failed to archive data.',
@@ -40,41 +46,27 @@ return [
     'INVALID_REFERRAL' => 'Invalid referral code.',
     'REFERRAL_CAN_BE_USED_ONCE' => 'Referral code can be used only once.',
     'REFERRALS_ARE_ONLY_FOR_FIRST_ORDER' => 'Sorry, you can only use a referral before placing your first order.',
-
     'VALIDATION_ERROR' => 'Validation Error.',
     'INVALID_CREDENTIALS' => 'Invalid Credentials.',
-
     'EMAIL_NOT_VERIFIED' => 'Email not verified, verify your email first.',
-
     'ACCOUNT_DEACTIVATED' => 'You are deactivated, kindly contact admin.',
-
     'NO_RECORD' => 'No Record Found.',
     'NO_SELLER' => 'No seller found against this id.',
     'NO_STORES_FOUND' => 'No stores found in this area.',
-
-    'ORDER_ASSIGNED' => 'Assigned.',
-    'ORDER_UPDATED' => 'Updated.',
     'ORDER_CANCELLED' => 'Cancelled.',
-
-    'VALID_PROMOCODE' => 'You have entered a valid promo code.',
     'INVALID_PROMOCODE' => 'Invalid promo code.',
     'EXPIRED_PROMOCODE' => 'This promo code has been expired.',
-
-    'BANK_DETAILS_UPDATED' => 'Bank Account details are successfully updated.',
-
     'MISSING_OR_INVALID_DATA' => 'Required fields missing or invalid data.',
-
-    'VERIFICATION_SUCCESS' => 'Verification Successful.',
     'VERIFICATION_FAILED' => 'You have entered a invalid verification code.',
-
     'ITEM_DELETED' => 'Data deleted successfully.',
-
     'MAX_LIMIT' => 'Promo code usage has reached its maximum limit.',
-
-    'WITHDRAWAL_REQUEST_SUBMITTED' => 'Withdrawal request is successfully submitted.',
-
     'DATA_ALREADY_EXISTS' => 'Data already exists against id:- ',
-
+    'CACHE_REMOVED_FAILED' => 'Sorry due to some issue your cahce can not be removed.',
+    /*
+    |--------------------------------------------------------------------------
+    | Digital Ocean Bucket
+    |--------------------------------------------------------------------------
+    */
     'BUCKET' => 'https://user-imgs.sgp1.digitaloceanspaces.com/',
     /*
     |--------------------------------------------------------------------------
@@ -94,10 +86,17 @@ return [
     'STUART_PRODUCTION_CLIENT_SECRET' => '0144e8a9978851e7005a5a3ef53cba22dc1b6102f49c7add5bb22dedf74c9ba2',
     'STUART_PRODUCTION_JOBS_URL' => 'https://api.stuart.com/v2/jobs',
     'STUART_PRODUCTION_TOKEN_URL' => 'https://api.stuart.com/oauth/token',
-
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Email
+    |--------------------------------------------------------------------------
+    */
     'ADMIN_EMAIL' => 'admin@teekit.co.uk',
-
-    'HTTP_SUCCESS_CODE' => 200,
+    /*
+    |--------------------------------------------------------------------------
+    | HTTP Status Codes
+    |--------------------------------------------------------------------------
+    */
     'HTTP_OK' => 200,
     'HTTP_SERVER_ERROR' => 500,
     'HTTP_INVALID_ARGUMETS' => 400,

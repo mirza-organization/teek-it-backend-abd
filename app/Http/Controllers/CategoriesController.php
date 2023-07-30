@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Categories;
+use App\Services\GoogleMap;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
 use App\Services\JsonResponseCustom;
+use Illuminate\Support\Facades\Cache;
 
 class CategoriesController extends Controller
 {
@@ -87,7 +89,10 @@ class CategoriesController extends Controller
             if (request()->has('store_id'))
                 $data =  Categories::getAllCategoriesByStoreId(request()->store_id);
             else
-                $data = Categories::allCategories();
+                $data = Cache::rememberForever('allCategories', function () {
+                    return Categories::allCategories();
+                });
+
             if (!empty($data)) {
                 return JsonResponseCustom::getApiResponse(
                     $data,
@@ -95,14 +100,13 @@ class CategoriesController extends Controller
                     '',
                     config('constants.HTTP_OK')
                 );
-            } else {
-                return JsonResponseCustom::getApiResponse(
-                    [],
-                    config('constants.FALSE_STATUS'),
-                    config('constants.NO_RECORD'),
-                    config('constants.HTTP_OK')
-                );
             }
+            return JsonResponseCustom::getApiResponse(
+                [],
+                config('constants.FALSE_STATUS'),
+                config('constants.NO_RECORD'),
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(
@@ -118,7 +122,7 @@ class CategoriesController extends Controller
      * @version 1.9.0
      */
     public function products(Request $request)
-     {
+    {
         try {
             $validate = Validator::make($request->route()->parameters(), [
                 'category_id' => 'required|integer',
@@ -183,22 +187,14 @@ class CategoriesController extends Controller
                     config('constants.HTTP_UNPROCESSABLE_REQUEST')
                 );
             }
-            $data = [];
-            $buyer_lat = $request->lat;
-            $buyer_lon = $request->lon;
-            $stores = Categories::stores($category_id);
-            foreach ($stores as $store) {
-                $result = (new UsersController())->getDistanceBetweenPoints($store->lat, $store->lon, $buyer_lat, $buyer_lon);
-                if (isset($result['distance']) && $result['distance'] < 5) $data[] = (new UsersController())->getSellerInfo($store, $result);
-            }
-            if (!empty($data)) {
-                return JsonResponseCustom::getApiResponse(
-                    $data,
-                    config('constants.TRUE_STATUS'),
-                    '',
-                    config('constants.HTTP_OK')
-                );
-            } else {
+            $stores = Cache::remember('get-stores-by-category' . $category_id, now()->addDay(), function () use ($category_id) {
+                return Categories::stores($category_id);
+            });
+            $pagination = $stores->toArray();
+            unset($pagination['data']);
+
+            $data = GoogleMap::findDistanceByMakingChunks($request, $stores, 25);
+            if (empty($data)) {
                 return JsonResponseCustom::getApiResponse(
                     [],
                     config('constants.FALSE_STATUS'),
@@ -206,6 +202,14 @@ class CategoriesController extends Controller
                     config('constants.HTTP_OK')
                 );
             }
+            return JsonResponseCustom::getApiResponseExtention(
+                $data,
+                config('constants.TRUE_STATUS'),
+                '',
+                'pagination',
+                $pagination,
+                config('constants.HTTP_OK')
+            );
         } catch (Throwable $error) {
             report($error);
             return JsonResponseCustom::getApiResponse(
