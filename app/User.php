@@ -290,7 +290,7 @@ class User extends Authenticatable implements JWTSubject
                 'roles' => $user->role()->pluck('name'),
                 'user_img' => $user->user_img,
                 'referral_code' => $user->referral_code,
-                'referral_relation_details' => [$user->referralRelations]
+                'referral_relation_details' => ($user->referralRelations) ? [$user->referralRelations] : null
             );
         }
         return null;
