@@ -3,13 +3,15 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Http\Request;
 
 class Drivers extends Authenticatable implements JWTSubject
 {
-    use Notifiable;
+    use Notifiable, SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
@@ -59,5 +61,28 @@ class Drivers extends Authenticatable implements JWTSubject
     public function role()
     {
         return $this->belongsTo('App\Role');
+    }
+    /**
+     * Relations
+     */
+    // 
+
+    /**
+     * Helpers
+     */
+    public static function getDrivers(string $search = '')
+    {
+        return Drivers::where('f_name', 'like', '%' . $search . '%')
+            ->orderBy('f_name', 'asc')
+            ->paginate(9);
+    }
+
+    public function adminDriversDel(Request $request)
+    {
+        for ($i = 0; $i < count($request->drivers); $i++) {
+            DB::table('drivers')->where('id', '=', $request->drivers[$i])->delete();
+            DB::table('driver_documents')->where('driver_id', '=', $request->drivers[$i])->delete();
+        }
+        return response("Drivers Deleted Successfully");
     }
 }

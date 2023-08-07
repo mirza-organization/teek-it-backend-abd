@@ -13,6 +13,7 @@ use App\Http\Controllers\QtyController;
 use App\Http\Controllers\StuartDeliveryController;
 use App\Http\Livewire\Admin\ChildSellersLivewire;
 use App\Http\Livewire\Admin\CustomersLivewire;
+use App\Http\Livewire\Admin\DriversLivewire;
 use App\Http\Livewire\Sellers\Settings\UserGeneralSettings;
 use Illuminate\Support\Facades\Route;
 /*
@@ -128,6 +129,8 @@ Route::prefix('admin')->group(function () {
     Route::get('/sellers/parent', ParentSellersLiveWire::class)->name('admin.sellers.parent');
     Route::get('/sellers/child', ChildSellersLivewire::class)->name('admin.sellers.child');
     Route::get('/customers', CustomersLivewire::class)->name('admin.customers');
+    Route::get('/drivers', DriversLivewire::class)->name('admin.test.drivers');
+    Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');
 });
 Route::get('/notification/home', [NotificationsController::class, 'notificationHome'])->name('admin.notification.home');
 Route::post('/notification/send', [NotificationsController::class, 'notificationSend'])->name('admin.notification.send');
@@ -158,7 +161,7 @@ Route::get('/store/application-fee/{user_id}/{application_fee}', [UserAndRoleCon
 Route::post('/update_pages', [HomeController::class, 'updatePages'])->name('update_pages');
 Route::get('/users/{user_id}/status/{status}', [HomeController::class, 'changeUserStatus'])->name('change_user_status');
 Route::get('/users_del', [HomeController::class, 'adminUsersDel'])->name('admin.del.users');
-Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');
+// Route::get('/drivers_del', [HomeController::class, 'adminDriversDel'])->name('admin.del.drivers');
 Route::post('/store_info/update', [HomeController::class, 'updateStoreInfo'])->name('admin.image.update');
 Route::post('/stuart/job/creation/', [StuartDeliveryController::class, 'stuartJobCreation'])->name('stuart.job.creation');
 Route::post('/stuart/job/status', [StuartDeliveryController::class, 'stuartJobStatus'])->name('stuart.job.status');

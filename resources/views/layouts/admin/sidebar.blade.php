@@ -91,6 +91,14 @@
                           </p>
                       </a>
                   </li>
+                  <li class="nav-item">
+                      <a href="{{ route('admin.test.drivers') }}" class="nav-link @if (request()->is('admin/drivers')) active @endif">
+                          <i class="nav-icon fas fa-biking"></i>
+                          <p class="ml-2">
+                              Test Drivers
+                          </p>
+                      </a>
+                  </li>
                   <li class="nav-item has-treeview">
                       <a href="#" class="nav-link ">
                           <i class="nav-icon fas fa-luggage-cart"></i>
