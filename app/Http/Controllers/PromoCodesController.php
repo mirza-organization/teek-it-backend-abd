@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PromoCodeHelpers;
 use App\Models\PromoCodesUsageLimit;
 use App\Orders;
 use App\PromoCodes;
@@ -127,23 +128,6 @@ class PromoCodesController extends Controller
         }
     }
     /**
-     * function will check if promo code belongs to a specific store
-     */
-    public function ifPromoCodeBelongsToStore($promo_code_data)
-    {
-        $store = User::where('id', $promo_code_data->store_id)->first();
-        if (empty($store)) {
-            return false;
-        } else {
-            $data = [
-                'id' => $store->id,
-                'name' => $store->business_name,
-                'discount' => $promo_code_data->discount,
-            ];
-            return $data;
-        }
-    }
-    /**
      * function will return all promocodes from table
      */
     public function allPromocodes()
@@ -192,7 +176,7 @@ class PromoCodesController extends Controller
                     'message' => $validatedData->errors()
                 ], 422);
             }
-            $promocodes_count = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->count();
+            $promocodes_count = PromoCodes::where('promo_code', '=', $request->promo_code)->count();
             if ($promocodes_count == 1) {
                 $expiry_dt = PromoCodes::where('promo_code', '=', $request->promo_code)->pluck('expiry_dt')->first();
                 $current_date = date('Y-m-d');
@@ -203,7 +187,7 @@ class PromoCodesController extends Controller
                         'message' =>  config('constants.EXPIRED_PROMOCODE')
                     ], 200);
                 } else {
-                    $promo_codes = PromoCodes::query()->where('promo_code', '=', $request->promo_code)->get();
+                    $promo_codes = PromoCodes::where('promo_code', '=', $request->promo_code)->get();
                     if (empty($promo_codes[0]->store_id)) $promo_codes[0]->store_id = NULL;
                     //below query will pass required data to our helper functions down below to validate
                     $promo_code_data = PromoCodes::where('promo_code', $request->promo_code)->first(['id', 'usage_limit', 'store_id', 'discount']);
@@ -212,25 +196,9 @@ class PromoCodesController extends Controller
                      * Promo code is only valid for a specific order#
                      */
                     if (!empty($promo_codes[0]->order_number)) {
-                        $user_orders_count = Orders::query()->where('user_id', '=', $request->user_id)->count();
+                        $user_orders_count = Orders::where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
-                            if (!empty($promo_code_data->usage_limit)) {
-                                if (PromoCodesUsageLimit::promoCodeUsageLimit($promo_code_data, $request->user_id) == 1) {
-                                    $data[0]['promo_code'] = $promo_codes[0];
-                                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
-                                    return response()->json([
-                                        'data' => $data,
-                                        'status' => true,
-                                        'message' => config('constants.VALID_PROMOCODE')
-                                    ], 200);
-                                } else {
-                                    return response()->json([
-                                        'data' => [],
-                                        'status' => false,
-                                        'message' => config('constants.MAX_LIMIT')
-                                    ], 200);
-                                }
-                            }
+                            if (!empty($promo_code_data->usage_limit)) return PromoCodeHelpers::checkUsageLimit($promo_codes, $promo_code_data, $request);
                         } else {
                             return response()->json([
                                 'data' => [],
@@ -239,27 +207,16 @@ class PromoCodesController extends Controller
                             ], 200);
                         }
                     }
-                     /**
+                    /**
                      * If the Promo code does not belongs to a specific order# 
                      * Still we have to validate it's usage limit 
                      */
-                    if (PromoCodesUsageLimit::promoCodeUsageLimit($promo_code_data, $request->user_id) == 1) {
-                        $data[0]['promo_code'] = $promo_codes[0];
-                        $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
-                        return response()->json([
-                            'data' => $data,
-                            'status' => true,
-                            'message' => config('constants.VALID_PROMOCODE')
-                        ], 200);
-                    } else {
-                        return response()->json([
-                            'data' => [],
-                            'status' => false,
-                            'message' => config('constants.MAX_LIMIT')
-                        ], 200);
-                    }
+                    if (!empty($promo_code_data->usage_limit))
+                        return PromoCodeHelpers::checkUsageLimit($promo_codes, $promo_code_data, $request);
+
                     $data[0]['promo_code'] = $promo_codes[0];
-                    $data[1]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+                    $store_data = PromoCodeHelpers::ifPromoCodeBelongsToStore($promo_code_data);
+                    $data[1]['store'] = ($store_data) ? ($store_data) : (NULL);
                     return response()->json([
                         'data' => $data,
                         'status' => true,
@@ -324,8 +281,9 @@ class PromoCodesController extends Controller
                         $user_orders_count = Orders::where('user_id', '=', $request->user_id)->count();
                         if ($promo_codes[0]->order_number == $user_orders_count + 1) {
                             $data[0]['promo_code'] = $promo_codes[0];
-                            $data[1]['promo_codes_usage_limit'] = PromoCodesUsageLimit::promoCodeTotalUsedByUser($request->user_id, $promo_codes[0]->id);
-                            $data[2]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+                            $data[1]['promo_codes_usage_limit'] = ($promo_codes[0]->usage_limit) ? PromoCodesUsageLimit::promoCodeTotalUsedByUser($request->user_id, $promo_codes[0]->id) : null;
+                            $store_data = PromoCodeHelpers::ifPromoCodeBelongsToStore($promo_code_data);
+                            $data[2]['store'] = ($store_data) ? ($store_data) : (NULL);
                             return response()->json([
                                 'data' => $data,
                                 'status' => true,
@@ -340,8 +298,9 @@ class PromoCodesController extends Controller
                         }
                     }
                     $data[0]['promo_code'] = $promo_codes[0];
-                    $data[1]['promo_codes_usage_limit'] = PromoCodesUsageLimit::promoCodeTotalUsedByUser($request->user_id, $promo_codes[0]->id);
-                    $data[2]['store'] = ($this->ifPromoCodeBelongsToStore($promo_code_data)) ? ($this->ifPromoCodeBelongsToStore($promo_code_data)) : (NULL);
+                    $data[1]['promo_codes_usage_limit'] = ($promo_codes[0]->usage_limit) ? PromoCodesUsageLimit::promoCodeTotalUsedByUser($request->user_id, $promo_codes[0]->id) : null;
+                    $store_data = PromoCodeHelpers::ifPromoCodeBelongsToStore($promo_code_data);
+                    $data[2]['store'] = ($store_data) ? ($store_data) : (NULL);
                     return response()->json([
                         'data' => $data,
                         'status' => true,
