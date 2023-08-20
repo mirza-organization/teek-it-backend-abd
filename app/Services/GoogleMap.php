@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 
-class GoogleMap
+final class GoogleMap
 {
     // Sending Multiple requests to Google Matrix at a time
     public static function getDistanceForMultipleDestinations(float $origin_lat, float $origin_lon, array $destinations, int $miles)

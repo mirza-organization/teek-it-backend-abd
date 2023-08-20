@@ -2,12 +2,14 @@
 
 namespace App;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Services\ImageManipulation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class Drivers extends Authenticatable implements JWTSubject
 {
@@ -58,18 +60,46 @@ class Drivers extends Authenticatable implements JWTSubject
     {
         return [];
     }
+    /**
+     * Relations
+     */
     public function role()
     {
         return $this->belongsTo('App\Role');
     }
     /**
-     * Relations
-     */
-    // 
-
-    /**
      * Helpers
      */
+    public static function add(object $request)
+    {
+        return Drivers::create([
+            'f_name' => $request->f_name,
+            'l_name' => $request->l_name,
+            'email' => $request->email,
+            'phone' => '+44' . $request->phone,
+            'password' => Hash::make($request->password),
+            'vehicle_type' => $request->vehicle_type,
+            'vehicle_number' => $request->vehicle_number,
+            'area' => $request->area,
+            'lat' => $request->lat,
+            'lon' => $request->lon,
+            'account_holders_name' => $request->account_holders_name,
+            'bank_name' => $request->bank_name,
+            'sort_code' => $request->sort_code,
+            'account_number' => $request->account_number,
+            'driving_licence_name' => $request->driving_licence_name,
+            'dob' => $request->dob,
+            'driving_licence_number' => $request->driving_licence_number
+        ]);
+    }
+
+    public static function addImg(object $driver, object $request, string $img_key_name)
+    {
+        $driver->profile_img = ImageManipulation::uploadImg($request, $img_key_name, $driver->id);
+        $driver->save();
+        return $driver;
+    }
+
     public static function getDrivers(string $search = '')
     {
         return Drivers::where('f_name', 'like', '%' . $search . '%')
@@ -80,8 +110,8 @@ class Drivers extends Authenticatable implements JWTSubject
     public function adminDriversDel(Request $request)
     {
         for ($i = 0; $i < count($request->drivers); $i++) {
-            DB::table('drivers')->where('id', '=', $request->drivers[$i])->delete();
-            DB::table('driver_documents')->where('driver_id', '=', $request->drivers[$i])->delete();
+            Drivers::where('id', '=', $request->drivers[$i])->delete();
+            DriverDocuments::where('driver_id', '=', $request->drivers[$i])->delete();
         }
         return response("Drivers Deleted Successfully");
     }

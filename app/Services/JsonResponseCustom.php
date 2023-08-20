@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class JsonResponseCustom
+final class JsonResponseCustom
 {
     public static function getApiResponse($data, $status, $message, $http_code)
     {

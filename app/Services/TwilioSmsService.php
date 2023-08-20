@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Twilio\Rest\Client;
 
-class TwilioSmsService
+final class TwilioSmsService
 {
 
     private $sid;

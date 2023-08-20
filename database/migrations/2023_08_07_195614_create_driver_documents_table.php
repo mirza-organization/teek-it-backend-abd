@@ -18,7 +18,7 @@ class CreateDriverDocumentsTable extends Migration
             $table->unsignedBigInteger('driver_id');
            // $table->foreign('driver_id')->references('id')->on('drivers')->onDelete('cascade');
             $table->text('front_img');
-            $table->text('back_image');       
+            $table->text('back_img');       
             $table->timestamps();
             $table->softDeletes();
         });

@@ -1,7 +1,12 @@
 <?php
 
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
+use QtySeeder;
+use Database\Seeders\ReferralCodeRelationSeeder;
+use App\Database\Seeders\DriverSeeder;
+use Database\Seeders\DriverDocumentsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,7 +18,10 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            ReferralCodeRelationSeeder::class
+            QtySeeder::class,
+            ReferralCodeRelationSeeder::class,
+            DriverSeeder::class,
+            DriverDocumentsSeeder::class
         ]);
     }
 }
